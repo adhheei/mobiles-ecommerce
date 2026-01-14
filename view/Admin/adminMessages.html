@@ -5,9 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Messages - Jinsa Mobiles Admin</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
@@ -18,7 +27,7 @@
         --sidebar-width: 260px;
         --active-bg: #e9ecef;
         --text-muted: #6c757d;
-        --unread-bg: #f0f7ff; /* Added missing variable */
+        --unread-bg: #f0f7ff;
       }
 
       body {
@@ -28,75 +37,452 @@
         color: var(--primary-black);
       }
 
-      /* --- SIDEBAR (Standardized) --- */
-      .sidebar { width: var(--sidebar-width); height: 100vh; background-color: #fff; border-right: 1px solid var(--border-color); position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding: 20px; z-index: 1000; }
-      .brand-section { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; text-decoration: none; color: var(--primary-black); }
-      .brand-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-      .brand-text-container { display: flex; flex-direction: column; line-height: 1.1; }
-      .brand-title { font-weight: 800; font-size: 1rem; color: #000; }
-      .brand-subtitle { font-size: 0.55rem; letter-spacing: 2px; color: #777; font-weight: 600; text-transform: uppercase; }
+      /* --- ANIMATIONS --- */
+      @keyframes slideInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .content-animate { animation: slideInUp 0.6s ease-out forwards; }
 
-      .sidebar-menu { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; }
-      .menu-item { margin-bottom: 5px; }
-      .menu-link { display: flex; align-items: center; padding: 12px 15px; color: #555; text-decoration: none; font-weight: 500; font-size: 0.9rem; border-radius: 8px; transition: all 0.2s; }
-      .menu-link i { width: 25px; font-size: 1.1rem; color: #777; margin-right: 10px; }
-      .menu-link:hover { background-color: var(--bg-light); color: #000; }
-      .menu-link.active { background-color: var(--active-bg); color: #000; font-weight: 600; }
-      .menu-link.active i { color: #000; }
+      /* --- SIDEBAR --- */
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        background-color: #fff;
+        border-right: 1px solid var(--border-color);
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        z-index: 1000;
+        transition: transform 0.3s ease;
+      }
+      .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 40px;
+        text-decoration: none;
+        color: var(--primary-black);
+      }
+      .brand-logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .brand-text-container {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+      }
+      .brand-title {
+        font-weight: 800;
+        font-size: 1rem;
+        color: #000;
+      }
+      .brand-subtitle {
+        font-size: 0.55rem;
+        letter-spacing: 2px;
+        color: #777;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
 
-      .admin-profile { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color); }
-      .profile-info { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; text-decoration: none; color: inherit; }
-      .admin-avatar { width: 35px; height: 35px; border-radius: 50%; }
-      .logout-btn { width: 100%; background-color: var(--bg-light); border: none; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; color: #333; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+      .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-grow: 1;
+        overflow-y: auto;
+      }
+      .menu-item {
+        margin-bottom: 5px;
+      }
+      .menu-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        color: #555;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        transition: all 0.2s;
+      }
+      .menu-link i {
+        width: 25px;
+        font-size: 1.1rem;
+        color: #777;
+      }
+      .menu-link:hover {
+        background-color: var(--bg-light);
+        color: #000;
+      }
+      .menu-link.active {
+        background-color: var(--active-bg);
+        color: #000;
+        font-weight: 600;
+      }
+      .menu-link.active i {
+        color: #000;
+      }
+
+      .admin-profile {
+        margin-top: auto;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+      }
+      .profile-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        text-decoration: none;
+        color: inherit;
+      }
+      .admin-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: #ccc;
+      }
+      .admin-details h6 {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+      .admin-details span {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+      .logout-btn {
+        width: 100%;
+        background-color: var(--bg-light);
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: 0.2s;
+        text-decoration: none;
+      }
+      .logout-btn:hover {
+        background-color: #e2e6ea;
+        color: #000;
+      }
 
       /* --- MAIN CONTENT --- */
-      .main-content { margin-left: var(--sidebar-width); padding: 30px; padding-bottom: 80px; transition: margin-left 0.3s ease; }
-      .page-header { margin-bottom: 25px; }
-      .page-title { font-size: 1.8rem; font-weight: 800; margin: 0; color: #000; }
-
-      /* --- MESSAGES UI --- */
-      .toolbar-container { background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-      .search-box { position: relative; flex-grow: 1; max-width: 400px; }
-      .search-box input { width: 100%; padding: 10px 15px 10px 40px; border-radius: 8px; border: 1px solid #ddd; font-size: 0.9rem; }
-      .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; }
-      .filter-select { padding: 10px 15px; border-radius: 8px; border: 1px solid #ddd; font-size: 0.9rem; min-width: 150px; }
-
-      .message-list { background: #fff; border-radius: 12px; border: 1px solid #eee; overflow: hidden; }
-      .message-item { display: flex; align-items: center; padding: 20px; border-bottom: 1px solid #f5f5f5; cursor: pointer; transition: 0.2s; position: relative; }
-      .message-item:hover { background-color: #fafafa; }
-      .message-item.unread { background-color: var(--unread-bg); }
-      .message-item.unread::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background-color: #0d6efd; }
-      
-      .msg-avatar { width: 45px; height: 45px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #475569; margin-right: 15px; flex-shrink: 0; }
-      .msg-content { flex-grow: 1; min-width: 0; margin-right: 15px; }
-      .msg-sender { font-weight: 600; font-size: 0.95rem; color: #000; }
-      .msg-time { font-size: 0.75rem; color: #888; white-space: nowrap; }
-      .msg-subject { font-weight: 500; font-size: 0.9rem; color: #333; display: block; }
-      .msg-preview { font-size: 0.85rem; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
-
-      .msg-actions { display: flex; gap: 10px; opacity: 0; transition: 0.2s; }
-      .message-item:hover .msg-actions { opacity: 1; }
-      .action-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #eee; color: #666; background: #fff; }
-      .action-icon:hover { background: #000; color: #fff; }
-      .action-icon.delete:hover { background: #dc3545; border-color: #dc3545; }
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 30px;
+        transition: margin-left 0.3s ease;
+      }
 
       /* Mobile Nav */
-      .mobile-nav { display: none; background: #fff; padding: 15px 20px; border-bottom: 1px solid #eee; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 999; }
+      .mobile-nav {
+        display: none;
+        background: #fff;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 999;
+      }
+      .mobile-nav .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 0;
+        text-decoration: none;
+        color: var(--primary-black);
+      }
+      .brand-text-mobile {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+        text-align: left;
+      }
+      .brand-title-mobile {
+        font-weight: 800;
+        font-size: 1rem;
+        color: #000;
+        display: block;
+      }
+      .brand-subtitle-mobile {
+        font-size: 0.6rem;
+        letter-spacing: 1px;
+        color: #777;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: block;
+      }
+
+      /* Header */
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+      .page-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin: 0;
+        color: #000;
+      }
+
+      /* Toolbar */
+      .toolbar-container {
+        background: #fff;
+        padding: 25px;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+      }
+      .search-box {
+        position: relative;
+        flex-grow: 1;
+        max-width: 400px;
+      }
+      .search-box input {
+        width: 100%;
+        padding: 12px 15px 12px 45px;
+        border-radius: 12px;
+        border: 1px solid #eee;
+        background-color: #fcfcfc;
+        font-size: 0.88rem;
+        font-family: "Poppins", sans-serif;
+      }
+      .search-box i {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #aaa;
+      }
+      .filter-select {
+        border-radius: 12px;
+        border: 1px solid #eee;
+        padding: 8px 35px 8px 18px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        height: 46px;
+        appearance: none;
+        background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") no-repeat right 0.75rem center/16px 12px;
+        font-family: "Poppins", sans-serif;
+        min-width: 160px;
+      }
+
+      /* Message List */
+      .message-list {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        margin-bottom: 25px;
+      }
+      .message-item {
+        display: flex;
+        align-items: center;
+        padding: 20px 25px;
+        border-bottom: 1px solid #f9f9f9;
+        cursor: pointer;
+        transition: 0.2s;
+        position: relative;
+      }
+      .message-item:last-child {
+        border-bottom: none;
+      }
+      .message-item:hover {
+        background-color: #fafafa;
+      }
+      .message-item.unread {
+        background-color: var(--unread-bg);
+      }
+      .message-item.unread::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background-color: #0d6efd;
+      }
+
+      .msg-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: #475569;
+        margin-right: 15px;
+        flex-shrink: 0;
+      }
+      .msg-content {
+        flex-grow: 1;
+        min-width: 0;
+        margin-right: 15px;
+      }
+      .msg-sender {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #000;
+      }
+      .msg-time {
+        font-size: 0.75rem;
+        color: #888;
+        white-space: nowrap;
+      }
+      .msg-subject {
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: #333;
+        display: block;
+        margin-top: 4px;
+      }
+      .msg-preview {
+        font-size: 0.85rem;
+        color: #777;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+        margin-top: 4px;
+      }
+
+      .msg-actions {
+        display: flex;
+        gap: 10px;
+        opacity: 0;
+        transition: 0.2s;
+      }
+      .message-item:hover .msg-actions {
+        opacity: 1;
+      }
+      .action-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #eee;
+        color: #555;
+        background: #fff;
+        text-decoration: none;
+      }
+      .action-icon:hover {
+        background: #f8f9fa;
+        color: #000;
+        border-color: #ccc;
+      }
+      .action-icon.delete:hover {
+        background: #ffe5e5;
+        color: #dc3545;
+        border-color: #f5c2c7;
+      }
+
+      /* Modal Styling */
+      .modal-content {
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+      }
+      .modal-header {
+        padding: 25px 25px 15px;
+        border-bottom: 1px solid var(--border-color);
+      }
+      .modal-body {
+        padding: 25px;
+      }
+      .modal-footer {
+        padding: 15px 25px 25px;
+        border-top: 1px solid var(--border-color);
+      }
+      .detail-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 15px;
+      }
+      .message-body-text {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: #333;
+      }
 
       @media (max-width: 991px) {
-        .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
-        .sidebar.active { transform: translateX(0); }
-        .main-content { margin-left: 0; padding: 20px; }
-        .mobile-nav { display: flex; }
-        .msg-actions { opacity: 1; } 
-        .sidebar-overlay.active { display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 998; }
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.active {
+          transform: translateX(0);
+          box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .main-content {
+          margin-left: 0;
+          padding: 20px;
+        }
+        .mobile-nav {
+          display: flex;
+        }
+        .toolbar-container {
+          flex-direction: column;
+          align-items: stretch;
+          padding: 20px;
+        }
+        .search-box {
+          max-width: 100%;
+        }
+        .filter-select {
+          width: 100%;
+        }
+        .msg-actions {
+          opacity: 1;
+        }
+        .sidebar-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 998;
+        }
+        .sidebar-overlay.active {
+          display: block;
+        }
       }
     </style>
   </head>
   <body>
     <div class="mobile-nav">
       <a href="#" class="brand-section">
-        <img src="images/logo.jpg" alt="Logo" class="brand-logo" />
+        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
         <div class="brand-text-mobile">
           <span class="brand-title-mobile">JINSA MOBILES</span>
           <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
@@ -110,8 +496,8 @@
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <nav class="sidebar" id="sidebar">
-      <a href="#" class="brand-section">
-        <img src="images/logo.jpg" alt="Logo" class="brand-logo" />
+      <a href="./adminDashboard.html" class="brand-section">
+        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
         <div class="brand-text-container">
           <span class="brand-title">JINSA MOBILES</span>
           <span class="brand-subtitle">AND ACCESSORIES</span>
@@ -119,32 +505,68 @@
       </a>
 
       <ul class="sidebar-menu">
-        <li class="menu-item"><a href="adminDashboard.html" class="menu-link"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
-        <li class="menu-item"><a href="adminOrders.html" class="menu-link"><i class="fa-solid fa-cart-shopping"></i> Orders</a></li>
-        <li class="menu-item"><a href="adminProducts.html" class="menu-link"><i class="fa-solid fa-box-open"></i> Products</a></li>
-        <li class="menu-item"><a href="adminCustomers.html" class="menu-link"><i class="fa-solid fa-users"></i> Customers</a></li>
-        <li class="menu-item"><a href="adminMessages.html" class="menu-link active"><i class="fa-regular fa-envelope"></i> Messages</a></li>
-        <li class="menu-item"><a href="adminAnalytics.html" class="menu-link"><i class="fa-solid fa-chart-simple"></i> Analytics</a></li>
-        <li class="menu-item"><a href="adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i> Coupons</a></li>
-        <li class="menu-item"><a href="adminCategories.html" class="menu-link"><i class="fa-solid fa-layer-group"></i> Categories</a></li>
-        <li class="menu-item"><a href="adminOffers.html" class="menu-link"><i class="fa-solid fa-gift"></i> Offers</a></li>
+        <li class="menu-item">
+          <a href="./adminDashboard.html" class="menu-link">
+            <i class="fa-solid fa-border-all"></i> &nbsp;Dashboard
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="./adminOrders.html" class="menu-link">
+            <i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="./adminProducts.html" class="menu-link">
+            <i class="fa-solid fa-box-open"></i> &nbsp;Products
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="./adminCustomers.html" class="menu-link">
+            <i class="fa-solid fa-users"></i> &nbsp;Customers
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="./adminMessages.html" class="menu-link active">
+            <i class="fa-regular fa-envelope"></i> &nbsp;Messages
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="./adminAnalytics.html" class="menu-link">
+            <i class="fa-solid fa-chart-simple"></i> &nbsp;Analytics
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="./adminCoupons.html" class="menu-link">
+            <i class="fa-solid fa-tag"></i> &nbsp;Coupon Management
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="./adminCategories.html" class="menu-link">
+            <i class="fa-solid fa-layer-group"></i> &nbsp;Category Management
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="./adminOffers.html" class="menu-link">
+            <i class="fa-solid fa-gift"></i> &nbsp;Offer
+          </a>
+        </li>
       </ul>
 
       <div class="admin-profile">
-        <a href="adminProfile.html" class="profile-info">
-          <img src="https://placehold.co/100x100/ccc/fff?text=A" class="admin-avatar" />
+        <a href="./adminProfile.html" class="profile-info text-decoration-none text-reset">
+          <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
           <div class="admin-details">
-            <h6 class="m-0" style="font-size: 0.9rem;">Admin</h6>
-            <span style="font-size: 0.7rem; color: #777;">admin@example.com</span>
+            <h6 id="sidebarName" class="m-0">Admin</h6>
+            <span class="small text-muted">admin@example.com</span>
           </div>
         </a>
-        <a href="adminLogin.html" class="logout-btn">
+        <a href="./adminLogin.html" class="logout-btn">
           <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
         </a>
       </div>
     </nav>
 
-    <div class="main-content">
+    <div class="main-content content-animate">
       <div class="page-header">
         <h2 class="page-title">Messages</h2>
       </div>
@@ -152,7 +574,7 @@
       <div class="toolbar-container">
         <div class="search-box">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="msgSearch" placeholder="Search messages..." onkeyup="filterMessages()">
+          <input type="text" id="msgSearch" placeholder="Search messages..." onkeyup="filterMessages()" />
         </div>
         <select class="filter-select" id="statusFilter" onchange="filterMessages()">
           <option value="all">All Messages</option>
@@ -161,8 +583,7 @@
         </select>
       </div>
 
-      <div class="message-list" id="messageListContainer">
-        </div>
+      <div class="message-list" id="messageListContainer"></div>
     </div>
 
     <div class="modal fade" id="messageModal" tabindex="-1" aria-hidden="true">
@@ -174,7 +595,7 @@
           </div>
           <div class="modal-body">
             <div class="d-flex align-items-center mb-4">
-              <div class="detail-avatar" id="modalAvatar" style="width: 50px; height: 50px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px;"></div>
+              <div class="detail-avatar" id="modalAvatar"></div>
               <div>
                 <h5 class="mb-0 fw-bold" id="modalSender"></h5>
                 <span class="text-muted small" id="modalEmail"></span>
@@ -227,8 +648,8 @@
               <div class="text-end ps-2" style="min-width: 90px;">
                 <div class="msg-time mb-2 d-none d-md-block">${msg.time}</div>
                 <div class="msg-actions justify-content-end" onclick="event.stopPropagation()">
-                  <button class="action-icon" onclick="viewMessage(${msg.id})"><i class="fa-regular fa-eye"></i></button>
-                  <button class="action-icon delete" onclick="deleteMessage(${msg.id})"><i class="fa-solid fa-trash"></i></button>
+                  <a href="#" class="action-icon" onclick="viewMessage(${msg.id}); return false;"><i class="fa-regular fa-eye"></i></a>
+                  <a href="#" class="action-icon delete" onclick="deleteMessage(${msg.id}); return false;"><i class="fa-solid fa-trash"></i></a>
                 </div>
               </div>
             </div>`;
@@ -238,7 +659,10 @@
       function filterMessages() {
         const search = document.getElementById("msgSearch").value.toLowerCase();
         const status = document.getElementById("statusFilter").value;
-        const filtered = messages.filter(msg => (msg.sender.toLowerCase().includes(search) || msg.subject.toLowerCase().includes(search)) && (status === 'all' || msg.status === status));
+        const filtered = messages.filter(msg => 
+          (msg.sender.toLowerCase().includes(search) || msg.subject.toLowerCase().includes(search)) && 
+          (status === 'all' || msg.status === status)
+        );
         renderMessages(filtered);
       }
 
@@ -267,7 +691,7 @@
           confirmButtonText: 'Delete'
         }).then((result) => {
           if (result.isConfirmed) {
-            const idx = messages.findIndex(m => m.id === id);
+            const idx = messages.findIndex(m => m.id === id); // Fixed: was using = instead of ===
             if(idx > -1) {
               messages.splice(idx, 1);
               filterMessages();

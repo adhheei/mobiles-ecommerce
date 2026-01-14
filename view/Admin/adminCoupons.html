@@ -37,93 +37,478 @@
       }
 
       /* --- ANIMATIONS --- */
-      .reveal-up { opacity: 0; transform: translateY(30px); animation: revealUp 0.8s ease-out forwards; }
-      @keyframes revealUp { to { opacity: 1; transform: translateY(0); } }
-      .pop-in { opacity: 0; transform: scale(0.5); animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; animation-delay: 0.2s; }
-      @keyframes popIn { to { opacity: 1; transform: scale(1); } }
+      @keyframes slideInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .content-animate { animation: slideInUp 0.6s ease-out forwards; }
 
       /* --- SIDEBAR --- */
-      .sidebar { width: var(--sidebar-width); height: 100vh; background-color: #fff; border-right: 1px solid var(--border-color); position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding: 20px; z-index: 1000; transition: transform 0.3s ease; }
-      .brand-section { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; text-decoration: none; color: var(--primary-black); }
-      .brand-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-      .brand-text-container { display: flex; flex-direction: column; line-height: 1.1; }
-      .brand-title { font-weight: 800; font-size: 1rem; color: #000; }
-      .brand-subtitle { font-size: 0.55rem; letter-spacing: 2px; color: #777; font-weight: 600; text-transform: uppercase; }
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        background-color: #fff;
+        border-right: 1px solid var(--border-color);
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        z-index: 1000;
+        transition: transform 0.3s ease;
+      }
+      .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 40px;
+        text-decoration: none;
+        color: var(--primary-black);
+      }
+      .brand-logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .brand-text-container {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+      }
+      .brand-title {
+        font-weight: 800;
+        font-size: 1rem;
+        color: #000;
+      }
+      .brand-subtitle {
+        font-size: 0.55rem;
+        letter-spacing: 2px;
+        color: #777;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
       
-      .sidebar-menu { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; }
-      .menu-item { margin-bottom: 5px; }
-      .menu-link { display: flex; align-items: center; padding: 12px 15px; color: #555; text-decoration: none; font-weight: 500; font-size: 0.9rem; border-radius: 8px; transition: all 0.2s; }
-      .menu-link i { width: 25px; font-size: 1.1rem; color: #777; margin-right: 10px; }
-      .menu-link:hover { background-color: var(--bg-light); color: #000; }
-      .menu-link.active { background-color: var(--active-bg); color: #000; font-weight: 600; }
-      .menu-link.active i { color: #000; }
+      .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-grow: 1;
+        overflow-y: auto;
+      }
+      .menu-item {
+        margin-bottom: 5px;
+      }
+      .menu-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        color: #555;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        transition: all 0.2s;
+      }
+      .menu-link i {
+        width: 25px;
+        font-size: 1.1rem;
+        color: #777;
+      }
+      .menu-link:hover {
+        background-color: var(--bg-light);
+        color: #000;
+      }
+      .menu-link.active {
+        background-color: var(--active-bg);
+        color: #000;
+        font-weight: 600;
+      }
+      .menu-link.active i {
+        color: #000;
+      }
 
-      .admin-profile { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color); }
-      .profile-info { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; text-decoration: none; color: inherit; }
-      .admin-avatar { width: 35px; height: 35px; border-radius: 50%; background: #ccc; }
-      .admin-details h6 { margin: 0; font-size: 0.9rem; font-weight: 600; }
-      .admin-details span { font-size: 0.75rem; color: var(--text-muted); }
-      .logout-btn { width: 100%; background-color: var(--bg-light); border: none; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; color: #333; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; text-decoration: none; }
-      .logout-btn:hover { background-color: #e2e6ea; color: #000; }
+      .admin-profile {
+        margin-top: auto;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+      }
+      .profile-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        text-decoration: none;
+        color: inherit;
+      }
+      .admin-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: #ccc;
+      }
+      .admin-details h6 {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+      .admin-details span {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+      .logout-btn {
+        width: 100%;
+        background-color: var(--bg-light);
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: 0.2s;
+        text-decoration: none;
+      }
+      .logout-btn:hover {
+        background-color: #e2e6ea;
+        color: #000;
+      }
 
       /* --- MAIN CONTENT --- */
-      .main-content { margin-left: var(--sidebar-width); padding: 30px; padding-bottom: 80px; transition: margin-left 0.3s ease; }
-      .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-      .page-title { font-size: 1.8rem; font-weight: 800; margin: 0; color: #000; }
-      
-      .btn-add-new { background-color: #000; color: #fff; padding: 10px 20px; border-radius: 30px; font-weight: 600; font-size: 0.9rem; border: none; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; text-decoration: none; }
-      .btn-add-new:hover { background-color: #333; color: #fff; }
-
-      /* Toolbar */
-      .table-toolbar { background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 20px; }
-      .search-box { position: relative; flex-grow: 1; max-width: 300px; }
-      .search-box input { width: 100%; padding: 10px 15px 10px 40px; border-radius: 8px; border: 1px solid #ddd; font-size: 0.9rem; }
-      .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; }
-
-      /* Table Card */
-      .table-card { background: #fff; border-radius: 12px; border: 1px solid #eee; overflow: hidden; }
-      .table { margin-bottom: 0; width: 100%; }
-      .table thead th { background-color: #f8f9fa; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; color: #888; border-bottom: 1px solid #eee; padding: 15px; }
-      .table tbody td { padding: 15px; vertical-align: middle; font-size: 0.9rem; color: #333; border-bottom: 1px solid #eee; }
-
-      /* Coupon Code Style */
-      .coupon-code { font-family: monospace; font-weight: 700; background: #e9ecef; padding: 5px 10px; border-radius: 6px; letter-spacing: 1px; color: #333; display: inline-flex; align-items: center; gap: 8px; }
-      .copy-icon { cursor: pointer; color: #999; font-size: 0.8rem; transition: 0.2s; }
-      .copy-icon:hover { color: #333; }
-
-      /* Status Badges */
-      .badge-status { padding: 5px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; }
-      .status-active { background-color: #d1e7dd; color: #0f5132; }
-      .status-expired { background-color: #f8d7da; color: #842029; }
-      .status-inactive { background-color: #e2e3e5; color: #383d41; }
-
-      .action-btn { width: 32px; height: 32px; border-radius: 6px; border: 1px solid #eee; background: #fff; display: inline-flex; align-items: center; justify-content: center; color: #555; transition: 0.2s; margin-left: 5px; cursor: pointer; text-decoration: none; }
-      .action-btn:hover { background: #f8f9fa; color: #000; border-color: #ccc; }
-      .btn-delete:hover { background: #f8d7da; color: #842029; border-color: #f5c2c7; }
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 30px;
+        transition: margin-left 0.3s ease;
+      }
 
       /* Mobile Nav */
-      .mobile-nav { display: none; background: #fff; padding: 15px 20px; border-bottom: 1px solid #eee; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 999; }
-      .mobile-nav .brand-section { display: flex; align-items: center; gap: 10px; margin-bottom: 0; text-decoration: none; color: var(--primary-black); }
-      .brand-text-mobile { display: flex; flex-direction: column; line-height: 1.1; text-align: left; }
-      .brand-title-mobile { font-weight: 800; font-size: 1rem; color: #000; display: block; }
-      .brand-subtitle-mobile { font-size: 0.6rem; letter-spacing: 1px; color: #777; font-weight: 600; text-transform: uppercase; display: block; }
+      .mobile-nav {
+        display: none;
+        background: #fff;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 999;
+      }
+      .mobile-nav .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 0;
+        text-decoration: none;
+        color: var(--primary-black);
+      }
+      .brand-text-mobile {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+        text-align: left;
+      }
+      .brand-title-mobile {
+        font-weight: 800;
+        font-size: 1rem;
+        color: #000;
+        display: block;
+      }
+      .brand-subtitle-mobile {
+        font-size: 0.6rem;
+        letter-spacing: 1px;
+        color: #777;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: block;
+      }
+
+      /* Header */
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+      .page-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin: 0;
+        color: #000;
+      }
+      
+      .btn-add-new {
+        background-color: #000;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.2s;
+      }
+      .btn-add-new:hover {
+        background-color: #333;
+        color: #fff;
+      }
+
+      /* Toolbar */
+      .table-toolbar {
+        background: #fff;
+        padding: 25px;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+      }
+      .search-box {
+        position: relative;
+        flex-grow: 1;
+        max-width: 400px;
+      }
+      .search-box input {
+        width: 100%;
+        padding: 12px 15px 12px 45px;
+        border-radius: 12px;
+        border: 1px solid #eee;
+        background-color: #fcfcfc;
+        font-size: 0.88rem;
+        font-family: "Poppins", sans-serif;
+      }
+      .search-box i {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #aaa;
+      }
+
+      /* Filter Dropdowns (New) */
+      .filter-dropdown {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .filter-btn {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        min-width: 140px;
+        position: relative;
+        transition: 0.2s;
+      }
+      .filter-btn:hover {
+        background: #e9ecef;
+      }
+      .filter-btn::after {
+        content: "\f0d7";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        font-size: 0.7rem;
+        margin-left: 8px;
+        color: #777;
+      }
+      .filter-btn.open::after {
+        content: "\f0d8";
+      }
+      .filter-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        z-index: 1000;
+        display: none;
+        min-width: 140px;
+      }
+      .filter-menu.show {
+        display: block;
+      }
+      .filter-menu a {
+        display: block;
+        padding: 8px 15px;
+        color: #333;
+        text-decoration: none;
+        font-size: 0.85rem;
+      }
+      .filter-menu a:hover {
+        background: #f8f9fa;
+      }
+
+      /* Table Card */
+      .table-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        margin-bottom: 25px;
+      }
+      .table {
+        margin-bottom: 0;
+        width: 100%;
+      }
+      .table thead th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        color: #888;
+        padding: 15px 25px;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+        letter-spacing: 0.5px;
+      }
+      .table tbody td {
+        padding: 15px 25px;
+        vertical-align: middle;
+        font-size: 0.9rem;
+        color: #333;
+        border-bottom: 1px solid #f9f9f9;
+        font-weight: 500;
+      }
+
+      /* Coupon Code Style */
+      .coupon-code {
+        font-family: monospace;
+        font-weight: 700;
+        background: #e9ecef;
+        padding: 6px 12px;
+        border-radius: 20px;
+        letter-spacing: 1px;
+        color: #333;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .copy-icon {
+        cursor: pointer;
+        color: #777;
+        font-size: 0.8rem;
+        transition: 0.2s;
+      }
+      .copy-icon:hover {
+        color: #000;
+      }
+
+      /* Status Badges — MATCH DASHBOARD STYLE */
+      .badge-custom {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+      }
+      .status-active {
+        background-color: #e3e3e3;
+        color: #4a4a4a;
+      }
+      .status-expired {
+        background-color: #ffe5e5;
+        color: #dc3545;
+      }
+      .status-inactive {
+        background-color: #f1f1f1;
+        color: #666;
+        border: 1px solid #ddd;
+      }
+
+      .action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: 1px solid #eee;
+        background: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #555;
+        transition: 0.2s;
+        margin-left: 5px;
+        text-decoration: none;
+      }
+      .action-btn:hover {
+        background: #f8f9fa;
+        color: #000;
+        border-color: #ccc;
+      }
+      .btn-delete:hover {
+        background: #ffe5e5;
+        color: #dc3545;
+        border-color: #f5c2c7;
+      }
 
       @media (max-width: 991px) {
-        .sidebar { transform: translateX(-100%); }
-        .sidebar.active { transform: translateX(0); box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1); }
-        .main-content { margin-left: 0; padding: 20px; }
-        .mobile-nav { display: flex; }
-        .table-container { overflow-x: auto; }
-        .table { min-width: 700px; }
-        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 998; }
-        .sidebar-overlay.active { display: block; }
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.active {
+          transform: translateX(0);
+          box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .main-content {
+          margin-left: 0;
+          padding: 20px;
+        }
+        .mobile-nav {
+          display: flex;
+        }
+        .table-container {
+          overflow-x: auto;
+        }
+        .table {
+          min-width: 700px;
+        }
+        .sidebar-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 998;
+        }
+        .sidebar-overlay.active {
+          display: block;
+        }
+        .table-toolbar {
+          flex-direction: column;
+          align-items: stretch;
+          padding: 20px;
+        }
+        .search-box {
+          max-width: 100%;
+        }
+        .filter-dropdown {
+          width: 100%;
+          justify-content: space-between;
+        }
       }
     </style>
   </head>
   <body>
     <div class="mobile-nav">
       <a href="#" class="brand-section">
-        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
+        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
         <div class="brand-text-mobile">
           <span class="brand-title-mobile">JINSA MOBILES</span>
           <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
@@ -134,15 +519,11 @@
       </button>
     </div>
 
-    <div
-      class="sidebar-overlay"
-      id="sidebarOverlay"
-      onclick="toggleSidebar()"
-    ></div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <nav class="sidebar" id="sidebar">
-      <a href="#" class="brand-section">
-        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
+      <a href="./adminDashboard.html" class="brand-section">
+        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
         <div class="brand-text-container">
           <span class="brand-title">JINSA MOBILES</span>
           <span class="brand-subtitle">AND ACCESSORIES</span>
@@ -151,7 +532,7 @@
 
       <ul class="sidebar-menu">
         <li class="menu-item">
-          <a href="./adminDashboard.html" class="menu-link active">
+          <a href="./adminDashboard.html" class="menu-link">
             <i class="fa-solid fa-border-all"></i> &nbsp;Dashboard
           </a>
         </li>
@@ -181,13 +562,13 @@
           </a>
         </li>
         <li class="menu-item">
-          <a href="./adminCoupons.html" class="menu-link">
-            <i class="fa-solid fa-tag"></i> &nbsp;Coupon Management
+          <a href="./adminCoupons.html" class="menu-link active">
+            <i class="fa-solid fa-tag"></i> &nbsp;Coupon &nbsp;Management
           </a>
         </li>
         <li class="menu-item">
           <a href="./adminCategories.html" class="menu-link">
-            <i class="fa-solid fa-layer-group"></i> &nbsp;Category Management
+            <i class="fa-solid fa-layer-group"></i> &nbsp;Category &nbsp;Management
           </a>
         </li>
         <li class="menu-item">
@@ -198,23 +579,20 @@
       </ul>
 
       <div class="admin-profile">
-        <a href="adminProfile.html" class="profile-info">
-          <img
-            src="https://placehold.co/100x100/ccc/fff?text=A"
-            class="admin-avatar"
-          />
+        <a href="./adminProfile.html" class="profile-info text-decoration-none text-reset">
+          <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
           <div class="admin-details">
-            <h6>Admin</h6>
-            <span>admin@example.com</span>
+            <h6 id="sidebarName" class="m-0">Admin</h6>
+            <span class="small text-muted">admin@example.com</span>
           </div>
         </a>
-        <a href="adminLogin.html" class="logout-btn">
+        <a href="./adminLogin.html" class="logout-btn">
           <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
         </a>
       </div>
     </nav>
 
-    <div class="main-content reveal-up">
+    <div class="main-content content-animate">
       <div class="page-header">
         <h2 class="page-title">Coupons</h2>
         <a href="./adminAddCoupon.html" class="btn-add-new">
@@ -225,27 +603,47 @@
       <div class="table-toolbar">
         <div class="search-box">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="searchInput" placeholder="Search coupon code..." onkeyup="filterCoupons()">
+          <input type="text" id="searchInput" placeholder="Search coupon code..." onkeyup="applyFilters()" />
+        </div>
+
+        <!-- NEW: Status & Discount Type Filters -->
+        <div class="filter-dropdown">
+          <div class="filter-btn" onclick="toggleFilter('status')">
+            <span>Status: <span id="statusLabel">All</span></span>
+            <div class="filter-menu" id="statusMenu">
+              <a href="#" onclick="setFilter('status', 'all'); return false;">All</a>
+              <a href="#" onclick="setFilter('status', 'Active'); return false;">Active</a>
+              <a href="#" onclick="setFilter('status', 'Expired'); return false;">Expired</a>
+              <a href="#" onclick="setFilter('status', 'Inactive'); return false;">Inactive</a>
+            </div>
+          </div>
+
+          <div class="filter-btn" onclick="toggleFilter('type')">
+            <span>Discount Type: <span id="typeLabel">All</span></span>
+            <div class="filter-menu" id="typeMenu">
+              <a href="#" onclick="setFilter('type', 'all'); return false;">All</a>
+              <a href="#" onclick="setFilter('type', 'fixed'); return false;">Fixed Amount</a>
+              <a href="#" onclick="setFilter('type', 'percentage'); return false;">Percentage</a>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="table-card">
-        <div class="table-container">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Code</th>
-                <th>Discount</th>
-                <th>Usage Limit</th>
-                <th>Expiry Date</th>
-                <th>Status</th>
-                <th class="text-end">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="couponTableBody">
-              </tbody>
-          </table>
-        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Discount</th>
+              <th>Usage Limit</th>
+              <th>Expiry Date</th>
+              <th>Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="couponTableBody">
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -257,15 +655,73 @@
       }
 
       // --- Dummy Data ---
-      const coupons = [
+      let coupons = [
         { id: 1, code: "WELCOME50", type: "fixed", value: 50, limit: 100, used: 45, expiry: "2024-12-31", status: "Active" },
         { id: 2, code: "SUMMER20", type: "percentage", value: 20, limit: 500, used: 120, expiry: "2024-06-30", status: "Active" },
         { id: 3, code: "FLASH10", type: "percentage", value: 10, limit: 50, used: 50, expiry: "2023-10-01", status: "Expired" },
         { id: 4, code: "FREESHIP", type: "fixed", value: 5, limit: 200, used: 12, expiry: "2024-11-15", status: "Inactive" },
       ];
 
+      // --- Filter State ---
+      let currentFilters = {
+        status: 'all',
+        type: 'all',
+        searchTerm: ''
+      };
+
+      // --- Toggle Filter Menu ---
+      function toggleFilter(filterType) {
+        const menuId = `${filterType}Menu`;
+        const menu = document.getElementById(menuId);
+        const allMenus = ['statusMenu', 'typeMenu'];
+
+        allMenus.forEach(id => {
+          if (id !== menuId) {
+            document.getElementById(id).classList.remove('show');
+          }
+        });
+
+        menu.classList.toggle('show');
+      }
+
+      // --- Set Filter ---
+      function setFilter(filterType, value) {
+        currentFilters[filterType] = value;
+
+        // Update label
+        const labelId = `${filterType}Label`;
+        const labelMap = {
+          'all': 'All',
+          'Active': 'Active',
+          'Expired': 'Expired',
+          'Inactive': 'Inactive',
+          'fixed': 'Fixed Amount',
+          'percentage': 'Percentage'
+        };
+        document.getElementById(labelId).innerText = labelMap[value];
+
+        // Close menu
+        document.getElementById(`${filterType}Menu`).classList.remove('show');
+
+        applyFilters();
+      }
+
+      // --- Apply All Filters ---
+      function applyFilters() {
+        const { status, type, searchTerm } = currentFilters;
+
+        let filtered = coupons.filter(c => {
+          const matchesSearch = c.code.toUpperCase().includes(searchTerm.toUpperCase());
+          const matchesStatus = status === 'all' || c.status === status;
+          const matchesType = type === 'all' || c.type === type;
+          return matchesSearch && matchesStatus && matchesType;
+        });
+
+        renderTable(filtered);
+      }
+
       // --- Render Table ---
-      function renderTable(data = coupons) {
+      function renderTable(data) {
         const tbody = document.getElementById("couponTableBody");
         tbody.innerHTML = "";
 
@@ -281,7 +737,6 @@
 
           const discountDisplay = c.type === 'percentage' ? `${c.value}% Off` : `$${c.value} Off`;
 
-          // Edit button now links to adminCouponForm.html with ID param
           const row = `
             <tr>
               <td>
@@ -293,7 +748,7 @@
               <td>${discountDisplay}</td>
               <td>${c.used} / ${c.limit}</td>
               <td>${c.expiry}</td>
-              <td><span class="badge-status ${statusClass}">${c.status}</span></td>
+              <td><span class="badge-custom ${statusClass}">${c.status}</span></td>
               <td class="text-end">
                 <a href="./adminEditCoupon.html?id=${c.id}" class="action-btn" title="Edit"><i class="fa-solid fa-pen"></i></a>
                 <button class="action-btn btn-delete" title="Delete" onclick="deleteCoupon(${c.id})"><i class="fa-solid fa-trash"></i></button>
@@ -302,13 +757,6 @@
           `;
           tbody.innerHTML += row;
         });
-      }
-
-      // --- Filter ---
-      function filterCoupons() {
-        const term = document.getElementById("searchInput").value.toUpperCase();
-        const filtered = coupons.filter(c => c.code.includes(term));
-        renderTable(filtered);
       }
 
       // --- Delete Coupon ---
@@ -326,7 +774,7 @@
             const index = coupons.findIndex(c => c.id === id);
             if(index > -1) {
               coupons.splice(index, 1);
-              renderTable();
+              applyFilters();
               Swal.fire('Deleted!', 'Coupon has been deleted.', 'success');
             }
           }
@@ -342,8 +790,26 @@
         Toast.fire({ icon: 'success', title: 'Code copied!' });
       }
 
+      // --- Search Input Handler ---
+      document.getElementById("searchInput").addEventListener("input", function() {
+        currentFilters.searchTerm = this.value;
+        applyFilters();
+      });
+
       // Init
-      document.addEventListener("DOMContentLoaded", () => renderTable());
+      document.addEventListener("DOMContentLoaded", () => {
+        // Close menus when clicking outside
+        document.addEventListener('click', function(e) {
+          const statusMenu = document.getElementById('statusMenu');
+          const typeMenu = document.getElementById('typeMenu');
+          if (!e.target.closest('.filter-btn')) {
+            statusMenu.classList.remove('show');
+            typeMenu.classList.remove('show');
+          }
+        });
+
+        applyFilters();
+      });
     </script>
   </body>
 </html>

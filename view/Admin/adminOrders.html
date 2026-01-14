@@ -25,8 +25,8 @@
         --bg-light: #f8f9fa;
         --border-color: #eee;
         --sidebar-width: 260px;
-        --active-bg: #f1f1f1;
-        --text-muted: #888;
+        --active-bg: #e9ecef;
+        --text-muted: #6c757d;
       }
 
       body {
@@ -34,6 +34,16 @@
         background-color: var(--bg-light);
         overflow-x: hidden;
         color: var(--primary-black);
+      }
+
+      /* --- ANIMATIONS --- */
+      @keyframes slideInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .content-animate {
+        animation: slideInUp 0.6s ease-out forwards;
       }
 
       /* --- SIDEBAR --- */
@@ -47,38 +57,43 @@
         left: 0;
         display: flex;
         flex-direction: column;
-        padding: 25px 20px;
+        padding: 20px;
         z-index: 1000;
+        transition: transform 0.3s ease;
       }
+
       .brand-section {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
         margin-bottom: 40px;
         text-decoration: none;
         color: var(--primary-black);
       }
+
       .brand-logo {
-        width: 42px;
-        height: 42px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         object-fit: cover;
       }
+
       .brand-text-container {
         display: flex;
         flex-direction: column;
         line-height: 1.1;
       }
+
       .brand-title {
         font-weight: 800;
-        font-size: 1.05rem;
+        font-size: 1rem;
         color: #000;
-        letter-spacing: -0.5px;
       }
+
       .brand-subtitle {
         font-size: 0.55rem;
         letter-spacing: 2px;
-        color: #999;
+        color: #777;
         font-weight: 600;
         text-transform: uppercase;
       }
@@ -90,75 +105,87 @@
         flex-grow: 1;
         overflow-y: auto;
       }
+
       .menu-item {
-        margin-bottom: 4px;
+        margin-bottom: 5px;
       }
+
       .menu-link {
         display: flex;
         align-items: center;
         padding: 12px 15px;
-        color: #666;
+        color: #555;
         text-decoration: none;
         font-weight: 500;
-        font-size: 0.88rem;
-        border-radius: 10px;
+        font-size: 0.9rem;
+        border-radius: 8px;
         transition: all 0.2s;
       }
+
       .menu-link i {
-        width: 28px;
+        width: 25px;
         font-size: 1.1rem;
-        color: #999;
+        color: #777;
       }
+
       .menu-link:hover {
         background-color: var(--bg-light);
         color: #000;
       }
+
       .menu-link.active {
         background-color: var(--active-bg);
         color: #000;
         font-weight: 600;
       }
+
       .menu-link.active i {
         color: #000;
       }
 
+      /* Admin Profile */
       .admin-profile {
         margin-top: auto;
         padding-top: 20px;
         border-top: 1px solid var(--border-color);
       }
+
       .profile-info {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
         margin-bottom: 15px;
         text-decoration: none;
         color: inherit;
       }
+
       .admin-avatar {
-        width: 38px;
-        height: 38px;
+        width: 35px;
+        height: 35px;
         border-radius: 50%;
-        background: #eee;
+        background: #ccc;
       }
+
       .admin-details h6 {
         margin: 0;
-        font-size: 0.85rem;
-        font-weight: 700;
+        font-size: 0.9rem;
+        font-weight: 600;
       }
+
       .admin-details span {
-        font-size: 0.72rem;
+        font-size: 0.75rem;
         color: var(--text-muted);
       }
+
       .logout-btn {
         width: 100%;
-        background-color: #000;
+        background-color: var(--bg-light);
         border: none;
-        padding: 12px;
-        border-radius: 10px;
+        padding: 10px;
+        border-radius: 8px;
         font-weight: 600;
-        font-size: 0.85rem;
-        color: #fff;
+        font-size: 0.9rem;
+        color: #333;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -166,50 +193,90 @@
         transition: 0.2s;
         text-decoration: none;
       }
+
       .logout-btn:hover {
-        background-color: #333;
-        color: #fff;
+        background-color: #e2e6ea;
+        color: #000;
       }
 
       /* --- MAIN CONTENT --- */
       .main-content {
         margin-left: var(--sidebar-width);
-        padding: 40px;
+        padding: 30px;
         transition: margin-left 0.3s ease;
       }
 
+      /* Mobile Nav */
       .mobile-nav {
         display: none;
         background: #fff;
         padding: 15px 20px;
         border-bottom: 1px solid #eee;
+        justify-content: space-between;
+        align-items: center;
         position: sticky;
         top: 0;
         z-index: 999;
       }
 
-      .page-header {
-        margin-bottom: 35px;
+      .mobile-nav .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 0;
+        text-decoration: none;
+        color: var(--primary-black);
       }
+
+      .brand-text-mobile {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+        text-align: left;
+      }
+
+      .brand-title-mobile {
+        font-weight: 800;
+        font-size: 1rem;
+        color: #000;
+        display: block;
+      }
+
+      .brand-subtitle-mobile {
+        font-size: 0.6rem;
+        letter-spacing: 1px;
+        color: #777;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: block;
+      }
+
+      /* Page Header */
+      .page-header {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 30px;
+      }
+
       .page-title {
-        font-size: 2rem;
+        font-size: 1.8rem;
         font-weight: 800;
         margin: 0;
         color: #000;
-        letter-spacing: -0.5px;
       }
+
       .page-subtitle {
         font-size: 0.9rem;
         color: var(--text-muted);
         margin-top: 5px;
       }
 
-      /* Toolbar & Search Spacing */
+      /* Toolbar & Search */
       .table-toolbar {
         background: #fff;
-        padding: 20px;
         border-radius: 16px;
         border: 1px solid var(--border-color);
+        padding: 25px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -223,6 +290,7 @@
         max-width: 400px;
         position: relative;
       }
+
       .search-group input {
         border-radius: 12px;
         padding-left: 45px;
@@ -231,7 +299,9 @@
         background-color: #fcfcfc;
         width: 100%;
         font-size: 0.88rem;
+        font-family: "Poppins", sans-serif;
       }
+
       .search-group i {
         position: absolute;
         left: 18px;
@@ -244,6 +314,7 @@
         display: flex;
         gap: 12px;
       }
+
       .custom-select {
         border-radius: 12px;
         border: 1px solid #eee;
@@ -255,50 +326,58 @@
         background: #fff
           url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e")
           no-repeat right 0.75rem center/16px 12px;
+        font-family: "Poppins", sans-serif;
       }
 
-      /* --- TABLE REFINEMENT --- */
+      /* Table */
       .table-container {
         background: #fff;
         border-radius: 16px;
         border: 1px solid var(--border-color);
         overflow: hidden;
+        margin-bottom: 25px;
       }
+
       .table thead th {
-        background-color: #fcfcfc;
-        font-weight: 600;
-        font-size: 0.75rem;
+        background: #f8f9fa;
+        font-size: 0.7rem;
         text-transform: uppercase;
-        letter-spacing: 1px;
         color: #888;
-        padding: 20px 25px;
+        padding: 15px 25px;
         border-bottom: 1px solid #eee;
+        text-align: left;
+        letter-spacing: 0.5px;
+        font-weight: 600;
       }
+
       .table tbody td {
-        padding: 22px 25px;
-        vertical-align: middle;
+        padding: 15px 25px;
         font-size: 0.9rem;
-        border-bottom: 1px solid #f8f8f8;
+        border-bottom: 1px solid #f9f9f9;
+        vertical-align: middle;
         color: #333;
+        font-weight: 500;
       }
 
       .order-id {
-        font-weight: 700;
+        font-weight: 600;
         color: #000;
       }
-      
-      /* Status Badges - Minimalist Style */
-      .badge-status {
+
+      /* Status Badges — MATCH DASHBOARD STYLE */
+      .badge-custom {
         padding: 6px 14px;
-        border-radius: 30px;
-        font-size: 0.72rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
         font-weight: 600;
+        display: inline-block;
       }
-      .status-pending { background-color: #f1f1f1; color: #666; }
-      .status-processing { background-color: #e9ecef; color: #444; }
-      .status-shipped { background-color: #1a1a1a; color: #fff; }
-      .status-delivered { background-color: #e3e3e3; color: #333; }
-      .status-cancelled { background-color: #ffe5e5; color: #d00; }
+
+      .status-pending { background-color: #f1f1f1; color: #666; border: 1px solid #ddd; }
+      .status-processing { background-color: #f1f1f1; color: #666; border: 1px solid #ddd; }
+      .status-shipped { background-color: #e3e3e3; color: #4a4a4a; }
+      .status-delivered { background-color: #e3e3e3; color: #4a4a4a; }
+      .status-cancelled { background-color: #ffe5e5; color: #dc3545; }
 
       .price {
         font-weight: 700;
@@ -307,7 +386,7 @@
 
       .btn-view-details {
         padding: 8px 18px;
-        border-radius: 10px;
+        border-radius: 30px;
         border: 1px solid #eee;
         background: #fff;
         color: #000;
@@ -316,6 +395,7 @@
         text-decoration: none;
         transition: 0.2s;
       }
+
       .btn-view-details:hover {
         background: #000;
         color: #fff;
@@ -324,9 +404,15 @@
 
       /* Pagination */
       .pagination-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         padding: 20px 25px;
         background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
       }
+
       .page-nav-btn {
         width: 36px;
         height: 36px;
@@ -338,26 +424,45 @@
         justify-content: center;
         transition: 0.2s;
         color: #000;
+        text-decoration: none;
       }
+
       .page-nav-btn:hover {
         background: #f1f1f1;
       }
 
+      /* Responsive */
       @media (max-width: 991px) {
-        .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
-        .sidebar.active { transform: translateX(0); box-shadow: 10px 0 30px rgba(0,0,0,0.05); }
-        .main-content { margin-left: 0; padding: 25px; }
-        .mobile-nav { display: flex; justify-content: space-between; align-items: center; }
-        .sidebar-overlay.active { display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 998; }
+        .sidebar { transform: translateX(-100%); }
+        .sidebar.active {
+          transform: translateX(0);
+          box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .main-content { margin-left: 0; padding: 20px; }
+        .mobile-nav { display: flex; }
+        .sidebar-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 998;
+        }
+        .sidebar-overlay.active { display: block; }
+        .table-responsive { overflow-x: auto; }
+        .table { min-width: 600px; }
       }
     </style>
   </head>
   <body>
     <div class="mobile-nav">
-      <a href="#" class="brand-section" style="margin-bottom:0">
-        <img src="images/logo.jpg" alt="Logo" class="brand-logo" />
-        <div class="brand-text-container">
-          <span class="brand-title">JINSA MOBILES</span>
+      <a href="#" class="brand-section">
+        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
+        <div class="brand-text-mobile">
+          <span class="brand-title-mobile">JINSA MOBILES</span>
+          <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
         </div>
       </a>
       <button class="btn btn-light" onclick="toggleSidebar()">
@@ -368,8 +473,8 @@
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <nav class="sidebar" id="sidebar">
-      <a href="#" class="brand-section">
-        <img src="images/logo.jpg" alt="Logo" class="brand-logo" />
+      <a href="./adminDashboard.html" class="brand-section">
+        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
         <div class="brand-text-container">
           <span class="brand-title">JINSA MOBILES</span>
           <span class="brand-subtitle">AND ACCESSORIES</span>
@@ -378,67 +483,70 @@
 
       <ul class="sidebar-menu">
         <li class="menu-item">
-          <a href="adminDashboard.html" class="menu-link">
-            <i class="fa-solid fa-border-all"></i> Dashboard
+          <a href="./adminDashboard.html" class="menu-link">
+            <i class="fa-solid fa-border-all"></i> &nbsp;Dashboard
           </a>
         </li>
         <li class="menu-item">
-          <a href="adminOrders.html" class="menu-link active">
-            <i class="fa-solid fa-cart-shopping"></i> Orders
+          <a href="./adminOrders.html" class="menu-link active">
+            <i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders
           </a>
         </li>
         <li class="menu-item">
-          <a href="adminProducts.html" class="menu-link">
-            <i class="fa-solid fa-box-open"></i> Products
+          <a href="./adminProducts.html" class="menu-link">
+            <i class="fa-solid fa-box-open"></i> &nbsp;Products
           </a>
         </li>
         <li class="menu-item">
-          <a href="adminCustomers.html" class="menu-link">
-            <i class="fa-solid fa-users"></i> Customers
+          <a href="./adminCustomers.html" class="menu-link">
+            <i class="fa-solid fa-users"></i> &nbsp;Customers
           </a>
         </li>
         <li class="menu-item">
-          <a href="adminMessages.html" class="menu-link">
-            <i class="fa-regular fa-envelope"></i> Messages
+          <a href="./adminMessages.html" class="menu-link">
+            <i class="fa-regular fa-envelope"></i> &nbsp;Messages
           </a>
         </li>
         <li class="menu-item">
-          <a href="adminAnalytics.html" class="menu-link">
-            <i class="fa-solid fa-chart-simple"></i> Analytics
+          <a href="./adminAnalytics.html" class="menu-link">
+            <i class="fa-solid fa-chart-simple"></i> &nbsp;Analytics
           </a>
         </li>
         <li class="menu-item">
-          <a href="adminCoupons.html" class="menu-link">
-            <i class="fa-solid fa-tag"></i> Coupon Management
+          <a href="./adminCoupons.html" class="menu-link">
+            <i class="fa-solid fa-tag"></i> &nbsp;Coupon Management
           </a>
         </li>
         <li class="menu-item">
-          <a href="adminCategories.html" class="menu-link">
-            <i class="fa-solid fa-layer-group"></i> Category Management
+          <a href="./adminCategories.html" class="menu-link">
+            <i class="fa-solid fa-layer-group"></i> &nbsp;Category Management
           </a>
         </li>
         <li class="menu-item">
-          <a href="adminOffers.html" class="menu-link">
-            <i class="fa-solid fa-gift"></i> Offer
+          <a href="./adminOffers.html" class="menu-link">
+            <i class="fa-solid fa-gift"></i> &nbsp;Offer
           </a>
         </li>
       </ul>
 
       <div class="admin-profile">
-        <a href="adminProfile.html" class="profile-info">
-          <img src="https://placehold.co/100x100/eee/999?text=A" class="admin-avatar" />
+        <a href="./adminProfile.html" class="profile-info">
+          <img
+            src="https://placehold.co/100x100/ccc/fff?text=A"
+            class="admin-avatar"
+          />
           <div class="admin-details">
-            <h6>Admin Panel</h6>
-            <span>admin@jinsa.com</span>
+            <h6>Admin</h6>
+            <span>admin@example.com</span>
           </div>
         </a>
-        <a href="adminLogin.html" class="logout-btn">
+        <a href="./adminLogin.html" class="logout-btn">
           <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
         </a>
       </div>
     </nav>
 
-    <div class="main-content">
+    <div class="main-content content-animate">
       <div class="page-header">
         <h2 class="page-title">Order Management</h2>
         <p class="page-subtitle">Detailed overview of all customer transactions.</p>
@@ -493,10 +601,10 @@
               <td>2023-10-23</td>
               <td>Robert Fox</td>
               <td><span class="text-muted small fw-bold">Apple Pay</span></td>
-              <td><span class="badge-status status-delivered">Delivered</span></td>
+              <td><span class="badge-custom status-delivered">Delivered</span></td>
               <td class="price">$89.99</td>
               <td class="text-end">
-                <a href="adminOrderDetails.html" class="btn-view-details">View Details</a>
+                <a href="./adminOrderDetails.html" class="btn-view-details">View Details</a>
               </td>
             </tr>
             <tr>
@@ -504,10 +612,10 @@
               <td>2023-10-22</td>
               <td>Esther Howard</td>
               <td><span class="text-muted small fw-bold">Google Pay</span></td>
-              <td><span class="badge-status status-processing">Processing</span></td>
+              <td><span class="badge-custom status-processing">Processing</span></td>
               <td class="price">$15.50</td>
               <td class="text-end">
-                <a href="adminOrderDetails.html" class="btn-view-details">View Details</a>
+                <a href="./adminOrderDetails.html" class="btn-view-details">View Details</a>
               </td>
             </tr>
             <tr>
@@ -515,10 +623,10 @@
               <td>2023-10-21</td>
               <td>Cameron Williamson</td>
               <td><span class="text-muted small fw-bold">Stripe</span></td>
-              <td><span class="badge-status status-shipped">Shipped</span></td>
+              <td><span class="badge-custom status-shipped">Shipped</span></td>
               <td class="price">$145.00</td>
               <td class="text-end">
-                <a href="adminOrderDetails.html" class="btn-view-details">View Details</a>
+                <a href="./adminOrderDetails.html" class="btn-view-details">View Details</a>
               </td>
             </tr>
             <tr>
@@ -526,10 +634,10 @@
               <td>2023-10-20</td>
               <td>Arlene McCoy</td>
               <td><span class="text-muted small fw-bold">COD</span></td>
-              <td><span class="badge-status status-pending">Pending</span></td>
+              <td><span class="badge-custom status-pending">Pending</span></td>
               <td class="price">$32.00</td>
               <td class="text-end">
-                <a href="adminOrderDetails.html" class="btn-view-details">View Details</a>
+                <a href="./adminOrderDetails.html" class="btn-view-details">View Details</a>
               </td>
             </tr>
             <tr>
@@ -537,22 +645,22 @@
               <td>2023-10-19</td>
               <td>Jerome Bell</td>
               <td><span class="text-muted small fw-bold">PayPal</span></td>
-              <td><span class="badge-status status-cancelled">Cancelled</span></td>
+              <td><span class="badge-custom status-cancelled">Cancelled</span></td>
               <td class="price">$215.75</td>
               <td class="text-end">
-                <a href="adminOrderDetails.html" class="btn-view-details">View Details</a>
+                <a href="./adminOrderDetails.html" class="btn-view-details">View Details</a>
               </td>
             </tr>
           </tbody>
         </table>
+      </div>
 
-        <div class="pagination-wrapper d-flex justify-content-between align-items-center border-top">
-          <span class="text-muted small">Showing 1 to 5 of 50 entries</span>
-          <div class="d-flex align-items-center gap-2">
-            <button class="page-nav-btn"><i class="fa-solid fa-chevron-left"></i></button>
-            <span class="fw-bold px-2 small">1</span>
-            <button class="page-nav-btn"><i class="fa-solid fa-chevron-right"></i></button>
-          </div>
+      <div class="pagination-wrapper">
+        <span class="text-muted small">Showing 1 to 5 of 50 entries</span>
+        <div class="d-flex align-items-center gap-2">
+          <a href="#" class="page-nav-btn"><i class="fa-solid fa-chevron-left"></i></a>
+          <span class="fw-bold px-2 small">1</span>
+          <a href="#" class="page-nav-btn"><i class="fa-solid fa-chevron-right"></i></a>
         </div>
       </div>
     </div>
@@ -575,7 +683,7 @@
           const searchTerm = searchInput.value.toLowerCase();
 
           originalRows.forEach((row) => {
-            const badge = row.querySelector(".badge-status");
+            const badge = row.querySelector(".badge-custom");
             const rowStatus = badge ? badge.innerText.trim().toLowerCase() : "";
             const orderID = row.querySelector(".order-id").innerText.toLowerCase();
             const customerName = row.children[2].innerText.toLowerCase();
@@ -585,9 +693,6 @@
 
             row.style.display = statusMatch && searchMatch ? "" : "none";
           });
-        
-          
-
         }
 
         window.searchOrders = filterTable;

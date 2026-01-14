@@ -64,8 +64,8 @@
       .menu-link { display: flex; align-items: center; padding: 12px 15px; color: #555; text-decoration: none; font-weight: 500; font-size: 0.9rem; border-radius: 8px; transition: all 0.2s; }
       .menu-link i { width: 25px; font-size: 1.1rem; color: #777; }
       .menu-link:hover { background-color: var(--bg-light); color: #000; }
-      .menu-link.active { background-color: #000; color: #fff; font-weight: 600; }
-      .menu-link.active i { color: #fff; }
+      .menu-link.active { background-color: var(--active-bg); color: #000; font-weight: 600; }
+      .menu-link.active i { color: #000; }
 
       .admin-profile { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color); }
       .profile-info { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; text-decoration: none; color: inherit; }
@@ -77,7 +77,7 @@
       .logout-btn:hover { background-color: #e2e6ea; color: #000; }
 
       /* --- MAIN CONTENT --- */
-      .main-content { margin-left: var(--sidebar-width); padding: 30px; transition: margin-left 0.3s ease; padding-bottom: 80px; }
+      .main-content { margin-left: var(--sidebar-width); padding: 30px; transition: margin-left 0.3s ease; }
       
       /* Mobile Nav */
       .mobile-nav { display: none; background: #fff; padding: 15px 20px; border-bottom: 1px solid #eee; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 999; }
@@ -95,52 +95,218 @@
       .btn-add-new:hover { background-color: #333; color: #fff; }
 
       /* Toolbar */
-      .table-toolbar { background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+      .table-toolbar { 
+        background: #fff; 
+        padding: 25px; 
+        border-radius: 16px; 
+        border: 1px solid var(--border-color); 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        gap: 20px; 
+        flex-wrap: wrap; 
+        margin-bottom: 25px; 
+      }
       .search-group { flex-grow: 1; max-width: 400px; position: relative; }
-      .search-group input { border-radius: 8px; padding-left: 40px; height: 40px; border: 1px solid #dee2e6; font-size: 0.9rem; }
-      .search-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #999; }
-      .filter-group { display: flex; gap: 10px; }
-      .custom-select { border-radius: 8px; border: 1px solid #dee2e6; padding: 8px 35px 8px 15px; font-size: 0.9rem; color: #333; background-color: #fff; cursor: pointer; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 16px 12px; appearance: none; min-width: 160px; height: 40px; }
-      .custom-select:focus { border-color: #000; outline: none; }
+      .search-group input { 
+        border-radius: 12px; 
+        padding-left: 45px; 
+        height: 46px; 
+        border: 1px solid #eee; 
+        background-color: #fcfcfc; 
+        width: 100%; 
+        font-size: 0.88rem; 
+        font-family: "Poppins", sans-serif;
+      }
+      .search-group i { 
+        position: absolute; 
+        left: 18px; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        color: #aaa; 
+      }
+      .filter-group { display: flex; gap: 12px; }
+      .custom-select { 
+        border-radius: 12px; 
+        border: 1px solid #eee; 
+        padding: 8px 35px 8px 18px; 
+        font-size: 0.85rem; 
+        font-weight: 500; 
+        height: 46px; 
+        appearance: none; 
+        background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") no-repeat right 0.75rem center/16px 12px;
+        font-family: "Poppins", sans-serif;
+        min-width: 160px;
+      }
 
-      /* Table */
-      .table-card { background: #fff; border-radius: 12px; border: 1px solid #eee; overflow: hidden; }
+      /* Table Card */
+      .table-card { 
+        background: #fff; 
+        border-radius: 16px; 
+        border: 1px solid var(--border-color); 
+        overflow: hidden; 
+        margin-bottom: 25px; 
+      }
       .table { margin-bottom: 0; width: 100%; }
-      .table thead th { background-color: #f8f9fa; font-weight: 600; font-size: 0.85rem; color: #555; border-bottom: 1px solid #eee; padding: 15px; }
-      .table tbody td { padding: 15px; vertical-align: middle; font-size: 0.9rem; color: #333; border-bottom: 1px solid #eee; }
-      
+      .table thead th { 
+        background-color: #f8f9fa; 
+        font-weight: 600; 
+        font-size: 0.7rem; 
+        text-transform: uppercase; 
+        color: #888; 
+        padding: 15px 25px; 
+        border-bottom: 1px solid #eee; 
+        text-align: left; 
+        letter-spacing: 0.5px; 
+      }
+      .table tbody td { 
+        padding: 15px 25px; 
+        vertical-align: middle; 
+        font-size: 0.9rem; 
+        color: #333; 
+        border-bottom: 1px solid #f9f9f9; 
+        font-weight: 500; 
+      }
+
       /* Product Specifics */
       .product-cell { display: flex; align-items: center; gap: 15px; }
-      .product-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: #f1f1f1; border: 1px solid #eee; }
-      .product-info h6 { margin: 0; font-size: 0.95rem; font-weight: 600; }
-      .product-info span { font-size: 0.8rem; color: #777; }
-      .price-text { font-weight: 600; }
-      
-      /* Status Badges */
-      .badge-status { padding: 6px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 500; }
-      .status-active { background-color: #d1e7dd; color: #0f5132; }
-      .status-draft { background-color: #f8f9fa; color: #555; border: 1px solid #ddd; }
-      .status-out { background-color: #f8d7da; color: #842029; }
+      .product-img { 
+        width: 50px; 
+        height: 50px; 
+        border-radius: 8px; 
+        object-fit: cover; 
+        background: #f1f1f1; 
+        border: 1px solid #eee; 
+      }
+      .product-info h6 { 
+        margin: 0; 
+        font-size: 0.95rem; 
+        font-weight: 600; 
+        color: #000; 
+      }
+      .product-info span { 
+        font-size: 0.8rem; 
+        color: #777; 
+      }
+      .price-text { 
+        font-weight: 700; 
+        color: #000; 
+      }
 
-      .action-btn { width: 32px; height: 32px; border-radius: 6px; border: 1px solid #eee; background: #fff; display: inline-flex; align-items: center; justify-content: center; color: #555; transition: 0.2s; text-decoration: none; margin-left: 5px; }
-      .action-btn:hover { background: #f8f9fa; color: #000; border-color: #ccc; }
-      .btn-delete:hover { background: #f8d7da; color: #842029; border-color: #f5c2c7; }
+      /* Status Badges — MATCH DASHBOARD STYLE */
+      .badge-custom { 
+        padding: 6px 14px; 
+        border-radius: 20px; 
+        font-size: 0.75rem; 
+        font-weight: 600; 
+        display: inline-block; 
+      }
+      .status-active { background-color: #e3e3e3; color: #4a4a4a; }
+      .status-draft { background-color: #f1f1f1; color: #666; border: 1px solid #ddd; }
+      .status-out { background-color: #ffe5e5; color: #dc3545; }
+
+      .action-btn { 
+        width: 32px; 
+        height: 32px; 
+        border-radius: 6px; 
+        border: 1px solid #eee; 
+        background: #fff; 
+        display: inline-flex; 
+        align-items: center; 
+        justify-content: center; 
+        color: #555; 
+        transition: 0.2s; 
+        text-decoration: none; 
+        margin-left: 5px; 
+      }
+      .action-btn:hover { 
+        background: #f8f9fa; 
+        color: #000; 
+        border-color: #ccc; 
+      }
+      .btn-delete:hover { 
+        background: #ffe5e5; 
+        color: #dc3545; 
+        border-color: #f5c2c7; 
+      }
 
       /* Pagination */
-      .pagination-wrapper { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; background: #fff; }
-      .page-info { font-size: 0.85rem; color: #777; }
-      .page-btn { background: #fff; border: 1px solid #ddd; padding: 5px 12px; border-radius: 6px; color: #555; cursor: pointer; transition: 0.2s; margin: 0 2px; }
-      .page-btn:hover:not(:disabled) { background: #f1f1f1; color: #000; }
-      .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-      .page-number { font-weight: 700; margin: 0 10px; font-size: 0.9rem; }
+      .pagination-wrapper { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        padding: 20px 25px; 
+        background: #fff; 
+        border-radius: 16px; 
+        border: 1px solid var(--border-color); 
+      }
+      .page-info { 
+        font-size: 0.85rem; 
+        color: var(--text-muted); 
+      }
+      .page-btn { 
+        width: 36px; 
+        height: 36px; 
+        border-radius: 10px; 
+        border: 1px solid #eee; 
+        background: white; 
+        display: inline-flex; 
+        align-items: center; 
+        justify-content: center; 
+        transition: 0.2s; 
+        color: #000; 
+        text-decoration: none; 
+      }
+      .page-btn:hover:not(:disabled) { 
+        background: #f1f1f1; 
+        color: #000; 
+      }
+      .page-btn:disabled { 
+        opacity: 0.5; 
+        cursor: not-allowed; 
+      }
+      .page-number { 
+        font-weight: 700; 
+        margin: 0 10px; 
+        font-size: 0.9rem; 
+      }
 
-      @media (max-width: 991px) { .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1); } .main-content { margin-left: 0; padding: 20px; } .mobile-nav { display: flex; } .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 998; } .sidebar-overlay.active { display: block; } .table-toolbar { flex-direction: column; align-items: stretch; } .search-group { max-width: 100%; } .filter-group { flex-direction: column; } .custom-select { width: 100%; } .table-container { overflow-x: auto; } .table { min-width: 800px; } }
+      @media (max-width: 991px) { 
+        .sidebar { transform: translateX(-100%); } 
+        .sidebar.active { transform: translateX(0); box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1); } 
+        .main-content { margin-left: 0; padding: 20px; } 
+        .mobile-nav { display: flex; } 
+        .sidebar-overlay { 
+          display: none; 
+          position: fixed; 
+          top: 0; 
+          left: 0; 
+          width: 100%; 
+          height: 100%; 
+          background: rgba(0, 0, 0, 0.5); 
+          z-index: 998; 
+        } 
+        .sidebar-overlay.active { display: block; } 
+        .table-toolbar { 
+          flex-direction: column; 
+          align-items: stretch; 
+          padding: 20px; 
+        } 
+        .search-group { max-width: 100%; } 
+        .filter-group { 
+          flex-direction: column; 
+          gap: 10px; 
+        } 
+        .custom-select { width: 100%; } 
+        .table-container { overflow-x: auto; } 
+        .table { min-width: 700px; } 
+      }
     </style>
   </head>
   <body>
     <div class="mobile-nav">
       <a href="#" class="brand-section">
-        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
+        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
         <div class="brand-text-mobile">
           <span class="brand-title-mobile">JINSA MOBILES</span>
           <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
@@ -154,8 +320,8 @@
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <nav class="sidebar" id="sidebar">
-      <a href="#" class="brand-section">
-        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
+      <a href="./adminDashboard.html" class="brand-section">
+        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
         <div class="brand-text-container">
           <span class="brand-title">JINSA MOBILES</span>
           <span class="brand-subtitle">AND ACCESSORIES</span>
@@ -169,17 +335,17 @@
         <li class="menu-item"><a href="./adminCustomers.html" class="menu-link"><i class="fa-solid fa-users"></i> &nbsp;Customers</a></li>
         <li class="menu-item"><a href="./adminMessages.html" class="menu-link"><i class="fa-regular fa-envelope"></i> &nbsp;Messages</a></li>
         <li class="menu-item"><a href="./adminAnalytics.html" class="menu-link"><i class="fa-solid fa-chart-simple"></i> &nbsp;Analytics</a></li>
-        <li class="menu-item"><a href="./adminCoupons.html" class="menu-link"><i class="fa-solid fa-ticket"></i> &nbsp;Coupon Management</a></li>
+        <li class="menu-item"><a href="./adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i> &nbsp;Coupon Management</a></li>
         <li class="menu-item"><a href="./adminCategories.html" class="menu-link"><i class="fa-solid fa-layer-group"></i> &nbsp;Category Management</a></li>
         <li class="menu-item"><a href="./adminOffers.html" class="menu-link"><i class="fa-solid fa-gift"></i> &nbsp;Offer</a></li>
       </ul>
 
       <div class="admin-profile">
-        <a href="adminProfileP.html" class="profile-info text-decoration-none text-reset">
+        <a href="./adminProfile.html" class="profile-info text-decoration-none text-reset">
           <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
           <div class="admin-details"><h6 id="sidebarName" class="m-0">Admin</h6><span class="small text-muted">admin@example.com</span></div>
         </a>
-        <a href="adminLogin.html" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        <a href="./adminLogin.html" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
       </div>
     </nav>
 
@@ -196,8 +362,8 @@
 
       <div class="table-toolbar">
         <div class="search-group">
-          <i class="fa-solid fa-magnifying-glass search-icon"></i>
-          <input type="text" class="search-input" id="searchInput" placeholder="Search product name..." onkeyup="handleSearch()" />
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="searchInput" placeholder="Search product name..." onkeyup="handleSearch()" />
         </div>
         <div class="filter-group">
           <select class="custom-select" id="filterCategory" onchange="handleFilter()">
@@ -214,7 +380,7 @@
         </div>
       </div>
 
-      <div class="table-container">
+      <div class="table-card">
         <table class="table">
           <thead>
             <tr>
@@ -227,20 +393,20 @@
             </tr>
           </thead>
           <tbody id="productsTableBody">
-            </tbody>
+          </tbody>
         </table>
+      </div>
 
-        <div class="pagination-wrapper">
-          <span class="page-info" id="pageInfoText">Showing 0 to 0 of 0 entries</span>
-          <div>
-            <button class="page-btn" id="prevBtn" onclick="changePage(-1)">
-              <i class="fa-solid fa-chevron-left"></i>
-            </button>
-            <span class="page-number" id="pageNumberDisplay">1</span>
-            <button class="page-btn" id="nextBtn" onclick="changePage(1)">
-              <i class="fa-solid fa-chevron-right"></i>
-            </button>
-          </div>
+      <div class="pagination-wrapper">
+        <span class="page-info" id="pageInfoText">Showing 0 to 0 of 0 entries</span>
+        <div>
+          <a href="#" class="page-btn" id="prevBtn" onclick="changePage(-1)">
+            <i class="fa-solid fa-chevron-left"></i>
+          </a>
+          <span class="page-number" id="pageNumberDisplay">1</span>
+          <a href="#" class="page-btn" id="nextBtn" onclick="changePage(1)">
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
         </div>
       </div>
     </div>
@@ -254,7 +420,7 @@
 
       // --- DUMMY DATA ---
       const allProducts = [
-        { id: 1, name: "iPhone 15 Pro Max Case", category: "Accessories", price: 49.99, stock: 150, status: "Active", img: "../images/16backcover.jpeg" },
+        { id: 1, name: "iPhone 15 Pro Max Case", category: "Accessories", price: 49.99, stock: 150, status: "Active", img: "../../images/16backcover.jpeg" },
         { id: 2, name: "Samsung Galaxy S24 Ultra", category: "Mobiles", price: 1299.00, stock: 25, status: "Active", img: "https://placehold.co/50x50/eee/333?text=S24" },
         { id: 3, name: "AirPods Pro 2nd Gen", category: "Audio", price: 249.00, stock: 0, status: "Out of Stock", img: "https://placehold.co/50x50/eee/333?text=AirPods" },
         { id: 4, name: "USB-C Fast Charger", category: "Accessories", price: 19.99, stock: 500, status: "Active", img: "https://placehold.co/50x50/eee/333?text=Charger" },
@@ -288,7 +454,7 @@
 
         // Sort
         currentProducts.sort((a, b) => {
-            if (sortType === 'newest') return b.id - a.id; // Simulating newness by ID
+            if (sortType === 'newest') return b.id - a.id;
             if (sortType === 'price-high') return b.price - a.price;
             if (sortType === 'price-low') return a.price - b.price;
             return 0;
@@ -336,7 +502,7 @@
                     <td>${p.category}</td>
                     <td class="price-text">$${p.price.toFixed(2)}</td>
                     <td>${p.stock}</td>
-                    <td><span class="badge-status ${statusClass}">${p.status}</span></td>
+                    <td><span class="badge-custom ${statusClass}">${p.status}</span></td>
                     <td class="text-end">
                         <a href="./adminEditProduct.html" class="action-btn" title="Edit"><i class="fa-solid fa-pen"></i></a>
                         <button class="action-btn btn-delete" title="Delete" onclick="confirmDelete(${p.id})"><i class="fa-solid fa-trash"></i></button>
@@ -354,8 +520,14 @@
         document.getElementById("pageNumberDisplay").innerText = currentPage;
         
         const totalPages = Math.ceil(total / rowsPerPage);
-        document.getElementById("prevBtn").disabled = currentPage === 1;
-        document.getElementById("nextBtn").disabled = currentPage === totalPages || total === 0;
+        document.getElementById("prevBtn").onclick = (totalPages <= 1 || currentPage === 1) ? null : () => changePage(-1);
+        document.getElementById("nextBtn").onclick = (currentPage === totalPages || total === 0) ? null : () => changePage(1);
+        
+        // Disable visually
+        document.getElementById("prevBtn").style.opacity = (currentPage === 1) ? '0.5' : '1';
+        document.getElementById("nextBtn").style.opacity = (currentPage === totalPages || total === 0) ? '0.5' : '1';
+        document.getElementById("prevBtn").style.pointerEvents = (currentPage === 1) ? 'none' : 'auto';
+        document.getElementById("nextBtn").style.pointerEvents = (currentPage === totalPages || total === 0) ? 'none' : 'auto';
       }
 
       function changePage(dir) {
@@ -374,11 +546,10 @@
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Remove from array logic
                 const index = allProducts.findIndex(p => p.id === id);
                 if (index > -1) {
                     allProducts.splice(index, 1);
-                    applyLogic(); // Re-render
+                    applyLogic();
                     Swal.fire('Deleted!', 'Product has been deleted.', 'success');
                 }
             }

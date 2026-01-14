@@ -81,23 +81,22 @@
         border-radius: 50%;
         object-fit: cover;
       }
+      .brand-text-container {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+      }
       .brand-title {
         font-weight: 800;
         font-size: 1rem;
-        display: block;
-        /* Add these two lines */
-        line-height: 1; /* Reduces the height of the text line */
-        margin-bottom: 0; /* Removes space below the title */
+        color: #000;
       }
-
       .brand-subtitle {
-        font-size: 0.63rem;
+        font-size: 0.55rem;
         letter-spacing: 2px;
-        color: var(--text-muted);
+        color: #777;
         font-weight: 600;
-        /* Add this line */
-        display: block; /* Ensures it sits on its own line */
-        margin-top: 0; /* Removes space above the subtitle */
+        text-transform: uppercase;
       }
 
       .sidebar-menu {
@@ -113,7 +112,7 @@
       .menu-link {
         display: flex;
         align-items: center;
-        padding: 12px 2px;
+        padding: 12px 15px;
         color: #555;
         text-decoration: none;
         font-weight: 500;
@@ -131,12 +130,12 @@
         color: #000;
       }
       .menu-link.active {
-        background-color: #000;
-        color: #fff;
+        background-color: var(--active-bg);
+        color: #000;
         font-weight: 600;
       }
       .menu-link.active i {
-        color: #fff;
+        color: #000;
       }
 
       /* Admin Profile */
@@ -150,6 +149,8 @@
         align-items: center;
         gap: 10px;
         margin-bottom: 15px;
+        text-decoration: none;
+        color: inherit;
       }
       .admin-avatar {
         width: 35px;
@@ -193,7 +194,6 @@
         margin-left: var(--sidebar-width);
         padding: 30px;
         transition: margin-left 0.3s ease;
-        padding-bottom: 80px;
       }
 
       /* Mobile Nav */
@@ -208,35 +208,29 @@
         top: 0;
         z-index: 999;
       }
-
-      /* Ensure brand section inside mobile nav behaves correctly */
       .mobile-nav .brand-section {
         display: flex;
         align-items: center;
         gap: 10px;
-        margin-bottom: 0; /* Override default margin */
+        margin-bottom: 0;
         text-decoration: none;
         color: var(--primary-black);
       }
-
-      /* New class to ensure text layout in mobile */
       .brand-text-mobile {
         display: flex;
         flex-direction: column;
         line-height: 1.1;
         text-align: left;
       }
-
       .brand-title-mobile {
         font-weight: 800;
         font-size: 1rem;
         color: #000;
         display: block;
       }
-
       .brand-subtitle-mobile {
-        font-size: 0.63rem;
-        letter-spacing: 2px;
+        font-size: 0.6rem;
+        letter-spacing: 1px;
         color: #777;
         font-weight: 600;
         text-transform: uppercase;
@@ -248,7 +242,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 25px;
+        margin-bottom: 30px;
         flex-wrap: wrap;
         gap: 15px;
       }
@@ -269,30 +263,36 @@
         font-size: 1.8rem;
         font-weight: 800;
         margin: 0;
+        color: #000;
       }
       .order-meta {
         font-size: 0.9rem;
-        color: #777;
+        color: var(--text-muted);
       }
 
       .header-actions {
         display: flex;
         gap: 10px;
+        align-items: center;
       }
       .status-select {
-        border-radius: 8px;
-        padding: 8px 15px;
-        border: 1px solid #dee2e6;
-        font-size: 0.9rem;
+        border-radius: 12px;
+        padding: 8px 35px 8px 18px;
+        border: 1px solid #eee;
+        font-size: 0.85rem;
         font-weight: 500;
-        cursor: pointer;
+        height: 46px;
+        appearance: none;
+        background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") no-repeat right 0.75rem center/16px 12px;
+        font-family: "Poppins", sans-serif;
+        min-width: 160px;
       }
       .btn-save-status {
         background-color: #000;
         color: #fff;
         border: none;
-        padding: 8px 20px;
-        border-radius: 8px;
+        padding: 10px 20px;
+        border-radius: 30px;
         font-weight: 600;
         font-size: 0.9rem;
         transition: 0.2s;
@@ -304,14 +304,13 @@
       /* Cards */
       .card-custom {
         background: #fff;
-        border-radius: 12px;
-        border: 1px solid #eee;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
         padding: 25px;
         margin-bottom: 25px;
-        /* height: 100%; */
       }
       .card-title-sm {
-        font-size: 1.05rem;
+        font-size: 1.1rem;
         font-weight: 700;
         margin-bottom: 20px;
         display: flex;
@@ -341,6 +340,7 @@
         margin: 0 0 5px;
         font-size: 0.95rem;
         font-weight: 600;
+        color: #000;
       }
       .item-meta {
         font-size: 0.85rem;
@@ -348,7 +348,8 @@
       }
       .item-total {
         margin-left: auto;
-        font-weight: 600;
+        font-weight: 700;
+        color: #000;
       }
 
       /* Summary Section */
@@ -393,15 +394,34 @@
       }
 
       /* Badge in Header */
-      .status-badge-lg {
-        padding: 5px 12px;
+      .badge-custom {
+        padding: 6px 14px;
         border-radius: 20px;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         font-weight: 600;
-        background-color: #fff3cd;
-        color: #856404;
-        margin-left: 10px;
-        vertical-align: middle;
+        display: inline-block;
+      }
+      .status-pending {
+        background-color: #f1f1f1;
+        color: #666;
+        border: 1px solid #ddd;
+      }
+      .status-processing {
+        background-color: #f1f1f1;
+        color: #666;
+        border: 1px solid #ddd;
+      }
+      .status-shipped {
+        background-color: #e3e3e3;
+        color: #4a4a4a;
+      }
+      .status-delivered {
+        background-color: #e3e3e3;
+        color: #4a4a4a;
+      }
+      .status-cancelled {
+        background-color: #ffe5e5;
+        color: #dc3545;
       }
 
       /* Responsive */
@@ -436,9 +456,12 @@
         .header-actions {
           width: 100%;
           margin-top: 10px;
+          flex-direction: column;
+          align-items: stretch;
         }
-        .status-select {
-          flex-grow: 1;
+        .status-select,
+        .btn-save-status {
+          width: 100%;
         }
       }
     </style>
@@ -446,7 +469,7 @@
   <body>
     <div class="mobile-nav">
       <a href="#" class="brand-section">
-        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
+        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
         <div class="brand-text-mobile">
           <span class="brand-title-mobile">JINSA MOBILES</span>
           <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
@@ -457,15 +480,11 @@
       </button>
     </div>
 
-    <div
-      class="sidebar-overlay"
-      id="sidebarOverlay"
-      onclick="toggleSidebar()"
-    ></div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <nav class="sidebar" id="sidebar">
-      <a href="#" class="brand-section">
-        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
+      <a href="./adminDashboard.html" class="brand-section">
+        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
         <div class="brand-text-container">
           <span class="brand-title">JINSA MOBILES</span>
           <span class="brand-subtitle">AND ACCESSORIES</span>
@@ -474,12 +493,12 @@
 
       <ul class="sidebar-menu">
         <li class="menu-item">
-          <a href="./adminDashboard.html" class="menu-link active">
+          <a href="./adminDashboard.html" class="menu-link">
             <i class="fa-solid fa-border-all"></i> &nbsp;Dashboard
           </a>
         </li>
         <li class="menu-item">
-          <a href="./adminOrders.html" class="menu-link">
+          <a href="./adminOrders.html" class="menu-link active">
             <i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders
           </a>
         </li>
@@ -521,17 +540,14 @@
       </ul>
 
       <div class="admin-profile">
-        <a href="adminProfile.html" class="profile-info">
-          <img
-            src="https://placehold.co/100x100/ccc/fff?text=A"
-            class="admin-avatar"
-          />
+        <a href="./adminProfile.html" class="profile-info text-decoration-none text-reset">
+          <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
           <div class="admin-details">
-            <h6>Admin</h6>
-            <span>admin@example.com</span>
+            <h6 id="sidebarName" class="m-0">Admin</h6>
+            <span class="small text-muted">admin@example.com</span>
           </div>
         </a>
-        <a href="adminLogin.html" class="logout-btn">
+        <a href="./adminLogin.html" class="logout-btn">
           <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
         </a>
       </div>
@@ -540,18 +556,18 @@
     <div class="main-content content-animate">
       <div class="page-header">
         <div>
-          <a href="./adminOrders.html" class="btn-back"
-            ><i class="fa-solid fa-arrow-left"></i> Back to Orders</a
-          >
+          <a href="./adminOrders.html" class="btn-back">
+            <i class="fa-solid fa-arrow-left"></i> Back to Orders
+          </a>
           <div class="d-flex align-items-center">
             <h2 class="order-title">Order #12345</h2>
-            <span class="status-badge-lg">Pending</span>
+            <span class="badge-custom status-pending">Pending</span>
           </div>
           <span class="order-meta">Placed on October 24, 2023 at 10:30 AM</span>
         </div>
 
         <div class="header-actions">
-          <select class="status-select form-select">
+          <select class="status-select" id="statusSelect">
             <option value="pending" selected>Pending</option>
             <option value="processing">Processing</option>
             <option value="shipped">Shipped</option>
@@ -571,7 +587,7 @@
 
             <div class="item-row">
               <img
-                src="../images/16backcover.jpeg"
+                src="../../images/16backcover.jpeg"
                 class="item-img"
                 alt="Product"
               />
@@ -624,10 +640,7 @@
                 <span class="text-muted small">Processed via Stripe</span>
               </div>
               <div class="ms-auto">
-                <span
-                  class="badge bg-success bg-opacity-10 text-success border border-success"
-                  >Paid</span
-                >
+                <span class="badge bg-success bg-opacity-10 text-success border border-success">Paid</span>
               </div>
             </div>
           </div>
@@ -637,9 +650,7 @@
           <div class="card-custom">
             <h5 class="card-title-sm">Customer</h5>
             <div class="d-flex align-items-center mb-4">
-              <div
-                class="admin-avatar me-3 d-flex align-items-center justify-content-center bg-light text-dark fw-bold"
-              >
+              <div class="admin-avatar me-3 d-flex align-items-center justify-content-center bg-light text-dark fw-bold">
                 JD
               </div>
               <div>
@@ -683,13 +694,26 @@
       }
 
       function updateStatus() {
+        const newStatus = document.getElementById('statusSelect').value;
+        const currentStatus = 'pending'; // In real app, get from order data
+        
+        if (newStatus === currentStatus) {
+          Swal.fire({
+            icon: 'info',
+            title: 'No Change',
+            text: 'Status is already set to this value.',
+            confirmButtonColor: '#1a1a1a'
+          });
+          return;
+        }
+
         Swal.fire({
           title: "Update Status?",
           text: "Are you sure you want to change the order status?",
           icon: "question",
           showCancelButton: true,
           confirmButtonColor: "#000",
-          cancelButtonColor: "#d33",
+          cancelButtonColor: "#6c757d",
           confirmButtonText: "Yes, update it!",
         }).then((result) => {
           if (result.isConfirmed) {
@@ -697,6 +721,17 @@
           }
         });
       }
+
+      // Close sidebar when clicking outside on mobile
+      document.addEventListener('click', function(e) {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (window.innerWidth <= 991 && sidebar.classList.contains('active') && 
+            !e.target.closest('.sidebar') && !e.target.closest('.mobile-nav button')) {
+          sidebar.classList.remove('active');
+          overlay.classList.remove('active');
+        }
+      });
     </script>
   </body>
 </html>

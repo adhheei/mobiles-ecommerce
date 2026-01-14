@@ -37,45 +37,11 @@
       }
 
       /* --- ANIMATIONS --- */
-      
-      /* 1. Page Load Slide Up */
-      .reveal-up {
-        opacity: 0;
-        transform: translateY(30px);
-        animation: revealUp 0.8s ease-out forwards;
+      @keyframes slideInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
       }
-
-      @keyframes revealUp {
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      /* 2. Logo Pop In */
-      .pop-in {
-        opacity: 0;
-        transform: scale(0.5);
-        animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        animation-delay: 0.2s;
-      }
-
-      @keyframes popIn {
-        to {
-          opacity: 1;
-          transform: scale(1);
-        }
-      }
-
-      /* 3. Image Scale In */
-      @keyframes scaleIn {
-        from { opacity: 0; transform: scale(0.8); }
-        to { opacity: 1; transform: scale(1); }
-      }
-
-      .main-image-preview, .thumbnail-item {
-        animation: scaleIn 0.4s ease-out forwards;
-      }
+      .content-animate { animation: slideInUp 0.6s ease-out forwards; }
 
       /* --- SIDEBAR --- */
       .sidebar {
@@ -234,7 +200,48 @@
       .main-content {
         margin-left: var(--sidebar-width);
         padding: 30px;
-        padding-bottom: 80px;
+        transition: margin-left 0.3s ease;
+      }
+
+      /* Mobile Nav */
+      .mobile-nav {
+        display: none;
+        background: #fff;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 999;
+      }
+      .mobile-nav .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 0;
+        text-decoration: none;
+        color: var(--primary-black);
+      }
+      .brand-text-mobile {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+        text-align: left;
+      }
+      .brand-title-mobile {
+        font-weight: 800;
+        font-size: 1rem;
+        color: #000;
+        display: block;
+      }
+      .brand-subtitle-mobile {
+        font-size: 0.6rem;
+        letter-spacing: 1px;
+        color: #777;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: block;
       }
 
       /* Header */
@@ -242,7 +249,7 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 25px;
+        margin-bottom: 30px;
         flex-wrap: wrap;
         gap: 15px;
       }
@@ -261,8 +268,10 @@
       }
 
       .page-title {
+        font-size: 1.8rem;
         font-weight: 800;
-        margin-bottom: 5px;
+        margin: 0;
+        color: #000;
       }
       .page-subtitle {
         color: var(--text-muted);
@@ -273,7 +282,7 @@
       /* Form Cards */
       .form-section {
         background: #fff;
-        border-radius: 12px;
+        border-radius: 16px;
         border: 1px solid var(--border-color);
         padding: 25px;
         margin-bottom: 25px;
@@ -292,167 +301,220 @@
         margin-bottom: 8px;
       }
 
-      .form-control, .form-select {
-        border-radius: 8px;
-        border-color: var(--border-color);
-        padding: 10px 15px;
+      .form-control,
+      .form-select {
+        border-radius: 12px;
+        border: 1px solid #eee;
+        padding: 12px 15px;
         font-size: 0.95rem;
+        font-family: "Poppins", sans-serif;
       }
-      
-      .form-control:focus, .form-select:focus {
-          box-shadow: none;
-          border-color: #000;
+
+      .form-control:focus,
+      .form-select:focus {
+        box-shadow: none;
+        border-color: #000;
+      }
+
+      .input-group-text {
+        border-radius: 12px 0 0 12px !important;
+        border-right: none !important;
+        background-color: #fcfcfc;
+        border-color: #eee;
+      }
+
+      .form-control.border-start-0 {
+        border-radius: 0 12px 12px 0 !important;
       }
 
       /* Image Upload Styles */
       .upload-area {
-        border: 2px dashed var(--border-color);
+        border: 2px dashed #ddd;
         border-radius: 12px;
-        padding: 20px;
+        padding: 30px;
         text-align: center;
-        background-color: #fbfbfc;
+        background-color: #fcfcfc;
         cursor: pointer;
         transition: all 0.3s;
         margin-bottom: 15px;
       }
       .upload-area:hover {
-          border-color: #aaa;
-          background-color: #f4f4f4;
+        border-color: #aaa;
+        background-color: #f4f4f4;
       }
       .upload-icon {
-          font-size: 1.5rem;
-          color: #aaa;
-          margin-bottom: 5px;
+        font-size: 1.8rem;
+        color: #aaa;
+        margin-bottom: 10px;
       }
       .upload-text {
-          font-size: 0.8rem;
-          color: #777;
-          margin: 0;
+        font-size: 0.85rem;
+        color: #777;
+        margin: 0;
       }
 
       /* Main Image Preview */
       .main-image-preview {
-          width: 150px;
-          height: 150px;
-          border-radius: 12px;
-          overflow: hidden;
-          background-color: #fff;
-          border: 1px solid #eee;
-          position: relative;
-          display: block; /* Visible by default for Edit page */
+        width: 150px;
+        height: 150px;
+        border-radius: 12px;
+        overflow: hidden;
+        background-color: #fff;
+        border: 1px solid #eee;
+        position: relative;
+        display: block;
       }
       .main-image-preview img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
 
       /* Gallery Grid */
       .image-thumbnails {
-          display: flex;
-          gap: 15px;
-          flex-wrap: wrap;
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
       }
       .thumbnail-item {
-          width: 100px;
-          height: 100px;
-          border-radius: 8px;
-          overflow: hidden;
-          position: relative;
-          border: 1px solid var(--border-color);
-          background-color: #fff;
+        width: 100px;
+        height: 100px;
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid #eee;
+        background-color: #fff;
       }
       .thumbnail-item img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
 
       /* Remove Button */
       .remove-btn {
-          position: absolute;
-          top: 5px;
-          right: 5px;
-          background: rgba(255, 255, 255, 0.9);
-          border: none;
-          border-radius: 50%;
-          width: 22px;
-          height: 22px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          font-size: 0.7rem;
-          color: #dc3545;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-          transition: all 0.2s;
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 0.7rem;
+        color: #dc3545;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s;
       }
       .remove-btn:hover {
-          background: #dc3545;
-          color: white;
+        background: #dc3545;
+        color: white;
       }
 
       /* Action Buttons */
       .btn-delete-prod {
-          background-color: #f8d7da;
-          color: #842029;
-          border: 1px solid #f5c2c7;
-          font-weight: 600;
-          padding: 8px 15px;
-          border-radius: 8px;
-          font-size: 0.9rem;
-          transition: 0.2s;
+        background-color: #ffe5e5;
+        color: #dc3545;
+        border: 1px solid #f5c2c7;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
       }
       .btn-delete-prod:hover {
-          background-color: #dc3545;
-          color: #fff;
+        background-color: #dc3545;
+        color: #fff;
+        border-color: #dc3545;
       }
 
       .form-footer {
-          position: fixed;
-          bottom: 0;
-          right: 0;
-          width: calc(100% - var(--sidebar-width));
-          background: #fff;
-          padding: 15px 30px;
-          border-top: 1px solid var(--border-color);
-          display: flex;
-          justify-content: flex-end;
-          gap: 15px;
-          z-index: 900;
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        width: calc(100% - var(--sidebar-width));
+        background: #fff;
+        padding: 15px 30px;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        z-index: 900;
+        transition: width 0.3s ease;
       }
       .btn-cancel {
-          background-color: #fff;
-          color: #333;
-          font-weight: 600;
-          border: 1px solid #eee;
-          padding: 10px 25px;
-          border-radius: 8px;
+        background-color: var(--active-bg);
+        color: #333;
+        font-weight: 600;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 30px;
+        transition: 0.2s;
+      }
+      .btn-cancel:hover {
+        background-color: #dcdcdc;
       }
       .btn-submit {
-          background-color: #000;
-          color: #fff;
-          font-weight: 600;
-          border: none;
-          padding: 10px 25px;
-          border-radius: 8px;
+        background-color: #000;
+        color: #fff;
+        font-weight: 600;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 30px;
+        transition: 0.2s;
       }
       .btn-submit:hover {
-          background-color: #333;
+        background-color: #333;
       }
 
-      /* Mobile Nav */
-      .mobile-nav { display: none; background: #fff; padding: 15px 20px; border-bottom: 1px solid #eee; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 999; }
-      .mobile-nav .brand-section { display: flex; align-items: center; gap: 10px; margin-bottom: 0; text-decoration: none; color: var(--primary-black); }
-      .brand-text-mobile { display: flex; flex-direction: column; line-height: 1.1; text-align: left; }
-      .brand-title-mobile { font-weight: 800; font-size: 1rem; color: #000; display: block; }
-      .brand-subtitle-mobile { font-size: 0.6rem; letter-spacing: 1px; color: #777; font-weight: 600; text-transform: uppercase; display: block; }
-
       @media (max-width: 991px) {
-        .sidebar { transform: translateX(-100%); }
-        .form-footer { width: 100%; }
-        .main-content { margin-left: 0; padding: 20px; }
-        .mobile-nav { display: flex; }
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.active {
+          transform: translateX(0);
+          box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .main-content {
+          margin-left: 0;
+          padding: 20px;
+        }
+        .form-footer {
+          width: 100%;
+          padding: 15px 20px;
+        }
+        .mobile-nav {
+          display: flex;
+        }
+        .sidebar-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 998;
+        }
+        .sidebar-overlay.active {
+          display: block;
+        }
+        .page-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .btn-delete-prod {
+          width: 100%;
+          justify-content: center;
+        }
       }
     </style>
   </head>
@@ -470,14 +532,10 @@
       </button>
     </div>
 
-    <div
-      class="sidebar-overlay"
-      id="sidebarOverlay"
-      onclick="toggleSidebar()"
-    ></div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <nav class="sidebar" id="sidebar">
-      <a href="#" class="brand-section">
+      <a href="./adminDashboard.html" class="brand-section">
         <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
         <div class="brand-text-container">
           <span class="brand-title">JINSA MOBILES</span>
@@ -487,7 +545,7 @@
 
       <ul class="sidebar-menu">
         <li class="menu-item">
-          <a href="./adminDashboard.html" class="menu-link active">
+          <a href="./adminDashboard.html" class="menu-link">
             <i class="fa-solid fa-border-all"></i> &nbsp;Dashboard
           </a>
         </li>
@@ -497,7 +555,7 @@
           </a>
         </li>
         <li class="menu-item">
-          <a href="./adminProducts.html" class="menu-link">
+          <a href="./adminProducts.html" class="menu-link active">
             <i class="fa-solid fa-box-open"></i> &nbsp;Products
           </a>
         </li>
@@ -534,230 +592,236 @@
       </ul>
 
       <div class="admin-profile">
-        <a href="adminProfile.html" class="profile-info">
-          <img
-            src="https://placehold.co/100x100/ccc/fff?text=A"
-            class="admin-avatar"
-          />
+        <a href="./adminProfile.html" class="profile-info text-decoration-none text-reset">
+          <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
           <div class="admin-details">
-            <h6>Admin</h6>
-            <span>admin@example.com</span>
+            <h6 id="sidebarName" class="m-0">Admin</h6>
+            <span class="small text-muted">admin@example.com</span>
           </div>
         </a>
-        <a href="adminLogin.html" class="logout-btn">
+        <a href="./adminLogin.html" class="logout-btn">
           <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
         </a>
       </div>
     </nav>
 
-    <div class="main-content reveal-up">
+    <div class="main-content content-animate">
       <div class="page-header">
-          <div>
-            <a href="./adminProducts.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back to Products</a>
-            <h2 class="page-title">Edit Product</h2>
-            <p class="page-subtitle">Update product details, pricing, and media.</p>
-          </div>
-          <button type="button" class="btn-delete-prod" onclick="deleteProduct()"><i class="fa-solid fa-trash-can"></i> Delete Product</button>
+        <div>
+          <a href="./adminProducts.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back to Products</a>
+          <h2 class="page-title">Edit Product</h2>
+          <p class="page-subtitle">Update product details, pricing, and media.</p>
+        </div>
+        <a href="#" class="btn-delete-prod" onclick="deleteProduct(); return false;"><i class="fa-solid fa-trash-can"></i> Delete Product</a>
       </div>
 
       <form id="editProductForm">
-        
         <div class="row">
-            <div class="col-lg-8">
-                <div class="form-section">
-                    <h5 class="form-section-title">Basic Information</h5>
-                    <div class="mb-3">
-                        <label class="form-label">Product Name</label>
-                        <input type="text" class="form-control" value="iPhone 15 Pro Max Silicone Case">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" rows="4">Premium soft-touch silicone case with MagSafe compatibility. Microfiber lining for extra protection.</textarea>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">SKU</label>
-                            <input type="text" class="form-control" value="MOB-CASE-15PM-BLK">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Price</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0">$</span>
-                                <input type="number" class="form-control border-start-0 ps-0" value="49.99">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Stock Quantity</label>
-                        <input type="number" class="form-control" value="150">
-                    </div>
+          <div class="col-lg-8">
+            <div class="form-section">
+              <h5 class="form-section-title">Basic Information</h5>
+              <div class="mb-3">
+                <label class="form-label">Product Name</label>
+                <input type="text" class="form-control" value="iPhone 15 Pro Max Silicone Case">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" rows="4">Premium soft-touch silicone case with MagSafe compatibility. Microfiber lining for extra protection.</textarea>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">SKU</label>
+                  <input type="text" class="form-control" value="MOB-CASE-15PM-BLK">
                 </div>
-
-                <div class="form-section">
-                    <h5 class="form-section-title">Product Media</h5>
-                    
-                    <div class="row">
-                        <div class="col-md-4 mb-4">
-                            <label class="form-label">Main Image</label>
-                            <div class="upload-area" id="mainUploadArea" style="display:none" onclick="document.getElementById('mainImageInput').click()">
-                                <i class="fa-regular fa-image upload-icon"></i>
-                                <p class="upload-text">Upload <strong>Main</strong></p>
-                                <input type="file" id="mainImageInput" hidden accept="image/*" onchange="handleMainImage(this)">
-                            </div>
-                            <div class="main-image-preview" id="mainImagePreview">
-                                <img src="../images/16backcover.jpeg" id="mainImageSrc" onerror="this.src='https://placehold.co/150x150/eee/999?text=Main'">
-                                <button type="button" class="remove-btn" onclick="removeMainImage()">
-                                    <i class="fa-solid fa-xmark"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="col-md-8">
-                            <label class="form-label">Gallery Images</label>
-                            <div class="upload-area" onclick="document.getElementById('galleryInput').click()">
-                                <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
-                                <p class="upload-text">Add to <strong>Gallery</strong></p>
-                                <input type="file" id="galleryInput" hidden multiple accept="image/*" onchange="handleGalleryFiles(this.files)">
-                            </div>
-                            <div class="image-thumbnails" id="galleryContainer">
-                                <div class="thumbnail-item">
-                                    <img src="https://placehold.co/100x100/e9ecef/777?text=Side" alt="Thumb">
-                                    <button type="button" class="remove-btn" onclick="removeGalleryImage(this)"><i class="fa-solid fa-xmark"></i></button>
-                                </div>
-                                <div class="thumbnail-item">
-                                    <img src="https://placehold.co/100x100/e9ecef/777?text=Back" alt="Thumb">
-                                    <button type="button" class="remove-btn" onclick="removeGalleryImage(this)"><i class="fa-solid fa-xmark"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Price</label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" step="0.01" class="form-control" value="49.99">
+                  </div>
                 </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Stock Quantity</label>
+                <input type="number" class="form-control" value="150">
+              </div>
             </div>
 
-            <div class="col-lg-4">
-                <div class="form-section">
-                    <h5 class="form-section-title">Status</h5>
-                    <div class="mb-3">
-                        <label class="form-label">Product Status</label>
-                        <select class="form-select">
-                            <option value="active" selected>Active</option>
-                            <option value="draft">Draft</option>
-                            <option value="outofstock">Out of Stock</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Visibility</label>
-                        <select class="form-select">
-                            <option value="public" selected>Public</option>
-                            <option value="hidden">Hidden</option>
-                        </select>
-                    </div>
+            <div class="form-section">
+              <h5 class="form-section-title">Product Media</h5>
+              
+              <div class="row">
+                <div class="col-md-4 mb-4">
+                  <label class="form-label">Main Image</label>
+                  <div class="upload-area" id="mainUploadArea" style="display:none" onclick="document.getElementById('mainImageInput').click()">
+                    <i class="fa-regular fa-image upload-icon"></i>
+                    <p class="upload-text">Upload <strong>Main</strong></p>
+                    <input type="file" id="mainImageInput" hidden accept="image/*" onchange="handleMainImage(this)">
+                  </div>
+                  <div class="main-image-preview" id="mainImagePreview">
+                    <img src="../images/16backcover.jpeg" id="mainImageSrc" onerror="this.src='https://placehold.co/150x150/eee/999?text=Main'">
+                    <button type="button" class="remove-btn" onclick="removeMainImage()">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
                 </div>
 
-                <div class="form-section">
-                    <h5 class="form-section-title">Organization</h5>
-                    <div class="mb-3">
-                        <label class="form-label">Category</label>
-                        <select class="form-select">
-                            <option>Mobiles</option>
-                            <option selected>Accessories</option>
-                            <option>Audio</option>
-                        </select>
+                <div class="col-md-8">
+                  <label class="form-label">Gallery Images</label>
+                  <div class="upload-area" onclick="document.getElementById('galleryInput').click()">
+                    <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                    <p class="upload-text">Add to <strong>Gallery</strong></p>
+                    <input type="file" id="galleryInput" hidden multiple accept="image/*" onchange="handleGalleryFiles(this.files)">
+                  </div>
+                  <div class="image-thumbnails" id="galleryContainer">
+                    <div class="thumbnail-item">
+                      <img src="https://placehold.co/100x100/e9ecef/777?text=Side" alt="Thumb">
+                      <button type="button" class="remove-btn" onclick="removeGalleryImage(this)"><i class="fa-solid fa-xmark"></i></button>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Tags</label>
-                        <input type="text" class="form-control" placeholder="e.g. Case, Silicon, iPhone" value="Case, New">
+                    <div class="thumbnail-item">
+                      <img src="https://placehold.co/100x100/e9ecef/777?text=Back" alt="Thumb">
+                      <button type="button" class="remove-btn" onclick="removeGalleryImage(this)"><i class="fa-solid fa-xmark"></i></button>
                     </div>
+                  </div>
                 </div>
+              </div>
             </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="form-section">
+              <h5 class="form-section-title">Status</h5>
+              <div class="mb-3">
+                <label class="form-label">Product Status</label>
+                <select class="form-select">
+                  <option value="active" selected>Active</option>
+                  <option value="draft">Draft</option>
+                  <option value="outofstock">Out of Stock</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Visibility</label>
+                <select class="form-select">
+                  <option value="public" selected>Public</option>
+                  <option value="hidden">Hidden</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h5 class="form-section-title">Organization</h5>
+              <div class="mb-3">
+                <label class="form-label">Category</label>
+                <select class="form-select">
+                  <option>Mobiles</option>
+                  <option selected>Accessories</option>
+                  <option>Audio</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Tags</label>
+                <input type="text" class="form-control" placeholder="e.g. Case, Silicon, iPhone" value="Case, New">
+              </div>
+            </div>
+          </div>
         </div>
-
       </form>
+    </div>
 
-      <div class="form-footer">
-          <button type="button" class="btn btn-cancel" onclick="history.back()">Cancel</button>
-          <button type="button" class="btn btn-submit" onclick="updateProduct()">Update Product</button>
-      </div>
-
+    <div class="form-footer">
+      <button type="button" class="btn btn-cancel" onclick="history.back()">Cancel</button>
+      <button type="button" class="btn btn-submit" onclick="updateProduct()">Update Product</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function toggleSidebar() {
-            document.getElementById("sidebar").classList.toggle("active");
-        }
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+        document.getElementById("sidebarOverlay").classList.toggle("active");
+      }
 
-        // --- Handle Main Image ---
-        function handleMainImage(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('mainImageSrc').src = e.target.result;
-                    document.getElementById('mainImagePreview').style.display = 'block';
-                    document.getElementById('mainUploadArea').style.display = 'none';
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
+      // --- Handle Main Image ---
+      function handleMainImage(input) {
+        if (input.files && input.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            document.getElementById('mainImageSrc').src = e.target.result;
+            document.getElementById('mainImagePreview').style.display = 'block';
+            document.getElementById('mainUploadArea').style.display = 'none';
+          }
+          reader.readAsDataURL(input.files[0]);
         }
+      }
 
-        function removeMainImage() {
-            document.getElementById('mainImageInput').value = '';
-            document.getElementById('mainImagePreview').style.display = 'none';
-            document.getElementById('mainUploadArea').style.display = 'block';
-        }
+      function removeMainImage() {
+        document.getElementById('mainImageInput').value = '';
+        document.getElementById('mainImagePreview').style.display = 'none';
+        document.getElementById('mainUploadArea').style.display = 'block';
+      }
 
-        // --- Handle Gallery Images ---
-        function handleGalleryFiles(files) {
-            const container = document.getElementById('galleryContainer');
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const div = document.createElement('div');
-                    div.className = 'thumbnail-item';
-                    div.innerHTML = `
-                        <img src="${e.target.result}" alt="Gallery">
-                        <button type="button" class="remove-btn" onclick="removeGalleryImage(this)"><i class="fa-solid fa-xmark"></i></button>
-                    `;
-                    container.appendChild(div);
-                }
-                reader.readAsDataURL(file);
+      // --- Handle Gallery Images ---
+      function handleGalleryFiles(files) {
+        const container = document.getElementById('galleryContainer');
+        Array.from(files).forEach(file => {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.className = 'thumbnail-item';
+            div.innerHTML = `
+              <img src="${e.target.result}" alt="Gallery">
+              <button type="button" class="remove-btn" onclick="removeGalleryImage(this)"><i class="fa-solid fa-xmark"></i></button>
+            `;
+            container.appendChild(div);
+          }
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function removeGalleryImage(btn) {
+        btn.closest('.thumbnail-item').remove();
+      }
+
+      // --- Actions ---
+      function updateProduct() {
+        Swal.fire({
+          title: 'Success!',
+          text: 'Product updated successfully.',
+          icon: 'success',
+          confirmButtonColor: '#1a1a1a',
+          confirmButtonText: 'OK'
+        }).then(() => {
+          window.location.href = './adminProducts.html';
+        });
+      }
+
+      function deleteProduct() {
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "This will permanently delete this product.",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#dc3545',
+          cancelButtonColor: '#1a1a1a',
+          confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire('Deleted!', 'Product has been deleted.', 'success').then(() => {
+              window.location.href = './adminProducts.html';
             });
-        }
+          }
+        });
+      }
 
-        function removeGalleryImage(btn) {
-            btn.closest('.thumbnail-item').remove();
+      // Close sidebar when clicking outside on mobile
+      document.addEventListener('click', function(e) {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (window.innerWidth <= 991 && sidebar.classList.contains('active') && 
+            !e.target.closest('.sidebar') && !e.target.closest('.mobile-nav button')) {
+          sidebar.classList.remove('active');
+          overlay.classList.remove('active');
         }
-
-        // --- Actions ---
-        function updateProduct() {
-            Swal.fire({
-                title: 'Success!',
-                text: 'Product updated successfully.',
-                icon: 'success',
-                confirmButtonColor: '#1a1a1a',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                window.location.href = './adminProducts.html';
-            });
-        }
-
-        function deleteProduct() {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "This will permanently delete this product.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#1a1a1a',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire('Deleted!', 'Product has been deleted.', 'success').then(() => {
-                        window.location.href = './adminProducts.html';
-                    });
-                }
-            });
-        }
+      });
     </script>
   </body>
 </html>

@@ -37,94 +37,416 @@
       }
 
       /* --- ANIMATIONS --- */
-      .reveal-up { opacity: 0; transform: translateY(30px); animation: revealUp 0.8s ease-out forwards; }
-      @keyframes revealUp { to { opacity: 1; transform: translateY(0); } }
-      .pop-in { opacity: 0; transform: scale(0.5); animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; animation-delay: 0.2s; }
-      @keyframes popIn { to { opacity: 1; transform: scale(1); } }
+      @keyframes slideInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .content-animate { animation: slideInUp 0.6s ease-out forwards; }
 
       /* --- SIDEBAR --- */
-      .sidebar { width: var(--sidebar-width); height: 100vh; background-color: #fff; border-right: 1px solid var(--border-color); position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding: 20px; z-index: 1000; transition: transform 0.3s ease; }
-      .brand-section { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; text-decoration: none; color: var(--primary-black); }
-      .brand-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-      .brand-text-container { display: flex; flex-direction: column; line-height: 1.1; }
-      .brand-title { font-weight: 800; font-size: 1rem; color: #000; }
-      .brand-subtitle { font-size: 0.55rem; letter-spacing: 2px; color: #777; font-weight: 600; text-transform: uppercase; }
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        background-color: #fff;
+        border-right: 1px solid var(--border-color);
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        z-index: 1000;
+        transition: transform 0.3s ease;
+      }
+      .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 40px;
+        text-decoration: none;
+        color: var(--primary-black);
+      }
+      .brand-logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .brand-text-container {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+      }
+      .brand-title {
+        font-weight: 800;
+        font-size: 1rem;
+        color: #000;
+      }
+      .brand-subtitle {
+        font-size: 0.55rem;
+        letter-spacing: 2px;
+        color: #777;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
       
-      .sidebar-menu { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; }
-      .menu-item { margin-bottom: 5px; }
-      .menu-link { display: flex; align-items: center; padding: 12px 15px; color: #555; text-decoration: none; font-weight: 500; font-size: 0.9rem; border-radius: 8px; transition: all 0.2s; }
-      .menu-link i { width: 25px; font-size: 1.1rem; color: #777; margin-right: 10px; }
-      .menu-link:hover { background-color: var(--bg-light); color: #000; }
-      .menu-link.active { background-color: var(--active-bg); color: #000; font-weight: 600; }
-      .menu-link.active i { color: #000; }
+      .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-grow: 1;
+        overflow-y: auto;
+      }
+      .menu-item {
+        margin-bottom: 5px;
+      }
+      .menu-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        color: #555;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        transition: all 0.2s;
+      }
+      .menu-link i {
+        width: 25px;
+        font-size: 1.1rem;
+        color: #777;
+      }
+      .menu-link:hover {
+        background-color: var(--bg-light);
+        color: #000;
+      }
+      .menu-link.active {
+        background-color: var(--active-bg);
+        color: #000;
+        font-weight: 600;
+      }
+      .menu-link.active i {
+        color: #000;
+      }
 
-      .admin-profile { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color); }
-      .profile-info { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; text-decoration: none; color: inherit; }
-      .admin-avatar { width: 35px; height: 35px; border-radius: 50%; background: #ccc; }
-      .admin-details h6 { margin: 0; font-size: 0.9rem; font-weight: 600; }
-      .admin-details span { font-size: 0.75rem; color: var(--text-muted); }
-      .logout-btn { width: 100%; background-color: var(--bg-light); border: none; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; color: #333; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; text-decoration: none; }
-      .logout-btn:hover { background-color: #e2e6ea; color: #000; }
+      .admin-profile {
+        margin-top: auto;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+      }
+      .profile-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        text-decoration: none;
+        color: inherit;
+      }
+      .admin-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: #ccc;
+      }
+      .admin-details h6 {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+      .admin-details span {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+      .logout-btn {
+        width: 100%;
+        background-color: var(--bg-light);
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: 0.2s;
+        text-decoration: none;
+      }
+      .logout-btn:hover {
+        background-color: #e2e6ea;
+        color: #000;
+      }
 
       /* --- MAIN CONTENT --- */
-      .main-content { margin-left: var(--sidebar-width); padding: 30px; padding-bottom: 80px; transition: margin-left 0.3s ease; }
-      .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-      .page-title { font-size: 1.8rem; font-weight: 800; margin: 0; color: #000; }
-      
-      .btn-add-new { background-color: #000; color: #fff; padding: 10px 20px; border-radius: 30px; font-weight: 600; font-size: 0.9rem; border: none; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; text-decoration: none; }
-      .btn-add-new:hover { background-color: #333; color: #fff; }
-
-      /* Toolbar */
-      .table-toolbar { background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-      .search-box { position: relative; flex-grow: 1; max-width: 300px; }
-      .search-box input { width: 100%; padding: 10px 15px 10px 40px; border-radius: 8px; border: 1px solid #ddd; font-size: 0.9rem; }
-      .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; }
-      .filter-group { display: flex; gap: 10px; }
-      .custom-select { border-radius: 8px; border: 1px solid #ddd; padding: 8px 30px 8px 15px; font-size: 0.9rem; cursor: pointer; height: 40px; }
-
-      /* Table Card */
-      .table-card { background: #fff; border-radius: 12px; border: 1px solid #eee; overflow: hidden; }
-      .table { margin-bottom: 0; width: 100%; }
-      .table thead th { background-color: #f8f9fa; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; color: #888; border-bottom: 1px solid #eee; padding: 15px; }
-      .table tbody td { padding: 15px; vertical-align: middle; font-size: 0.9rem; color: #333; border-bottom: 1px solid #eee; }
-
-      /* Badges */
-      .badge-offer { padding: 5px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; }
-      .offer-product { background-color: #e3f2fd; color: #0d47a1; }
-      .offer-referral { background-color: #e2d9f3; color: #5e35b1; }
-      .status-active { background-color: #d1e7dd; color: #0f5132; }
-      .status-expired { background-color: #f8d7da; color: #842029; }
-
-      .action-btn { width: 32px; height: 32px; border-radius: 6px; border: 1px solid #eee; background: #fff; display: inline-flex; align-items: center; justify-content: center; color: #555; transition: 0.2s; margin-left: 5px; cursor: pointer; text-decoration: none; }
-      .action-btn:hover { background: #f8f9fa; color: #000; border-color: #ccc; }
-      .btn-delete:hover { background: #f8d7da; color: #842029; border-color: #f5c2c7; }
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 30px;
+        transition: margin-left 0.3s ease;
+      }
 
       /* Mobile Nav */
-      .mobile-nav { display: none; background: #fff; padding: 15px 20px; border-bottom: 1px solid #eee; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 999; }
-      .mobile-nav .brand-section { display: flex; align-items: center; gap: 10px; margin-bottom: 0; text-decoration: none; color: var(--primary-black); }
-      .brand-text-mobile { display: flex; flex-direction: column; line-height: 1.1; text-align: left; }
-      .brand-title-mobile { font-weight: 800; font-size: 1rem; color: #000; display: block; }
-      .brand-subtitle-mobile { font-size: 0.6rem; letter-spacing: 1px; color: #777; font-weight: 600; text-transform: uppercase; display: block; }
+      .mobile-nav {
+        display: none;
+        background: #fff;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 999;
+      }
+      .mobile-nav .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 0;
+        text-decoration: none;
+        color: var(--primary-black);
+      }
+      .brand-text-mobile {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+        text-align: left;
+      }
+      .brand-title-mobile {
+        font-weight: 800;
+        font-size: 1rem;
+        color: #000;
+        display: block;
+      }
+      .brand-subtitle-mobile {
+        font-size: 0.6rem;
+        letter-spacing: 1px;
+        color: #777;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: block;
+      }
+
+      /* Header */
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+      .page-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin: 0;
+        color: #000;
+      }
+      
+      .btn-add-new {
+        background-color: #000;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.2s;
+      }
+      .btn-add-new:hover {
+        background-color: #333;
+        color: #fff;
+      }
+
+      /* Toolbar */
+      .table-toolbar {
+        background: #fff;
+        padding: 25px;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+      }
+      .search-box {
+        position: relative;
+        flex-grow: 1;
+        max-width: 400px;
+      }
+      .search-box input {
+        width: 100%;
+        padding: 12px 15px 12px 45px;
+        border-radius: 12px;
+        border: 1px solid #eee;
+        background-color: #fcfcfc;
+        font-size: 0.88rem;
+        font-family: "Poppins", sans-serif;
+      }
+      .search-box i {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #aaa;
+      }
+      .filter-group {
+        display: flex;
+        gap: 12px;
+      }
+      .custom-select {
+        border-radius: 12px;
+        border: 1px solid #eee;
+        padding: 8px 35px 8px 18px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        height: 46px;
+        appearance: none;
+        background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") no-repeat right 0.75rem center/16px 12px;
+        font-family: "Poppins", sans-serif;
+        min-width: 160px;
+      }
+
+      /* Table Card */
+      .table-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        margin-bottom: 25px;
+      }
+      .table {
+        margin-bottom: 0;
+        width: 100%;
+      }
+      .table thead th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        color: #888;
+        padding: 15px 25px;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+        letter-spacing: 0.5px;
+      }
+      .table tbody td {
+        padding: 15px 25px;
+        vertical-align: middle;
+        font-size: 0.9rem;
+        color: #333;
+        border-bottom: 1px solid #f9f9f9;
+        font-weight: 500;
+      }
+
+      /* Badges — MATCH DASHBOARD STYLE */
+      .badge-custom {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+      }
+      .offer-product {
+        background-color: #e3e3e3;
+        color: #4a4a4a;
+      }
+      .offer-referral {
+        background-color: #e2d9f3;
+        color: #5e35b1;
+      }
+      .status-active {
+        background-color: #e3e3e3;
+        color: #4a4a4a;
+      }
+      .status-expired {
+        background-color: #ffe5e5;
+        color: #dc3545;
+      }
+
+      .action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: 1px solid #eee;
+        background: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #555;
+        transition: 0.2s;
+        margin-left: 5px;
+        text-decoration: none;
+      }
+      .action-btn:hover {
+        background: #f8f9fa;
+        color: #000;
+        border-color: #ccc;
+      }
+      .btn-delete:hover {
+        background: #ffe5e5;
+        color: #dc3545;
+        border-color: #f5c2c7;
+      }
 
       @media (max-width: 991px) {
-        .sidebar { transform: translateX(-100%); }
-        .sidebar.active { transform: translateX(0); box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1); }
-        .main-content { margin-left: 0; padding: 20px; }
-        .mobile-nav { display: flex; }
-        .table-container { overflow-x: auto; }
-        .table { min-width: 700px; }
-        .table-toolbar { flex-direction: column; align-items: stretch; }
-        .search-box { max-width: 100%; }
-        .filter-group { flex-direction: column; }
-        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 998; }
-        .sidebar-overlay.active { display: block; }
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.active {
+          transform: translateX(0);
+          box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .main-content {
+          margin-left: 0;
+          padding: 20px;
+        }
+        .mobile-nav {
+          display: flex;
+        }
+        .table-container {
+          overflow-x: auto;
+        }
+        .table {
+          min-width: 700px;
+        }
+        .table-toolbar {
+          flex-direction: column;
+          align-items: stretch;
+          padding: 20px;
+        }
+        .search-box {
+          max-width: 100%;
+        }
+        .filter-group {
+          flex-direction: column;
+          gap: 10px;
+        }
+        .custom-select {
+          width: 100%;
+        }
+        .sidebar-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 998;
+        }
+        .sidebar-overlay.active {
+          display: block;
+        }
       }
     </style>
   </head>
   <body>
     <div class="mobile-nav">
       <a href="#" class="brand-section">
-        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
+        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
         <div class="brand-text-mobile">
           <span class="brand-title-mobile">JINSA MOBILES</span>
           <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
@@ -135,15 +457,11 @@
       </button>
     </div>
 
-    <div
-      class="sidebar-overlay"
-      id="sidebarOverlay"
-      onclick="toggleSidebar()"
-    ></div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <nav class="sidebar" id="sidebar">
-      <a href="#" class="brand-section">
-        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
+      <a href="./adminDashboard.html" class="brand-section">
+        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
         <div class="brand-text-container">
           <span class="brand-title">JINSA MOBILES</span>
           <span class="brand-subtitle">AND ACCESSORIES</span>
@@ -152,7 +470,7 @@
 
       <ul class="sidebar-menu">
         <li class="menu-item">
-          <a href="./adminDashboard.html" class="menu-link active">
+          <a href="./adminDashboard.html" class="menu-link">
             <i class="fa-solid fa-border-all"></i> &nbsp;Dashboard
           </a>
         </li>
@@ -192,30 +510,27 @@
           </a>
         </li>
         <li class="menu-item">
-          <a href="./adminOffers.html" class="menu-link">
+          <a href="./adminOffers.html" class="menu-link active">
             <i class="fa-solid fa-gift"></i> &nbsp;Offer
           </a>
         </li>
       </ul>
 
       <div class="admin-profile">
-        <a href="adminProfile.html" class="profile-info">
-          <img
-            src="https://placehold.co/100x100/ccc/fff?text=A"
-            class="admin-avatar"
-          />
+        <a href="./adminProfile.html" class="profile-info text-decoration-none text-reset">
+          <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
           <div class="admin-details">
-            <h6>Admin</h6>
-            <span>admin@example.com</span>
+            <h6 id="sidebarName" class="m-0">Admin</h6>
+            <span class="small text-muted">admin@example.com</span>
           </div>
         </a>
-        <a href="adminLogin.html" class="logout-btn">
+        <a href="./adminLogin.html" class="logout-btn">
           <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
         </a>
       </div>
     </nav>
 
-    <div class="main-content reveal-up">
+    <div class="main-content content-animate">
       <div class="page-header">
         <h2 class="page-title">Offers</h2>
         <a href="./adminAddOffer.html" class="btn-add-new">
@@ -226,44 +541,42 @@
       <div class="table-toolbar">
         <div class="search-box">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="searchInput" placeholder="Search offers..." onkeyup="applyFilters()">
+          <input type="text" id="searchInput" placeholder="Search offers..." onkeyup="applyFilters()" />
         </div>
         <div class="filter-group">
-            <select class="custom-select" id="filterStatus" onchange="applyFilters()">
-                <option value="all">All Status</option>
-                <option value="Active">Active</option>
-                <option value="Expired">Expired</option>
-            </select>
-            <select class="custom-select" id="filterType" onchange="applyFilters()">
-                <option value="all">All Types</option>
-                <option value="Product">Product Offer</option>
-                <option value="Referral">Referral Offer</option>
-            </select>
-            <select class="custom-select" id="sortOption" onchange="applyFilters()">
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="value-high">Discount: High to Low</option>
-            </select>
+          <select class="custom-select" id="filterStatus" onchange="applyFilters()">
+            <option value="all">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Expired">Expired</option>
+          </select>
+          <select class="custom-select" id="filterType" onchange="applyFilters()">
+            <option value="all">All Types</option>
+            <option value="Product">Product Offer</option>
+            <option value="Referral">Referral Offer</option>
+          </select>
+          <select class="custom-select" id="sortOption" onchange="applyFilters()">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="value-high">Discount: High to Low</option>
+          </select>
         </div>
       </div>
 
       <div class="table-card">
-        <div class="table-container">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Offer Title</th>
-                <th>Type</th>
-                <th>Discount Value</th>
-                <th>Valid Until</th>
-                <th>Status</th>
-                <th class="text-end">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="offerTableBody">
-              </tbody>
-          </table>
-        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Offer Title</th>
+              <th>Type</th>
+              <th>Discount Value</th>
+              <th>Valid Until</th>
+              <th>Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="offerTableBody">
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -322,14 +635,13 @@
           let badgeClass = offer.type === "Product" ? "offer-product" : "offer-referral";
           let statusClass = offer.status === "Active" ? "status-active" : "status-expired";
 
-          // MODIFIED: Edit Link now redirects to adminEditOffer.html with parameters
           const row = `
             <tr>
               <td class="fw-bold">${offer.title}</td>
-              <td><span class="badge-offer ${badgeClass}">${offer.type}</span></td>
+              <td><span class="badge-custom ${badgeClass}">${offer.type}</span></td>
               <td>${offer.value}%</td>
               <td>${offer.expiry}</td>
-              <td><span class="badge-offer ${statusClass}">${offer.status}</span></td>
+              <td><span class="badge-custom ${statusClass}">${offer.status}</span></td>
               <td class="text-end">
                 <a href="./adminEditOffer.html?id=${offer.id}" class="action-btn" title="Edit">
                     <i class="fa-solid fa-pen"></i>
