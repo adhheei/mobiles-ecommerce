@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add New Product - Jinsa Mobiles Admin</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+      :root {
+        --primary-black: #1a1a1a;
+        --bg-light: #f8f9fa;
+        --border-color: #eee;
+        --sidebar-width: 260px;
+        --active-bg: #e9ecef;
+        --text-muted: #6c757d;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: var(--bg-light);
+        overflow-x: hidden;
+        color: var(--primary-black);
+      }
+
+      /* --- ANIMATIONS --- */
+      .reveal-up {
+        opacity: 0;
+        transform: translateY(30px);
+        animation: revealUp 0.8s ease-out forwards;
+      }
+
+      @keyframes revealUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .pop-in {
+        opacity: 0;
+        transform: scale(0.5);
+        animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        animation-delay: 0.2s;
+      }
+
+      @keyframes popIn {
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      @keyframes scaleIn {
+        from { opacity: 0; transform: scale(0.8); }
+        to { opacity: 1; transform: scale(1); }
+      }
+
+      .thumbnail-item, .main-image-preview {
+        animation: scaleIn 0.4s ease-out forwards;
+      }
+
+      /* --- SIDEBAR --- */
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        background-color: #fff;
+        border-right: 1px solid var(--border-color);
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        z-index: 1000;
+      }
+
+      .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 40px;
+        text-decoration: none;
+        color: var(--primary-black);
+      }
+
+      .brand-logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .brand-text-container {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+      }
+
+      .brand-title {
+        font-weight: 800;
+        font-size: 1rem;
+        color: #000;
+      }
+
+      .brand-subtitle {
+        font-size: 0.55rem;
+        letter-spacing: 2px;
+        color: #777;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-grow: 1;
+        overflow-y: auto;
+      }
+
+      .menu-item { margin-bottom: 5px; }
+
+      .menu-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        color: #555;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        transition: all 0.2s;
+      }
+
+      .menu-link i {
+        width: 25px;
+        font-size: 1.1rem;
+        color: #777;
+        margin-right: 10px;
+      }
+
+      .menu-link:hover {
+        background-color: var(--bg-light);
+        color: #000;
+      }
+
+      .menu-link.active {
+        background-color: var(--active-bg);
+        color: #000;
+        font-weight: 600;
+      }
+
+      .menu-link.active i { color: #000; }
+
+      .admin-profile {
+        margin-top: auto;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+      }
+
+      .profile-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .admin-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: #ccc;
+      }
+
+      .admin-details h6 { margin: 0; font-size: 0.9rem; font-weight: 600; }
+      .admin-details span { font-size: 0.75rem; color: var(--text-muted); }
+
+      .logout-btn {
+        width: 100%;
+        background-color: var(--bg-light);
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: 0.2s;
+        text-decoration: none;
+      }
+
+      .logout-btn:hover { background-color: #e2e6ea; color: #000; }
+
+      /* --- MAIN CONTENT --- */
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 30px;
+        padding-bottom: 80px;
+      }
+
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 25px;
+      }
+      .btn-back {
+        text-decoration: none;
+        color: #777;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 10px;
+        transition: 0.2s;
+      }
+      .btn-back:hover { color: #000; }
+
+      .page-title {
+        font-weight: 800;
+        margin-bottom: 5px;
+      }
+      .page-subtitle {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 0;
+      }
+
+      /* Form Sections */
+      .form-section {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        padding: 25px;
+        margin-bottom: 25px;
+      }
+
+      .form-section-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .form-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #333;
+        margin-bottom: 8px;
+      }
+
+      .form-control, .form-select {
+        border-radius: 8px;
+        border-color: var(--border-color);
+        padding: 10px 15px;
+        font-size: 0.95rem;
+      }
+      
+      .form-control:focus, .form-select:focus {
+          box-shadow: none;
+          border-color: #000;
+      }
+
+      /* Image Upload Styles */
+      .upload-area {
+        border: 2px dashed var(--border-color);
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        background-color: #fbfbfc;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-bottom: 15px;
+      }
+
+      .upload-area:hover {
+          border-color: #aaa;
+          background-color: #f4f4f4;
+      }
+
+      .upload-icon {
+          font-size: 1.8rem;
+          color: #aaa;
+          margin-bottom: 10px;
+      }
+      .upload-text {
+          font-size: 0.85rem;
+          color: #777;
+          margin: 0;
+      }
+
+      /* Main Image Preview */
+      .main-image-preview {
+          width: 150px;
+          height: 150px;
+          border-radius: 12px;
+          overflow: hidden;
+          background-color: #fff;
+          border: 1px solid #eee;
+          position: relative;
+          display: none; 
+      }
+      .main-image-preview img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+      }
+
+      /* Gallery Grid */
+      .image-thumbnails {
+          display: flex;
+          gap: 15px;
+          flex-wrap: wrap;
+      }
+      .thumbnail-item {
+          width: 100px;
+          height: 100px;
+          border-radius: 8px;
+          overflow: hidden;
+          position: relative;
+          border: 1px solid var(--border-color);
+          background-color: #fff;
+      }
+      .thumbnail-item img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+      }
+
+      /* Remove Button */
+      .remove-btn {
+          position: absolute;
+          top: 5px;
+          right: 5px;
+          background: rgba(255, 255, 255, 0.9);
+          border: none;
+          border-radius: 50%;
+          width: 22px;
+          height: 22px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          font-size: 0.7rem;
+          color: #dc3545;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          transition: all 0.2s;
+      }
+      .remove-btn:hover {
+          background: #dc3545;
+          color: white;
+      }
+
+      /* Footer */
+      .form-footer {
+          position: fixed;
+          bottom: 0;
+          right: 0;
+          width: calc(100% - var(--sidebar-width));
+          background: #fff;
+          padding: 15px 30px;
+          border-top: 1px solid var(--border-color);
+          display: flex;
+          justify-content: flex-end;
+          gap: 15px;
+          z-index: 900;
+      }
+
+      .btn-cancel {
+          background-color: var(--active-bg);
+          color: #333;
+          font-weight: 600;
+          border: none;
+          padding: 10px 25px;
+          border-radius: 8px;
+      }
+
+      .btn-submit {
+          background-color: var(--primary-black);
+          color: #fff;
+          font-weight: 600;
+          border: none;
+          padding: 10px 25px;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+      }
+      .btn-submit:hover {
+          background-color: #333; color: #fff;
+      }
+
+      /* Mobile Nav */
+      .mobile-nav { display: none; background: #fff; padding: 15px 20px; border-bottom: 1px solid #eee; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 999; }
+      .mobile-nav .brand-section { display: flex; align-items: center; gap: 10px; margin-bottom: 0; text-decoration: none; color: var(--primary-black); }
+      .brand-text-mobile { display: flex; flex-direction: column; line-height: 1.1; text-align: left; }
+      .brand-title-mobile { font-weight: 800; font-size: 1rem; color: #000; display: block; }
+      .brand-subtitle-mobile { font-size: 0.6rem; letter-spacing: 1px; color: #777; font-weight: 600; text-transform: uppercase; display: block; }
+
+      @media (max-width: 991px) {
+        .sidebar { transform: translateX(-100%); }
+        .form-footer { width: 100%; }
+        .main-content { margin-left: 0; padding: 20px; }
+        .mobile-nav { display: flex; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mobile-nav">
+      <a href="#" class="brand-section">
+        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
+        <div class="brand-text-mobile">
+          <span class="brand-title-mobile">JINSA MOBILES</span>
+          <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
+        </div>
+      </a>
+      <button class="btn btn-light" onclick="toggleSidebar()">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+
+    <div
+      class="sidebar-overlay"
+      id="sidebarOverlay"
+      onclick="toggleSidebar()"
+    ></div>
+
+    <nav class="sidebar" id="sidebar">
+      <a href="#" class="brand-section">
+        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
+        <div class="brand-text-container">
+          <span class="brand-title">JINSA MOBILES</span>
+          <span class="brand-subtitle">AND ACCESSORIES</span>
+        </div>
+      </a>
+
+      <ul class="sidebar-menu">
+        <li class="menu-item">
+          <a href="./adminDashboard.html" class="menu-link active">
+            <i class="fa-solid fa-border-all"></i> &nbsp;Dashboard
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="./adminOrders.html" class="menu-link">
+            <i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="./adminProducts.html" class="menu-link">
+            <i class="fa-solid fa-box-open"></i> &nbsp;Products
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="./adminCustomers.html" class="menu-link">
+            <i class="fa-solid fa-users"></i> &nbsp;Customers
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="./adminMessages.html" class="menu-link">
+            <i class="fa-regular fa-envelope"></i> &nbsp;Messages
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="./adminAnalytics.html" class="menu-link">
+            <i class="fa-solid fa-chart-simple"></i> &nbsp;Analytics
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="./adminCoupons.html" class="menu-link">
+            <i class="fa-solid fa-tag"></i> &nbsp;Coupon Management
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="./adminCategories.html" class="menu-link">
+            <i class="fa-solid fa-layer-group"></i> &nbsp;Category Management
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="./adminOffers.html" class="menu-link">
+            <i class="fa-solid fa-gift"></i> &nbsp;Offer
+          </a>
+        </li>
+      </ul>
+
+      <div class="admin-profile">
+        <a href="adminProfile.html" class="profile-info">
+          <img
+            src="https://placehold.co/100x100/ccc/fff?text=A"
+            class="admin-avatar"
+          />
+          <div class="admin-details">
+            <h6>Admin</h6>
+            <span>admin@example.com</span>
+          </div>
+        </a>
+        <a href="adminLogin.html" class="logout-btn">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+        </a>
+      </div>
+    </nav>
+
+    <div class="main-content reveal-up">
+      <div class="page-header">
+          <div>
+            <a href="./adminProducts.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back to Products</a>
+            <h2 class="page-title">Add New Product</h2>
+            <p class="page-subtitle">Enter the details for the new phone or tablet case.</p>
+          </div>
+      </div>
+
+      <form id="addProductForm">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="form-section">
+                    <h5 class="form-section-title">Basic Information</h5>
+                    <div class="mb-3">
+                        <label for="productName" class="form-label">Product Name</label>
+                        <input type="text" class="form-control" id="productName" placeholder="e.g. Ultra Slim Silicone Case for iPhone 15">
+                    </div>
+                    <div class="mb-3">
+                        <label for="productDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="productDescription" rows="4" placeholder="Provide a detailed description of the product."></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="productSku" class="form-label">SKU</label>
+                            <input type="text" class="form-control" id="productSku" placeholder="SKU-12345">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="productPrice" class="form-label">Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">$</span>
+                                <input type="number" class="form-control border-start-0 ps-0" id="productPrice" placeholder="29.99">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="stockQuantity" class="form-label">Stock Quantity</label>
+                        <input type="number" class="form-control" id="stockQuantity" placeholder="100">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h5 class="form-section-title">Product Media</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-4 mb-md-0">
+                            <label class="form-label">Main Image</label>
+                            <div class="upload-area" id="mainUploadArea" onclick="document.getElementById('mainImageInput').click()">
+                                <i class="fa-regular fa-image upload-icon"></i>
+                                <p class="upload-text">Click to upload <strong>Main Image</strong></p>
+                                <input type="file" id="mainImageInput" hidden accept="image/*" onchange="handleMainImage(this)">
+                            </div>
+                            <div class="main-image-preview" id="mainImagePreview">
+                                <img src="" alt="Main Preview" id="mainImageSrc">
+                                <button type="button" class="remove-btn" onclick="removeMainImage()">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Gallery Images</label>
+                            <div class="upload-area" onclick="document.getElementById('galleryInput').click()">
+                                <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                                <p class="upload-text">Drag & drop or click to add <strong>Gallery Images</strong></p>
+                                <input type="file" id="galleryInput" hidden multiple accept="image/*" onchange="handleGalleryFiles(this.files)">
+                            </div>
+                            <div class="image-thumbnails" id="galleryContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="form-section">
+                    <h5 class="form-section-title">Status</h5>
+                    <div class="mb-3">
+                        <label class="form-label">Product Status</label>
+                        <select class="form-select">
+                            <option value="active" selected>Active</option>
+                            <option value="draft">Draft</option>
+                            <option value="outofstock">Out of Stock</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Visibility</label>
+                        <select class="form-select">
+                            <option value="public" selected>Public</option>
+                            <option value="hidden">Hidden</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Publish Date</label>
+                        <input type="date" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h5 class="form-section-title">Organization</h5>
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select class="form-select">
+                            <option selected>Accessories</option>
+                            <option>Mobiles</option>
+                            <option>Audio</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tags</label>
+                        <input type="text" class="form-control" placeholder="e.g. Case, New">
+                    </div>
+                </div>
+            </div>
+        </div>
+      </form>
+
+      <div class="form-footer">
+          <button type="button" class="btn btn-cancel" onclick="goBack()">Cancel</button>
+          <button type="button" class="btn btn-submit" onclick="submitProduct()"><i class="fa-solid fa-plus"></i> Add Product</button>
+      </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("active");
+        }
+
+        // Go Back Function
+        function goBack() {
+            window.location.href = './adminProducts.html';
+        }
+
+        // --- Handle Main Image ---
+        function handleMainImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('mainImagePreview');
+                    const img = document.getElementById('mainImageSrc');
+                    const uploadArea = document.getElementById('mainUploadArea');
+
+                    img.src = e.target.result;
+                    preview.style.display = 'block'; 
+                    uploadArea.style.display = 'none'; 
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function removeMainImage() {
+            const input = document.getElementById('mainImageInput');
+            const preview = document.getElementById('mainImagePreview');
+            const uploadArea = document.getElementById('mainUploadArea');
+
+            input.value = ''; 
+            preview.style.display = 'none'; 
+            uploadArea.style.display = 'block'; 
+        }
+
+        // --- Handle Gallery Images ---
+        function handleGalleryFiles(files) {
+            const container = document.getElementById('galleryContainer');
+            if (files.length > 0) {
+                Array.from(files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.className = 'thumbnail-item';
+                        div.innerHTML = `
+                            <img src="${e.target.result}" alt="Gallery Image">
+                            <button type="button" class="remove-btn" onclick="removeGalleryImage(this)">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        `;
+                        container.appendChild(div);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        function removeGalleryImage(btn) {
+            btn.closest('.thumbnail-item').remove();
+        }
+
+        // --- Submit Product ---
+        function submitProduct() {
+            const name = document.getElementById('productName').value;
+            
+            if(!name) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Missing Information',
+                    text: 'Please enter at least a product name!',
+                    confirmButtonColor: '#1a1a1a'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Success!',
+                text: 'New product has been added successfully.',
+                icon: 'success',
+                confirmButtonColor: '#1a1a1a',
+                confirmButtonText: 'Go to Products'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = './adminProducts.html';
+                }
+            });
+        }
+    </script>
+  </body>
+</html>

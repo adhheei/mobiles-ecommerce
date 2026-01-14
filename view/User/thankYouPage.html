@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thank You - Jinsa Mobiles</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* --- GLOBAL VARIABLES & FONTS --- */
+      :root {
+        --primary-black: #1a1a1a;
+        --primary-red: #d32f2f;
+        --bg-light: #f8f9fa;
+        --border-color: #e5e5e5;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #fcfcfc;
+        padding-top: 0;
+        color: #1a1a1a;
+      }
+
+      /* --- ANIMATION CSS --- */
+      
+      /* 1. Slide Up Fade In */
+      .reveal-up {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.8s ease-out;
+      }
+      .reveal-up.active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* 2. Pop In (Bounce effect for icon) */
+      .pop-in {
+        opacity: 0;
+        transform: scale(0.5);
+        transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+      .pop-in.active {
+        opacity: 1;
+        transform: scale(1);
+      }
+      /* -------------------- */
+
+      /* --- THANK YOU PAGE STYLES --- */
+      .thank-you-container {
+        max-width: 800px;
+        margin: 60px auto;
+        text-align: center;
+        padding: 0 15px;
+      }
+
+      .success-icon {
+        width: 80px;
+        height: 80px;
+        background-color: #28a745; /* Green */
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin: 0 auto 25px;
+        box-shadow: 0 10px 20px rgba(40, 167, 69, 0.2);
+      }
+
+      .thank-you-heading {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      .order-number-text {
+        color: #666;
+        font-size: 0.95rem;
+        margin-bottom: 40px;
+      }
+
+      /* Order Summary Card */
+      .order-card {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 0;
+        text-align: left;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.03);
+        overflow: hidden;
+      }
+
+      .order-card-header {
+        padding: 20px 30px;
+        border-bottom: 1px solid #eee;
+      }
+      .order-card-header h5 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+      .order-card-header p {
+        margin: 5px 0 0;
+        font-size: 0.85rem;
+        color: #666;
+      }
+
+      .order-item-row {
+        padding: 20px 30px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+      }
+      .item-thumb {
+        width: 60px;
+        height: 70px;
+        border-radius: 8px;
+        object-fit: cover;
+        background: #f8f9fa;
+        margin-right: 20px;
+      }
+      .item-info h6 {
+        margin: 0 0 5px;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .item-info p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: #666;
+      }
+      .item-total {
+        margin-left: auto;
+        font-weight: 600;
+      }
+
+      .order-totals-row {
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+        color: #555;
+      }
+      .order-totals-row.final {
+        border-top: 1px solid #eee;
+        padding-top: 20px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 10px;
+      }
+
+      .shipping-info-row {
+        padding: 20px 30px;
+        background-color: #fcfcfc;
+        border-top: 1px solid #eee;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+      }
+      .info-column h6 {
+        font-size: 0.9rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .info-column p {
+        font-size: 0.85rem;
+        color: #555;
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      /* Buttons */
+      .action-buttons {
+        margin-top: 40px;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+      }
+      .btn-black {
+        background: #1a1a1a;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 6px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s;
+        border: 1px solid #1a1a1a;
+      }
+      .btn-black:hover {
+        background: #333;
+        color: white;
+      }
+
+      .btn-outline {
+        background: transparent;
+        color: #1a1a1a;
+        padding: 12px 30px;
+        border-radius: 6px;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1px solid #e5e5e5;
+        transition: all 0.2s;
+        background-color: #e9ecef;
+      }
+      .btn-outline:hover {
+        background: #dde0e3;
+        color: #1a1a1a;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="thank-you-container">
+      <div class="success-icon pop-in">
+        <i class="fa-solid fa-check"></i>
+      </div>
+
+      <h1 class="thank-you-heading reveal-up">Thank You for Your Order!</h1>
+      <p class="order-number-text reveal-up">
+        Your order #123456 has been successfully placed.
+      </p>
+
+      <div class="order-card reveal-up">
+        <div class="order-card-header">
+          <h5>Order Summary</h5>
+          <p>A confirmation email has been sent to your email address.</p>
+        </div>
+
+        <div class="order-item-row">
+          <img
+            src="https://placehold.co/100x100/eee/333?text=Case"
+            class="item-thumb"
+            alt="Product"
+          />
+          <div class="item-info text-start">
+            <h6>Pikkme iPhone 16 Pro Max</h6>
+            <p>Color: Black | Qty: 1</p>
+          </div>
+          <div class="item-total">Rs. 499.00</div>
+        </div>
+
+        <div class="order-totals-row">
+          <span>Subtotal</span>
+          <span>Rs. 499.00</span>
+        </div>
+        <div class="order-totals-row">
+          <span>Shipping</span>
+          <span class="text-success">Free</span>
+        </div>
+        <div class="order-totals-row">
+          <span>Tax</span>
+          <span>Rs. 0.00</span>
+        </div>
+        <div class="order-totals-row final">
+          <span>Total</span>
+          <span>Rs. 499.00</span>
+        </div>
+
+        <div class="shipping-info-row">
+          <div class="info-column text-start">
+            <h6>Shipping Address</h6>
+            <p>John Doe<br />123 Main Street<br />Kerala, India 673001</p>
+          </div>
+          <div class="info-column text-start ms-auto">
+            <h6>Estimated Delivery</h6>
+            <p>October 26, 2025</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons px-4 reveal-up">
+        <a href="./userOrderDetails.html" class="btn-black">View Order History</a>
+        <a href="./index.html" class="btn-outline">Continue Shopping</a>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const observerOptions = {
+          root: null,
+          rootMargin: "0px",
+          threshold: 0.1, // Trigger when 10% of element is visible
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("active");
+              observer.unobserve(entry.target); // Run animation only once
+            }
+          });
+        }, observerOptions);
+
+        // Observe elements with animation classes
+        const animatedElements = document.querySelectorAll(".reveal-up, .pop-in");
+        animatedElements.forEach((el) => observer.observe(el));
+      });
+    </script>
+  </body>
+</html>

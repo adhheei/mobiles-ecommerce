@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Return Order - Jinsa Mobiles</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+      :root {
+        --primary-black: #1a1a1a;
+        --bg-light: #f8f9fa;
+        --border-color: #eee;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #fff;
+        color: var(--primary-black);
+        padding-top: 100px;
+        overflow-x: hidden;
+      }
+
+      /* --- ANIMATIONS START --- */
+      @keyframes slideInFromBottom {
+        0% {
+          transform: translateY(30px);
+          opacity: 0;
+        }
+        100% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .content-animate {
+        animation: slideInFromBottom 0.6s ease-out forwards;
+      }
+
+      /* Interactive Click Effects */
+      .shipping-option:active,
+      .btn-submit-return:active,
+      .sidebar-link:active {
+        transform: scale(0.98) !important;
+        transition: transform 0.1s ease;
+      }
+      /* --- ANIMATIONS END --- */
+
+      /* --- HEADER STYLES --- */
+      .navbar {
+        padding: 10px 0;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .navbar-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: var(--primary-black);
+      }
+
+      /* Links Centered & Styled */
+      .navbar-nav .nav-link {
+        font-family: "Poppins";
+        font-size: 0.95rem; /* Adjusted for better readability */
+        font-weight: 600;
+        color: #333 !important;
+        transition: color 0.3s;
+        margin: 0 10px; /* Added spacing between links */
+      }
+
+      .navbar-nav .nav-link:hover {
+        color: #0d6efd !important;
+      }
+
+      /* Search Bar Styling */
+      .search-container {
+        position: relative;
+      }
+      .search-input {
+        width: 200px;
+        height: 35px;
+        font-size: 0.9rem;
+        padding-right: 35px; /* Space for icon */
+        border-radius: 50px;
+        border: 1px solid #dee2e6;
+        padding-left: 15px;
+      }
+      .search-icon {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        color: #6c757d;
+        cursor: pointer;
+      }
+
+      /* Mobile Adjustments */
+      @media (max-width: 991px) {
+        .navbar-nav {
+          text-align: center;
+          margin-bottom: 15px;
+          align-items: center; /* This ensures links are perfectly centered */
+          width: 100%;
+        }
+
+        .nav-icons {
+          justify-content: center;
+          margin-top: 15px;
+          width: 100%;
+          border-top: 1px solid #eee;
+          padding-top: 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          align-items: center;
+        }
+
+        .search-container {
+          margin-bottom: 10px;
+        }
+      }
+
+      @media (min-width: 992px) {
+        /* Moved the margin here so it doesn't break mobile centering */
+        .navbar-collapse {
+          margin-left: 50px;
+        }
+
+        .nav-icons {
+          display: flex;
+          align-items: center;
+          margin-left: auto;
+        }
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 10px 0;
+        margin-top: 10px;
+      }
+      .dropdown-item {
+        padding: 10px 20px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: #333;
+        transition: all 0.2s ease;
+      }
+      .dropdown-item:hover {
+        background-color: #f8f9fa;
+        color: #d32f2f;
+        padding-left: 25px;
+      }
+
+      /* --- PAGE LAYOUT --- */
+      .profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px 20px;
+      }
+
+      /* Sidebar Navigation (Desktop Default) */
+      .sidebar {
+        background-color: #fff;
+        border-right: 1px solid var(--border-color);
+        min-height: 600px;
+        padding-right: 20px;
+      }
+      .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .sidebar-item {
+        margin-bottom: 5px;
+      }
+      .sidebar-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        color: #555;
+        text-decoration: none;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      .sidebar-link i {
+        margin-right: 15px;
+        width: 20px;
+        text-align: center;
+      }
+      .sidebar-link:hover {
+        background-color: #f8f9fa;
+        color: #000;
+      }
+      .sidebar-link.active {
+        background-color: #000;
+        color: #fff;
+      }
+      .logout-btn {
+        color: #dc3545;
+      }
+      .logout-btn:hover {
+        color: #b02a37;
+        background-color: #f8f9fa;
+      }
+
+      /* --- MOBILE SIDEBAR (SCROLLING BAR) --- */
+      @media (max-width: 991px) {
+        .profile-container {
+          padding: 0 15px 40px 15px;
+        }
+        .sidebar {
+          border-right: none;
+          min-height: auto;
+          padding: 10px 0;
+          border-bottom: 1px solid #eee;
+          position: sticky;
+          top: 85px;
+          z-index: 99;
+          background: #fff;
+          overflow-x: auto;
+          white-space: nowrap;
+          width: 100vw;
+          margin-left: -15px;
+          padding-left: 15px;
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .sidebar::-webkit-scrollbar {
+          display: none;
+        }
+        .sidebar-menu {
+          display: flex;
+          flex-direction: row;
+          gap: 10px;
+          padding-right: 20px;
+        }
+        .sidebar-item {
+          margin-bottom: 0;
+          display: inline-block;
+        }
+        .sidebar-link {
+          border: 1px solid #eee;
+          padding: 8px 16px;
+          font-size: 0.9rem;
+          background: #fff;
+        }
+        .sidebar-link:hover {
+          transform: none;
+        }
+        .sidebar-link.active {
+          border-color: #000;
+        }
+        .main-content {
+          padding-left: 0;
+          margin-top: 20px;
+        }
+      }
+
+      /* Main Content Area */
+      .main-content {
+        padding-left: 40px;
+      }
+      @media (max-width: 991px) {
+        .main-content {
+          padding-left: 0;
+        }
+      }
+
+      .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+      }
+
+      /* --- RETURN ORDER SPECIFIC STYLES --- */
+      .form-container-limit {
+        max-width: 850px;
+      }
+
+      .status-banner {
+        background-color: #d1e7dd;
+        color: #0f5132;
+        border: 1px solid #badbcc;
+        padding: 15px 20px;
+        border-radius: 8px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+      .status-banner i {
+        margin-right: 10px;
+        font-size: 1.2rem;
+      }
+
+      /* Table Styles */
+      .return-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 15px;
+      }
+      .return-table th {
+        font-size: 0.85rem;
+        color: #999;
+        font-weight: 600;
+        text-transform: uppercase;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+      }
+      .return-table td {
+        vertical-align: middle;
+        padding: 15px 0;
+        border-bottom: 1px solid #f9f9f9;
+      }
+
+      .product-col {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      .product-img {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+        background: #f8f9fa;
+        border-radius: 6px;
+        border: 1px solid #eee;
+      }
+      .product-name {
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: block;
+      }
+
+      .form-select-sm {
+        border-radius: 6px;
+        border-color: #dee2e6;
+        padding: 8px 10px;
+        font-size: 0.9rem;
+      }
+      .custom-checkbox {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #000;
+      }
+
+      /* Shipping Options */
+      .shipping-option {
+        border: 1px solid #eee;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .shipping-option:hover {
+        background-color: #f9f9f9;
+      }
+      .form-check-input {
+        cursor: pointer;
+        accent-color: #000;
+      }
+
+      /* Return Summary */
+      .return-summary h5 {
+        font-weight: 600;
+      }
+      .estimated-amount {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #000;
+        margin-top: 5px;
+      }
+
+      .btn-submit-return {
+        background-color: #000;
+        color: white;
+        width: 100%;
+        padding: 15px;
+        font-weight: 600;
+        border-radius: 8px;
+        border: none;
+        font-size: 1rem;
+        margin-top: 20px;
+        transition: background 0.3s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+      }
+      .btn-submit-return:hover {
+        background-color: #333;
+      }
+      .btn-submit-return i {
+        font-size: 1.2rem;
+      }
+
+      /* Footer */
+      footer {
+        background-color: #111;
+        color: #aaa;
+        padding: 60px 0 20px;
+        margin-top: 60px;
+      }
+      footer h5 {
+        color: white;
+        font-weight: 600;
+        margin-bottom: 20px;
+      }
+      footer ul {
+        padding-left: 0;
+        list-style: none;
+      }
+      footer ul li {
+        margin-bottom: 10px;
+      }
+      footer a {
+        color: #aaa;
+        text-decoration: none;
+      }
+      footer a:hover {
+        color: white;
+      }
+      .newsletter-input {
+        background: #333;
+        border: none;
+        color: white;
+        padding: 10px;
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+   <nav class="navbar navbar-expand-lg fixed-top">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="./index.html">
+          <img
+            src="../images/logo.jpg"
+            alt="Logo"
+            width="50"
+            height="50"
+            class="me-2 rounded-circle"
+          />
+          <div class="d-flex flex-column">
+            <span
+              class="fw-bold text-dark"
+              style="line-height: 1.1; font-size: 1.2rem"
+              >JINSA MOBILES</span
+            >
+            <span
+              class="text-secondary"
+              style="font-size: 0.6rem; letter-spacing: 4.2px; font-weight: 500"
+              >AND ACCESSORIES</span
+            >
+          </div>
+        </a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div
+          class="collapse navbar-collapse justify-content-center"
+          id="navbarNav"
+        >
+          <ul class="navbar-nav align-items-center">
+            <li class="nav-item">
+              <a class="nav-link" href="./index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="./productPage.html"
+                >Shop Products</a
+              >
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Categories
+              </a>
+              <ul class="dropdown-menu border-0 shadow-sm">
+                <li>
+                  <a class="dropdown-item" href="./productPage.html"
+                    >Mobiles Case</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./productPage.html"
+                    >Chargers</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./productPage.html"
+                    >Earphones</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./productPage.html"
+                    >Powerbanks</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./productPage.html"
+                    >Screen Protectors</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./productPage.html">Cables</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./aboutUs.html">About Us</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./contactUs.html">Contact</a>
+            </li>
+          </ul>
+
+          <div class="nav-icons align-items-center">
+            <div class="position-relative">
+              <input
+                type="text"
+                id="navbarSearch"
+                class="form-control border-secondary rounded-pill pe-5"
+                placeholder="Search products..."
+                style="width: 200px; height: 35px; font-size: 0.9rem"
+              />
+              <i
+                class="fa-solid fa-magnifying-glass position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"
+                style="cursor: pointer"
+              ></i>
+            </div>
+
+            <a
+              href="cart.html"
+              class="position-relative ms-lg-4 mt-3 mt-lg-0 text-dark"
+              style="cursor: pointer"
+            >
+              <i class="fa-solid fa-cart-shopping fs-5"></i>
+              <span
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                style="font-size: 0.6rem"
+                >2</span
+              >
+            </a>
+
+            <div class="dropdown ms-lg-4 mt-3 mt-lg-0">
+              <a
+                class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <div
+                  class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2"
+                  style="width: 35px; height: 35px; border: 1px solid #dee2e6"
+                >
+                  <i class="fa-regular fa-user"></i>
+                </div>
+                <span class="fw-semibold small">Jinsa</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end border-0 shadow mt-2">
+                <li>
+                  <a class="dropdown-item" href="./userProfilePage.html"
+                    ><i class="fa-solid fa-user me-2 text-muted"></i>My Profile</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./userWishListPage.html"
+                    ><i class="fa-regular fa-heart me-2 text-muted"></i
+                    >Wishlist</a
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item text-danger" href="./userLogin.html"
+                    ><i class="fa-solid fa-arrow-right-from-bracket me-2"></i
+                    >Logout</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+          </div>
+
+        <script>
+          function toggleSearch() {
+            const searchBox = document.getElementById("navbarSearch");
+            if (searchBox.classList.contains("d-none")) {
+              searchBox.classList.remove("d-none");
+              searchBox.focus();
+            } else {
+              searchBox.classList.add("d-none");
+            }
+          }
+        </script>
+      </div>
+    </nav>
+
+    <div class="profile-container">
+      <div class="row">
+        <div class="col-lg-3 sidebar">
+          <ul class="sidebar-menu">
+            <li class="sidebar-item">
+              <a href="./userProfilePage.html" class="sidebar-link"
+                ><i class="fa-regular fa-user"></i> Profile</a
+              >
+            </li>
+            <li class="sidebar-item">
+              <a href="./userOrdersPage.html" class="sidebar-link active"
+                ><i class="fa-solid fa-bag-shopping"></i> Orders</a
+              >
+            </li>
+            <li class="sidebar-item">
+              <a href="./userWalletPage.html" class="sidebar-link"
+                ><i class="fa-solid fa-wallet"></i> Wallet</a
+              >
+            </li>
+            <li class="sidebar-item">
+              <a href="./userWishListPage.html" class="sidebar-link"
+                ><i class="fa-regular fa-heart"></i> Wishlist</a
+              >
+            </li>
+            <li class="sidebar-item">
+              <a href="./userAddressPage.html" class="sidebar-link"
+                ><i class="fa-solid fa-location-dot"></i> Address</a
+              >
+            </li>
+            <li class="sidebar-item">
+              <a href="./userPassword.html" class="sidebar-link"
+                ><i class="fa-solid fa-lock"></i> Password</a
+              >
+            </li>
+            <li class="sidebar-item">
+              <a href="./userCoupon.html" class="sidebar-link"
+                ><i class="fa-solid fa-ticket"></i> Coupon</a
+              >
+            </li>
+            <li class="sidebar-item">
+              <a href="./userLogin.html" class="sidebar-link logout-btn"
+                ><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div class="col-lg-9 main-content content-animate">
+          <div class="form-container-limit">
+            <h2 class="page-title">Return Order #12345678</h2>
+
+            <div class="status-banner">
+              <i class="fa-regular fa-circle-check"></i>
+              <span>Status: Return Initiated - December 23, 2025</span>
+            </div>
+
+            <h5 class="fw-bold mb-3">Select Items to Return</h5>
+
+            <form id="returnForm">
+              <div class="table-responsive">
+                <table class="return-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 40%">Product</th>
+                      <th style="width: 15%">Quantity</th>
+                      <th style="width: 15%">Price</th>
+                      <th style="width: 30%">Reason for Return</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <div class="product-col">
+                          <input
+                            type="checkbox"
+                            class="custom-checkbox item-check"
+                            data-price="29.99"
+                            checked
+                          />
+                          <img
+                            src="../images/16backcover.jpeg"
+                            alt="Item"
+                            class="product-img"
+                          />
+                          <span class="product-name">iPhone 17 Pro Case</span>
+                        </div>
+                      </td>
+                      <td>1</td>
+                      <td>$29.99</td>
+                      <td>
+                        <select class="form-select form-select-sm">
+                          <option>Reason for Return</option>
+                          <option>Defective / Damaged</option>
+                          <option>Wrong Item Sent</option>
+                          <option>Changed Mind</option>
+                        </select>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>
+                        <div class="product-col">
+                          <input
+                            type="checkbox"
+                            class="custom-checkbox item-check"
+                            data-price="19.99"
+                          />
+                          <img
+                            src="https://placehold.co/100x100/f5f5f5/333?text=Adapter"
+                            alt="Item"
+                            class="product-img"
+                          />
+                          <span class="product-name">20W Fast Adapter</span>
+                        </div>
+                      </td>
+                      <td>1</td>
+                      <td>$19.99</td>
+                      <td>
+                        <select class="form-select form-select-sm">
+                          <option>Reason for Return</option>
+                          <option>Defective / Damaged</option>
+                          <option>Wrong Item Sent</option>
+                          <option>No Longer Needed</option>
+                        </select>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="mt-4 mb-4">
+                <h5 class="fw-bold mb-3">Return Shipping Options</h5>
+                <div class="row">
+                  <div class="col-md-6">
+                    <label class="shipping-option">
+                      <input
+                        type="radio"
+                        name="shipping"
+                        class="form-check-input"
+                        checked
+                      />
+                      <div>
+                        <strong>Drop-off at Carrier</strong>
+                        <div class="small text-muted">
+                          Print label and drop off at nearest store.
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="shipping-option">
+                      <input
+                        type="radio"
+                        name="shipping"
+                        class="form-check-input"
+                      />
+                      <div>
+                        <strong>Schedule Pickup</strong>
+                        <div class="small text-muted">
+                          Carrier will pick up from your address.
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="border-secondary opacity-25 my-4" />
+
+              <div class="return-summary">
+                <h5>Return Summary</h5>
+                <div class="text-muted small">Items selected for refund</div>
+                <div class="estimated-amount" id="totalRefund">$29.99</div>
+              </div>
+
+              <button
+                type="button"
+                class="btn-submit-return"
+                onclick="submitReturn()"
+              >
+                Submit Return <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-3">
+            <h5>Discover More</h5>
+            <ul>
+              <li><a href="#">About Us</a></li>
+              <li><a href="#">Contact Us</a></li>
+              <li><a href="#">Blog</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h5>Explore Products</h5>
+            <ul>
+              <li><a href="#">Mobiles</a></li>
+              <li><a href="#">Accessories</a></li>
+              <li><a href="#">Trendy Cases</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h5>Customer Care</h5>
+            <ul>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Service</a></li>
+              <li><a href="#">Return Policy</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h5>Contact Us</h5>
+            <input
+              type="email"
+              class="newsletter-input"
+              placeholder="Enter email"
+            /><button class="btn btn-light w-100">Subscribe</button>
+            <div class="mt-3">
+              <i class="fa-brands fa-facebook me-3"></i
+              ><i class="fa-brands fa-instagram me-3"></i
+              ><i class="fa-brands fa-twitter"></i>
+            </div>
+          </div>
+        </div>
+        <hr class="border-secondary mt-4" />
+        <div class="text-center small">
+          &copy; 2025 Jinsa Mobiles. All rights reserved.
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // 1. DYNAMIC REFUND CALCULATOR
+      const checkboxes = document.querySelectorAll(".item-check");
+      const totalDisplay = document.getElementById("totalRefund");
+
+      function calculateTotal() {
+        let total = 0;
+        checkboxes.forEach((box) => {
+          if (box.checked) {
+            total += parseFloat(box.getAttribute("data-price"));
+          }
+        });
+        totalDisplay.innerText = "$" + total.toFixed(2);
+      }
+
+      checkboxes.forEach((box) => {
+        box.addEventListener("change", calculateTotal);
+      });
+
+      // 2. SUBMIT BUTTON FUNCTIONALITY
+      function submitReturn() {
+        let anyChecked = false;
+        checkboxes.forEach((box) => {
+          if (box.checked) anyChecked = true;
+        });
+
+        if (!anyChecked) {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Please select at least one item to return.",
+            confirmButtonColor: "#1a1a1a",
+          });
+          return;
+        }
+
+        Swal.fire({
+          title: "Return Requested!",
+          text: "Your return request has been submitted successfully. We will email you the shipping label shortly.",
+          icon: "success",
+          confirmButtonText: "Back to Orders",
+          confirmButtonColor: "#1a1a1a",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = "#";
+          }
+        });
+      }
+
+      // Run calculation once on load
+      calculateTotal();
+    </script>
+  </body>
+</html>

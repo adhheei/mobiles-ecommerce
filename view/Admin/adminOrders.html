@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Management - Jinsa Mobiles Admin</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+      :root {
+        --primary-black: #1a1a1a;
+        --bg-light: #f8f9fa;
+        --border-color: #eee;
+        --sidebar-width: 260px;
+        --active-bg: #f1f1f1;
+        --text-muted: #888;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: var(--bg-light);
+        overflow-x: hidden;
+        color: var(--primary-black);
+      }
+
+      /* --- SIDEBAR --- */
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        background-color: #fff;
+        border-right: 1px solid var(--border-color);
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 25px 20px;
+        z-index: 1000;
+      }
+      .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 40px;
+        text-decoration: none;
+        color: var(--primary-black);
+      }
+      .brand-logo {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .brand-text-container {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+      }
+      .brand-title {
+        font-weight: 800;
+        font-size: 1.05rem;
+        color: #000;
+        letter-spacing: -0.5px;
+      }
+      .brand-subtitle {
+        font-size: 0.55rem;
+        letter-spacing: 2px;
+        color: #999;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-grow: 1;
+        overflow-y: auto;
+      }
+      .menu-item {
+        margin-bottom: 4px;
+      }
+      .menu-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        color: #666;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.88rem;
+        border-radius: 10px;
+        transition: all 0.2s;
+      }
+      .menu-link i {
+        width: 28px;
+        font-size: 1.1rem;
+        color: #999;
+      }
+      .menu-link:hover {
+        background-color: var(--bg-light);
+        color: #000;
+      }
+      .menu-link.active {
+        background-color: var(--active-bg);
+        color: #000;
+        font-weight: 600;
+      }
+      .menu-link.active i {
+        color: #000;
+      }
+
+      .admin-profile {
+        margin-top: auto;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+      }
+      .profile-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 15px;
+        text-decoration: none;
+        color: inherit;
+      }
+      .admin-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #eee;
+      }
+      .admin-details h6 {
+        margin: 0;
+        font-size: 0.85rem;
+        font-weight: 700;
+      }
+      .admin-details span {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+      }
+      .logout-btn {
+        width: 100%;
+        background-color: #000;
+        border: none;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: 0.2s;
+        text-decoration: none;
+      }
+      .logout-btn:hover {
+        background-color: #333;
+        color: #fff;
+      }
+
+      /* --- MAIN CONTENT --- */
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 40px;
+        transition: margin-left 0.3s ease;
+      }
+
+      .mobile-nav {
+        display: none;
+        background: #fff;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        position: sticky;
+        top: 0;
+        z-index: 999;
+      }
+
+      .page-header {
+        margin-bottom: 35px;
+      }
+      .page-title {
+        font-size: 2rem;
+        font-weight: 800;
+        margin: 0;
+        color: #000;
+        letter-spacing: -0.5px;
+      }
+      .page-subtitle {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-top: 5px;
+      }
+
+      /* Toolbar & Search Spacing */
+      .table-toolbar {
+        background: #fff;
+        padding: 20px;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+      }
+
+      .search-group {
+        flex-grow: 1;
+        max-width: 400px;
+        position: relative;
+      }
+      .search-group input {
+        border-radius: 12px;
+        padding-left: 45px;
+        height: 46px;
+        border: 1px solid #eee;
+        background-color: #fcfcfc;
+        width: 100%;
+        font-size: 0.88rem;
+      }
+      .search-group i {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #aaa;
+      }
+
+      .filter-group {
+        display: flex;
+        gap: 12px;
+      }
+      .custom-select {
+        border-radius: 12px;
+        border: 1px solid #eee;
+        padding: 8px 35px 8px 18px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        height: 46px;
+        appearance: none;
+        background: #fff
+          url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e")
+          no-repeat right 0.75rem center/16px 12px;
+      }
+
+      /* --- TABLE REFINEMENT --- */
+      .table-container {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+      }
+      .table thead th {
+        background-color: #fcfcfc;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #888;
+        padding: 20px 25px;
+        border-bottom: 1px solid #eee;
+      }
+      .table tbody td {
+        padding: 22px 25px;
+        vertical-align: middle;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #f8f8f8;
+        color: #333;
+      }
+
+      .order-id {
+        font-weight: 700;
+        color: #000;
+      }
+      
+      /* Status Badges - Minimalist Style */
+      .badge-status {
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 0.72rem;
+        font-weight: 600;
+      }
+      .status-pending { background-color: #f1f1f1; color: #666; }
+      .status-processing { background-color: #e9ecef; color: #444; }
+      .status-shipped { background-color: #1a1a1a; color: #fff; }
+      .status-delivered { background-color: #e3e3e3; color: #333; }
+      .status-cancelled { background-color: #ffe5e5; color: #d00; }
+
+      .price {
+        font-weight: 700;
+        color: #000;
+      }
+
+      .btn-view-details {
+        padding: 8px 18px;
+        border-radius: 10px;
+        border: 1px solid #eee;
+        background: #fff;
+        color: #000;
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: 0.2s;
+      }
+      .btn-view-details:hover {
+        background: #000;
+        color: #fff;
+        border-color: #000;
+      }
+
+      /* Pagination */
+      .pagination-wrapper {
+        padding: 20px 25px;
+        background: #fff;
+      }
+      .page-nav-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid #eee;
+        background: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s;
+        color: #000;
+      }
+      .page-nav-btn:hover {
+        background: #f1f1f1;
+      }
+
+      @media (max-width: 991px) {
+        .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+        .sidebar.active { transform: translateX(0); box-shadow: 10px 0 30px rgba(0,0,0,0.05); }
+        .main-content { margin-left: 0; padding: 25px; }
+        .mobile-nav { display: flex; justify-content: space-between; align-items: center; }
+        .sidebar-overlay.active { display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 998; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mobile-nav">
+      <a href="#" class="brand-section" style="margin-bottom:0">
+        <img src="images/logo.jpg" alt="Logo" class="brand-logo" />
+        <div class="brand-text-container">
+          <span class="brand-title">JINSA MOBILES</span>
+        </div>
+      </a>
+      <button class="btn btn-light" onclick="toggleSidebar()">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <nav class="sidebar" id="sidebar">
+      <a href="#" class="brand-section">
+        <img src="images/logo.jpg" alt="Logo" class="brand-logo" />
+        <div class="brand-text-container">
+          <span class="brand-title">JINSA MOBILES</span>
+          <span class="brand-subtitle">AND ACCESSORIES</span>
+        </div>
+      </a>
+
+      <ul class="sidebar-menu">
+        <li class="menu-item">
+          <a href="adminDashboard.html" class="menu-link">
+            <i class="fa-solid fa-border-all"></i> Dashboard
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="adminOrders.html" class="menu-link active">
+            <i class="fa-solid fa-cart-shopping"></i> Orders
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="adminProducts.html" class="menu-link">
+            <i class="fa-solid fa-box-open"></i> Products
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="adminCustomers.html" class="menu-link">
+            <i class="fa-solid fa-users"></i> Customers
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="adminMessages.html" class="menu-link">
+            <i class="fa-regular fa-envelope"></i> Messages
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="adminAnalytics.html" class="menu-link">
+            <i class="fa-solid fa-chart-simple"></i> Analytics
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="adminCoupons.html" class="menu-link">
+            <i class="fa-solid fa-tag"></i> Coupon Management
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="adminCategories.html" class="menu-link">
+            <i class="fa-solid fa-layer-group"></i> Category Management
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="adminOffers.html" class="menu-link">
+            <i class="fa-solid fa-gift"></i> Offer
+          </a>
+        </li>
+      </ul>
+
+      <div class="admin-profile">
+        <a href="adminProfile.html" class="profile-info">
+          <img src="https://placehold.co/100x100/eee/999?text=A" class="admin-avatar" />
+          <div class="admin-details">
+            <h6>Admin Panel</h6>
+            <span>admin@jinsa.com</span>
+          </div>
+        </a>
+        <a href="adminLogin.html" class="logout-btn">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+        </a>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="page-header">
+        <h2 class="page-title">Order Management</h2>
+        <p class="page-subtitle">Detailed overview of all customer transactions.</p>
+      </div>
+
+      <div class="table-toolbar">
+        <div class="search-group">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search Order ID or Customer..."
+            onkeyup="searchOrders()"
+          />
+        </div>
+
+        <div class="filter-group">
+          <select class="custom-select" id="filterStatus">
+            <option value="all">Status: All</option>
+            <option value="pending">Pending</option>
+            <option value="processing">Processing</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+
+          <select class="custom-select" id="sortOrders">
+            <option value="newest">Sort: Newest</option>
+            <option value="oldest">Sort: Oldest</option>
+            <option value="amount-high">Price: High to Low</option>
+            <option value="amount-low">Price: Low to High</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Date</th>
+              <th>Customer</th>
+              <th>Payment</th>
+              <th>Status</th>
+              <th>Total</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody">
+            <tr>
+              <td><span class="order-id">#ORD-00120</span></td>
+              <td>2023-10-23</td>
+              <td>Robert Fox</td>
+              <td><span class="text-muted small fw-bold">Apple Pay</span></td>
+              <td><span class="badge-status status-delivered">Delivered</span></td>
+              <td class="price">$89.99</td>
+              <td class="text-end">
+                <a href="adminOrderDetails.html" class="btn-view-details">View Details</a>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="order-id">#ORD-00119</span></td>
+              <td>2023-10-22</td>
+              <td>Esther Howard</td>
+              <td><span class="text-muted small fw-bold">Google Pay</span></td>
+              <td><span class="badge-status status-processing">Processing</span></td>
+              <td class="price">$15.50</td>
+              <td class="text-end">
+                <a href="adminOrderDetails.html" class="btn-view-details">View Details</a>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="order-id">#ORD-00118</span></td>
+              <td>2023-10-21</td>
+              <td>Cameron Williamson</td>
+              <td><span class="text-muted small fw-bold">Stripe</span></td>
+              <td><span class="badge-status status-shipped">Shipped</span></td>
+              <td class="price">$145.00</td>
+              <td class="text-end">
+                <a href="adminOrderDetails.html" class="btn-view-details">View Details</a>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="order-id">#ORD-00117</span></td>
+              <td>2023-10-20</td>
+              <td>Arlene McCoy</td>
+              <td><span class="text-muted small fw-bold">COD</span></td>
+              <td><span class="badge-status status-pending">Pending</span></td>
+              <td class="price">$32.00</td>
+              <td class="text-end">
+                <a href="adminOrderDetails.html" class="btn-view-details">View Details</a>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="order-id">#ORD-00116</span></td>
+              <td>2023-10-19</td>
+              <td>Jerome Bell</td>
+              <td><span class="text-muted small fw-bold">PayPal</span></td>
+              <td><span class="badge-status status-cancelled">Cancelled</span></td>
+              <td class="price">$215.75</td>
+              <td class="text-end">
+                <a href="adminOrderDetails.html" class="btn-view-details">View Details</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="pagination-wrapper d-flex justify-content-between align-items-center border-top">
+          <span class="text-muted small">Showing 1 to 5 of 50 entries</span>
+          <div class="d-flex align-items-center gap-2">
+            <button class="page-nav-btn"><i class="fa-solid fa-chevron-left"></i></button>
+            <span class="fw-bold px-2 small">1</span>
+            <button class="page-nav-btn"><i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+        document.getElementById("sidebarOverlay").classList.toggle("active");
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const filterStatusSelect = document.getElementById("filterStatus");
+        const sortOrdersSelect = document.getElementById("sortOrders");
+        const searchInput = document.getElementById("searchInput");
+        const tableBody = document.getElementById("ordersTableBody");
+        const originalRows = Array.from(tableBody.querySelectorAll("tr"));
+
+        function filterTable() {
+          const status = filterStatusSelect.value.toLowerCase();
+          const searchTerm = searchInput.value.toLowerCase();
+
+          originalRows.forEach((row) => {
+            const badge = row.querySelector(".badge-status");
+            const rowStatus = badge ? badge.innerText.trim().toLowerCase() : "";
+            const orderID = row.querySelector(".order-id").innerText.toLowerCase();
+            const customerName = row.children[2].innerText.toLowerCase();
+
+            const statusMatch = status === "all" || rowStatus.includes(status);
+            const searchMatch = orderID.includes(searchTerm) || customerName.includes(searchTerm);
+
+            row.style.display = statusMatch && searchMatch ? "" : "none";
+          });
+        
+          
+        }
+
+        window.searchOrders = filterTable;
+        filterStatusSelect.addEventListener("change", filterTable);
+        sortOrdersSelect.addEventListener("change", () => {
+          const sortBy = sortOrdersSelect.value;
+          const rowsToSort = [...originalRows];
+
+          rowsToSort.sort((a, b) => {
+            const getPrice = (r) => parseFloat(r.children[5].innerText.replace("$", ""));
+            const getDate = (r) => new Date(r.children[1].innerText);
+
+            if (sortBy === "newest") return getDate(b) - getDate(a);
+            if (sortBy === "oldest") return getDate(a) - getDate(b);
+            if (sortBy === "amount-high") return getPrice(b) - getPrice(a);
+            if (sortBy === "amount-low") return getPrice(a) - getPrice(b);
+            return 0;
+          });
+
+          tableBody.innerHTML = "";
+          rowsToSort.forEach((row) => tableBody.appendChild(row));
+        });
+      });
+    </script>
+  </body>
+</html>

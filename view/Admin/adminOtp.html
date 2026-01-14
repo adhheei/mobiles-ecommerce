@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify OTP - Jinsa Mobiles</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+      :root {
+        --primary-black: #1a1a1a;
+        --bg-light: #f8f9fa;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: var(--bg-light);
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+      }
+
+      /* --- ANIMATION CSS --- */
+      .reveal-up {
+        opacity: 0;
+        transform: translateY(30px);
+        animation: revealUp 0.8s ease-out forwards;
+      }
+
+      @keyframes revealUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      /* -------------------- */
+
+      .otp-card {
+        background: #fff;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+        border: 1px solid #eee;
+      }
+
+      /* Logo Styling */
+      .brand-logo {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 20px;
+      }
+
+      .title {
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin-bottom: 5px;
+        color: var(--primary-black);
+      }
+
+      .subtitle {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 30px;
+        line-height: 1.5;
+      }
+
+      /* OTP Input Group */
+      .otp-group {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 25px;
+      }
+
+      .otp-field {
+        width: 50px;
+        height: 55px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        font-size: 1.2rem;
+        font-weight: 600;
+        text-align: center;
+        background-color: #fcfcfc;
+        transition: all 0.2s;
+      }
+
+      .otp-field:focus {
+        border-color: var(--primary-black);
+        box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.1);
+        background-color: #fff;
+        outline: none;
+      }
+
+      .btn-verify {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        background: var(--primary-black);
+        color: #fff;
+        font-weight: 600;
+        border: none;
+        transition: 0.2s;
+        font-size: 1rem;
+      }
+
+      .btn-verify:hover {
+        background: #333;
+      }
+
+      .resend-text {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 20px;
+      }
+
+      .resend-link {
+        color: var(--primary-black);
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .resend-link:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="otp-card reveal-up">
+      <img
+        src="../images/logo.jpg"
+        alt="Logo"
+        class="brand-logo"
+        onerror="this.src='https://placehold.co/80'"
+      />
+
+      <h2 class="title">Verify OTP</h2>
+      <p class="subtitle">
+        Please enter the 4-digit code sent to <br /><strong>admin@example.com</strong>
+      </p>
+
+      <form onsubmit="handleVerify(event)">
+        <div class="otp-group">
+          <input
+            type="text"
+            class="otp-field"
+            maxlength="1"
+            onkeyup="moveToNext(this, 'otp2')"
+            id="otp1"
+            autofocus
+          />
+          <input
+            type="text"
+            class="otp-field"
+            maxlength="1"
+            onkeyup="moveToNext(this, 'otp3')"
+            id="otp2"
+          />
+          <input
+            type="text"
+            class="otp-field"
+            maxlength="1"
+            onkeyup="moveToNext(this, 'otp4')"
+            id="otp3"
+          />
+          <input
+            type="text"
+            class="otp-field"
+            maxlength="1"
+            id="otp4"
+          />
+        </div>
+
+        <button type="submit" class="btn-verify">Verify & Proceed</button>
+      </form>
+
+      <p class="resend-text">
+        Didn't

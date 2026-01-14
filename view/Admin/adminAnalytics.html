@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analytics - Jinsa Mobiles Admin</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+      :root {
+        --primary-black: #1a1a1a;
+        --bg-light: #f8f9fa;
+        --border-color: #eee;
+        --sidebar-width: 260px;
+        --active-bg: #e9ecef;
+        --text-muted: #6c757d;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: var(--bg-light);
+        overflow-x: hidden;
+        color: var(--primary-black);
+      }
+
+      /* --- ANIMATIONS --- */
+      .reveal-up { opacity: 0; transform: translateY(30px); animation: revealUp 0.8s ease-out forwards; }
+      @keyframes revealUp { to { opacity: 1; transform: translateY(0); } }
+      .pop-in { opacity: 0; transform: scale(0.5); animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; animation-delay: 0.2s; }
+      @keyframes popIn { to { opacity: 1; transform: scale(1); } }
+
+      /* --- SIDEBAR --- */
+      .sidebar { width: var(--sidebar-width); height: 100vh; background-color: #fff; border-right: 1px solid var(--border-color); position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding: 20px; z-index: 1000; transition: transform 0.3s ease; }
+      .brand-section { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; text-decoration: none; color: var(--primary-black); }
+      .brand-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+      .brand-text-container { display: flex; flex-direction: column; line-height: 1.1; }
+      .brand-title { font-weight: 800; font-size: 1rem; color: #000; }
+      .brand-subtitle { font-size: 0.55rem; letter-spacing: 2px; color: #777; font-weight: 600; text-transform: uppercase; }
+      
+      .sidebar-menu { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; }
+      .menu-item { margin-bottom: 5px; }
+      .menu-link { display: flex; align-items: center; padding: 12px 15px; color: #555; text-decoration: none; font-weight: 500; font-size: 0.9rem; border-radius: 8px; transition: all 0.2s; }
+      .menu-link i { width: 25px; font-size: 1.1rem; color: #777; margin-right: 10px; }
+      .menu-link:hover { background-color: var(--bg-light); color: #000; }
+      .menu-link.active { background-color: var(--active-bg); color: #000; font-weight: 600; }
+      .menu-link.active i { color: #000; }
+
+      .admin-profile { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color); }
+      .profile-info { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; text-decoration: none; color: inherit; }
+      .admin-avatar { width: 35px; height: 35px; border-radius: 50%; background: #ccc; }
+      .admin-details h6 { margin: 0; font-size: 0.9rem; font-weight: 600; }
+      .admin-details span { font-size: 0.75rem; color: var(--text-muted); }
+      .logout-btn { width: 100%; background-color: var(--bg-light); border: none; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; color: #333; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; text-decoration: none; }
+      .logout-btn:hover { background-color: #e2e6ea; color: #000; }
+
+      /* --- MAIN CONTENT --- */
+      .main-content { margin-left: var(--sidebar-width); padding: 30px; padding-bottom: 80px; transition: margin-left 0.3s ease; }
+      .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
+      .page-title { font-size: 1.8rem; font-weight: 800; margin: 0; color: #000; }
+      .page-subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 2px; }
+
+      .header-actions { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+
+      .date-filter { background: #fff; border: 1px solid #ddd; padding: 8px 15px; border-radius: 8px; font-size: 0.9rem; color: #333; display: flex; align-items: center; gap: 10px; cursor: pointer; height: 40px; }
+      .date-filter:hover { background: #f8f9fa; }
+
+      .btn-download { background-color: #000; color: #fff; border: none; padding: 0 20px; border-radius: 8px; font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; height: 40px; transition: 0.2s; }
+      .btn-download:hover { background-color: #333; color: #fff; }
+
+      /* Stats Grid */
+      .stat-card { background: #fff; border-radius: 12px; border: 1px solid #eee; padding: 20px; display: flex; flex-direction: column; height: 100%; transition: transform 0.2s; }
+      .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+      .stat-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+      .stat-title { font-size: 0.85rem; color: #777; font-weight: 500; }
+      .stat-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+      .bg-blue { background: #e3f2fd; color: #0d47a1; }
+      .bg-green { background: #d1e7dd; color: #0f5132; }
+      .bg-orange { background: #fff3cd; color: #856404; }
+      .bg-purple { background: #e2d9f3; color: #5e35b1; }
+      
+      .stat-value { font-size: 1.8rem; font-weight: 700; color: #000; margin-bottom: 5px; }
+      .stat-trend { font-size: 0.8rem; font-weight: 500; display: flex; align-items: center; gap: 5px; }
+      .trend-up { color: #198754; }
+      .trend-down { color: #dc3545; }
+
+      /* Charts */
+      .chart-card { background: #fff; border-radius: 12px; border: 1px solid #eee; padding: 25px; margin-bottom: 25px; height: 100%; }
+      .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+      .chart-title { font-weight: 700; font-size: 1.1rem; margin: 0; }
+      .chart-container { position: relative; width: 100%; }
+      .doughnut-wrapper { height: 280px; display: flex; justify-content: center; }
+
+      /* Top Products Table */
+      .top-product-item { display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid #f9f9f9; }
+      .top-product-item:last-child { border-bottom: none; }
+      .tp-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: #eee; margin-right: 15px; }
+      .tp-info { flex-grow: 1; }
+      .tp-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; display: block; }
+      .tp-cat { font-size: 0.8rem; color: #777; }
+      .tp-sales { text-align: right; font-weight: 700; font-size: 0.95rem; }
+      .tp-revenue { text-align: right; font-size: 0.8rem; color: #777; display: block; }
+      
+      .progress-container { width: 100%; background-color: #f0f0f0; border-radius: 10px; height: 6px; margin-top: 8px; }
+      .progress-bar-custom { height: 100%; border-radius: 10px; background-color: var(--primary-black); }
+
+      /* Mobile Nav */
+      .mobile-nav { display: none; background: #fff; padding: 15px 20px; border-bottom: 1px solid #eee; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 999; }
+      .mobile-nav .brand-section { display: flex; align-items: center; gap: 10px; margin-bottom: 0; text-decoration: none; color: var(--primary-black); }
+      .brand-text-mobile { display: flex; flex-direction: column; line-height: 1.1; text-align: left; }
+      .brand-title-mobile { font-weight: 800; font-size: 1rem; color: #000; display: block; }
+      .brand-subtitle-mobile { font-size: 0.6rem; letter-spacing: 1px; color: #777; font-weight: 600; text-transform: uppercase; display: block; }
+
+      @media (max-width: 991px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar.active { transform: translateX(0); box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1); }
+        .main-content { margin-left: 0; padding: 20px; }
+        .mobile-nav { display: flex; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 998; }
+        .sidebar-overlay.active { display: block; }
+        .header-actions { width: 100%; }
+        .date-filter, .btn-download { flex-grow: 1; justify-content: center; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mobile-nav">
+      <a href="#" class="brand-section">
+        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
+        <div class="brand-text-mobile">
+          <span class="brand-title-mobile">JINSA MOBILES</span>
+          <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
+        </div>
+      </a>
+      <button class="btn btn-light" onclick="toggleSidebar()">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <nav class="sidebar" id="sidebar">
+      <a href="#" class="brand-section">
+        <img src="../images/logo.jpg" alt="Logo" class="brand-logo pop-in" />
+        <div class="brand-text-container">
+          <span class="brand-title">JINSA MOBILES</span>
+          <span class="brand-subtitle">AND ACCESSORIES</span>
+        </div>
+      </a>
+
+      <ul class="sidebar-menu">
+        <li class="menu-item"><a href="adminDashboard.html" class="menu-link"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
+        <li class="menu-item"><a href="./adminOrders.html" class="menu-link"><i class="fa-solid fa-cart-shopping"></i> Orders</a></li>
+        <li class="menu-item"><a href="./adminProducts.html" class="menu-link"><i class="fa-solid fa-box-open"></i> Products</a></li>
+        <li class="menu-item"><a href="./adminCustomers.html" class="menu-link"><i class="fa-solid fa-users"></i> Customers</a></li>
+        <li class="menu-item"><a href="./adminMessages.html" class="menu-link"><i class="fa-regular fa-envelope"></i> Messages</a></li>
+        <li class="menu-item"><a href="./adminAnalytics.html" class="menu-link active"><i class="fa-solid fa-chart-simple"></i> Analytics</a></li>
+        <li class="menu-item"><a href="./adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i> Coupon Management</a></li>
+        <li class="menu-item"><a href="./adminCategories.html" class="menu-link"><i class="fa-solid fa-layer-group"></i> Category Management</a></li>
+        <li class="menu-item"><a href="./adminOffers.html" class="menu-link"><i class="fa-solid fa-gift"></i> Offer</a></li>
+      </ul>
+
+      <div class="admin-profile">
+        <a href="./pro" class="profile-info">
+          <img src="https://placehold.co/100x100/ccc/fff?text=A" class="admin-avatar" />
+          <div class="admin-details"><h6>Admin</h6><span>admin@example.com</span></div>
+        </a>
+        <a href="#" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+      </div>
+    </nav>
+
+    <div class="main-content reveal-up">
+      <div class="page-header">
+        <div>
+          <h2 class="page-title">Analytics</h2>
+          <p class="page-subtitle">Overview of your store performance.</p>
+        </div>
+        
+        <div class="header-actions">
+            <div class="date-filter">
+              <i class="fa-regular fa-calendar"></i>
+              <span>Last 30 Days</span>
+              <i class="fa-solid fa-chevron-down ms-2" style="font-size: 0.7rem;"></i>
+            </div>
+            
+            <button class="btn-download" onclick="downloadReport()">
+                <i class="fa-solid fa-download"></i> Download Report
+            </button>
+        </div>
+      </div>
+
+      <div class="row g-4 mb-4">
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="stat-head">
+              <span class="stat-title">Total Revenue</span>
+              <div class="stat-icon bg-blue"><i class="fa-solid fa-dollar-sign"></i></div>
+            </div>
+            <div class="stat-value">$45,231</div>
+            <span class="stat-trend trend-up"><i class="fa-solid fa-arrow-up"></i> +12.5%</span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="stat-head">
+              <span class="stat-title">Total Orders</span>
+              <div class="stat-icon bg-green"><i class="fa-solid fa-cart-shopping"></i></div>
+            </div>
+            <div class="stat-value">1,342</div>
+            <span class="stat-trend trend-up"><i class="fa-solid fa-arrow-up"></i> +8.2%</span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="stat-head">
+              <span class="stat-title">Visitors</span>
+              <div class="stat-icon bg-orange"><i class="fa-solid fa-users"></i></div>
+            </div>
+            <div class="stat-value">24.5k</div>
+            <span class="stat-trend trend-down"><i class="fa-solid fa-arrow-down"></i> -3.1%</span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="stat-head">
+              <span class="stat-title">Conversion Rate</span>
+              <div class="stat-icon bg-purple"><i class="fa-solid fa-chart-pie"></i></div>
+            </div>
+            <div class="stat-value">3.2%</div>
+            <span class="stat-trend trend-up"><i class="fa-solid fa-arrow-up"></i> +1.1%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h5 class="chart-title">Revenue & Sales</h5>
+              <i class="fa-solid fa-ellipsis text-muted" style="cursor:pointer;"></i>
+            </div>
+            <div class="chart-container" style="height: 300px;">
+              <canvas id="revenueChart"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h5 class="chart-title">Sales by Category</h5>
+            </div>
+            <div class="chart-container doughnut-wrapper">
+              <canvas id="categoryChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h5 class="chart-title">Top Selling Products</h5>
+              <a href="./adminProducts.html" class="text-decoration-none small fw-bold text-dark">View All</a>
+            </div>
+            
+            <div class="top-product-item">
+                <img src="../images/16backcover.jpeg" class="tp-img" alt="Product">
+                <div class="tp-info">
+                    <span class="tp-name">iPhone 15 Pro Max Case</span>
+                    <span class="tp-cat">Accessories</span>
+                    <div class="progress-container">
+                        <div class="progress-bar-custom" style="width: 85%;"></div>
+                    </div>
+                </div>
+                <div class="ms-3">
+                    <div class="tp-sales">850 Sold</div>
+                    <span class="tp-revenue">$42,500</span>
+                </div>
+            </div>
+
+            <div class="top-product-item">
+                <img src="https://placehold.co/100x100/eee/333?text=S24" class="tp-img" alt="Product">
+                <div class="tp-info">
+                    <span class="tp-name">Samsung Galaxy S24 Ultra</span>
+                    <span class="tp-cat">Mobiles</span>
+                    <div class="progress-container">
+                        <div class="progress-bar-custom" style="width: 65%;"></div>
+                    </div>
+                </div>
+                <div class="ms-3">
+                    <div class="tp-sales">650 Sold</div>
+                    <span class="tp-revenue">$845,000</span>
+                </div>
+            </div>
+
+            <div class="top-product-item">
+                <img src="https://placehold.co/100x100/eee/333?text=AirPods" class="tp-img" alt="Product">
+                <div class="tp-info">
+                    <span class="tp-name">AirPods Pro 2nd Gen</span>
+                    <span class="tp-cat">Audio</span>
+                    <div class="progress-container">
+                        <div class="progress-bar-custom" style="width: 45%;"></div>
+                    </div>
+                </div>
+                <div class="ms-3">
+                    <div class="tp-sales">450 Sold</div>
+                    <span class="tp-revenue">$112,500</span>
+                </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+        document.getElementById("sidebarOverlay").classList.toggle("active");
+      }
+
+      // --- Download Report Logic ---
+      function downloadReport() {
+        let timerInterval;
+        Swal.fire({
+          title: 'Generating Report...',
+          html: 'Preparing your data in <b></b> milliseconds.',
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: () => {
+            Swal.showLoading();
+            const b = Swal.getHtmlContainer().querySelector('b');
+            timerInterval = setInterval(() => {
+              b.textContent = Swal.getTimerLeft();
+            }, 100);
+          },
+          willClose: () => {
+            clearInterval(timerInterval);
+          }
+        }).then((result) => {
+          if (result.dismiss === Swal.DismissReason.timer) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Downloaded!',
+              text: 'The report has been successfully downloaded.',
+              confirmButtonColor: '#1a1a1a'
+            });
+          }
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", function() {
+        // --- 1. Revenue Chart (Line) ---
+        const ctxRev = document.getElementById('revenueChart').getContext('2d');
+        const gradientRev = ctxRev.createLinearGradient(0, 0, 0, 300);
+        gradientRev.addColorStop(0, 'rgba(26, 26, 26, 0.1)');
+        gradientRev.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+        new Chart(ctxRev, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [12000, 19000, 15000, 22000, 20000, 30000, 25000, 35000],
+                    borderColor: '#1a1a1a',
+                    backgroundColor: gradientRev,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#1a1a1a'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { grid: { borderDash: [5, 5] }, ticks: { callback: v => '$' + v/1000 + 'k' } }
+                }
+            }
+        });
+
+        // --- 2. Category Chart (Doughnut) ---
+        const ctxCat = document.getElementById('categoryChart').getContext('2d');
+        new Chart(ctxCat, {
+            type: 'doughnut',
+            data: {
+                labels: ['Mobiles', 'Accessories', 'Audio'],
+                datasets: [{
+                    data: [35, 45, 20],
+                    backgroundColor: ['#1a1a1a', '#6c757d', '#ced4da'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+                }
+            }
+        });
+      });
+    </script>
+  </body>
+</html>

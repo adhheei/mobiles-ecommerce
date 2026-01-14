@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pikkme iPhone 16 Case - Jinsa Mobiles</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* --- GLOBAL VARIABLES & FONTS --- */
+      :root {
+        --primary-black: #1a1a1a;
+        --primary-red: #d32f2f;
+        --bg-light: #f8f9fa;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #fff;
+        /* FIXED: Added padding to prevent content from hiding behind fixed navbar */
+        padding-top: 85px; 
+        color: #1a1a1a;
+        overflow-x: hidden;
+      }
+
+      /* --- ANIMATION CSS --- */
+      .reveal-up {
+        opacity: 0;
+        transform: translateY(50px);
+        transition: all 0.8s ease-out;
+      }
+
+      .reveal-up.active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      /* -------------------- */
+
+      /* --- HEADER STYLES --- */
+      .navbar {
+        padding: 10px 0;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+      .navbar-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: var(--primary-black);
+      }
+      .navbar-nav .nav-link {
+        font-family: "Poppins", sans-serif !important;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1a1a1a !important;
+        margin: 0 15px; 
+        transition: color 0.3s ease;
+      }
+      .navbar-nav .nav-link:hover {
+        color: #0d6efd !important;
+      }
+      .search-container {
+        position: relative;
+      }
+      .search-input {
+        width: 200px;
+        height: 40px;
+        font-size: 0.9rem;
+        padding-right: 40px;
+        border-radius: 50px;
+        border: 1px solid #dee2e6;
+        padding-left: 15px;
+      }
+      .search-icon {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        color: #6c757d;
+        cursor: pointer;
+      }
+      .nav-icons i {
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: var(--primary-black);
+      }
+
+      /* Mobile Adjustments */
+      @media (max-width: 991px) {
+        .navbar-nav {
+          text-align: center;
+          margin-bottom: 15px;
+          align-items: center; /* This ensures links are perfectly centered */
+          width: 100%;
+        }
+
+        .nav-icons {
+          justify-content: center;
+          margin-top: 15px;
+          width: 100%;
+          border-top: 1px solid #eee;
+          padding-top: 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          align-items: center;
+        }
+
+        .search-container {
+          margin-bottom: 10px;
+        }
+      }
+
+      @media (min-width: 992px) {
+        /* Moved the margin here so it doesn't break mobile centering */
+        .navbar-collapse {
+          margin-left: 50px;
+        }
+
+        .nav-icons {
+          display: flex;
+          align-items: center;
+          margin-left: auto;
+        }
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 10px 0;
+        margin-top: 10px;
+      }
+      .dropdown-item {
+        padding: 10px 20px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: #333;
+        transition: all 0.2s ease;
+      }
+      .dropdown-item:hover {
+        background-color: #f8f9fa;
+        color: #d32f2f;
+        padding-left: 25px;
+      }
+
+      /* --- PRODUCT DETAILS STYLES --- */
+      .main-image-container {
+        border-radius: 16px;
+        background-color: #f8f9fa;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 15px;
+        padding-top: 100%;
+      }
+      .main-image-container img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 20px;
+      }
+      .thumbnail-container {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+      }
+      .thumbnail {
+        width: 70px;
+        height: 70px;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        cursor: pointer;
+        border: 2px solid transparent;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+      .thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .thumbnail.active {
+        border-color: #1a1a1a;
+      }
+
+      .vendor-text {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: #666;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+      }
+      .product-title-large {
+        font-size: 1.8rem;
+        font-weight: 700;
+        line-height: 1.3;
+        margin-bottom: 10px;
+      }
+
+      .sales-proof {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        color: #d32f2f;
+        margin-bottom: 15px;
+        font-weight: 500;
+      }
+      .fire-icon {
+        animation: flicker 1.5s infinite alternate;
+      }
+      @keyframes flicker {
+        0% {
+          opacity: 0.8;
+          transform: scale(1);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1.1);
+        }
+      }
+
+      .price-section {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+      .current-price-large {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #d32f2f;
+      }
+      .old-price-large {
+        font-size: 1.1rem;
+        text-decoration: line-through;
+        color: #999;
+      }
+
+      .stock-badge {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 25px;
+      }
+
+      .accordion-custom .accordion-item {
+        border: none;
+        border-bottom: 1px solid #eee;
+      }
+      .accordion-custom .accordion-button {
+        padding: 15px 0;
+        font-weight: 600;
+        color: #1a1a1a;
+        background: transparent;
+        box-shadow: none;
+      }
+      .accordion-custom .accordion-button:not(.collapsed) {
+        color: #1a1a1a;
+        background: transparent;
+      }
+      .accordion-body {
+        padding: 0 0 15px 0;
+        font-size: 0.9rem;
+        color: #555;
+        line-height: 1.6;
+      }
+
+      .color-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-top: 20px;
+        margin-bottom: 10px;
+      }
+      .swatch-group {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 25px;
+      }
+      .swatch-circle {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 1px solid #dee2e6;
+        position: relative;
+        transition: transform 0.2s;
+      }
+      .swatch-circle:hover {
+        transform: scale(1.1);
+      }
+      .swatch-circle.active {
+        box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1a1a1a;
+      }
+
+      .action-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+        margin-top: 30px;
+      }
+      .quantity-selector {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ced4da;
+        border-radius: 50px;
+        padding: 5px 15px;
+        width: 120px;
+        justify-content: space-between;
+      }
+      .qty-btn {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 0 5px;
+      }
+      .qty-input {
+        width: 40px;
+        text-align: center;
+        border: none;
+        font-weight: 600;
+        background: transparent;
+      }
+      
+      /* --- FIXED ADD TO CART BUTTON --- */
+      .btn-add-cart {
+        background: #1a1a1a;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 12px;
+        font-weight: 600;
+        flex-grow: 1;
+        transition: opacity 0.2s, background-color 0.2s;
+        text-decoration: none; /* Ensure link looks like button */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .btn-add-cart:hover {
+        opacity: 0.9;
+        background-color: #1a1a1a !important; 
+        color: white !important;
+      }
+
+      .btn-buy-now {
+        width: 100%;
+        background: white;
+        border: 1px solid #1a1a1a;
+        color: #1a1a1a;
+        border-radius: 50px;
+        padding: 12px;
+        font-weight: 600;
+        transition: background 0.2s;
+        margin-bottom: 25px;
+        text-decoration: none; /* Ensure link looks like button */
+        display: block;
+        text-align: center;
+      }
+      .btn-buy-now:hover {
+        background: #f8f9fa;
+        color: #1a1a1a;
+      }
+      .share-links span {
+        font-size: 0.85rem;
+        color: #666;
+        cursor: pointer;
+        margin-right: 20px;
+      }
+
+      /* --- CAROUSEL / SLIDER STYLES --- */
+      .scrolling-wrapper {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        scroll-behavior: smooth;
+        -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
+        scrollbar-width: none; /* Hide scrollbar Firefox */
+        padding-bottom: 20px;
+      }
+      .scrolling-wrapper::-webkit-scrollbar {
+        display: none;
+      } /* Hide scrollbar Chrome/Safari */
+
+      .related-section {
+        background-color: #fafafa;
+        padding: 60px 0;
+        margin-top: 50px;
+      }
+      .related-title {
+        font-weight: 700;
+        margin-bottom: 0;
+      }
+
+      /* Product Card for Slider */
+      .product-card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        height: 100%;
+      }
+      .product-card-link:hover {
+        color: inherit;
+      }
+
+      .product-card {
+        border: none;
+        background: white;
+        border-radius: 12px;
+        transition: transform 0.2s;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        height: 100%;
+        overflow: hidden;
+      }
+      .product-card:hover {
+        transform: translateY(-5px);
+      }
+      .card-img-top {
+        height: 250px;
+        object-fit: cover;
+        background: #f1f1f1;
+        padding: 0;
+      }
+      .card-body {
+        padding: 15px;
+        text-align: center;
+      }
+      .related-vendor {
+        font-size: 0.7rem;
+        color: #888;
+        text-transform: uppercase;
+      }
+      .related-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .related-price {
+        color: #d32f2f;
+        font-weight: 700;
+        font-size: 0.9rem;
+      }
+
+      /* --- FOOTER FEATURES --- */
+      .bottom-features {
+        border-top: 1px solid #eee;
+        padding: 40px 0;
+        margin-top: 0;
+        background: #fff;
+      }
+      .feature-box {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      .feature-box i {
+        font-size: 1.5rem;
+        color: #333;
+      }
+      .feature-text h6 {
+        font-weight: 700;
+        margin: 0;
+        font-size: 0.9rem;
+      }
+      .feature-text p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: #666;
+      }
+
+      /* --- FOOTER --- */
+      footer {
+        background-color: #111;
+        color: #aaa;
+        padding: 60px 0 20px;
+      }
+      footer h5 {
+        color: white;
+        font-weight: 600;
+        margin-bottom: 20px;
+      }
+      footer ul {
+        padding-left: 0;
+        list-style: none;
+      }
+      footer ul li {
+        margin-bottom: 10px;
+      }
+      footer a {
+        color: #aaa;
+        text-decoration: none;
+      }
+      footer a:hover {
+        color: white;
+      }
+      .newsletter-input {
+        background: #333;
+        border: none;
+        color: white;
+        padding: 10px;
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg fixed-top">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="./index.html">
+          <img
+            src="../../images/logo.jpg"
+            alt="Logo"
+            width="50"
+            height="50"
+            class="me-2 rounded-circle"
+          />
+          <div class="d-flex flex-column">
+            <span
+              class="fw-bold text-dark"
+              style="line-height: 1.1; font-size: 1.2rem"
+              >JINSA MOBILES</span
+            >
+            <span
+              class="text-secondary"
+              style="font-size: 0.6rem; letter-spacing: 4.2px; font-weight: 500"
+              >AND ACCESSORIES</span
+            >
+          </div>
+        </a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div
+          class="collapse navbar-collapse justify-content-center"
+          id="navbarNav"
+        >
+          <ul class="navbar-nav align-items-center">
+            <li class="nav-item">
+              <a class="nav-link" href="./index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="./productPage.html"
+                >Shop Products</a
+              >
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Categories
+              </a>
+              <ul class="dropdown-menu border-0 shadow-sm">
+                <li>
+                  <a class="dropdown-item" href="./productPage.html"
+                    >Mobiles Case</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./productPage.html"
+                    >Chargers</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./productPage.html"
+                    >Earphones</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./productPage.html"
+                    >Powerbanks</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./productPage.html"
+                    >Screen Protectors</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./productPage.html">Cables</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./aboutUs.html">About Us</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./contactUs.html">Contact</a>
+            </li>
+          </ul>
+
+          <div class="nav-icons align-items-center">
+            <div class="position-relative">
+              <input
+                type="text"
+                id="navbarSearch"
+                class="form-control border-secondary rounded-pill pe-5"
+                placeholder="Search products..."
+                style="width: 200px; height: 35px; font-size: 0.9rem"
+              />
+              <i
+                class="fa-solid fa-magnifying-glass position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"
+                style="cursor: pointer"
+              ></i>
+            </div>
+
+            <a
+              href="cart.html"
+              class="position-relative ms-lg-4 mt-3 mt-lg-0 text-dark"
+              style="cursor: pointer"
+            >
+              <i class="fa-solid fa-cart-shopping fs-5"></i>
+              <span
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                style="font-size: 0.6rem"
+                >2</span
+              >
+            </a>
+
+            <div class="dropdown ms-lg-4 mt-3 mt-lg-0">
+              <a
+                class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <div
+                  class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2"
+                  style="width: 35px; height: 35px; border: 1px solid #dee2e6"
+                >
+                  <i class="fa-regular fa-user"></i>
+                </div>
+                <span class="fw-semibold small">Jinsa</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end border-0 shadow mt-2">
+                <li>
+                  <a class="dropdown-item" href="./userProfilePage.html"
+                    ><i class="fa-solid fa-user me-2 text-muted"></i>My Profile</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./userWishListPage.html"
+                    ><i class="fa-regular fa-heart me-2 text-muted"></i
+                    >Wishlist</a
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item text-danger" href="./userLogin.html"
+                    ><i class="fa-solid fa-arrow-right-from-bracket me-2"></i
+                    >Logout</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <script>
+          function toggleSearch() {
+            const searchBox = document.getElementById("navbarSearch");
+            if (searchBox.classList.contains("d-none")) {
+              searchBox.classList.remove("d-none");
+              searchBox.focus();
+            } else {
+              searchBox.classList.add("d-none");
+            }
+          }
+        </script>
+      </div>
+    </nav>
+
+    <section class="py-4 reveal-up">
+      <div class="container">
+        <div class="row g-5">
+          <div class="col-lg-6">
+            <div class="main-image-container">
+              <img
+                src="../../images/16backcover.jpeg"
+                id="mainImage"
+                alt="iPhone 16 Case"
+              />
+            </div>
+            <div class="thumbnail-container">
+              <div
+                class="thumbnail active"
+                onclick="changeImage(this, '../../images/16backcover.jpeg')"
+              >
+                <img src="../../images/16backcover.jpeg" alt="Front" />
+              </div>
+              <div
+                class="thumbnail"
+                onclick="changeImage(this, 'https://placehold.co/500x500/f0f0f0/333?text=Back')"
+              >
+                <img
+                  src="https://placehold.co/100x100/f0f0f0/333?text=Back"
+                  alt="Back"
+                />
+              </div>
+              <div
+                class="thumbnail"
+                onclick="changeImage(this, 'https://placehold.co/500x500/e0e0e0/333?text=Side')"
+              >
+                <img
+                  src="https://placehold.co/100x100/e0e0e0/333?text=Side"
+                  alt="Side"
+                />
+              </div>
+              <div
+                class="thumbnail"
+                onclick="changeImage(this, 'https://placehold.co/500x500/d0d0d0/333?text=Detail')"
+              >
+                <img
+                  src="https://placehold.co/100x100/d0d0d0/333?text=Detail"
+                  alt="Detail"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="vendor-text">PIKKME</div>
+            <h1 class="product-title-large">
+              Pikkme iPhone 16 Super Soft Silicone Back Cover (Black)
+            </h1>
+
+            <div class="sales-proof">
+              <i class="fa-solid fa-fire fire-icon"></i> 153+ bought in past
+              month
+            </div>
+
+            <div class="price-section">
+              <span class="current-price-large">Rs. 499.00</span>
+              <span class="old-price-large">Rs. 1,499.00</span>
+            </div>
+
+            <div class="stock-badge">
+              <i class="fa-solid fa-check-circle me-1"></i> In stock, ready to
+              ship
+            </div>
+
+            <div class="accordion accordion-custom mb-4" id="productAccordion">
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button
+                    class="accordion-button"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#descCollapse"
+                  >
+                    Description
+                  </button>
+                </h2>
+                <div
+                  id="descCollapse"
+                  class="accordion-collapse collapse show"
+                  data-bs-parent="#productAccordion"
+                >
+                  <div class="accordion-body">
+                    <ul class="ps-3 mb-0">
+                      <li>
+                        <strong>All-round protection:</strong> Soft Silicon
+                        wraps around the entire phone for ultrasound protection.
+                      </li>
+                      <li>
+                        <strong>High Quality Material:</strong> Our cases are
+                        made of 100% Original High Quality Silicone.
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button
+                    class="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#techCollapse"
+                  >
+                    Technical Specifications
+                  </button>
+                </h2>
+                <div
+                  id="techCollapse"
+                  class="accordion-collapse collapse"
+                  data-bs-parent="#productAccordion"
+                >
+                  <div class="accordion-body">
+                    <p class="mb-1">
+                      <strong>Material:</strong> Liquid Silicone
+                    </p>
+                    <p class="mb-0">
+                      <strong>Compatibility:</strong> iPhone 16
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="color-label">
+              Color: <span id="selectedColorName">Black</span>
+            </div>
+            <div class="swatch-group">
+              <div
+                class="swatch-circle active"
+                style="background: #000"
+                onclick="selectColor(this, 'Black')"
+              ></div>
+              <div
+                class="swatch-circle"
+                style="background: #ffb74d"
+                onclick="selectColor(this, 'Orange')"
+              ></div>
+              <div
+                class="swatch-circle"
+                style="background: #f8bbd0"
+                onclick="selectColor(this, 'Pink')"
+              ></div>
+              <div
+                class="swatch-circle"
+                style="background: #e1bee7"
+                onclick="selectColor(this, 'Purple')"
+              ></div>
+            </div>
+
+            <div class="action-row">
+              <div class="quantity-selector">
+                <button class="qty-btn" onclick="updateQty(-1)">-</button>
+                <input
+                  type="text"
+                  id="qtyInput"
+                  value="1"
+                  class="qty-input"
+                  readonly
+                />
+                <button class="qty-btn" onclick="updateQty(1)">+</button>
+              </div>
+              <a href="./cart.html" class="btn btn-add-cart">Add to cart</a>
+            </div>
+            <a href="./address.html" class="btn btn-buy-now">Buy it now</a>
+
+            <div class="share-links mt-3">
+              <span><i class="fa-solid fa-share-nodes"></i> Share</span>
+              <span
+                ><i class="fa-regular fa-circle-question"></i> Ask a
+                question</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="related-section reveal-up">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="related-title mb-0">You May Also Like</h3>
+          <div>
+            <button
+              class="btn btn-outline-dark rounded-circle me-2"
+              onclick="scrollRelated('left')"
+            >
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button
+              class="btn btn-outline-dark rounded-circle"
+              onclick="scrollRelated('right')"
+            >
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="scrolling-wrapper row flex-nowrap pb-4" id="relatedSlider">
+          <div class="col-10 col-md-3">
+            <a href="./productPage.html" class="product-card-link">
+              <div class="product-card h-100">
+                <img
+                  src="https://placehold.co/400x500/f1f1f1/333?text=Pro+Max"
+                  class="card-img-top"
+                  alt="Related"
+                />
+                <div class="card-body">
+                  <div class="related-vendor">Pikkme</div>
+                  <div class="related-name">iPhone 16 Pro Max Silicone</div>
+                  <div class="related-price">Rs. 599.00</div>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <div class="col-10 col-md-3">
+            <a href="./productPage.html" class="product-card-link">
+              <div class="product-card h-100">
+                <img
+                  src="https://placehold.co/400x500/f1f1f1/333?text=Plus"
+                  class="card-img-top"
+                  alt="Related"
+                />
+                <div class="card-body">
+                  <div class="related-vendor">Pikkme</div>
+                  <div class="related-name">iPhone 16 Plus Soft Case</div>
+                  <div class="related-price">Rs. 499.00</div>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <div class="col-10 col-md-3">
+            <a href="./productPage.html" class="product-card-link">
+              <div class="product-card h-100">
+                <img
+                  src="https://placehold.co/400x500/f1f1f1/333?text=Clear"
+                  class="card-img-top"
+                  alt="Related"
+                />
+                <div class="card-body">
+                  <div class="related-vendor">Pikkme</div>
+                  <div class="related-name">iPhone 16 Ultra Clear</div>
+                  <div class="related-price">Rs. 399.00</div>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <div class="col-10 col-md-3">
+            <a href="./productPage.html" class="product-card-link">
+              <div class="product-card h-100">
+                <img
+                  src="https://placehold.co/400x500/f1f1f1/333?text=Wallet"
+                  class="card-img-top"
+                  alt="Related"
+                />
+                <div class="card-body">
+                  <div class="related-vendor">Pikkme</div>
+                  <div class="related-name">iPhone 16 Leather Wallet</div>
+                  <div class="related-price">Rs. 899.00</div>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <div class="col-10 col-md-3">
+            <a href="./productPage.html" class="product-card-link">
+              <div class="product-card h-100">
+                <img
+                  src="https://placehold.co/400x500/f1f1f1/333?text=MagSafe"
+                  class="card-img-top"
+                  alt="Related"
+                />
+                <div class="card-body">
+                  <div class="related-vendor">Apple</div>
+                  <div class="related-name">MagSafe Clear Case</div>
+                  <div class="related-price">Rs. 1,299.00</div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="bottom-features reveal-up">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4 mb-3 mb-md-0">
+            <div
+              class="feature-box justify-content-center justify-content-md-start"
+            >
+              <i class="fa-solid fa-headset"></i>
+              <div class="feature-text">
+                <h6>Customer service</h6>
+                <p>Your Satisfaction Is Our Command</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3 mb-md-0">
+            <div
+              class="feature-box justify-content-center justify-content-md-start"
+            >
+              <i class="fa-solid fa-truck-fast"></i>
+              <div class="feature-text">
+                <h6>Fast Free Shipping</h6>
+                <p>Enjoy Free Convenience on Your Orders</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div
+              class="feature-box justify-content-center justify-content-md-start"
+            >
+              <i class="fa-solid fa-shield-halved"></i>
+              <div class="feature-text">
+                <h6>Secure payment</h6>
+                <p>Your Payment Information is Processed Securely</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="container reveal-up">
+        <div class="row">
+          <div class="col-md-3">
+            <h5>Discover More</h5>
+            <ul>
+              <li><a href="#">About Us</a></li>
+              <li><a href="#">Contact Us</a></li>
+              <li><a href="#">Blog</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h5>Explore Products</h5>
+            <ul>
+              <li><a href="#">Mobiles</a></li>
+              <li><a href="#">Accessories</a></li>
+              <li><a href="#">Trendy Cases</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h5>Customer Care</h5>
+            <ul>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Service</a></li>
+              <li><a href="#">Return Policy</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h5>Contact Us</h5>
+            <input
+              type="email"
+              class="newsletter-input"
+              placeholder="Enter email"
+            />
+            <button class="btn btn-light w-100">Subscribe</button>
+            <div class="mt-3">
+              <i class="fa-brands fa-facebook me-3"></i>
+              <i class="fa-brands fa-instagram me-3"></i>
+              <i class="fa-brands fa-twitter"></i>
+            </div>
+          </div>
+        </div>
+        <hr class="border-secondary mt-4" />
+        <div class="text-center small">
+          &copy; 2025 Jinsa Mobiles. All rights reserved.
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // 1. Change Main Image
+      function changeImage(thumbElement, srcUrl) {
+        document.getElementById("mainImage").src = srcUrl;
+        const thumbnails = document.querySelectorAll(".thumbnail");
+        thumbnails.forEach((t) => t.classList.remove("active"));
+        thumbElement.classList.add("active");
+      }
+
+      // 2. Quantity Selector
+      function updateQty(change) {
+        const input = document.getElementById("qtyInput");
+        let val = parseInt(input.value);
+        val += change;
+        if (val < 1) val = 1;
+        input.value = val;
+      }
+
+      // 3. Color Selection
+      function selectColor(swatchElement, colorName) {
+        document.getElementById("selectedColorName").innerText = colorName;
+        const swatches = document.querySelectorAll(".swatch-circle");
+        swatches.forEach((s) => s.classList.remove("active"));
+        swatchElement.classList.add("active");
+      }
+
+      // 4. Scroll "You May Also Like" Slider
+      function scrollRelated(direction) {
+        const slider = document.getElementById("relatedSlider");
+        const scrollAmount = 300; // Approx card width
+        if (direction === "left") {
+          slider.scrollLeft -= scrollAmount;
+        } else {
+          slider.scrollLeft += scrollAmount;
+        }
+      }
+
+      // 5. Scroll Animations
+      document.addEventListener("DOMContentLoaded", function () {
+        const observerOptions = {
+          root: null,
+          rootMargin: "0px",
+          threshold: 0.1, // Trigger when 10% is visible
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("active");
+              observer.unobserve(entry.target); // Run once
+            }
+          });
+        }, observerOptions);
+
+        const animatedElements = document.querySelectorAll(".reveal-up");
+        animatedElements.forEach((el) => observer.observe(el));
+      });
+    </script>
+  </body>
+</html>
