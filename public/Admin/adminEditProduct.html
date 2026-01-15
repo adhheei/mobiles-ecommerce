@@ -38,10 +38,18 @@
 
       /* --- ANIMATIONS --- */
       @keyframes slideInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
-      .content-animate { animation: slideInUp 0.6s ease-out forwards; }
+      .content-animate {
+        animation: slideInUp 0.6s ease-out forwards;
+      }
 
       /* --- SIDEBAR --- */
       .sidebar {
@@ -362,7 +370,7 @@
         background-color: #fff;
         border: 1px solid #eee;
         position: relative;
-        display: block;
+        display: none;
       }
       .main-image-preview img {
         width: 100%;
@@ -532,7 +540,11 @@
       </button>
     </div>
 
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div
+      class="sidebar-overlay"
+      id="sidebarOverlay"
+      onclick="toggleSidebar()"
+    ></div>
 
     <nav class="sidebar" id="sidebar">
       <a href="./adminDashboard.html" class="brand-section">
@@ -592,8 +604,15 @@
       </ul>
 
       <div class="admin-profile">
-        <a href="./adminProfile.html" class="profile-info text-decoration-none text-reset">
-          <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
+        <a
+          href="./adminProfile.html"
+          class="profile-info text-decoration-none text-reset"
+        >
+          <img
+            src="https://placehold.co/100x100/ccc/fff?text=A"
+            alt="Admin"
+            class="admin-avatar"
+          />
           <div class="admin-details">
             <h6 id="sidebarName" class="m-0">Admin</h6>
             <span class="small text-muted">admin@example.com</span>
@@ -608,11 +627,21 @@
     <div class="main-content content-animate">
       <div class="page-header">
         <div>
-          <a href="./adminProducts.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back to Products</a>
+          <a href="./adminProducts.html" class="btn-back">
+            <i class="fa-solid fa-arrow-left"></i> Back to Products
+          </a>
           <h2 class="page-title">Edit Product</h2>
-          <p class="page-subtitle">Update product details, pricing, and media.</p>
+          <p class="page-subtitle">
+            Update product details, pricing, and media.
+          </p>
         </div>
-        <a href="#" class="btn-delete-prod" onclick="deleteProduct(); return false;"><i class="fa-solid fa-trash-can"></i> Delete Product</a>
+        <a
+          href="#"
+          class="btn-delete-prod"
+          onclick="deleteProduct(); return false;"
+        >
+          <i class="fa-solid fa-trash-can"></i> Delete Product
+        </a>
       </div>
 
       <form id="editProductForm">
@@ -622,66 +651,79 @@
               <h5 class="form-section-title">Basic Information</h5>
               <div class="mb-3">
                 <label class="form-label">Product Name</label>
-                <input type="text" class="form-control" value="iPhone 15 Pro Max Silicone Case">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="productName"
+                  required
+                />
               </div>
               <div class="mb-3">
                 <label class="form-label">Description</label>
-                <textarea class="form-control" rows="4">Premium soft-touch silicone case with MagSafe compatibility. Microfiber lining for extra protection.</textarea>
+                <textarea
+                  class="form-control"
+                  id="productDescription"
+                  rows="4"
+                ></textarea>
               </div>
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">SKU</label>
-                  <input type="text" class="form-control" value="MOB-CASE-15PM-BLK">
+                  <label class="form-label">Price ($)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    class="form-control"
+                    id="productPrice"
+                    required
+                  />
                 </div>
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Price</label>
-                  <div class="input-group">
-                    <span class="input-group-text">$</span>
-                    <input type="number" step="0.01" class="form-control" value="49.99">
-                  </div>
+                  <label class="form-label">Stock Quantity</label>
+                  <input
+                    type="number"
+                    min="0"
+                    class="form-control"
+                    id="stockQuantity"
+                    required
+                  />
                 </div>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Stock Quantity</label>
-                <input type="number" class="form-control" value="150">
               </div>
             </div>
 
             <div class="form-section">
               <h5 class="form-section-title">Product Media</h5>
-              
               <div class="row">
                 <div class="col-md-4 mb-4">
                   <label class="form-label">Main Image</label>
-                  <div class="upload-area" id="mainUploadArea" style="display:none" onclick="document.getElementById('mainImageInput').click()">
+                  <div
+                    class="upload-area"
+                    id="mainUploadArea"
+                    onclick="document.getElementById('mainImageInput').click()"
+                  >
                     <i class="fa-regular fa-image upload-icon"></i>
-                    <p class="upload-text">Upload <strong>Main</strong></p>
-                    <input type="file" id="mainImageInput" hidden accept="image/*" onchange="handleMainImage(this)">
+                    <p class="upload-text">Click to upload main image</p>
+                    <input
+                      type="file"
+                      id="mainImageInput"
+                      hidden
+                      accept="image/*"
+                      onchange="previewMainImage(this)"
+                    />
                   </div>
                   <div class="main-image-preview" id="mainImagePreview">
-                    <img src="../images/16backcover.jpeg" id="mainImageSrc" onerror="this.src='https://placehold.co/150x150/eee/999?text=Main'">
-                    <button type="button" class="remove-btn" onclick="removeMainImage()">
+                    <img
+                      src=""
+                      id="mainImageSrc"
+                      onerror="this.src='https://placehold.co/150x150/eee/999?text=Main'"
+                    />
+                    <button
+                      type="button"
+                      class="remove-btn"
+                      onclick="removeMainImage(event)"
+                    >
                       <i class="fa-solid fa-xmark"></i>
                     </button>
-                  </div>
-                </div>
-
-                <div class="col-md-8">
-                  <label class="form-label">Gallery Images</label>
-                  <div class="upload-area" onclick="document.getElementById('galleryInput').click()">
-                    <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
-                    <p class="upload-text">Add to <strong>Gallery</strong></p>
-                    <input type="file" id="galleryInput" hidden multiple accept="image/*" onchange="handleGalleryFiles(this.files)">
-                  </div>
-                  <div class="image-thumbnails" id="galleryContainer">
-                    <div class="thumbnail-item">
-                      <img src="https://placehold.co/100x100/e9ecef/777?text=Side" alt="Thumb">
-                      <button type="button" class="remove-btn" onclick="removeGalleryImage(this)"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-                    <div class="thumbnail-item">
-                      <img src="https://placehold.co/100x100/e9ecef/777?text=Back" alt="Thumb">
-                      <button type="button" class="remove-btn" onclick="removeGalleryImage(this)"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -693,17 +735,10 @@
               <h5 class="form-section-title">Status</h5>
               <div class="mb-3">
                 <label class="form-label">Product Status</label>
-                <select class="form-select">
-                  <option value="active" selected>Active</option>
+                <select class="form-select" id="productStatus">
+                  <option value="active">Active</option>
                   <option value="draft">Draft</option>
-                  <option value="outofstock">Out of Stock</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Visibility</label>
-                <select class="form-select">
-                  <option value="public" selected>Public</option>
-                  <option value="hidden">Hidden</option>
+                  <option value="draft">Out of Stock</option>
                 </select>
               </div>
             </div>
@@ -712,15 +747,11 @@
               <h5 class="form-section-title">Organization</h5>
               <div class="mb-3">
                 <label class="form-label">Category</label>
-                <select class="form-select">
-                  <option>Mobiles</option>
-                  <option selected>Accessories</option>
-                  <option>Audio</option>
+                <select class="form-select" id="productCategory">
+                  <option value="mobiles">Mobiles</option>
+                  <option value="accessories">Accessories</option>
+                  <option value="audio">Audio</option>
                 </select>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Tags</label>
-                <input type="text" class="form-control" placeholder="e.g. Case, Silicon, iPhone" value="Case, New">
               </div>
             </div>
           </div>
@@ -729,99 +760,190 @@
     </div>
 
     <div class="form-footer">
-      <button type="button" class="btn btn-cancel" onclick="history.back()">Cancel</button>
-      <button type="button" class="btn btn-submit" onclick="updateProduct()">Update Product</button>
+      <button
+        type="button"
+        class="btn btn-cancel"
+        onclick="window.location.href='./adminProducts.html'"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-submit"
+        onclick="updateProduct()"
+      >
+        Update Product
+      </button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+      // Get product ID from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get("id");
+
+      if (!productId) {
+        Swal.fire("Error", "No Product ID found in URL", "error").then(() => {
+          window.location.href = "./adminProducts.html";
+        });
+      }
+
       function toggleSidebar() {
         document.getElementById("sidebar").classList.toggle("active");
         document.getElementById("sidebarOverlay").classList.toggle("active");
       }
 
-      // --- Handle Main Image ---
-      function handleMainImage(input) {
+      // Prevent form submission on Enter
+      document
+        .getElementById("editProductForm")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") e.preventDefault();
+        });
+
+      // Load product data on page load
+      document.addEventListener("DOMContentLoaded", async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:3000/admin/get-product/${productId}`
+          );
+          const data = await response.json();
+
+          if (data.success && data.product) {
+            const p = data.product;
+            document.getElementById("productName").value = p.name || "";
+            document.getElementById("productDescription").value =
+              p.description || "";
+            document.getElementById("productPrice").value = p.price || 0;
+            document.getElementById("stockQuantity").value = p.stock || 0;
+            document.getElementById("productStatus").value = p.status || "active";
+            document.getElementById("productCategory").value =
+              p.category || "mobiles";
+
+            // Handle image preview
+            if (p.image) {
+              document.getElementById("mainImageSrc").src =
+                `http://localhost:3000${p.image}`;
+              document.getElementById("mainImagePreview").style.display = "block";
+              document.getElementById("mainUploadArea").style.display = "none";
+            }
+          } else {
+            throw new Error(data.message || "Product not found");
+          }
+        } catch (error) {
+          console.error("Load Error:", error);
+          Swal.fire(
+            "Error",
+            "Failed to load product: " + error.message,
+            "error"
+          ).then(() => {
+            window.location.href = "./adminProducts.html";
+          });
+        }
+      });
+
+      // Image preview logic
+      function previewMainImage(input) {
         if (input.files && input.files[0]) {
           const reader = new FileReader();
-          reader.onload = function(e) {
-            document.getElementById('mainImageSrc').src = e.target.result;
-            document.getElementById('mainImagePreview').style.display = 'block';
-            document.getElementById('mainUploadArea').style.display = 'none';
-          }
+          reader.onload = function (e) {
+            document.getElementById("mainImageSrc").src = e.target.result;
+            document.getElementById("mainImagePreview").style.display = "block";
+            document.getElementById("mainUploadArea").style.display = "none";
+          };
           reader.readAsDataURL(input.files[0]);
         }
       }
 
-      function removeMainImage() {
-        document.getElementById('mainImageInput').value = '';
-        document.getElementById('mainImagePreview').style.display = 'none';
-        document.getElementById('mainUploadArea').style.display = 'block';
+      function removeMainImage(e) {
+        e.stopPropagation();
+        document.getElementById("mainImageInput").value = "";
+        document.getElementById("mainImagePreview").style.display = "none";
+        document.getElementById("mainUploadArea").style.display = "block";
       }
 
-      // --- Handle Gallery Images ---
-      function handleGalleryFiles(files) {
-        const container = document.getElementById('galleryContainer');
-        Array.from(files).forEach(file => {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            const div = document.createElement('div');
-            div.className = 'thumbnail-item';
-            div.innerHTML = `
-              <img src="${e.target.result}" alt="Gallery">
-              <button type="button" class="remove-btn" onclick="removeGalleryImage(this)"><i class="fa-solid fa-xmark"></i></button>
-            `;
-            container.appendChild(div);
-          }
-          reader.readAsDataURL(file);
-        });
-      }
+      // Update product
+      async function updateProduct() {
+        const name = document.getElementById("productName").value.trim();
+        const description = document.getElementById("productDescription").value.trim();
+        const price = parseFloat(document.getElementById("productPrice").value);
+        const stock = parseInt(document.getElementById("stockQuantity").value);
+        const status = document.getElementById("productStatus").value;
+        const category = document.getElementById("productCategory").value;
 
-      function removeGalleryImage(btn) {
-        btn.closest('.thumbnail-item').remove();
-      }
-
-      // --- Actions ---
-      function updateProduct() {
-        Swal.fire({
-          title: 'Success!',
-          text: 'Product updated successfully.',
-          icon: 'success',
-          confirmButtonColor: '#1a1a1a',
-          confirmButtonText: 'OK'
-        }).then(() => {
-          window.location.href = './adminProducts.html';
-        });
-      }
-
-      function deleteProduct() {
-        Swal.fire({
-          title: 'Are you sure?',
-          text: "This will permanently delete this product.",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#dc3545',
-          cancelButtonColor: '#1a1a1a',
-          confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            Swal.fire('Deleted!', 'Product has been deleted.', 'success').then(() => {
-              window.location.href = './adminProducts.html';
-            });
-          }
-        });
-      }
-
-      // Close sidebar when clicking outside on mobile
-      document.addEventListener('click', function(e) {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        if (window.innerWidth <= 991 && sidebar.classList.contains('active') && 
-            !e.target.closest('.sidebar') && !e.target.closest('.mobile-nav button')) {
-          sidebar.classList.remove('active');
-          overlay.classList.remove('active');
+        if (!name || isNaN(price) || isNaN(stock)) {
+          Swal.fire("Error", "Please fill all required fields correctly.", "warning");
+          return;
         }
-      });
+
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("description", description);
+        formData.append("price", price);
+        formData.append("stock", stock);
+        formData.append("status", status);
+        formData.append("category", category);
+
+        const fileInput = document.getElementById("mainImageInput");
+        if (fileInput.files[0]) {
+          formData.append("image", fileInput.files[0]);
+        }
+
+        try {
+          const response = await fetch(
+            `http://localhost:3000/admin/update-product/${productId}`,
+            {
+              method: "PUT",
+              body: formData,
+            }
+          );
+
+          const result = await response.json();
+          if (result.success) {
+            Swal.fire("Success!", "Product updated successfully.", "success").then(() => {
+              window.location.href = "./adminProducts.html";
+            });
+          } else {
+            Swal.fire("Error", result.message || "Update failed", "error");
+          }
+        } catch (error) {
+          console.error("Update Error:", error);
+          Swal.fire("Error", "Network error. Please try again.", "error");
+        }
+      }
+
+      // Delete product
+      async function deleteProduct() {
+        const result = await Swal.fire({
+          title: "Are you sure?",
+          text: "This will permanently delete the product!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#6c757d",
+          confirmButtonText: "Yes, delete it!",
+        });
+
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch(
+              `http://localhost:3000/admin/delete-product/${productId}`,
+              {
+                method: "DELETE",
+              }
+            );
+            const data = await response.json();
+            if (data.success) {
+              Swal.fire("Deleted!", "Product has been deleted.", "success").then(() => {
+                window.location.href = "./adminProducts.html";
+              });
+            } else {
+              throw new Error(data.message || "Deletion failed");
+            }
+          } catch (error) {
+            Swal.fire("Error", error.message || "Failed to delete product", "error");
+          }
+        }
+      }
     </script>
   </body>
 </html>
