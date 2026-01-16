@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -39,10 +38,18 @@
 
       /* --- ANIMATIONS --- */
       @keyframes slideInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
-      .content-animate { animation: slideInUp 0.6s ease-out forwards; }
+      .content-animate {
+        animation: slideInUp 0.6s ease-out forwards;
+      }
 
       /* --- SIDEBAR --- */
       .sidebar {
@@ -90,7 +97,7 @@
         font-weight: 600;
         text-transform: uppercase;
       }
-      
+
       .sidebar-menu {
         list-style: none;
         padding: 0;
@@ -240,7 +247,7 @@
         margin: 0;
         color: #000;
       }
-      
+
       .btn-add-new {
         background-color: #000;
         color: #fff;
@@ -438,7 +445,11 @@
       </button>
     </div>
 
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div
+      class="sidebar-overlay"
+      id="sidebarOverlay"
+      onclick="toggleSidebar()"
+    ></div>
 
     <nav class="sidebar" id="sidebar">
       <a href="./adminDashboard.html" class="brand-section">
@@ -498,8 +509,15 @@
       </ul>
 
       <div class="admin-profile">
-        <a href="./adminProfile.html" class="profile-info text-decoration-none text-reset">
-          <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
+        <a
+          href="./adminProfile.html"
+          class="profile-info text-decoration-none text-reset"
+        >
+          <img
+            src="https://placehold.co/100x100/ccc/fff?text=A"
+            alt="Admin"
+            class="admin-avatar"
+          />
           <div class="admin-details">
             <h6 id="sidebarName" class="m-0">Admin</h6>
             <span class="small text-muted">admin@example.com</span>
@@ -522,7 +540,12 @@
       <div class="table-toolbar">
         <div class="search-box">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="searchInput" placeholder="Search categories..." onkeyup="filterCategories()" />
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search categories..."
+            onkeyup="filterCategories()"
+          />
         </div>
       </div>
 
@@ -536,8 +559,7 @@
               <th class="text-end">Actions</th>
             </tr>
           </thead>
-          <tbody id="categoryTableBody">
-          </tbody>
+          <tbody id="categoryTableBody"></tbody>
         </table>
       </div>
     </div>
@@ -550,11 +572,31 @@
       }
 
       // --- Dummy Data ---
-      let categories = [
-        { id: 1, name: "Mobiles", desc: "Latest smartphones from top brands", products: 120, img: "https://placehold.co/100x100/e9ecef/333?text=M" },
-        { id: 2, name: "Accessories", desc: "Cases, chargers, and screen protectors", products: 350, img: "https://placehold.co/100x100/e9ecef/333?text=A" },
-        { id: 3, name: "Audio", desc: "Headphones, earbuds, and speakers", products: 85, img: "https://placehold.co/100x100/e9ecef/333?text=S" },
-      ];
+      let categories = []; // Will be filled from API
+
+      async function loadCategories() {
+        try {
+          const res = await fetch("/api/categories");
+          const data = await res.json();
+
+          if (data.success) {
+            categories = data.data;
+            renderTable(categories);
+          } else {
+            throw new Error(data.error || "Failed to load categories");
+          }
+        } catch (err) {
+          console.error(err);
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Failed to load categories. Please try again.",
+          });
+        }
+      }
+
+      // Call on page load
+      document.addEventListener("DOMContentLoaded", loadCategories);
 
       // --- Render Table ---
       function renderTable(data = categories) {
@@ -562,11 +604,12 @@
         tbody.innerHTML = "";
 
         if (data.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted">No categories found.</td></tr>';
+          tbody.innerHTML =
+            '<tr><td colspan="4" class="text-center py-4 text-muted">No categories found.</td></tr>';
           return;
         }
 
-        data.forEach(cat => {
+        data.forEach((cat) => {
           const row = `
             <tr>
               <td>
@@ -590,27 +633,45 @@
       // --- Filter ---
       function filterCategories() {
         const term = document.getElementById("searchInput").value.toLowerCase();
-        const filtered = categories.filter(c => c.name.toLowerCase().includes(term));
+        const filtered = categories.filter((c) =>
+          c.name.toLowerCase().includes(term)
+        );
         renderTable(filtered);
       }
 
       // --- Delete Category ---
-      function deleteCategory(id) {
+      async function deleteCategory(id) {
         Swal.fire({
-          title: 'Are you sure?',
+          title: "Are you sure?",
           text: "You won't be able to revert this!",
-          icon: 'warning',
+          icon: "warning",
           showCancelButton: true,
-          confirmButtonColor: '#dc3545',
-          cancelButtonColor: '#1a1a1a',
-          confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
+          confirmButtonColor: "#dc3545",
+          cancelButtonColor: "#1a1a1a",
+          confirmButtonText: "Yes, delete it!",
+        }).then(async (result) => {
           if (result.isConfirmed) {
-            const index = categories.findIndex(c => c.id === id);
-            if(index > -1) {
-              categories.splice(index, 1);
-              renderTable();
-              Swal.fire('Deleted!', 'Category has been deleted.', 'success');
+            try {
+              const res = await fetch(`/api/categories/${id}`, {
+                method: "DELETE",
+              });
+
+              const data = await res.json();
+
+              if (data.success) {
+                // Remove from local array
+                categories = categories.filter((c) => c.id !== id);
+                renderTable();
+                Swal.fire("Deleted!", "Category has been deleted.", "success");
+              } else {
+                throw new Error(data.error || "Delete failed");
+              }
+            } catch (err) {
+              Swal.fire({
+                icon: "error",
+                title: "Error!",
+                text: err.message,
+              });
             }
           }
         });
