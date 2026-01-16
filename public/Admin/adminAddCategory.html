@@ -38,10 +38,18 @@
 
       /* --- ANIMATIONS --- */
       @keyframes slideInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
-      .content-animate { animation: slideInUp 0.6s ease-out forwards; }
+      .content-animate {
+        animation: slideInUp 0.6s ease-out forwards;
+      }
 
       /* --- SIDEBAR --- */
       .sidebar {
@@ -481,7 +489,11 @@
         <i class="fa-solid fa-bars"></i>
       </button>
     </div>
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div
+      class="sidebar-overlay"
+      id="sidebarOverlay"
+      onclick="toggleSidebar()"
+    ></div>
 
     <nav class="sidebar" id="sidebar">
       <a href="./adminDashboard.html" class="brand-section">
@@ -541,8 +553,15 @@
       </ul>
 
       <div class="admin-profile">
-        <a href="./adminProfile.html" class="profile-info text-decoration-none text-reset">
-          <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
+        <a
+          href="./adminProfile.html"
+          class="profile-info text-decoration-none text-reset"
+        >
+          <img
+            src="https://placehold.co/100x100/ccc/fff?text=A"
+            alt="Admin"
+            class="admin-avatar"
+          />
           <div class="admin-details">
             <h6 id="sidebarName" class="m-0">Admin</h6>
             <span class="small text-muted">admin@example.com</span>
@@ -568,24 +587,43 @@
         <form id="addCategoryForm">
           <div class="form-group">
             <label for="categoryName" class="form-label">Category Name</label>
-            <input type="text" id="categoryName" class="form-control" placeholder="e.g., iPhone 15 Pro Max Cases" required />
+            <input
+              type="text"
+              id="categoryName"
+              class="form-control"
+              placeholder="e.g., iPhone 15 Pro Max Cases"
+              required
+            />
           </div>
 
           <div class="form-group">
             <label for="categoryDesc" class="form-label">Description</label>
-            <textarea id="categoryDesc" class="form-control" placeholder="A brief description of the category."></textarea>
+            <textarea
+              id="categoryDesc"
+              class="form-control"
+              placeholder="A brief description of the category."
+            ></textarea>
           </div>
 
           <div class="form-group">
             <label class="form-label">Category Image</label>
-            <div class="upload-area" onclick="document.getElementById('catImageInput').click()">
+            <div
+              class="upload-area"
+              onclick="document.getElementById('catImageInput').click()"
+            >
               <div id="uploadContent">
                 <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
                 <div class="upload-text">Upload a file or drag and drop</div>
                 <div class="upload-hint">PNG, JPG, GIF up to 10MB</div>
               </div>
               <img id="previewImage" src="" alt="Preview" />
-              <input type="file" id="catImageInput" hidden accept="image/*" onchange="handleImagePreview(this)" />
+              <input
+                type="file"
+                id="catImageInput"
+                hidden
+                accept="image/*"
+                onchange="handleImagePreview(this)"
+              />
             </div>
           </div>
 
@@ -594,16 +632,35 @@
             <div class="toggle-container">
               <span class="toggle-label">Inactive</span>
               <label class="switch">
-                <input type="checkbox" id="statusToggle" checked onchange="toggleStatusLabel()" />
+                <input
+                  type="checkbox"
+                  id="statusToggle"
+                  checked
+                  onchange="toggleStatusLabel()"
+                />
                 <span class="slider"></span>
               </label>
-              <span class="toggle-label active-text" id="activeLabel">Active</span>
+              <span class="toggle-label active-text" id="activeLabel"
+                >Active</span
+              >
             </div>
           </div>
 
           <div class="form-footer">
-            <button type="button" class="btn btn-cancel" onclick="location.href='./adminCategories.html'">Cancel</button>
-            <button type="button" class="btn btn-create" onclick="createCategory()">Create Category</button>
+            <button
+              type="button"
+              class="btn btn-cancel"
+              onclick="location.href='./adminCategories.html'"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-create"
+              onclick="createCategory()"
+            >
+              Create Category
+            </button>
           </div>
         </form>
       </div>
@@ -622,7 +679,8 @@
           const reader = new FileReader();
           reader.onload = function (e) {
             document.getElementById("previewImage").src = e.target.result;
-            document.getElementById("previewImage").style.display = "inline-block";
+            document.getElementById("previewImage").style.display =
+              "inline-block";
             document.getElementById("uploadContent").style.display = "none";
           };
           reader.readAsDataURL(input.files[0]);
@@ -633,7 +691,9 @@
       function toggleStatusLabel() {
         const isChecked = document.getElementById("statusToggle").checked;
         const activeLabel = document.getElementById("activeLabel");
-        const inactiveLabel = document.querySelector(".toggle-label:first-child");
+        const inactiveLabel = document.querySelector(
+          ".toggle-label:first-child"
+        );
 
         if (isChecked) {
           activeLabel.classList.add("active-text");
@@ -645,40 +705,88 @@
       }
 
       // Create Action
-      function createCategory() {
-        const name = document.getElementById("categoryName").value;
+      async function createCategory() {
+        const name = document.getElementById("categoryName").value.trim();
+        const description = document
+          .getElementById("categoryDesc")
+          .value.trim();
+        const isActive = document.getElementById("statusToggle").checked; // true/false
+        const imageInput = document.getElementById("catImageInput");
 
+        // Validate required fields
         if (!name) {
           Swal.fire({
             icon: "error",
-            title: "Error",
+            title: "Validation Error",
             text: "Category name is required!",
             confirmButtonColor: "#1a1a1a",
           });
           return;
         }
 
-        Swal.fire({
-          title: "Success!",
-          text: "New category has been added.",
-          icon: "success",
-          confirmButtonColor: "#1a1a1a",
-          confirmButtonText: "Go to Categories",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            window.location.href = "./adminCategories.html";
+        // Create FormData object
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("description", description);
+        formData.append("isActive", isActive); // Send as string or boolean? We'll handle in backend
+
+        // Add image if selected
+        if (imageInput.files[0]) {
+          formData.append("image", imageInput.files[0]);
+        }
+
+        try {
+          // Show loading state
+          Swal.fire({
+            title: "Creating...",
+            text: "Please wait while we save your category.",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+
+          const res = await fetch("/api/categories", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await res.json();
+
+          if (data.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Category Created!",
+              text: "Your new category has been saved successfully.",
+              timer: 2000,
+              showConfirmButton: false,
+            }).then(() => {
+              window.location.href = "./adminCategories.html"; // Redirect to list
+            });
+          } else {
+            throw new Error(data.error || "Failed to create category");
           }
-        });
+        } catch (err) {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: err.message || "Something went wrong. Please try again.",
+          });
+        }
       }
 
       // Close sidebar when clicking outside on mobile
-      document.addEventListener('click', function(e) {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        if (window.innerWidth <= 991 && sidebar.classList.contains('active') && 
-            !e.target.closest('.sidebar') && !e.target.closest('.mobile-nav button')) {
-          sidebar.classList.remove('active');
-          overlay.classList.remove('active');
+      document.addEventListener("click", function (e) {
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("sidebarOverlay");
+        if (
+          window.innerWidth <= 991 &&
+          sidebar.classList.contains("active") &&
+          !e.target.closest(".sidebar") &&
+          !e.target.closest(".mobile-nav button")
+        ) {
+          sidebar.classList.remove("active");
+          overlay.classList.remove("active");
         }
       });
     </script>
