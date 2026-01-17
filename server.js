@@ -11,8 +11,11 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// 📁 Create upload directories
-const uploadDirs = ['./public/uploads/categories'];
+// 📁 Create upload directories (add products too!)
+const uploadDirs = [
+  './public/uploads/categories',
+  './public/uploads/products' // 👈 Add this for future products
+];
 uploadDirs.forEach(dir => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
@@ -29,15 +32,15 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static('public'));
 
 // 🛣️ Routes
-const categoryRoutes = require('./routes/categories');
-app.use('/api/categories', categoryRoutes);
+const adminRoutes = require('./routes/adminRoutes');
+app.use('/api/admin', adminRoutes); // admin routes
 
 // 🏠 Home route
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// 🔄 Connect to MongoDB (NO extra options!)
+// 🔄 Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
@@ -46,7 +49,6 @@ mongoose
     process.exit(1);
   });
 
-  
 // 🚀 Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
