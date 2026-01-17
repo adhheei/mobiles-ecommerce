@@ -206,6 +206,7 @@ exports.addProduct = async (req, res) => {
 };
 
 // ✅ UPDATE product
+// UPDATE product
 exports.updateProduct = async (req, res) => {
   try {
     const {
@@ -264,7 +265,13 @@ exports.updateProduct = async (req, res) => {
         .json({ success: false, error: "Product not found" });
     }
 
-    res.json({ success: true, message: "Product updated successfully" });
+    // ✅ RETURN SUCCESS RESPONSE WITH MESSAGE
+    res.json({ 
+      success: true, 
+      message: "Product updated successfully",
+      // Optional: return updated product data
+       updated 
+    });
   } catch (err) {
     console.error(err);
     if (err.code === 11000) {
