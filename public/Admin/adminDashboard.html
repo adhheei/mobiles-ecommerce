@@ -38,8 +38,14 @@
 
       /* --- ANIMATIONS --- */
       @keyframes slideInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       .content-animate {
@@ -315,12 +321,26 @@
         flex-shrink: 0;
       }
 
-      .bg-icon-1 { background-color: #f8f9fa; color: #333; }
-      .bg-icon-2 { background-color: #f8f9fa; color: #333; }
-      .bg-icon-3 { background-color: #f8f9fa; color: #333; }
-      .bg-icon-4 { background-color: #f8f9fa; color: #333; }
+      .bg-icon-1 {
+        background-color: #f8f9fa;
+        color: #333;
+      }
+      .bg-icon-2 {
+        background-color: #f8f9fa;
+        color: #333;
+      }
+      .bg-icon-3 {
+        background-color: #f8f9fa;
+        color: #333;
+      }
+      .bg-icon-4 {
+        background-color: #f8f9fa;
+        color: #333;
+      }
 
-      .stat-info { flex-grow: 1; }
+      .stat-info {
+        flex-grow: 1;
+      }
 
       .stat-label {
         font-size: 0.85rem;
@@ -342,8 +362,12 @@
         display: block;
       }
 
-      .text-success-custom { color: #198754; }
-      .text-danger-custom { color: #dc3545; }
+      .text-success-custom {
+        color: #198754;
+      }
+      .text-danger-custom {
+        color: #dc3545;
+      }
 
       /* Graph Section */
       .chart-card {
@@ -412,7 +436,10 @@
         font-weight: 500;
       }
 
-      .order-id { font-weight: 600; color: #000; }
+      .order-id {
+        font-weight: 600;
+        color: #000;
+      }
 
       /* Status Badges */
       .badge-custom {
@@ -423,19 +450,36 @@
         display: inline-block;
       }
 
-      .status-shipped { background-color: #e3e3e3; color: #4a4a4a; }
-      .status-processing { background-color: #f1f1f1; color: #666; border: 1px solid #ddd; }
-      .status-cancelled { background-color: #f1f1f1; color: #666; }
+      .status-shipped {
+        background-color: #e3e3e3;
+        color: #4a4a4a;
+      }
+      .status-processing {
+        background-color: #f1f1f1;
+        color: #666;
+        border: 1px solid #ddd;
+      }
+      .status-cancelled {
+        background-color: #f1f1f1;
+        color: #666;
+      }
 
       /* Responsive */
       @media (max-width: 991px) {
-        .sidebar { transform: translateX(-100%); }
+        .sidebar {
+          transform: translateX(-100%);
+        }
         .sidebar.active {
           transform: translateX(0);
           box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
         }
-        .main-content { margin-left: 0; padding: 20px; }
-        .mobile-nav { display: flex; }
+        .main-content {
+          margin-left: 0;
+          padding: 20px;
+        }
+        .mobile-nav {
+          display: flex;
+        }
         .sidebar-overlay {
           display: none;
           position: fixed;
@@ -446,9 +490,15 @@
           background: rgba(0, 0, 0, 0.5);
           z-index: 998;
         }
-        .sidebar-overlay.active { display: block; }
-        .table-responsive { overflow-x: auto; }
-        .table { min-width: 600px; }
+        .sidebar-overlay.active {
+          display: block;
+        }
+        .table-responsive {
+          overflow-x: auto;
+        }
+        .table {
+          min-width: 600px;
+        }
       }
     </style>
   </head>
@@ -518,7 +568,7 @@
           </a>
         </li>
         <li class="menu-item">
-          <a href="./adminCategories.html" class="menu-link">
+          <a href="./Admin/adminCategories.html" class="menu-link active">
             <i class="fa-solid fa-layer-group"></i> &nbsp;Category Management
           </a>
         </li>
@@ -610,7 +660,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="chart-card">
         <div class="chart-header">
           <h5 class="chart-title">Sales Overview</h5>
@@ -641,7 +691,9 @@
                 <td class="order-id">#12345</td>
                 <td>John Doe</td>
                 <td>2023-10-27</td>
-                <td><span class="badge-custom status-shipped">Shipped</span></td>
+                <td>
+                  <span class="badge-custom status-shipped">Shipped</span>
+                </td>
               </tr>
               <tr>
                 <td class="order-id">#12346</td>
@@ -663,7 +715,9 @@
                 <td class="order-id">#12348</td>
                 <td>Emily Brown</td>
                 <td>2023-10-26</td>
-                <td><span class="badge-custom status-shipped">Shipped</span></td>
+                <td>
+                  <span class="badge-custom status-shipped">Shipped</span>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -679,63 +733,71 @@
       }
 
       // --- Chart.js Initialization ---
-      document.addEventListener("DOMContentLoaded", function() {
-        const ctx = document.getElementById('salesChart').getContext('2d');
-        
+      document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById("salesChart").getContext("2d");
+
         // Gradient Fill
         const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(26, 26, 26, 0.1)');
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        gradient.addColorStop(0, "rgba(26, 26, 26, 0.1)");
+        gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
 
         new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
-                datasets: [{
-                    label: 'Revenue ($)',
-                    data: [90000, 110000, 105000, 130000, 125000, 150000],
-                    backgroundColor: gradient,
-                    borderColor: '#1a1a1a',
-                    borderWidth: 2,
-                    pointBackgroundColor: '#fff',
-                    pointBorderColor: '#1a1a1a',
-                    pointRadius: 4,
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: '#1a1a1a',
-                        titleColor: '#fff',
-                        bodyColor: '#fff',
-                        padding: 10,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return '$' + context.parsed.y.toLocaleString();
-                            }
-                        }
-                    }
+          type: "line",
+          data: {
+            labels: ["May", "Jun", "Jul", "Aug", "Sep", "Oct"],
+            datasets: [
+              {
+                label: "Revenue ($)",
+                data: [90000, 110000, 105000, 130000, 125000, 150000],
+                backgroundColor: gradient,
+                borderColor: "#1a1a1a",
+                borderWidth: 2,
+                pointBackgroundColor: "#fff",
+                pointBorderColor: "#1a1a1a",
+                pointRadius: 4,
+                fill: true,
+                tension: 0.4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: "#1a1a1a",
+                titleColor: "#fff",
+                bodyColor: "#fff",
+                padding: 10,
+                displayColors: false,
+                callbacks: {
+                  label: function (context) {
+                    return "$" + context.parsed.y.toLocaleString();
+                  },
                 },
-                scales: {
-                    x: {
-                        grid: { display: false, drawBorder: false },
-                        ticks: { font: { family: 'Poppins' } }
-                    },
-                    y: {
-                        grid: { color: '#f0f0f0', borderDash: [5, 5], drawBorder: false },
-                        ticks: {
-                            callback: function(value) { return '$' + value / 1000 + 'k'; },
-                            font: { family: 'Poppins' }
-                        }
-                    }
-                }
-            }
+              },
+            },
+            scales: {
+              x: {
+                grid: { display: false, drawBorder: false },
+                ticks: { font: { family: "Poppins" } },
+              },
+              y: {
+                grid: {
+                  color: "#f0f0f0",
+                  borderDash: [5, 5],
+                  drawBorder: false,
+                },
+                ticks: {
+                  callback: function (value) {
+                    return "$" + value / 1000 + "k";
+                  },
+                  font: { family: "Poppins" },
+                },
+              },
+            },
+          },
         });
       });
     </script>
