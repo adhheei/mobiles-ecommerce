@@ -1,143 +1,172 @@
 // public/js/adminCategories.js
-document.addEventListener("DOMContentLoaded", () => {
-  const sidebar = document.getElementById("sidebar");
-  const overlay = document.getElementById("sidebarOverlay");
-  const sidebarToggleBtn = document.getElementById("sidebarToggleBtn");
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize categories as empty array
+  let categories = [];
 
   // Sidebar toggle
+  const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+
   if (sidebarToggleBtn) {
-    sidebarToggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("active");
-      overlay.classList.toggle("active");
+    sidebarToggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
     });
   }
   if (overlay) {
-    overlay.addEventListener("click", () => {
-      sidebar.classList.remove("active");
-      overlay.classList.remove("active");
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
     });
   }
 
-  let categories = [];
-
-  // Load categories
+  // Load categories from API
   async function loadCategories() {
     try {
-      const res = await fetch("/api/categories");
+      const res = await fetch('/api/admin/categories');
+      
+      // Check if response is OK
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
       const data = await res.json();
 
-      if (data.success) {
+      // Validate response structure
+      if (data.success && Array.isArray(data.data)) {
         categories = data.data;
-        renderTable(categories);
       } else {
-        throw new Error(data.error || "Failed to load categories");
+        console.warn('Unexpected API response:', data);
+        categories = [];
       }
+
+      renderTable(categories);
     } catch (err) {
+      console.error('Failed to load categories:', err);
       Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: err.message || "Failed to load categories.",
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Failed to load categories. Please try again later.',
+        confirmButtonColor: '#1a1a1a'
       });
+      categories = [];
+      renderTable(categories);
     }
   }
 
-  // Render table
+  // Render category table
   function renderTable(data = categories) {
-    const tbody = document.getElementById("categoryTableBody");
-    tbody.innerHTML = "";
-
-    if (data.length === 0) {
-      tbody.innerHTML =
-        '<tr><td colspan="4" class="text-center py-4 text-muted">No categories found.</td></tr>';
-      return;
+    const tbody = document.getElementById('categoryTableBody');
+    
+    // Safety check
+    if (!Array.isArray(data)) {
+      console.error('Expected array but got:', typeof data);
+      data = [];
     }
 
-    data.forEach((cat) => {
-      const row = `
+    if (data.length === 0) {
+      tbody.innerHTML = `
         <tr>
-          <td>
-            <div class="category-cell">
-              <img src="${cat.img}" class="cat-img" alt="${cat.name}">
-              <span class="cat-name">${cat.name}</span>
-            </div>
-          </td>
-          <td><div class="cat-desc">${cat.desc}</div></td>
-          <td>${cat.products} items</td>
-          <td class="text-end">
-            <a href="./adminEditCategory.html?id=${cat.id}" class="action-btn" title="Edit"><i class="fa-solid fa-pen"></i></a>
-            <button class="action-btn btn-delete" data-id="${cat.id}" title="Delete"><i class="fa-solid fa-trash"></i></button>
+          <td colspan="4" class="text-center py-4 text-muted">
+            No categories found. <a href="./adminAddCategory.html" class="text-primary">Add one now</a>.
           </td>
         </tr>
       `;
-      tbody.innerHTML += row;
+      return;
+    }
+
+    // Build table rows
+    let html = '';
+    data.forEach(cat => {
+      // Ensure all fields exist
+      const name = cat.name || 'Unnamed';
+      const desc = cat.desc || '';
+      const products = cat.products || 0;
+      const img = cat.img || '/images/logo.jpg';
+      const id = cat.id || '';
+
+      html += `
+        <tr>
+          <td>
+            <div class="category-cell">
+              <img src="${img}" class="cat-img" alt="${name}" onerror="this.src='/images/logo.jpg'">
+              <span class="cat-name">${name}</span>
+            </div>
+          </td>
+          <td><div class="cat-desc">${desc}</div></td>
+          <td>${products} items</td>
+          <td class="text-end">
+            <a href="./adminEditCategory.html?id=${id}" class="action-btn" title="Edit">
+              <i class="fa-solid fa-pen"></i>
+            </a>
+            <button class="action-btn btn-delete" data-id="${id}" title="Delete">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `;
     });
 
-    // Attach delete handlers
-    document.querySelectorAll(".btn-delete").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const id = btn.getAttribute("data-id");
-        deleteCategory(id);
+    tbody.innerHTML = html;
+
+    // Attach delete event listeners
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = e.currentTarget.getAttribute('data-id');
+        if (id) {
+          deleteCategory(id);
+        }
       });
     });
   }
 
-  // Search
+  // Search/filter categories
   function filterCategories() {
-    const term = document.getElementById("searchInput").value.toLowerCase();
-    const filtered = categories.filter((c) =>
-      c.name.toLowerCase().includes(term)
+    const term = document.getElementById('searchInput')?.value.toLowerCase() || '';
+    const filtered = categories.filter(cat => 
+      cat.name?.toLowerCase().includes(term)
     );
     renderTable(filtered);
   }
 
-  // Delete category (permanent)
+  // Delete category
   async function deleteCategory(id) {
     const result = await Swal.fire({
-      title: "Are you sure?",
-      html: "<strong>This action cannot be undone!</strong><br>All products in this category will lose their category link.",
-      icon: "warning",
+      title: 'Are you sure?',
+      text: "This category will be permanently deleted!",
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: "#dc3545",
-      cancelButtonColor: "#1a1a1a",
-      confirmButtonText: "Yes, delete permanently!",
-      cancelButtonText: "Cancel",
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#1a1a1a',
+      confirmButtonText: 'Yes, delete it!'
     });
 
     if (result.isConfirmed) {
       try {
-        Swal.fire({
-          title: "Deleting...",
-          text: "Removing category permanently.",
-          allowOutsideClick: false,
-          didOpen: () => Swal.showLoading(),
+        const res = await fetch(`/api/admin/categories/${id}`, {
+          method: 'DELETE'
         });
 
-        const res = await fetch(`/api/categories/${id}`, {
-          method: "DELETE",
-        });
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
 
         const data = await res.json();
-
         if (data.success) {
           // Remove from local array
-          categories = categories.filter((cat) => cat.id !== id);
-          renderTable(); // Refresh UI
-
-          Swal.fire({
-            icon: "success",
-            title: "Deleted!",
-            text: "Category has been permanently removed.",
-            timer: 2000,
-            showConfirmButton: false,
-          });
+          categories = categories.filter(cat => cat.id !== id);
+          renderTable();
+          Swal.fire('Deleted!', 'Category has been removed.', 'success');
         } else {
-          throw new Error(data.error || "Failed to delete category");
+          throw new Error(data.error || 'Delete failed');
         }
       } catch (err) {
+        console.error('Delete error:', err);
         Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: err.message || "Something went wrong.",
+          icon: 'error',
+          title: 'Error!',
+          text: err.message || 'Failed to delete category.'
         });
       }
     }
@@ -145,7 +174,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initialize
   loadCategories();
-  document
-    .getElementById("searchInput")
-    ?.addEventListener("keyup", filterCategories);
+  
+  // Setup search
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) {
+    searchInput.addEventListener('keyup', filterCategories);
+  }
 });

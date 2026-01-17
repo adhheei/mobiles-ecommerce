@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
           didOpen: () => Swal.showLoading()
         });
 
-        const res = await fetch('/api/categories', {
+        const res = await fetch('/api/admin/categories', {
           method: 'POST',
           body: formData
         });

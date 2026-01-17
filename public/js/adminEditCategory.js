@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Load category data
   async function loadCategory() {
     try {
-      const res = await fetch(`/api/categories/${categoryId}`);
+      const res = await fetch(`/api/admin/categories/${categoryId}`);
       const data = await res.json();
 
       if (data.success) {
@@ -147,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
           didOpen: () => Swal.showLoading(),
         });
 
-        const res = await fetch(`/api/categories/${categoryId}`, {
+        const res = await fetch(`/api/admin/categories/${categoryId}`, {
           method: "PUT",
           body: formData,
         });
