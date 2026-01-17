@@ -5,19 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Categories - Jinsa Mobiles Admin</title>
 
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Local CSS -->
+    <link href="/libs/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
     <style>
       :root {
@@ -36,22 +27,14 @@
         color: var(--primary-black);
       }
 
-      /* --- ANIMATIONS --- */
+      /* Animations */
       @keyframes slideInUp {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
       }
-      .content-animate {
-        animation: slideInUp 0.6s ease-out forwards;
-      }
+      .content-animate { animation: slideInUp 0.6s ease-out forwards; }
 
-      /* --- SIDEBAR --- */
+      /* Sidebar */
       .sidebar {
         width: var(--sidebar-width);
         height: 100vh;
@@ -85,18 +68,8 @@
         flex-direction: column;
         line-height: 1.1;
       }
-      .brand-title {
-        font-weight: 800;
-        font-size: 1rem;
-        color: #000;
-      }
-      .brand-subtitle {
-        font-size: 0.55rem;
-        letter-spacing: 2px;
-        color: #777;
-        font-weight: 600;
-        text-transform: uppercase;
-      }
+      .brand-title { font-weight: 800; font-size: 1rem; color: #000; }
+      .brand-subtitle { font-size: 0.55rem; letter-spacing: 2px; color: #777; font-weight: 600; text-transform: uppercase; }
 
       .sidebar-menu {
         list-style: none;
@@ -105,9 +78,7 @@
         flex-grow: 1;
         overflow-y: auto;
       }
-      .menu-item {
-        margin-bottom: 5px;
-      }
+      .menu-item { margin-bottom: 5px; }
       .menu-link {
         display: flex;
         align-items: center;
@@ -119,23 +90,10 @@
         border-radius: 8px;
         transition: all 0.2s;
       }
-      .menu-link i {
-        width: 25px;
-        font-size: 1.1rem;
-        color: #777;
-      }
-      .menu-link:hover {
-        background-color: var(--bg-light);
-        color: #000;
-      }
-      .menu-link.active {
-        background-color: var(--active-bg);
-        color: #000;
-        font-weight: 600;
-      }
-      .menu-link.active i {
-        color: #000;
-      }
+      .menu-link i { width: 25px; font-size: 1.1rem; color: #777; }
+      .menu-link:hover { background-color: var(--bg-light); color: #000; }
+      .menu-link.active { background-color: var(--active-bg); color: #000; font-weight: 600; }
+      .menu-link.active i { color: #000; }
 
       .admin-profile {
         margin-top: auto;
@@ -156,15 +114,8 @@
         border-radius: 50%;
         background: #ccc;
       }
-      .admin-details h6 {
-        margin: 0;
-        font-size: 0.9rem;
-        font-weight: 600;
-      }
-      .admin-details span {
-        font-size: 0.75rem;
-        color: var(--text-muted);
-      }
+      .admin-details h6 { margin: 0; font-size: 0.9rem; font-weight: 600; }
+      .admin-details span { font-size: 0.75rem; color: var(--text-muted); }
       .logout-btn {
         width: 100%;
         background-color: var(--bg-light);
@@ -181,19 +132,15 @@
         transition: 0.2s;
         text-decoration: none;
       }
-      .logout-btn:hover {
-        background-color: #e2e6ea;
-        color: #000;
-      }
+      .logout-btn:hover { background-color: #e2e6ea; color: #000; }
 
-      /* --- MAIN CONTENT --- */
+      /* Main Content */
       .main-content {
         margin-left: var(--sidebar-width);
         padding: 30px;
         transition: margin-left 0.3s ease;
       }
 
-      /* Mobile Nav */
       .mobile-nav {
         display: none;
         background: #fff;
@@ -205,36 +152,7 @@
         top: 0;
         z-index: 999;
       }
-      .mobile-nav .brand-section {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 0;
-        text-decoration: none;
-        color: var(--primary-black);
-      }
-      .brand-text-mobile {
-        display: flex;
-        flex-direction: column;
-        line-height: 1.1;
-        text-align: left;
-      }
-      .brand-title-mobile {
-        font-weight: 800;
-        font-size: 1rem;
-        color: #000;
-        display: block;
-      }
-      .brand-subtitle-mobile {
-        font-size: 0.6rem;
-        letter-spacing: 1px;
-        color: #777;
-        font-weight: 600;
-        text-transform: uppercase;
-        display: block;
-      }
 
-      /* Header */
       .page-header {
         display: flex;
         justify-content: space-between;
@@ -266,7 +184,6 @@
         color: #fff;
       }
 
-      /* Toolbar */
       .table-toolbar {
         background: #fff;
         padding: 25px;
@@ -301,7 +218,6 @@
         color: #aaa;
       }
 
-      /* Table Card */
       .table-card {
         background: #fff;
         border-radius: 16px;
@@ -360,7 +276,6 @@
         text-overflow: ellipsis;
       }
 
-      /* Action Buttons */
       .action-btn {
         width: 32px;
         height: 32px;
@@ -387,26 +302,11 @@
       }
 
       @media (max-width: 991px) {
-        .sidebar {
-          transform: translateX(-100%);
-        }
-        .sidebar.active {
-          transform: translateX(0);
-          box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
-        }
-        .main-content {
-          margin-left: 0;
-          padding: 20px;
-        }
-        .mobile-nav {
-          display: flex;
-        }
-        .table-container {
-          overflow-x: auto;
-        }
-        .table {
-          min-width: 700px;
-        }
+        .sidebar { transform: translateX(-100%); }
+        .sidebar.active { transform: translateX(0); box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1); }
+        .main-content { margin-left: 0; padding: 20px; }
+        .mobile-nav { display: flex; }
+        .table { min-width: 700px; }
         .sidebar-overlay {
           display: none;
           position: fixed;
@@ -417,43 +317,35 @@
           background: rgba(0, 0, 0, 0.5);
           z-index: 998;
         }
-        .sidebar-overlay.active {
-          display: block;
-        }
+        .sidebar-overlay.active { display: block; }
         .table-toolbar {
           flex-direction: column;
           align-items: stretch;
           padding: 20px;
         }
-        .search-box {
-          max-width: 100%;
-        }
+        .search-box { max-width: 100%; }
       }
     </style>
   </head>
   <body>
     <div class="mobile-nav">
       <a href="#" class="brand-section">
-        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
+        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
         <div class="brand-text-mobile">
           <span class="brand-title-mobile">JINSA MOBILES</span>
           <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
         </div>
       </a>
-      <button class="btn btn-light" onclick="toggleSidebar()">
+      <button class="btn btn-light" id="sidebarToggleBtn">
         <i class="fa-solid fa-bars"></i>
       </button>
     </div>
 
-    <div
-      class="sidebar-overlay"
-      id="sidebarOverlay"
-      onclick="toggleSidebar()"
-    ></div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <nav class="sidebar" id="sidebar">
-      <a href="./adminDashboard.html" class="brand-section">
-        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
+      <a href="../adminDashboard.html" class="brand-section">
+        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
         <div class="brand-text-container">
           <span class="brand-title">JINSA MOBILES</span>
           <span class="brand-subtitle">AND ACCESSORIES</span>
@@ -461,69 +353,26 @@
       </a>
 
       <ul class="sidebar-menu">
-        <li class="menu-item">
-          <a href="./adminDashboard.html" class="menu-link">
-            <i class="fa-solid fa-border-all"></i> &nbsp;Dashboard
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="./adminOrders.html" class="menu-link">
-            <i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="./adminProducts.html" class="menu-link">
-            <i class="fa-solid fa-box-open"></i> &nbsp;Products
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="./adminCustomers.html" class="menu-link">
-            <i class="fa-solid fa-users"></i> &nbsp;Customers
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="./adminMessages.html" class="menu-link">
-            <i class="fa-regular fa-envelope"></i> &nbsp;Messages
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="./adminAnalytics.html" class="menu-link">
-            <i class="fa-solid fa-chart-simple"></i> &nbsp;Analytics
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="./adminCoupons.html" class="menu-link">
-            <i class="fa-solid fa-tag"></i> &nbsp;Coupon Management
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="./adminCategories.html" class="menu-link active">
-            <i class="fa-solid fa-layer-group"></i> &nbsp;Category Management
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="./adminOffers.html" class="menu-link">
-            <i class="fa-solid fa-gift"></i> &nbsp;Offer
-          </a>
-        </li>
+        <li class="menu-item"><a href="../adminDashboard.html" class="menu-link"><i class="fa-solid fa-border-all"></i> &nbsp;Dashboard</a></li>
+        <li class="menu-item"><a href="../adminOrders.html" class="menu-link"><i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a></li>
+        <li class="menu-item"><a href="../adminProducts.html" class="menu-link"><i class="fa-solid fa-box-open"></i> &nbsp;Products</a></li>
+        <li class="menu-item"><a href="../adminCustomers.html" class="menu-link"><i class="fa-solid fa-users"></i> &nbsp;Customers</a></li>
+        <li class="menu-item"><a href="../adminMessages.html" class="menu-link"><i class="fa-regular fa-envelope"></i> &nbsp;Messages</a></li>
+        <li class="menu-item"><a href="../adminAnalytics.html" class="menu-link"><i class="fa-solid fa-chart-simple"></i> &nbsp;Analytics</a></li>
+        <li class="menu-item"><a href="../adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i> &nbsp;Coupon Management</a></li>
+        <li class="menu-item"><a href="./adminCategories.html" class="menu-link active"><i class="fa-solid fa-layer-group"></i> &nbsp;Category Management</a></li>
+        <li class="menu-item"><a href="../adminOffers.html" class="menu-link"><i class="fa-solid fa-gift"></i> &nbsp;Offer</a></li>
       </ul>
 
       <div class="admin-profile">
-        <a
-          href="./adminProfile.html"
-          class="profile-info text-decoration-none text-reset"
-        >
-          <img
-            src="https://placehold.co/100x100/ccc/fff?text=A"
-            alt="Admin"
-            class="admin-avatar"
-          />
+        <a href="../adminProfile.html" class="profile-info text-decoration-none text-reset">
+          <img src="../images/logo.jpg" alt="Admin" class="admin-avatar" />
           <div class="admin-details">
             <h6 id="sidebarName" class="m-0">Admin</h6>
             <span class="small text-muted">admin@example.com</span>
           </div>
         </a>
-        <a href="./adminLogin.html" class="logout-btn">
+        <a href="../adminLogin.html" class="logout-btn">
           <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
         </a>
       </div>
@@ -540,12 +389,7 @@
       <div class="table-toolbar">
         <div class="search-box">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Search categories..."
-            onkeyup="filterCategories()"
-          />
+          <input type="text" id="searchInput" placeholder="Search categories..." />
         </div>
       </div>
 
@@ -564,121 +408,9 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      function toggleSidebar() {
-        document.getElementById("sidebar").classList.toggle("active");
-        document.getElementById("sidebarOverlay").classList.toggle("active");
-      }
-
-      // --- Dummy Data ---
-      let categories = []; // Will be filled from API
-
-      async function loadCategories() {
-        try {
-          const res = await fetch("/api/categories");
-          const data = await res.json();
-
-          if (data.success) {
-            categories = data.data;
-            renderTable(categories);
-          } else {
-            throw new Error(data.error || "Failed to load categories");
-          }
-        } catch (err) {
-          console.error(err);
-          Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Failed to load categories. Please try again.",
-          });
-        }
-      }
-
-      // Call on page load
-      document.addEventListener("DOMContentLoaded", loadCategories);
-
-      // --- Render Table ---
-      function renderTable(data = categories) {
-        const tbody = document.getElementById("categoryTableBody");
-        tbody.innerHTML = "";
-
-        if (data.length === 0) {
-          tbody.innerHTML =
-            '<tr><td colspan="4" class="text-center py-4 text-muted">No categories found.</td></tr>';
-          return;
-        }
-
-        data.forEach((cat) => {
-          const row = `
-            <tr>
-              <td>
-                <div class="category-cell">
-                    <img src="${cat.img}" class="cat-img" alt="${cat.name}">
-                    <span class="cat-name">${cat.name}</span>
-                </div>
-              </td>
-              <td><div class="cat-desc">${cat.desc}</div></td>
-              <td>${cat.products} items</td>
-              <td class="text-end">
-                <a href="./adminEditCategory.html?id=${cat.id}" class="action-btn" title="Edit"><i class="fa-solid fa-pen"></i></a>
-                <button class="action-btn btn-delete" title="Delete" onclick="deleteCategory(${cat.id})"><i class="fa-solid fa-trash"></i></button>
-              </td>
-            </tr>
-          `;
-          tbody.innerHTML += row;
-        });
-      }
-
-      // --- Filter ---
-      function filterCategories() {
-        const term = document.getElementById("searchInput").value.toLowerCase();
-        const filtered = categories.filter((c) =>
-          c.name.toLowerCase().includes(term)
-        );
-        renderTable(filtered);
-      }
-
-      // --- Delete Category ---
-      async function deleteCategory(id) {
-        Swal.fire({
-          title: "Are you sure?",
-          text: "You won't be able to revert this!",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#dc3545",
-          cancelButtonColor: "#1a1a1a",
-          confirmButtonText: "Yes, delete it!",
-        }).then(async (result) => {
-          if (result.isConfirmed) {
-            try {
-              const res = await fetch(`/api/categories/${id}`, {
-                method: "DELETE",
-              });
-
-              const data = await res.json();
-
-              if (data.success) {
-                // Remove from local array
-                categories = categories.filter((c) => c.id !== id);
-                renderTable();
-                Swal.fire("Deleted!", "Category has been deleted.", "success");
-              } else {
-                throw new Error(data.error || "Delete failed");
-              }
-            } catch (err) {
-              Swal.fire({
-                icon: "error",
-                title: "Error!",
-                text: err.message,
-              });
-            }
-          }
-        });
-      }
-
-      // Init
-      document.addEventListener("DOMContentLoaded", () => renderTable());
-    </script>
+    <!-- External JS -->
+    <script src="/libs/bootstrap.bundle.min.js"></script>
+    <script src="/libs/sweetalert2.all.min.js"></script>
+    <script src="/js/adminCategories.js"></script>
   </body>
 </html>

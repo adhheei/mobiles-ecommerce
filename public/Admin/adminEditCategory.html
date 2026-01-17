@@ -1,525 +1,466 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Edit Category - Jinsa Mobiles Admin</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Local CSS -->
+    <link href="/libs/bootstrap.min.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
     <style>
-        :root {
-            --primary-black: #1a1a1a;
-            --bg-light: #f8f9fa;
-            --border-color: #eee;
-            --text-color: #333;
-            --text-muted: #6c757d;
-            --sidebar-width: 260px;
-            --active-bg: #e9ecef;
-        }
+      /* Same styles as adminAddCategory.html — reused for consistency */
+      :root {
+        --primary-black: #1a1a1a;
+        --bg-light: #f8f9fa;
+        --border-color: #eee;
+        --sidebar-width: 260px;
+        --active-bg: #e9ecef;
+        --text-muted: #6c757d;
+      }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-color);
-            overflow-x: hidden;
-        }
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: var(--bg-light);
+        color: var(--primary-black);
+        overflow-x: hidden;
+      }
 
-        /* --- ANIMATIONS --- */
-        @keyframes slideInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .content-animate { animation: slideInUp 0.6s ease-out forwards; }
+      .content-animate {
+        animation: slideInUp 0.6s ease-out forwards;
+      }
 
-        /* --- SIDEBAR --- */
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        background-color: #fff;
+        border-right: 1px solid var(--border-color);
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        z-index: 1000;
+        transition: transform 0.3s ease;
+      }
+
+      .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 40px;
+        text-decoration: none;
+        color: var(--primary-black);
+      }
+
+      .brand-logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .brand-text-container {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+      }
+
+      .brand-title {
+        font-weight: 800;
+        font-size: 1rem;
+        color: #000;
+      }
+      .brand-subtitle {
+        font-size: 0.55rem;
+        letter-spacing: 2px;
+        color: #777;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-grow: 1;
+        overflow-y: auto;
+      }
+
+      .menu-item {
+        margin-bottom: 5px;
+      }
+      .menu-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        color: #555;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        transition: all 0.2s;
+      }
+      .menu-link i {
+        width: 25px;
+        font-size: 1.1rem;
+        color: #777;
+      }
+      .menu-link:hover {
+        background-color: var(--bg-light);
+        color: #000;
+      }
+      .menu-link.active {
+        background-color: var(--active-bg);
+        color: #000;
+        font-weight: 600;
+      }
+      .menu-link.active i {
+        color: #000;
+      }
+
+      .admin-profile {
+        margin-top: auto;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+      }
+      .profile-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        text-decoration: none;
+        color: inherit;
+      }
+      .admin-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: #ccc;
+      }
+      .admin-details h6 {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+      .admin-details span {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+      .logout-btn {
+        width: 100%;
+        background-color: var(--bg-light);
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: 0.2s;
+        text-decoration: none;
+      }
+      .logout-btn:hover {
+        background-color: #e2e6ea;
+        color: #000;
+      }
+
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 30px;
+        transition: margin-left 0.3s ease;
+      }
+
+      .mobile-nav {
+        display: none;
+        background: #fff;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 999;
+      }
+
+      .page-header {
+        margin-bottom: 30px;
+      }
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+        color: var(--text-muted);
+        font-weight: 500;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+        transition: color 0.2s;
+      }
+      .back-link:hover {
+        color: var(--primary-black);
+      }
+      .back-link i {
+        margin-right: 8px;
+      }
+      .page-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin: 0 0 5px 0;
+        color: #000;
+      }
+      .page-description {
+        color: var(--text-muted);
+        margin: 0;
+        font-size: 0.95rem;
+      }
+
+      .form-card {
+        background-color: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+      }
+      .form-group {
+        margin-bottom: 25px;
+      }
+      .form-label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        color: #333;
+      }
+      .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        color: var(--primary-black);
+        font-family: "Poppins", sans-serif;
+      }
+      .form-control:focus {
+        box-shadow: none;
+        border-color: #000;
+      }
+      textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      .upload-area {
+        border: 2px dashed #ddd;
+        border-radius: 12px;
+        padding: 40px 20px;
+        text-align: center;
+        cursor: pointer;
+        background-color: #fcfcfc;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+      }
+      .upload-area:hover {
+        border-color: #aaa;
+        background-color: #f4f4f4;
+      }
+      .upload-icon {
+        font-size: 2.5rem;
+        color: #ccc;
+        margin-bottom: 15px;
+      }
+      .upload-text {
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+      }
+      .upload-hint {
+        font-size: 0.8rem;
+        color: #777;
+      }
+
+      #previewImage {
+        display: none;
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 8px;
+        margin-top: 10px;
+        object-fit: contain;
+      }
+
+      .status-group {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #f0f0f0;
+      }
+      .toggle-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .toggle-label {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        cursor: pointer;
+      }
+      .toggle-label.active-text {
+        color: var(--primary-black);
+        font-weight: 600;
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 48px;
+        height: 26px;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #e0e0e0;
+        transition: 0.4s;
+        border-radius: 34px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+      input:checked + .slider {
+        background-color: var(--primary-black);
+      }
+      input:checked + .slider:before {
+        transform: translateX(22px);
+      }
+
+      .form-footer {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 30px;
+        gap: 15px;
+      }
+      .btn-cancel {
+        background-color: var(--active-bg);
+        color: #333;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: 0.2s;
+      }
+      .btn-cancel:hover {
+        background-color: #dcdcdc;
+      }
+      .btn-update {
+        background-color: var(--primary-black);
+        color: #fff;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: 0.2s;
+      }
+      .btn-update:hover {
+        background-color: #333;
+      }
+
+      @media (max-width: 991px) {
         .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            background-color: #fff;
-            border-right: 1px solid var(--border-color);
-            position: fixed;
-            top: 0;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            z-index: 1000;
-            transition: transform 0.3s ease;
+          transform: translateX(-100%);
         }
-        .brand-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 40px;
-            text-decoration: none;
-            color: var(--primary-black);
+        .sidebar.active {
+          transform: translateX(0);
+          box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
         }
-        .brand-logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        .brand-text-container {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.1;
-        }
-        .brand-title {
-            font-weight: 800;
-            font-size: 1rem;
-            color: #000;
-        }
-        .brand-subtitle {
-            font-size: 0.55rem;
-            letter-spacing: 2px;
-            color: #777;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-        .menu-item {
-            margin-bottom: 5px;
-        }
-        .menu-link {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            color: #555;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9rem;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-        .menu-link i {
-            width: 25px;
-            font-size: 1.1rem;
-            color: #777;
-        }
-        .menu-link:hover {
-            background-color: var(--bg-light);
-            color: #000;
-        }
-        .menu-link.active {
-            background-color: var(--active-bg);
-            color: #000;
-            font-weight: 600;
-        }
-        .menu-link.active i {
-            color: #000;
-        }
-
-        .admin-profile {
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
-        }
-        .profile-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            text-decoration: none;
-            color: inherit;
-        }
-        .admin-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: #ccc;
-        }
-        .admin-details h6 {
-            margin: 0;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-        .admin-details span {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-        .logout-btn {
-            width: 100%;
-            background-color: var(--bg-light);
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: 0.2s;
-            text-decoration: none;
-        }
-        .logout-btn:hover {
-            background-color: #e2e6ea;
-            color: #000;
-        }
-
-        /* --- MAIN CONTENT --- */
         .main-content {
-            margin-left: var(--sidebar-width);
-            padding: 30px;
-            transition: margin-left 0.3s ease;
+          margin-left: 0;
+          padding: 20px;
         }
-        
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .header-left {
-            display: flex;
-            flex-direction: column;
-        }
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            text-decoration: none;
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-            transition: color 0.2s;
-        }
-        .back-link:hover {
-            color: var(--primary-black);
-        }
-        .back-link i {
-            margin-right: 8px;
-        }
-        .page-title {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin: 0 0 5px 0;
-            color: #000;
-        }
-        .page-description {
-            color: var(--text-muted);
-            margin: 0;
-            font-size: 0.95rem;
-        }
-
-        /* Delete Button */
-        .btn-delete-cat {
-            background-color: #ffe5e5;
-            color: #dc3545;
-            border: 1px solid #f5c2c7;
-            font-weight: 600;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-        .btn-delete-cat:hover {
-            background-color: #dc3545;
-            color: #fff;
-            border-color: #dc3545;
-        }
-
-        /* Form Container - FULL WIDTH */
-        .form-card {
-            background-color: #fff;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-        }
-        .form-group {
-            margin-bottom: 25px;
-        }
-        .form-label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            color: #333;
-        }
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            color: var(--primary-black);
-            font-family: "Poppins", sans-serif;
-        }
-        .form-control:focus {
-            box-shadow: none;
-            border-color: #000;
-        }
-        textarea.form-control {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        /* File Upload Area */
-        .upload-area {
-            border: 2px dashed #ddd;
-            border-radius: 12px;
-            padding: 40px 20px;
-            text-align: center;
-            cursor: pointer;
-            background-color: #fcfcfc;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        .upload-area:hover {
-            border-color: #aaa;
-            background-color: #f4f4f4;
-        }
-        .upload-icon {
-            font-size: 2.5rem;
-            color: #ccc;
-            margin-bottom: 15px;
-        }
-        .upload-text {
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #333;
-        }
-        .upload-hint {
-            font-size: 0.8rem;
-            color: #777;
-        }
-        
-        #previewImage {
-            display: block;
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: 8px;
-            margin: 10px auto 0;
-            object-fit: contain;
-        }
-        #uploadContent {
-            display: none;
-        }
-
-        /* Toggle Switch */
-        .status-group {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #f0f0f0;
-        }
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .toggle-label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-        .toggle-label.active-text {
-            color: var(--primary-black);
-            font-weight: 600;
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 48px;
-            height: 26px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #e0e0e0;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        input:checked + .slider {
-            background-color: var(--primary-black);
-        }
-        input:checked + .slider:before {
-            transform: translateX(22px);
-        }
-
-        /* Footer Buttons */
-        .form-footer {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 30px;
-            gap: 15px;
-        }
-        .btn-cancel {
-            background-color: var(--active-bg);
-            color: #333;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 30px;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-        .btn-cancel:hover {
-            background-color: #dcdcdc;
-        }
-        .btn-create {
-            background-color: var(--primary-black);
-            color: #fff;
-            border: none;
-            padding: 10px 30px;
-            border-radius: 30px;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-        .btn-create:hover {
-            background-color: #333;
-        }
-
-        /* Mobile Nav */
         .mobile-nav {
-            display: none;
-            background: #fff;
-            padding: 15px 20px;
-            border-bottom: 1px solid #eee;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 999;
+          display: flex;
         }
-        .mobile-nav .brand-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 0;
-            text-decoration: none;
-            color: var(--primary-black);
+        .sidebar-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 998;
         }
-        .brand-text-mobile {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.1;
-            text-align: left;
+        .sidebar-overlay.active {
+          display: block;
         }
-        .brand-title-mobile {
-            font-weight: 800;
-            font-size: 1rem;
-            color: #000;
-            display: block;
+        .form-card {
+          padding: 20px;
         }
-        .brand-subtitle-mobile {
-            font-size: 0.6rem;
-            letter-spacing: 1px;
-            color: #777;
-            font-weight: 600;
-            text-transform: uppercase;
-            display: block;
+        .upload-area {
+          padding: 30px 15px;
         }
-
-        @media (max-width: 991px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.active {
-                transform: translateX(0);
-                box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
-            }
-            .main-content {
-                margin-left: 0;
-                padding: 20px;
-            }
-            .mobile-nav {
-                display: flex;
-            }
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 998;
-            }
-            .sidebar-overlay.active {
-                display: block;
-            }
-            .page-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .form-card {
-                padding: 20px;
-            }
-            .upload-area {
-                padding: 30px 15px;
-            }
-            .btn-delete-cat {
-                width: 100%;
-                justify-content: center;
-            }
-        }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div class="mobile-nav">
       <a href="#" class="brand-section">
-        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
+        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
         <div class="brand-text-mobile">
           <span class="brand-title-mobile">JINSA MOBILES</span>
           <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
         </div>
       </a>
-      <button class="btn btn-light" onclick="toggleSidebar()">
+      <button class="btn btn-light" id="sidebarToggleBtn">
         <i class="fa-solid fa-bars"></i>
       </button>
     </div>
-
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <nav class="sidebar" id="sidebar">
-      <a href="./adminDashboard.html" class="brand-section">
-        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
+      <a href="../adminDashboard.html" class="brand-section">
+        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
         <div class="brand-text-container">
           <span class="brand-title">JINSA MOBILES</span>
           <span class="brand-subtitle">AND ACCESSORIES</span>
@@ -528,225 +469,162 @@
 
       <ul class="sidebar-menu">
         <li class="menu-item">
-          <a href="./adminDashboard.html" class="menu-link">
-            <i class="fa-solid fa-border-all"></i> &nbsp;Dashboard
-          </a>
+          <a href="../adminDashboard.html" class="menu-link"
+            ><i class="fa-solid fa-border-all"></i> &nbsp;Dashboard</a
+          >
         </li>
         <li class="menu-item">
-          <a href="./adminOrders.html" class="menu-link">
-            <i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders
-          </a>
+          <a href="../adminOrders.html" class="menu-link"
+            ><i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a
+          >
         </li>
         <li class="menu-item">
-          <a href="./adminProducts.html" class="menu-link">
-            <i class="fa-solid fa-box-open"></i> &nbsp;Products
-          </a>
+          <a href="../adminProducts.html" class="menu-link"
+            ><i class="fa-solid fa-box-open"></i> &nbsp;Products</a
+          >
         </li>
         <li class="menu-item">
-          <a href="./adminCustomers.html" class="menu-link">
-            <i class="fa-solid fa-users"></i> &nbsp;Customers
-          </a>
+          <a href="../adminCustomers.html" class="menu-link"
+            ><i class="fa-solid fa-users"></i> &nbsp;Customers</a
+          >
         </li>
         <li class="menu-item">
-          <a href="./adminMessages.html" class="menu-link">
-            <i class="fa-regular fa-envelope"></i> &nbsp;Messages
-          </a>
+          <a href="../adminMessages.html" class="menu-link"
+            ><i class="fa-regular fa-envelope"></i> &nbsp;Messages</a
+          >
         </li>
         <li class="menu-item">
-          <a href="./adminAnalytics.html" class="menu-link">
-            <i class="fa-solid fa-chart-simple"></i> &nbsp;Analytics
-          </a>
+          <a href="../adminAnalytics.html" class="menu-link"
+            ><i class="fa-solid fa-chart-simple"></i> &nbsp;Analytics</a
+          >
         </li>
         <li class="menu-item">
-          <a href="./adminCoupons.html" class="menu-link">
-            <i class="fa-solid fa-tag"></i> &nbsp;Coupon Management
-          </a>
+          <a href="../adminCoupons.html" class="menu-link"
+            ><i class="fa-solid fa-tag"></i> &nbsp;Coupon Management</a
+          >
         </li>
         <li class="menu-item">
-          <a href="./adminCategories.html" class="menu-link active">
-            <i class="fa-solid fa-layer-group"></i> &nbsp;Category Management
-          </a>
+          <a href="./adminCategories.html" class="menu-link active"
+            ><i class="fa-solid fa-layer-group"></i> &nbsp;Category
+            Management</a
+          >
         </li>
         <li class="menu-item">
-          <a href="./adminOffers.html" class="menu-link">
-            <i class="fa-solid fa-gift"></i> &nbsp;Offer
-          </a>
+          <a href="../adminOffers.html" class="menu-link"
+            ><i class="fa-solid fa-gift"></i> &nbsp;Offer</a
+          >
         </li>
       </ul>
 
       <div class="admin-profile">
-        <a href="./adminProfile.html" class="profile-info text-decoration-none text-reset">
-          <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
+        <a
+          href="../adminProfile.html"
+          class="profile-info text-decoration-none text-reset"
+        >
+          <img src="../images/logo.jpg" alt="Admin" class="admin-avatar" />
           <div class="admin-details">
             <h6 id="sidebarName" class="m-0">Admin</h6>
             <span class="small text-muted">admin@example.com</span>
           </div>
         </a>
-        <a href="./adminLogin.html" class="logout-btn">
+        <a href="../adminLogin.html" class="logout-btn">
           <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
         </a>
       </div>
     </nav>
 
     <div class="main-content content-animate">
-        <div class="page-header">
-            <div class="header-left">
-                <a href="./adminCategories.html" class="back-link">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    Back to Category Management
-                </a>
-                <h1 class="page-title">Edit Category</h1>
-                <p class="page-description">Modify existing category details.</p>
+      <div class="page-header">
+        <a href="./adminCategories.html" class="back-link">
+          <i class="fa-solid fa-arrow-left"></i>
+          Back to Category Management
+        </a>
+        <h1 class="page-title">Edit Category</h1>
+        <p class="page-description">Update category details.</p>
+      </div>
+
+      <div class="form-card">
+        <form id="editCategoryForm">
+          <input type="hidden" id="categoryId" />
+
+          <div class="form-group">
+            <label for="categoryName" class="form-label">Category Name</label>
+            <input
+              type="text"
+              id="categoryName"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="categoryDesc" class="form-label">Description</label>
+            <textarea id="categoryDesc" class="form-control"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Category Image</label>
+            <div class="upload-area" id="uploadArea">
+              <!-- Preview will appear here -->
+              <img
+                id="previewImage"
+                src=""
+                alt="Preview"
+                style="
+                  max-width: 100%;
+                  max-height: 200px;
+                  border-radius: 8px;
+                  display: none;
+                "
+              />
+
+              <!-- Upload prompt (hidden when image is shown) -->
+              <div
+                id="uploadContent"
+                style="padding: 40px 20px; text-align: center"
+              >
+                <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                <div class="upload-text">Upload a file or drag and drop</div>
+                <div class="upload-hint">PNG, JPG, GIF up to 10MB</div>
+              </div>
             </div>
-            
-            <a href="#" class="btn-delete-cat" onclick="deleteCategory(); return false;">
-                <i class="fa-solid fa-trash-can"></i> Delete Category
-            </a>
-        </div>
+            <div
+              id="currentImageInfo"
+              class="mt-2 text-muted"
+              style="font-size: 0.85rem"
+            ></div>
+            <input type="file" id="catImageInput" hidden accept="image/*" />
+          </div>
 
-        <div class="form-card">
-            <form id="editCategoryForm">
-                
-                <div class="form-group">
-                    <label for="categoryName" class="form-label">Category Name</label>
-                    <input type="text" id="categoryName" class="form-control" value="Mobiles" required>
-                </div>
+          <div class="status-group">
+            <label class="form-label mb-0">Status</label>
+            <div class="toggle-container">
+              <span class="toggle-label">Inactive</span>
+              <label class="switch">
+                <input type="checkbox" id="statusToggle" />
+                <span class="slider"></span>
+              </label>
+              <span class="toggle-label active-text" id="activeLabel"
+                >Active</span
+              >
+            </div>
+          </div>
 
-                <div class="form-group">
-                    <label for="categoryDesc" class="form-label">Description</label>
-                    <textarea id="categoryDesc" class="form-control">Latest smartphones from top brands like Apple, Samsung, and more.</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Category Image</label>
-                    <div class="upload-area" onclick="document.getElementById('catImageInput').click()">
-                        <div id="uploadContent">
-                            <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
-                            <div class="upload-text">Upload a file or drag and drop</div>
-                            <div class="upload-hint">PNG, JPG, GIF up to 10MB</div>
-                        </div>
-                        <img id="previewImage" src="https://placehold.co/100x100/e9ecef/333?text=M" alt="Preview">
-                        <input type="file" id="catImageInput" hidden accept="image/*" onchange="handleImagePreview(this)">
-                    </div>
-                </div>
-
-                <div class="status-group">
-                    <label class="form-label mb-0">Status</label>
-                    <div class="toggle-container">
-                        <span class="toggle-label">Inactive</span>
-                        <label class="switch">
-                            <input type="checkbox" id="statusToggle" checked onchange="toggleStatusLabel()">
-                            <span class="slider"></span>
-                        </label>
-                        <span class="toggle-label active-text" id="activeLabel">Active</span>
-                    </div>
-                </div>
-
-                <div class="form-footer">
-                    <button type="button" class="btn btn-cancel" onclick="location.href='./adminCategories.html'">Cancel</button>
-                    <button type="button" class="btn btn-create" onclick="updateCategory()">Update Category</button>
-                </div>
-
-            </form>
-        </div>
+          <div class="form-footer">
+            <button type="button" class="btn btn-cancel" id="cancelBtn">
+              Cancel
+            </button>
+            <button type="button" class="btn btn-update" id="updateCategoryBtn">
+              Update Category
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function toggleSidebar() {
-            document.getElementById("sidebar").classList.toggle("active");
-            document.getElementById("sidebarOverlay").classList.toggle("active");
-        }
-
-        // Image Preview Logic
-        function handleImagePreview(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById('previewImage');
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                    document.getElementById('uploadContent').style.display = 'none';
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        // Toggle Text styling
-        function toggleStatusLabel() {
-            const isChecked = document.getElementById('statusToggle').checked;
-            const activeLabel = document.getElementById('activeLabel');
-            const inactiveLabel = document.querySelector('.toggle-container .toggle-label:first-child');
-
-            if(isChecked) {
-                activeLabel.classList.add('active-text');
-                inactiveLabel.classList.remove('active-text');
-            } else {
-                activeLabel.classList.remove('active-text');
-                inactiveLabel.classList.add('active-text');
-            }
-        }
-
-        // Update Action
-        function updateCategory() {
-            const name = document.getElementById('categoryName').value;
-            
-            if (!name) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Category name is required!',
-                    confirmButtonColor: '#1a1a1a'
-                });
-                return;
-            }
-
-            Swal.fire({
-                title: 'Updated!',
-                text: 'Category details updated successfully.',
-                icon: 'success',
-                confirmButtonColor: '#1a1a1a',
-                confirmButtonText: 'Go to Categories'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = './adminCategories.html';
-                }
-            });
-        }
-
-        // Delete Action
-        function deleteCategory() {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#1a1a1a',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire(
-                        'Deleted!',
-                        'Category has been deleted.',
-                        'success'
-                    ).then(() => {
-                        window.location.href = './adminCategories.html';
-                    });
-                }
-            });
-        }
-
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function(e) {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (window.innerWidth <= 991 && sidebar.classList.contains('active') && 
-                !e.target.closest('.sidebar') && !e.target.closest('.mobile-nav button')) {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-            }
-        });
-    </script>
-</body>
+    <!-- External JS -->
+    <script src="/libs/bootstrap.bundle.min.js"></script>
+    <script src="/libs/sweetalert2.all.min.js"></script>
+    <script src="/js/adminEditCategory.js"></script>
+  </body>
 </html>
