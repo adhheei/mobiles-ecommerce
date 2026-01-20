@@ -3,19 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pikkme iPhone 16 Case - Jinsa Mobiles</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <title>Product Details - Jinsa Mobiles</title>
+    
+    <!-- ✅ FIXED: Removed trailing spaces and use local Bootstrap -->
+    <link href="/libs/bootstrap.min.css" rel="stylesheet" />
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
     <style>
       /* --- GLOBAL VARIABLES & FONTS --- */
@@ -28,7 +22,6 @@
       body {
         font-family: "Poppins", sans-serif;
         background-color: #fff;
-        /* FIXED: Added padding to prevent content from hiding behind fixed navbar */
         padding-top: 85px; 
         color: #1a1a1a;
         overflow-x: hidden;
@@ -45,7 +38,6 @@
         opacity: 1;
         transform: translateY(0);
       }
-      /* -------------------- */
 
       /* --- HEADER STYLES --- */
       .navbar {
@@ -100,7 +92,7 @@
         .navbar-nav {
           text-align: center;
           margin-bottom: 15px;
-          align-items: center; /* This ensures links are perfectly centered */
+          align-items: center;
           width: 100%;
         }
 
@@ -122,7 +114,6 @@
       }
 
       @media (min-width: 992px) {
-        /* Moved the margin here so it doesn't break mobile centering */
         .navbar-collapse {
           margin-left: 50px;
         }
@@ -262,6 +253,14 @@
         display: inline-block;
         margin-bottom: 25px;
       }
+      .stock-badge.low-stock {
+        background-color: #fff3e0;
+        color: #ef6c00;
+      }
+      .stock-badge.out-of-stock {
+        background-color: #ffebee;
+        color: #c62828;
+      }
 
       .accordion-custom .accordion-item {
         border: none;
@@ -283,33 +282,6 @@
         font-size: 0.9rem;
         color: #555;
         line-height: 1.6;
-      }
-
-      .color-label {
-        font-weight: 600;
-        font-size: 0.9rem;
-        margin-top: 20px;
-        margin-bottom: 10px;
-      }
-      .swatch-group {
-        display: flex;
-        gap: 12px;
-        margin-bottom: 25px;
-      }
-      .swatch-circle {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        cursor: pointer;
-        border: 1px solid #dee2e6;
-        position: relative;
-        transition: transform 0.2s;
-      }
-      .swatch-circle:hover {
-        transform: scale(1.1);
-      }
-      .swatch-circle.active {
-        box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1a1a1a;
       }
 
       .action-row {
@@ -352,7 +324,7 @@
         font-weight: 600;
         flex-grow: 1;
         transition: opacity 0.2s, background-color 0.2s;
-        text-decoration: none; /* Ensure link looks like button */
+        text-decoration: none;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -361,6 +333,11 @@
         opacity: 0.9;
         background-color: #1a1a1a !important; 
         color: white !important;
+      }
+      .btn-add-cart:disabled {
+        background: #6c757d !important;
+        cursor: not-allowed;
+        opacity: 0.6;
       }
 
       .btn-buy-now {
@@ -373,7 +350,7 @@
         font-weight: 600;
         transition: background 0.2s;
         margin-bottom: 25px;
-        text-decoration: none; /* Ensure link looks like button */
+        text-decoration: none;
         display: block;
         text-align: center;
       }
@@ -393,13 +370,13 @@
         overflow-x: auto;
         flex-wrap: nowrap;
         scroll-behavior: smooth;
-        -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
-        scrollbar-width: none; /* Hide scrollbar Firefox */
+        -ms-overflow-style: none;
+        scrollbar-width: none;
         padding-bottom: 20px;
       }
       .scrolling-wrapper::-webkit-scrollbar {
         display: none;
-      } /* Hide scrollbar Chrome/Safari */
+      }
 
       .related-section {
         background-color: #fafafa;
@@ -523,624 +500,411 @@
         width: 100%;
         margin-bottom: 10px;
       }
+
+      /* Loading State */
+      #loading {
+        display: none;
+        text-align: center;
+        padding: 40px 0;
+      }
+      #errorState {
+        display: none;
+        text-align: center;
+        padding: 40px 0;
+        color: #d32f2f;
+      }
     </style>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg fixed-top">
-      <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="./index.html">
-          <img
-            src="../images/logo.jpg"
-            alt="Logo"
-            width="50"
-            height="50"
-            class="me-2 rounded-circle"
-          />
-          <div class="d-flex flex-column">
-            <span
-              class="fw-bold text-dark"
-              style="line-height: 1.1; font-size: 1.2rem"
-              >JINSA MOBILES</span
-            >
-            <span
-              class="text-secondary"
-              style="font-size: 0.6rem; letter-spacing: 4.2px; font-weight: 500"
-              >AND ACCESSORIES</span
-            >
-          </div>
-        </a>
-
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div
-          class="collapse navbar-collapse justify-content-center"
-          id="navbarNav"
-        >
-          <ul class="navbar-nav align-items-center">
-            <li class="nav-item">
-              <a class="nav-link" href="./index.html">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" href="./productPage.html"
-                >Shop Products</a
-              >
-            </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Categories
-              </a>
-              <ul class="dropdown-menu border-0 shadow-sm">
-                <li>
-                  <a class="dropdown-item" href="./productPage.html"
-                    >Mobiles Case</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./productPage.html"
-                    >Chargers</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./productPage.html"
-                    >Earphones</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./productPage.html"
-                    >Powerbanks</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./productPage.html"
-                    >Screen Protectors</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./productPage.html">Cables</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="./aboutUs.html">About Us</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="./contactUs.html">Contact</a>
-            </li>
-          </ul>
-
-          <div class="nav-icons align-items-center">
-            <div class="position-relative">
-              <input
-                type="text"
-                id="navbarSearch"
-                class="form-control border-secondary rounded-pill pe-5"
-                placeholder="Search products..."
-                style="width: 200px; height: 35px; font-size: 0.9rem"
-              />
-              <i
-                class="fa-solid fa-magnifying-glass position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"
-                style="cursor: pointer"
-              ></i>
-            </div>
-
-            <a
-              href="cart.html"
-              class="position-relative ms-lg-4 mt-3 mt-lg-0 text-dark"
-              style="cursor: pointer"
-            >
-              <i class="fa-solid fa-cart-shopping fs-5"></i>
-              <span
-                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                style="font-size: 0.6rem"
-                >2</span
-              >
-            </a>
-
-            <div class="dropdown ms-lg-4 mt-3 mt-lg-0">
-              <a
-                class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <div
-                  class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2"
-                  style="width: 35px; height: 35px; border: 1px solid #dee2e6"
-                >
-                  <i class="fa-regular fa-user"></i>
-                </div>
-                <span class="fw-semibold small">Jinsa</span>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end border-0 shadow mt-2">
-                <li>
-                  <a class="dropdown-item" href="./userProfilePage.html"
-                    ><i class="fa-solid fa-user me-2 text-muted"></i>My Profile</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./userWishListPage.html"
-                    ><i class="fa-regular fa-heart me-2 text-muted"></i
-                    >Wishlist</a
-                  >
-                </li>
-                <li><hr class="dropdown-divider" /></li>
-                <li>
-                  <a class="dropdown-item text-danger" href="./userLogin.html"
-                    ><i class="fa-solid fa-arrow-right-from-bracket me-2"></i
-                    >Logout</a
-                  >
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <script>
-          function toggleSearch() {
-            const searchBox = document.getElementById("navbarSearch");
-            if (searchBox.classList.contains("d-none")) {
-              searchBox.classList.remove("d-none");
-              searchBox.focus();
-            } else {
-              searchBox.classList.add("d-none");
-            }
-          }
-        </script>
-      </div>
-    </nav>
-
-    <section class="py-4 reveal-up">
-      <div class="container">
-        <div class="row g-5">
-          <div class="col-lg-6">
-            <div class="main-image-container">
-              <img
-                src="../images/16backcover.jpeg"
-                id="mainImage"
-                alt="iPhone 16 Case"
-              />
-            </div>
-            <div class="thumbnail-container">
-              <div
-                class="thumbnail active"
-                onclick="changeImage(this, '../images/16backcover.jpeg')"
-              >
-                <img src="../images/16backcover.jpeg" alt="Front" />
-              </div>
-              <div
-                class="thumbnail"
-                onclick="changeImage(this, 'https://placehold.co/500x500/f0f0f0/333?text=Back')"
-              >
-                <img
-                  src="https://placehold.co/100x100/f0f0f0/333?text=Back"
-                  alt="Back"
-                />
-              </div>
-              <div
-                class="thumbnail"
-                onclick="changeImage(this, 'https://placehold.co/500x500/e0e0e0/333?text=Side')"
-              >
-                <img
-                  src="https://placehold.co/100x100/e0e0e0/333?text=Side"
-                  alt="Side"
-                />
-              </div>
-              <div
-                class="thumbnail"
-                onclick="changeImage(this, 'https://placehold.co/500x500/d0d0d0/333?text=Detail')"
-              >
-                <img
-                  src="https://placehold.co/100x100/d0d0d0/333?text=Detail"
-                  alt="Detail"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-6">
-            <div class="vendor-text">PIKKME</div>
-            <h1 class="product-title-large">
-              Pikkme iPhone 16 Super Soft Silicone Back Cover (Black)
-            </h1>
-
-            <div class="sales-proof">
-              <i class="fa-solid fa-fire fire-icon"></i> 153+ bought in past
-              month
-            </div>
-
-            <div class="price-section">
-              <span class="current-price-large">Rs. 499.00</span>
-              <span class="old-price-large">Rs. 1,499.00</span>
-            </div>
-
-            <div class="stock-badge">
-              <i class="fa-solid fa-check-circle me-1"></i> In stock, ready to
-              ship
-            </div>
-
-            <div class="accordion accordion-custom mb-4" id="productAccordion">
-              <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button
-                    class="accordion-button"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#descCollapse"
-                  >
-                    Description
-                  </button>
-                </h2>
-                <div
-                  id="descCollapse"
-                  class="accordion-collapse collapse show"
-                  data-bs-parent="#productAccordion"
-                >
-                  <div class="accordion-body">
-                    <ul class="ps-3 mb-0">
-                      <li>
-                        <strong>All-round protection:</strong> Soft Silicon
-                        wraps around the entire phone for ultrasound protection.
-                      </li>
-                      <li>
-                        <strong>High Quality Material:</strong> Our cases are
-                        made of 100% Original High Quality Silicone.
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button
-                    class="accordion-button collapsed"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#techCollapse"
-                  >
-                    Technical Specifications
-                  </button>
-                </h2>
-                <div
-                  id="techCollapse"
-                  class="accordion-collapse collapse"
-                  data-bs-parent="#productAccordion"
-                >
-                  <div class="accordion-body">
-                    <p class="mb-1">
-                      <strong>Material:</strong> Liquid Silicone
-                    </p>
-                    <p class="mb-0">
-                      <strong>Compatibility:</strong> iPhone 16
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="color-label">
-              Color: <span id="selectedColorName">Black</span>
-            </div>
-            <div class="swatch-group">
-              <div
-                class="swatch-circle active"
-                style="background: #000"
-                onclick="selectColor(this, 'Black')"
-              ></div>
-              <div
-                class="swatch-circle"
-                style="background: #ffb74d"
-                onclick="selectColor(this, 'Orange')"
-              ></div>
-              <div
-                class="swatch-circle"
-                style="background: #f8bbd0"
-                onclick="selectColor(this, 'Pink')"
-              ></div>
-              <div
-                class="swatch-circle"
-                style="background: #e1bee7"
-                onclick="selectColor(this, 'Purple')"
-              ></div>
-            </div>
-
-            <div class="action-row">
-              <div class="quantity-selector">
-                <button class="qty-btn" onclick="updateQty(-1)">-</button>
-                <input
-                  type="text"
-                  id="qtyInput"
-                  value="1"
-                  class="qty-input"
-                  readonly
-                />
-                <button class="qty-btn" onclick="updateQty(1)">+</button>
-              </div>
-              <a href="./cart.html" class="btn btn-add-cart">Add to cart</a>
-            </div>
-            <a href="./address.html" class="btn btn-buy-now">Buy it now</a>
-
-            <div class="share-links mt-3">
-              <span><i class="fa-solid fa-share-nodes"></i> Share</span>
-              <span
-                ><i class="fa-regular fa-circle-question"></i> Ask a
-                question</span
-              >
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="related-section reveal-up">
-      <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h3 class="related-title mb-0">You May Also Like</h3>
-          <div>
-            <button
-              class="btn btn-outline-dark rounded-circle me-2"
-              onclick="scrollRelated('left')"
-            >
-              <i class="fa-solid fa-chevron-left"></i>
-            </button>
-            <button
-              class="btn btn-outline-dark rounded-circle"
-              onclick="scrollRelated('right')"
-            >
-              <i class="fa-solid fa-chevron-right"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="scrolling-wrapper row flex-nowrap pb-4" id="relatedSlider">
-          <div class="col-10 col-md-3">
-            <a href="./productPage.html" class="product-card-link">
-              <div class="product-card h-100">
-                <img
-                  src="https://placehold.co/400x500/f1f1f1/333?text=Pro+Max"
-                  class="card-img-top"
-                  alt="Related"
-                />
-                <div class="card-body">
-                  <div class="related-vendor">Pikkme</div>
-                  <div class="related-name">iPhone 16 Pro Max Silicone</div>
-                  <div class="related-price">Rs. 599.00</div>
-                </div>
-              </div>
-            </a>
-          </div>
-
-          <div class="col-10 col-md-3">
-            <a href="./productPage.html" class="product-card-link">
-              <div class="product-card h-100">
-                <img
-                  src="https://placehold.co/400x500/f1f1f1/333?text=Plus"
-                  class="card-img-top"
-                  alt="Related"
-                />
-                <div class="card-body">
-                  <div class="related-vendor">Pikkme</div>
-                  <div class="related-name">iPhone 16 Plus Soft Case</div>
-                  <div class="related-price">Rs. 499.00</div>
-                </div>
-              </div>
-            </a>
-          </div>
-
-          <div class="col-10 col-md-3">
-            <a href="./productPage.html" class="product-card-link">
-              <div class="product-card h-100">
-                <img
-                  src="https://placehold.co/400x500/f1f1f1/333?text=Clear"
-                  class="card-img-top"
-                  alt="Related"
-                />
-                <div class="card-body">
-                  <div class="related-vendor">Pikkme</div>
-                  <div class="related-name">iPhone 16 Ultra Clear</div>
-                  <div class="related-price">Rs. 399.00</div>
-                </div>
-              </div>
-            </a>
-          </div>
-
-          <div class="col-10 col-md-3">
-            <a href="./productPage.html" class="product-card-link">
-              <div class="product-card h-100">
-                <img
-                  src="https://placehold.co/400x500/f1f1f1/333?text=Wallet"
-                  class="card-img-top"
-                  alt="Related"
-                />
-                <div class="card-body">
-                  <div class="related-vendor">Pikkme</div>
-                  <div class="related-name">iPhone 16 Leather Wallet</div>
-                  <div class="related-price">Rs. 899.00</div>
-                </div>
-              </div>
-            </a>
-          </div>
-
-          <div class="col-10 col-md-3">
-            <a href="./productPage.html" class="product-card-link">
-              <div class="product-card h-100">
-                <img
-                  src="https://placehold.co/400x500/f1f1f1/333?text=MagSafe"
-                  class="card-img-top"
-                  alt="Related"
-                />
-                <div class="card-body">
-                  <div class="related-vendor">Apple</div>
-                  <div class="related-name">MagSafe Clear Case</div>
-                  <div class="related-price">Rs. 1,299.00</div>
-                </div>
-              </div>
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <div class="bottom-features reveal-up">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-4 mb-3 mb-md-0">
-            <div
-              class="feature-box justify-content-center justify-content-md-start"
-            >
-              <i class="fa-solid fa-headset"></i>
-              <div class="feature-text">
-                <h6>Customer service</h6>
-                <p>Your Satisfaction Is Our Command</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4 mb-3 mb-md-0">
-            <div
-              class="feature-box justify-content-center justify-content-md-start"
-            >
-              <i class="fa-solid fa-truck-fast"></i>
-              <div class="feature-text">
-                <h6>Fast Free Shipping</h6>
-                <p>Enjoy Free Convenience on Your Orders</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div
-              class="feature-box justify-content-center justify-content-md-start"
-            >
-              <i class="fa-solid fa-shield-halved"></i>
-              <div class="feature-text">
-                <h6>Secure payment</h6>
-                <p>Your Payment Information is Processed Securely</p>
-              </div>
-            </div>
-          </div>
-        </div>
+    <!-- Loading State -->
+    <div id="loading">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
       </div>
     </div>
 
-    <footer>
-      <div class="container reveal-up">
-        <div class="row">
-          <div class="col-md-3">
-            <h5>Discover More</h5>
-            <ul>
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">Contact Us</a></li>
-              <li><a href="#">Blog</a></li>
-            </ul>
-          </div>
-          <div class="col-md-3">
-            <h5>Explore Products</h5>
-            <ul>
-              <li><a href="#">Mobiles</a></li>
-              <li><a href="#">Accessories</a></li>
-              <li><a href="#">Trendy Cases</a></li>
-            </ul>
-          </div>
-          <div class="col-md-3">
-            <h5>Customer Care</h5>
-            <ul>
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Terms of Service</a></li>
-              <li><a href="#">Return Policy</a></li>
-            </ul>
-          </div>
-          <div class="col-md-3">
-            <h5>Contact Us</h5>
-            <input
-              type="email"
-              class="newsletter-input"
-              placeholder="Enter email"
+    <!-- Error State -->
+    <div id="errorState">
+      <i class="fa-solid fa-triangle-exclamation fa-3x mb-3"></i>
+      <h5>Product not found</h5>
+      <p>We couldn't find the product you're looking for.</p>
+      <a href="./productPage.html" class="btn btn-primary">Back to Shop</a>
+    </div>
+
+    <!-- Main Content (Initially Hidden) -->
+    <div id="productContent" style="display: none;">
+      <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+          <a class="navbar-brand d-flex align-items-center" href="./index.html">
+            <img
+              src="../images/logo.jpg"
+              alt="Logo"
+              width="50"
+              height="50"
+              class="me-2 rounded-circle"
             />
-            <button class="btn btn-light w-100">Subscribe</button>
-            <div class="mt-3">
-              <i class="fa-brands fa-facebook me-3"></i>
-              <i class="fa-brands fa-instagram me-3"></i>
-              <i class="fa-brands fa-twitter"></i>
+            <div class="d-flex flex-column">
+              <span
+                class="fw-bold text-dark"
+                style="line-height: 1.1; font-size: 1.2rem"
+                >JINSA MOBILES</span
+              >
+              <span
+                class="text-secondary"
+                style="font-size: 0.6rem; letter-spacing: 4.2px; font-weight: 500"
+                >AND ACCESSORIES</span
+              >
+            </div>
+          </a>
+
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div
+            class="collapse navbar-collapse justify-content-center"
+            id="navbarNav"
+          >
+            <ul class="navbar-nav align-items-center">
+              <li class="nav-item">
+                <a class="nav-link" href="./index.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="./productPage.html"
+                  >Shop Products</a
+                >
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Categories
+                </a>
+                <ul class="dropdown-menu border-0 shadow-sm">
+                  <li>
+                    <a class="dropdown-item" href="./productPage.html"
+                      >Mobiles Case</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="./productPage.html"
+                      >Chargers</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="./productPage.html"
+                      >Earphones</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="./productPage.html"
+                      >Powerbanks</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="./productPage.html"
+                      >Screen Protectors</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="./productPage.html">Cables</a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="./aboutUs.html">About Us</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="./contactUs.html">Contact</a>
+              </li>
+            </ul>
+
+            <div class="nav-icons align-items-center">
+              <div class="position-relative">
+                <input
+                  type="text"
+                  id="navbarSearch"
+                  class="form-control border-secondary rounded-pill pe-5"
+                  placeholder="Search products..."
+                  style="width: 200px; height: 35px; font-size: 0.9rem"
+                />
+                <i
+                  class="fa-solid fa-magnifying-glass position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"
+                  style="cursor: pointer"
+                ></i>
+              </div>
+
+              <a
+                href="cart.html"
+                class="position-relative ms-lg-4 mt-3 mt-lg-0 text-dark"
+                style="cursor: pointer"
+              >
+                <i class="fa-solid fa-cart-shopping fs-5"></i>
+                <span
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                  style="font-size: 0.6rem"
+                  >2</span
+                >
+              </a>
+
+              <div class="dropdown ms-lg-4 mt-3 mt-lg-0">
+                <a
+                  class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <div
+                    class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2"
+                    style="width: 35px; height: 35px; border: 1px solid #dee2e6"
+                  >
+                    <i class="fa-regular fa-user"></i>
+                  </div>
+                  <span class="fw-semibold small">Jinsa</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end border-0 shadow mt-2">
+                  <li>
+                    <a class="dropdown-item" href="./userProfilePage.html"
+                      ><i class="fa-solid fa-user me-2 text-muted"></i>My Profile</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="./userWishListPage.html"
+                      ><i class="fa-regular fa-heart me-2 text-muted"></i
+                      >Wishlist</a
+                    >
+                  </li>
+                  <li><hr class="dropdown-divider" /></li>
+                  <li>
+                    <a class="dropdown-item text-danger" href="./userLogin.html"
+                      ><i class="fa-solid fa-arrow-right-from-bracket me-2"></i
+                      >Logout</a
+                    >
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
-        <hr class="border-secondary mt-4" />
-        <div class="text-center small">
-          &copy; 2025 Jinsa Mobiles. All rights reserved.
+      </nav>
+
+      <section class="py-4 reveal-up">
+        <div class="container">
+          <div class="row g-5">
+            <div class="col-lg-6">
+              <div class="main-image-container">
+                <img
+                  src=""
+                  id="mainImage"
+                  alt=""
+                />
+              </div>
+              <div class="thumbnail-container" id="thumbnailContainer">
+                <!-- Thumbnails will be generated here -->
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="vendor-text" id="vendorText"></div>
+              <h1 class="product-title-large" id="productTitle"></h1>
+
+              <div class="sales-proof">
+                <i class="fa-solid fa-fire fire-icon"></i> 
+                <span id="salesCount">153+ bought in past month</span>
+              </div>
+
+              <div class="price-section">
+                <span class="current-price-large" id="currentPrice"></span>
+                <span class="old-price-large" id="oldPrice"></span>
+              </div>
+
+              <div class="stock-badge" id="stockBadge">
+                <i class="fa-solid fa-check-circle me-1"></i> 
+                <span id="stockStatus">In stock, ready to ship</span>
+              </div>
+
+              <div class="accordion accordion-custom mb-4" id="productAccordion">
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button
+                      class="accordion-button"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#descCollapse"
+                    >
+                      Description
+                    </button>
+                  </h2>
+                  <div
+                    id="descCollapse"
+                    class="accordion-collapse collapse show"
+                    data-bs-parent="#productAccordion"
+                  >
+                    <div class="accordion-body" id="descriptionBody">
+                      <!-- Description will be loaded here -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="quantity-selector">
+                  <button class="qty-btn" onclick="updateQty(-1)">-</button>
+                  <input
+                    type="text"
+                    id="qtyInput"
+                    value="1"
+                    class="qty-input"
+                    readonly
+                  />
+                  <button class="qty-btn" onclick="updateQty(1)">+</button>
+                </div>
+                <button class="btn btn-add-cart" id="addToCartBtn" onclick="addToCart()">
+                  Add to cart
+                </button>
+              </div>
+              <a href="./address.html" class="btn btn-buy-now">Buy it now</a>
+
+              <div class="share-links mt-3">
+                <span><i class="fa-solid fa-share-nodes"></i> Share</span>
+                <span
+                  ><i class="fa-regular fa-circle-question"></i> Ask a
+                  question</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="related-section reveal-up">
+        <div class="container">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="related-title mb-0">You May Also Like</h3>
+            <div>
+              <button
+                class="btn btn-outline-dark rounded-circle me-2"
+                onclick="scrollRelated('left')"
+              >
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <button
+                class="btn btn-outline-dark rounded-circle"
+                onclick="scrollRelated('right')"
+              >
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="scrolling-wrapper row flex-nowrap pb-4" id="relatedSlider">
+            <!-- Related products will be loaded here -->
+          </div>
+        </div>
+      </section>
+
+      <div class="bottom-features reveal-up">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-4 mb-3 mb-md-0">
+              <div
+                class="feature-box justify-content-center justify-content-md-start"
+              >
+                <i class="fa-solid fa-headset"></i>
+                <div class="feature-text">
+                  <h6>Customer service</h6>
+                  <p>Your Satisfaction Is Our Command</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3 mb-md-0">
+              <div
+                class="feature-box justify-content-center justify-content-md-start"
+              >
+                <i class="fa-solid fa-truck-fast"></i>
+                <div class="feature-text">
+                  <h6>Fast Free Shipping</h6>
+                  <p>Enjoy Free Convenience on Your Orders</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div
+                class="feature-box justify-content-center justify-content-md-start"
+              >
+                <i class="fa-solid fa-shield-halved"></i>
+                <div class="feature-text">
+                  <h6>Secure payment</h6>
+                  <p>Your Payment Information is Processed Securely</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      // 1. Change Main Image
-      function changeImage(thumbElement, srcUrl) {
-        document.getElementById("mainImage").src = srcUrl;
-        const thumbnails = document.querySelectorAll(".thumbnail");
-        thumbnails.forEach((t) => t.classList.remove("active"));
-        thumbElement.classList.add("active");
-      }
+      <footer>
+        <div class="container reveal-up">
+          <div class="row">
+            <div class="col-md-3">
+              <h5>Discover More</h5>
+              <ul>
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">Contact Us</a></li>
+                <li><a href="#">Blog</a></li>
+              </ul>
+            </div>
+            <div class="col-md-3">
+              <h5>Explore Products</h5>
+              <ul>
+                <li><a href="#">Mobiles</a></li>
+                <li><a href="#">Accessories</a></li>
+                <li><a href="#">Trendy Cases</a></li>
+              </ul>
+            </div>
+            <div class="col-md-3">
+              <h5>Customer Care</h5>
+              <ul>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Return Policy</a></li>
+              </ul>
+            </div>
+            <div class="col-md-3">
+              <h5>Contact Us</h5>
+              <input
+                type="email"
+                class="newsletter-input"
+                placeholder="Enter email"
+              />
+              <button class="btn btn-light w-100">Subscribe</button>
+              <div class="mt-3">
+                <i class="fa-brands fa-facebook me-3"></i>
+                <i class="fa-brands fa-instagram me-3"></i>
+                <i class="fa-brands fa-twitter"></i>
+              </div>
+            </div>
+          </div>
+          <hr class="border-secondary mt-4" />
+          <div class="text-center small">
+            &copy; 2025 Jinsa Mobiles. All rights reserved.
+          </div>
+        </div>
+      </footer>
+    </div>
 
-      // 2. Quantity Selector
-      function updateQty(change) {
-        const input = document.getElementById("qtyInput");
-        let val = parseInt(input.value);
-        val += change;
-        if (val < 1) val = 1;
-        input.value = val;
-      }
-
-      // 3. Color Selection
-      function selectColor(swatchElement, colorName) {
-        document.getElementById("selectedColorName").innerText = colorName;
-        const swatches = document.querySelectorAll(".swatch-circle");
-        swatches.forEach((s) => s.classList.remove("active"));
-        swatchElement.classList.add("active");
-      }
-
-      // 4. Scroll "You May Also Like" Slider
-      function scrollRelated(direction) {
-        const slider = document.getElementById("relatedSlider");
-        const scrollAmount = 300; // Approx card width
-        if (direction === "left") {
-          slider.scrollLeft -= scrollAmount;
-        } else {
-          slider.scrollLeft += scrollAmount;
-        }
-      }
-
-      // 5. Scroll Animations
-      document.addEventListener("DOMContentLoaded", function () {
-        const observerOptions = {
-          root: null,
-          rootMargin: "0px",
-          threshold: 0.1, // Trigger when 10% is visible
-        };
-
-        const observer = new IntersectionObserver((entries, observer) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("active");
-              observer.unobserve(entry.target); // Run once
-            }
-          });
-        }, observerOptions);
-
-        const animatedElements = document.querySelectorAll(".reveal-up");
-        animatedElements.forEach((el) => observer.observe(el));
-      });
-    </script>
+    <!-- ✅ FIXED: Use local Bootstrap JS -->
+    <script src="/libs/bootstrap.bundle.min.js"></script>
+    <script src="/js/singleProductPage.js"></script>
   </body>
 </html>

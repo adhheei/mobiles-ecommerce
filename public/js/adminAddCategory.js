@@ -1,3 +1,8 @@
+const token = localStorage.getItem('token');
+  if (!token) {
+    window.location.href = './adminLogin.html';
+  }
+  
 // public/js/adminAddCategory.js
 document.addEventListener('DOMContentLoaded', () => {
   const sidebar = document.getElementById('sidebar');

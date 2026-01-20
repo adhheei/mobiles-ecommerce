@@ -6,90 +6,106 @@ const fs = require("fs");
 
 function formatImageUrl(filePath) {
   if (!filePath) return "";
-  return "/" + filePath.replace(/\\/g, "/").replace(/^public\//, "").replace(/^\//, "");
+  return (
+    "/" +
+    filePath
+      .replace(/\\/g, "/")
+      .replace(/^public\//, "")
+      .replace(/^\//, "")
+  );
 }
 console.log("formatImageUrl defined");
 
 // GET all products
-
 exports.getAllProducts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
+    const { search, category, sort = "newest" } = req.query; // 👈 Get sort param
 
     // Build query
     let query = {};
-    if (req.query.search) {
-      query.name = { $regex: req.query.search, $options: 'i' };
+    if (search) {
+      query.name = { $regex: search, $options: "i" };
     }
-    if (req.query.category && req.query.category !== 'all') {
-      query.category = req.query.category;
+    if (category && category !== "all") {
+      query.category = category;
+    }
+
+    // 👇 BUILD SORT OBJECT BASED ON FRONTEND VALUE
+    let sortObj = {};
+    switch (sort) {
+      case "name-asc":
+        sortObj = { name: 1 };
+        break;
+      case "name-desc":
+        sortObj = { name: -1 };
+        break;
+      case "price-low":
+        sortObj = { offerPrice: 1 };
+        break;
+      case "price-high":
+        sortObj = { offerPrice: -1 };
+        break;
+      case "oldest":
+        sortObj = { createdAt: 1 };
+        break;
+      default: // 'newest'
+        sortObj = { createdAt: -1 };
     }
 
     // Get total count
     const total = await Product.countDocuments(query);
+    console.log(`[DEBUG] getAllProducts query:`, JSON.stringify(query), `Total:`, total);
 
-    // Get products with pagination
+    // Get products with pagination AND sorting
     const products = await Product.find(query)
-      .populate('category', 'name')
+      .populate("category", "name")
+      .sort(sortObj) // 👈 Apply dynamic sort
       .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: -1 });
+      .limit(limit);
 
     // Format data
-    const formatted = products.map(p => {
-      // Debug check
-      if (typeof formatImageUrl !== 'function') {
-        console.error("CRITICAL: formatImageUrl is NOT a function:", typeof formatImageUrl);
-      }
-      const formattedImage = formatImageUrl(p.mainImage);
-      console.log(`[Debug Path] ID: ${p._id} | DB Path: "${p.mainImage}" | Formatted: "${formattedImage}"`);
-
-      return {
-        id: p._id.toString(),
-        name: p.name,
-        sku: p.sku || "",
-        actualPrice: p.actualPrice,
-        offerPrice: p.offerPrice,
-        stock: p.stock,
-        category: p.category?.name || "No Category",
-        mainImage: formattedImage,
-        status: p.status,
-      };
-    });
+    const formatted = products.map((p) => ({
+      id: p._id.toString(),
+      name: p.name,
+      sku: p.sku || "",
+      actualPrice: p.actualPrice,
+      offerPrice: p.offerPrice,
+      stock: p.stock,
+      category: p.category?.name || "No Category",
+      mainImage: formatImageUrl(p.mainImage),
+      status: p.status,
+    }));
 
     // Calculate pagination
     const totalPages = Math.ceil(total / limit);
 
-    // ✅ RETURN CORRECT STRUCTURE
     res.json({
       success: true,
-      formatted: formatted, // Matches frontend expectation
+      formatted,
       pagination: {
-        total: total,
-        page: page,
-        pages: totalPages
-      }
+        total,
+        page,
+        pages: totalPages,
+      },
     });
   } catch (err) {
     console.error("Critical Error in getAllProducts:", err);
     res.status(500).json({
       success: false,
       error: "Failed to load products",
-      details: err.message,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
   }
 };
-
 
 // getProductById function
 exports.getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id).populate(
       "category",
-      "name"
+      "name",
     );
     if (!product) {
       return res
@@ -131,13 +147,45 @@ exports.getProductById = async (req, res) => {
 // ✅ GET categories for dropdown
 exports.getCategoriesForDropdown = async (req, res) => {
   try {
-    const categories = await Category.find({ isActive: true }, 'name');
+    const categories = await Category.find({ isActive: true }, "name");
+    console.log(`[DEBUG] getCategoriesForDropdown found:`, categories.length);
     res.json({ success: true, categories }); // ✅ Matches frontend expectation
   } catch (err) {
-    res.status(500).json({ success: false, error: 'Failed to load categories' });
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to load categories" });
   }
 };
 
+// Add this to your productController.js
+exports.getCategoriesWithCounts = async (req, res) => {
+  try {
+    const Category = require('../models/Category');
+    const Product = require('../models/Product');
+
+    const categories = await Category.find({ isActive: true });
+
+    // Get product count for each category (only in-stock products)
+    const categoriesWithCounts = await Promise.all(
+      categories.map(async (cat) => {
+        const productCount = await Product.countDocuments({
+          category: cat._id,
+          stock: { $gt: 0 }
+        });
+        return {
+          _id: cat._id.toString(),
+          name: cat.name,
+          productCount: productCount
+        };
+      })
+    );
+
+    res.json({ success: true, categories: categoriesWithCounts });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Failed to load categories' });
+  }
+};
 
 // ✅ ADD product
 exports.addProduct = async (req, res) => {
@@ -205,7 +253,6 @@ exports.addProduct = async (req, res) => {
   }
 };
 
-// ✅ UPDATE product
 // UPDATE product
 exports.updateProduct = async (req, res) => {
   try {
@@ -266,11 +313,11 @@ exports.updateProduct = async (req, res) => {
     }
 
     // ✅ RETURN SUCCESS RESPONSE WITH MESSAGE
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: "Product updated successfully",
       // Optional: return updated product data
-       updated 
+      updated,
     });
   } catch (err) {
     console.error(err);
