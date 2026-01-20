@@ -1,1093 +1,807 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Shop Accessories - Jinsa Mobiles</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&display=swap"
-      rel="stylesheet"
-    />
 
-    <style>
-      /* --- GLOBAL VARIABLES & FONTS --- */
-      :root {
-        --primary-black: #1a1a1a;
-        --primary-red: #d32f2f;
-        --bg-light: #f8f9fa;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shop Accessories - Jinsa Mobiles</title>
 
-      body {
-        font-family: "Poppins", sans-serif;
-        background-color: #fff;
-        padding-top: 100px;
-        overflow-x: hidden;
-      }
+  <!-- Local Bootstrap CSS (root path) -->
+  <link href="/libs/bootstrap.min.css" rel="stylesheet" />
 
-      /* --- ANIMATION: SLIDE UP (Main Content) --- */
-      @keyframes slideInUp {
-        from {
-          opacity: 0;
-          transform: translateY(30px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      .main-content-animate {
-        animation: slideInUp 0.8s ease-out forwards;
-      }
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet" />
 
-      /* --- HEADER STYLES --- */
-      .navbar {
-        padding: 10px 0;
-        background: white;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-      }
+  <style>
+    /* --- GLOBAL VARIABLES & FONTS --- */
+    :root {
+      --primary-black: #1a1a1a;
+      --primary-red: #d32f2f;
+      --bg-light: #f8f9fa;
+    }
 
-      .navbar-brand {
-        font-weight: 700;
-        font-size: 1.5rem;
-        color: var(--primary-black);
-      }
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #fff;
+      padding-top: 100px;
+      overflow-x: hidden;
+    }
 
-      /* Links Centered & Styled */
-      .navbar-nav .nav-link {
-        font-family: "Poppins";
-        font-size: 0.95rem; /* Adjusted for better readability */
-        font-weight: 600;
-        color: #333 !important;
-        transition: color 0.3s;
-        margin: 0 10px; /* Added spacing between links */
-      }
-
-      .navbar-nav .nav-link:hover {
-        color: #0d6efd !important;
-      }
-
-      /* Search Bar Styling */
-      .search-container {
-        position: relative;
-      }
-      .search-input {
-        width: 200px;
-        height: 35px;
-        font-size: 0.9rem;
-        padding-right: 35px; /* Space for icon */
-        border-radius: 50px;
-        border: 1px solid #dee2e6;
-        padding-left: 15px;
-      }
-      .search-icon {
-        position: absolute;
-        top: 50%;
-        right: 15px;
-        transform: translateY(-50%);
-        color: #6c757d;
-        cursor: pointer;
-      }
-
-      /* Mobile Adjustments */
-      @media (max-width: 991px) {
-        .navbar-nav {
-          text-align: center;
-          margin-bottom: 15px;
-          align-items: center; /* This ensures links are perfectly centered */
-          width: 100%;
-        }
-
-        .nav-icons {
-          justify-content: center;
-          margin-top: 15px;
-          width: 100%;
-          border-top: 1px solid #eee;
-          padding-top: 20px;
-          display: flex;
-          flex-direction: column;
-          gap: 15px;
-          align-items: center;
-        }
-
-        .search-container {
-          margin-bottom: 10px;
-        }
-      }
-
-      @media (min-width: 992px) {
-        /* Moved the margin here so it doesn't break mobile centering */
-        .navbar-collapse {
-          margin-left: 50px;
-        }
-
-        .nav-icons {
-          display: flex;
-          align-items: center;
-          margin-left: auto;
-        }
-      }
-
-      /* Dropdown Menu Styles */
-      .dropdown-menu {
-        border: none;
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        padding: 10px 0;
-        margin-top: 10px;
-      }
-      .dropdown-item {
-        padding: 10px 20px;
-        font-weight: 500;
-        font-size: 0.9rem;
-        color: #333;
-        transition: all 0.2s ease;
-      }
-      .dropdown-item:hover {
-        background-color: #f8f9fa;
-        color: #d32f2f;
-        padding-left: 25px;
-      }
-
-      /* --- SHOP TOOLBAR --- */
-      .shop-toolbar {
-        margin-bottom: 30px;
-        padding: 10px 0;
-        border-bottom: 1px solid #f0f0f0;
-        padding-bottom: 20px;
-      }
-
-      .btn-pill-outline {
-        border: 1px solid #dee2e6;
-        border-radius: 50px;
-        padding: 8px 25px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        background: white;
-        color: #333;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        cursor: pointer;
-      }
-      .btn-pill-outline:hover,
-      .btn-pill-outline.active {
-        border-color: #000;
-        background: #000;
-        color: #fff;
-      }
-
-      .custom-select-pill {
-        appearance: none;
-        -webkit-appearance: none;
-        border: 1px solid #dee2e6;
-        border-radius: 50px;
-        padding: 8px 35px 8px 20px;
-        font-size: 0.9rem;
-        font-weight: 500;
-        background-color: white;
-        color: #333;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-        background-repeat: no-repeat;
-        background-position: right 1rem center;
-        background-size: 12px 12px;
-        cursor: pointer;
-      }
-      .custom-select-pill:focus {
-        outline: none;
-        border-color: #000;
-      }
-
-      /* --- FILTER OVERLAY STYLES --- */
-      .filter-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1040;
+    /* --- ANIMATION: SLIDE UP (Main Content) --- */
+    @keyframes slideInUp {
+      from {
         opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease;
+        transform: translateY(30px);
       }
-      .filter-backdrop.show {
+
+      to {
         opacity: 1;
-        visibility: visible;
+        transform: translateY(0);
       }
+    }
 
-      .filter-sidebar-overlay {
-        position: fixed;
-        top: 0;
-        left: -350px; /* Hidden left */
-        width: 320px;
-        height: 100vh;
-        background: white;
-        z-index: 1050;
-        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
-        transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        padding: 25px;
-        overflow-y: auto;
-      }
-      .filter-sidebar-overlay.open {
-        left: 0;
-      }
+    .main-content-animate {
+      animation: slideInUp 0.8s ease-out forwards;
+    }
 
-      .sidebar-header {
-        display: flex;
-        justify-content: space-between;
+    /* --- HEADER STYLES --- */
+    .navbar {
+      padding: 10px 0;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--primary-black);
+    }
+
+    /* Links Centered & Styled */
+    .navbar-nav .nav-link {
+      font-family: "Poppins";
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #333 !important;
+      transition: color 0.3s;
+      margin: 0 10px;
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: #0d6efd !important;
+    }
+
+    /* Search Bar Styling */
+    .search-container {
+      position: relative;
+    }
+
+    .search-input {
+      width: 200px;
+      height: 35px;
+      font-size: 0.9rem;
+      padding-right: 35px;
+      border-radius: 50px;
+      border: 1px solid #dee2e6;
+      padding-left: 15px;
+    }
+
+    .search-icon {
+      position: absolute;
+      top: 50%;
+      right: 15px;
+      transform: translateY(-50%);
+      color: #6c757d;
+      cursor: pointer;
+    }
+
+    /* Mobile Adjustments */
+    @media (max-width: 991px) {
+      .navbar-nav {
+        text-align: center;
+        margin-bottom: 15px;
         align-items: center;
-        margin-bottom: 25px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #eee;
-      }
-      .sidebar-title {
-        font-weight: 700;
-        font-size: 1.2rem;
-        margin: 0;
-      }
-      .close-filters {
-        cursor: pointer;
-        font-size: 1.2rem;
-        color: #333;
-        transition: 0.2s;
-      }
-      .close-filters:hover {
-        color: #d32f2f;
-        transform: rotate(90deg);
-      }
-
-      /* Sidebar Content */
-      .filter-group {
-        border-bottom: 1px solid #eee;
-        padding: 20px 0;
-      }
-      .filter-header {
-        font-weight: 600;
-        font-size: 1rem;
-        display: flex;
-        justify-content: space-between;
-        cursor: pointer;
-        margin-bottom: 12px;
-      }
-      .filter-list {
-        list-style: none;
-        padding-left: 0;
-        margin-bottom: 0;
-      }
-      .filter-list li {
-        margin-bottom: 10px;
-        font-size: 0.9rem;
-        color: #555;
-        display: flex;
-        align-items: center;
-      }
-      .form-check-input {
-        cursor: pointer;
-        margin-right: 10px;
-      }
-      .form-check-input:checked {
-        background-color: var(--primary-black);
-        border-color: var(--primary-black);
-      }
-
-      .sidebar-swatch {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: inline-block;
-        margin-right: 8px;
-        border: 1px solid #ddd;
-        cursor: pointer;
-        position: relative;
-      }
-      .sidebar-swatch.active::after {
-        content: "\f00c";
-        font-family: "Font Awesome 6 Free";
-        font-weight: 900;
-        color: white;
-        font-size: 10px;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
-      }
-
-      /* --- PRODUCT CARD STYLES --- */
-      /* New class for wrapping anchor tag */
-      .product-card-link {
-        text-decoration: none;
-        color: inherit;
-        display: block;
-        height: 100%;
-      }
-      .product-card-link:hover {
-        color: inherit;
-      }
-
-      .product-card {
-        border: none;
-        transition: transform 0.2s;
-        height: 100%;
-        position: relative;
-        background: transparent;
-      }
-      .product-card:hover .card-img-wrapper img {
-        transform: scale(1.05);
-      }
-      .card-img-wrapper {
-        position: relative;
-        border-radius: 16px;
-        overflow: hidden;
-        background-color: #f1f1f1;
-        margin-bottom: 12px;
-        padding-top: 100%;
-      }
-      .card-img-wrapper img {
-        position: absolute;
-        top: 0;
-        left: 0;
         width: 100%;
-        height: 100%;
-        object-fit: cover;
-        padding: 0;
-        transition: transform 0.3s ease;
       }
-      .badge-overlay {
-        position: absolute;
-        top: 12px;
-        left: 12px;
-        z-index: 2;
+
+      .nav-icons {
+        justify-content: center;
+        margin-top: 15px;
+        width: 100%;
+        border-top: 1px solid #eee;
+        padding-top: 20px;
         display: flex;
         flex-direction: column;
-        gap: 5px;
-      }
-      .sale-badge {
-        background: #d32f2f;
-        color: white;
-        font-size: 0.75rem;
-        font-weight: 600;
-        padding: 4px 10px;
-        border-radius: 30px;
-      }
-      .sold-out-badge {
-        background: #333;
-        color: white;
-        font-size: 0.75rem;
-        font-weight: 600;
-        padding: 4px 10px;
-        border-radius: 30px;
+        gap: 15px;
+        align-items: center;
       }
 
-      .product-card.sold-out .card-img-wrapper img {
-        opacity: 0.6;
-        filter: grayscale(100%);
+      .search-container {
+        margin-bottom: 10px;
       }
-      .product-card.sold-out .product-title,
-      .product-card.sold-out .price-row {
-        opacity: 0.6;
+    }
+
+    @media (min-width: 992px) {
+      .navbar-collapse {
+        margin-left: 50px;
       }
 
-      .product-info {
-        padding: 0 4px;
-      }
-      .product-vendor {
-        font-size: 0.7rem;
-        color: #888;
-        font-weight: 600;
-        text-transform: uppercase;
-        margin-bottom: 4px;
-      }
-      .product-title {
-        font-size: 1rem;
-        font-weight: 500;
-        color: #1a1a1a;
-        margin-bottom: 6px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .price-row {
+      .nav-icons {
         display: flex;
         align-items: center;
-        gap: 8px;
-        font-size: 0.95rem;
+        margin-left: auto;
       }
-      .current-price {
-        color: #1a1a1a;
-        font-weight: 700;
-      }
-      .sale-price {
-        color: #d32f2f;
-      }
-      .old-price {
-        text-decoration: line-through;
-        color: #999;
-        font-size: 0.85rem;
-      }
-      .card-swatches {
-        display: flex;
-        gap: 6px;
-        margin-top: 10px;
-      }
-      .card-dot {
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        border: 1px solid #ddd;
-        cursor: pointer;
-      }
-      .card-dot.active {
-        border-color: #000;
-        transform: scale(1.1);
-      }
+    }
 
-      /* --- FOOTER --- */
-      footer {
-        background-color: #111;
-        color: #aaa;
-        padding: 60px 0 20px;
-        margin-top: 60px;
-      }
-      footer h5 {
-        color: white;
-        font-weight: 600;
-        margin-bottom: 20px;
-      }
-      footer ul {
-        padding-left: 0;
-        list-style: none;
-      }
-      footer ul li {
-        margin-bottom: 10px;
-      }
-      footer a {
-        color: #aaa;
-        text-decoration: none;
-      }
-      footer a:hover {
-        color: white;
-      }
-      .newsletter-input {
-        background: #333;
-        border: none;
-        color: white;
-        padding: 10px;
-        width: 100%;
-        margin-bottom: 10px;
-      }
-    </style>
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg fixed-top">
-      <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="./index.html">
-          <img
-            src="../images/logo.jpg"
-            alt="Logo"
-            width="50"
-            height="50"
-            class="me-2 rounded-circle"
-          />
-          <div class="d-flex flex-column">
-            <span
-              class="fw-bold text-dark"
-              style="line-height: 1.1; font-size: 1.2rem"
-              >JINSA MOBILES</span
-            >
-            <span
-              class="text-secondary"
-              style="font-size: 0.6rem; letter-spacing: 4.2px; font-weight: 500"
-              >AND ACCESSORIES</span
-            >
-          </div>
-        </a>
+    /* Dropdown Menu Styles */
+    .dropdown-menu {
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      padding: 10px 0;
+      margin-top: 10px;
+    }
 
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
+    .dropdown-item {
+      padding: 10px 20px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #333;
+      transition: all 0.2s ease;
+    }
 
-        <div
-          class="collapse navbar-collapse justify-content-center"
-          id="navbarNav"
-        >
-          <ul class="navbar-nav align-items-center">
-            <li class="nav-item">
-              <a class="nav-link" href="./index.html">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" href="./productPage.html"
-                >Shop Products</a
-              >
-            </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Categories
-              </a>
-              <ul class="dropdown-menu border-0 shadow-sm">
-                <li>
-                  <a class="dropdown-item" href="./productPage.html"
-                    >Mobiles Case</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./productPage.html"
-                    >Chargers</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./productPage.html"
-                    >Earphones</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./productPage.html"
-                    >Powerbanks</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./productPage.html"
-                    >Screen Protectors</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./productPage.html">Cables</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="./aboutUs.html">About Us</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="./contactUs.html">Contact</a>
-            </li>
-          </ul>
+    .dropdown-item:hover {
+      background-color: #f8f9fa;
+      color: #d32f2f;
+      padding-left: 25px;
+    }
 
-          <div class="nav-icons align-items-center">
-            <div class="position-relative">
-              <input
-                type="text"
-                id="navbarSearch"
-                class="form-control border-secondary rounded-pill pe-5"
-                placeholder="Search products..."
-                style="width: 200px; height: 35px; font-size: 0.9rem"
-              />
-              <i
-                class="fa-solid fa-magnifying-glass position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"
-                style="cursor: pointer"
-              ></i>
-            </div>
+    /* --- SHOP TOOLBAR --- */
+    .shop-toolbar {
+      margin-bottom: 30px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+      padding-bottom: 20px;
+    }
 
-            <a
-              href="cart.html"
-              class="position-relative ms-lg-4 mt-3 mt-lg-0 text-dark"
-              style="cursor: pointer"
-            >
-              <i class="fa-solid fa-cart-shopping fs-5"></i>
-              <span
-                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                style="font-size: 0.6rem"
-                >2</span
-              >
+    .btn-pill-outline {
+      border: 1px solid #dee2e6;
+      border-radius: 50px;
+      padding: 8px 25px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      background: white;
+      color: #333;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn-pill-outline:hover,
+    .btn-pill-outline.active {
+      border-color: #000;
+      background: #000;
+      color: #fff;
+    }
+
+    .custom-select-pill {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 1px solid #dee2e6;
+      border-radius: 50px;
+      padding: 8px 35px 8px 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      background-color: white;
+      color: #333;
+      background-image: url("image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 12px 12px;
+      cursor: pointer;
+    }
+
+    .custom-select-pill:focus {
+      outline: none;
+      border-color: #000;
+    }
+
+    /* --- FILTER OVERLAY STYLES --- */
+    .filter-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1040;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+    }
+
+    .filter-backdrop.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .filter-sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: -350px;
+      width: 320px;
+      height: 100vh;
+      background: white;
+      z-index: 1050;
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+      transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      padding: 25px;
+      overflow-y: auto;
+    }
+
+    .filter-sidebar-overlay.open {
+      left: 0;
+    }
+
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .sidebar-title {
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    .close-filters {
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: #333;
+      transition: 0.2s;
+    }
+
+    .close-filters:hover {
+      color: #d32f2f;
+      transform: rotate(90deg);
+    }
+
+    /* Sidebar Content */
+    .filter-group {
+      border-bottom: 1px solid #eee;
+      padding: 20px 0;
+    }
+
+    .filter-header {
+      font-weight: 600;
+      font-size: 1rem;
+      display: flex;
+      justify-content: space-between;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+
+    .filter-list {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 0;
+    }
+
+    .filter-list li {
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+      color: #555;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-check-input {
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    .form-check-input:checked {
+      background-color: var(--primary-black);
+      border-color: var(--primary-black);
+    }
+
+    .sidebar-swatch {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+      border: 1px solid #ddd;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .sidebar-swatch.active::after {
+      content: "\f00c";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      color: white;
+      font-size: 10px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+    }
+
+    /* --- PRODUCT CARD STYLES --- */
+    .product-card-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      height: 100%;
+    }
+
+    .product-card-link:hover {
+      color: inherit;
+    }
+
+    .product-card {
+      border: none;
+      transition: transform 0.2s;
+      height: 100%;
+      position: relative;
+      background: transparent;
+    }
+
+    .product-card:hover .card-img-wrapper img {
+      transform: scale(1.05);
+    }
+
+    .card-img-wrapper {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background-color: #f1f1f1;
+      margin-bottom: 12px;
+      padding-top: 100%;
+    }
+
+    .card-img-wrapper img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      padding: 0;
+      transition: transform 0.3s ease;
+    }
+
+    .badge-overlay {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .sale-badge {
+      background: #d32f2f;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 30px;
+    }
+
+    .sold-out-badge {
+      background: #333;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 30px;
+    }
+
+    .product-card.sold-out .card-img-wrapper img {
+      opacity: 0.6;
+      filter: grayscale(100%);
+    }
+
+    .product-card.sold-out .product-title,
+    .product-card.sold-out .price-row {
+      opacity: 0.6;
+    }
+
+    .product-info {
+      padding: 0 4px;
+    }
+
+    .product-vendor {
+      font-size: 0.7rem;
+      color: #888;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .product-title {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+    }
+
+    .current-price {
+      color: #1a1a1a;
+      font-weight: 700;
+    }
+
+    .sale-price {
+      color: #d32f2f;
+    }
+
+    .old-price {
+      text-decoration: line-through;
+      color: #999;
+      font-size: 0.85rem;
+    }
+
+    .card-swatches {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .card-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid #ddd;
+      cursor: pointer;
+    }
+
+    .card-dot.active {
+      border-color: #000;
+      transform: scale(1.1);
+    }
+
+    /* --- FOOTER --- */
+    footer {
+      background-color: #111;
+      color: #aaa;
+      padding: 60px 0 20px;
+      margin-top: 60px;
+    }
+
+    footer h5 {
+      color: white;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    footer ul {
+      padding-left: 0;
+      list-style: none;
+    }
+
+    footer ul li {
+      margin-bottom: 10px;
+    }
+
+    footer a {
+      color: #aaa;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: white;
+    }
+
+    .newsletter-input {
+      background: #333;
+      border: none;
+      color: white;
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    /* Loading & Empty States */
+    #loading {
+      display: none;
+      text-align: center;
+      padding: 40px 0;
+    }
+
+    #emptyState {
+      display: none;
+      text-align: center;
+      padding: 40px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="../index.html">
+        <img src="../images/logo.jpg" alt="Logo" width="50" height="50" class="me-2 rounded-circle" />
+        <div class="d-flex flex-column">
+          <span class="fw-bold text-dark" style="line-height: 1.1; font-size: 1.2rem">JINSA MOBILES</span>
+          <span class="text-secondary" style="font-size: 0.6rem; letter-spacing: 4.2px; font-weight: 500">AND
+            ACCESSORIES</span>
+        </div>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+        <ul class="navbar-nav align-items-center">
+          <li class="nav-item">
+            <a class="nav-link" href="../index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="./productPage.html">Shop Products</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Categories
             </a>
-
-            <div class="dropdown ms-lg-4 mt-3 mt-lg-0">
-              <a
-                class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <div
-                  class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2"
-                  style="width: 35px; height: 35px; border: 1px solid #dee2e6"
-                >
-                  <i class="fa-regular fa-user"></i>
-                </div>
-                <span class="fw-semibold small">Jinsa</span>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end border-0 shadow mt-2">
-                <li>
-                  <a class="dropdown-item" href="./userProfilePage.html"
-                    ><i class="fa-solid fa-user me-2 text-muted"></i>My Profile</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./userWishListPage.html"
-                    ><i class="fa-regular fa-heart me-2 text-muted"></i
-                    >Wishlist</a
-                  >
-                </li>
-                <li><hr class="dropdown-divider" /></li>
-                <li>
-                  <a class="dropdown-item text-danger" href="./userLogin.html"
-                    ><i class="fa-solid fa-arrow-right-from-bracket me-2"></i
-                    >Logout</a
-                  >
-                </li>
-              </ul>
-            </div>
-          </div>
-          </div>
-
-        <script>
-          function toggleSearch() {
-            const searchBox = document.getElementById("navbarSearch");
-            if (searchBox.classList.contains("d-none")) {
-              searchBox.classList.remove("d-none");
-              searchBox.focus();
-            } else {
-              searchBox.classList.add("d-none");
-            }
-          }
-        </script>
-      </div>
-    </nav>
-
-    <div
-      class="filter-backdrop"
-      id="filterBackdrop"
-      onclick="closeSidebar()"
-    ></div>
-
-    <div class="filter-sidebar-overlay" id="filterSidebar">
-      <div class="sidebar-header">
-        <h4 class="sidebar-title">Filters</h4>
-        <i class="fa-solid fa-xmark close-filters" onclick="closeSidebar()"></i>
-      </div>
-
-      <div class="filter-content">
-        <div
-          class="filter-group d-flex justify-content-between align-items-center pt-0"
-        >
-          <span class="fw-bold">In stock only</span>
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" />
-          </div>
-        </div>
-
-        <div class="filter-group">
-          <div
-            class="filter-header"
-            data-bs-toggle="collapse"
-            data-bs-target="#categoryCollapse"
-          >
-            Category <i class="fa-solid fa-chevron-down small"></i>
-          </div>
-          <div class="collapse show" id="categoryCollapse">
-            <ul class="filter-list">
+            <ul class="dropdown-menu border-0 shadow-sm">
               <li>
-                <input type="checkbox" class="form-check-input" /> Cases &
-                Covers (124)
+                <a class="dropdown-item" href="./productPage.html">Mobiles Case</a>
               </li>
               <li>
-                <input type="checkbox" class="form-check-input" /> Screen Guards
-                (45)
+                <a class="dropdown-item" href="./productPage.html">Chargers</a>
               </li>
               <li>
-                <input type="checkbox" class="form-check-input" /> Chargers &
-                Adapters (22)
+                <a class="dropdown-item" href="./productPage.html">Earphones</a>
               </li>
               <li>
-                <input type="checkbox" class="form-check-input" /> USB Cables
-                (30)
+                <a class="dropdown-item" href="./productPage.html">Powerbanks</a>
               </li>
               <li>
-                <input type="checkbox" class="form-check-input" /> Headphones /
-                TWS (18)
+                <a class="dropdown-item" href="./productPage.html">Screen Protectors</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="./productPage.html">Cables</a>
               </li>
             </ul>
-          </div>
-        </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../aboutUs.html">About Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../contactUs.html">Contact</a>
+          </li>
+        </ul>
 
-        <div class="filter-group">
-          <div
-            class="filter-header"
-            data-bs-toggle="collapse"
-            data-bs-target="#brandCollapse"
-          >
-            Brand <i class="fa-solid fa-chevron-down small"></i>
+        <div class="nav-icons align-items-center">
+          <div class="position-relative">
+            <input type="text" id="navbarSearch" class="form-control border-secondary rounded-pill pe-5"
+              placeholder="Search products..." style="width: 200px; height: 35px; font-size: 0.9rem" />
+            <i class="fa-solid fa-magnifying-glass position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"
+              style="cursor: pointer"></i>
           </div>
-          <div class="collapse show" id="brandCollapse">
-            <ul class="filter-list">
+
+          <a href="../cart.html" class="position-relative ms-lg-4 mt-3 mt-lg-0 text-dark" style="cursor: pointer">
+            <i class="fa-solid fa-cart-shopping fs-5"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+              style="font-size: 0.6rem">2</span>
+          </a>
+
+          <div class="dropdown ms-lg-4 mt-3 mt-lg-0">
+            <a class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" href="#" role="button"
+              data-bs-toggle="dropdown" aria-expanded="false">
+              <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2"
+                style="width: 35px; height: 35px; border: 1px solid #dee2e6">
+                <i class="fa-regular fa-user"></i>
+              </div>
+              <span class="fw-semibold small">Jinsa</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end border-0 shadow mt-2">
               <li>
-                <input type="checkbox" class="form-check-input" /> Samsung
+                <a class="dropdown-item" href="../userProfilePage.html"><i
+                    class="fa-solid fa-user me-2 text-muted"></i>My
+                  Profile</a>
               </li>
-              <li><input type="checkbox" class="form-check-input" /> Apple</li>
-              <li><input type="checkbox" class="form-check-input" /> boAt</li>
-              <li><input type="checkbox" class="form-check-input" /> Spigen</li>
+              <li>
+                <a class="dropdown-item" href="../userWishListPage.html"><i
+                    class="fa-regular fa-heart me-2 text-muted"></i>Wishlist</a>
+              </li>
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+              <li>
+                <a class="dropdown-item text-danger" href="../userLogin.html"><i
+                    class="fa-solid fa-arrow-right-from-bracket me-2"></i>Logout</a>
+              </li>
             </ul>
-          </div>
-        </div>
-
-        <div class="filter-group">
-          <div class="filter-header">Color</div>
-          <div class="d-flex flex-wrap gap-2">
-            <span class="sidebar-swatch active" style="background: #000"></span>
-            <span class="sidebar-swatch" style="background: #fff"></span>
-            <span class="sidebar-swatch" style="background: #d32f2f"></span>
-            <span class="sidebar-swatch" style="background: #0d6efd"></span>
-            <span class="sidebar-swatch" style="background: #198754"></span>
-          </div>
-        </div>
-
-        <div class="filter-group">
-          <div class="filter-header">Price</div>
-          <input type="range" class="form-range" min="0" max="5000" />
-          <div class="d-flex justify-content-between small text-muted">
-            <span>Rs. 99</span>
-            <span>Rs. 5,000+</span>
           </div>
         </div>
       </div>
     </div>
+  </nav>
 
-    <div class="container-fluid px-lg-5 pb-5">
-      <div
-        class="shop-toolbar d-flex justify-content-between align-items-center gap-3"
-      >
-        <button
-          class="btn-pill-outline"
-          id="filterToggleBtn"
-          onclick="openSidebar()"
-        >
-          <i class="fa-solid fa-sliders"></i> Filter
-        </button>
-        <div class="d-flex align-items-center gap-2">
-          <span class="small text-muted fw-bold d-none d-md-inline"
-            >Sort by:</span
-          >
-          <select class="custom-select-pill">
-            <option>Best selling</option>
-            <option>Featured</option>
-            <option>Price: Low to High</option>
-            <option>Price: High to Low</option>
-            <option>Newest Arrivals</option>
-          </select>
+  <div class="filter-backdrop" id="filterBackdrop"></div>
+
+  <div class="filter-sidebar-overlay" id="filterSidebar">
+    <div class="sidebar-header">
+      <h4 class="sidebar-title">Filters</h4>
+      <i class="fa-solid fa-xmark close-filters" id="closeFiltersBtn"></i>
+    </div>
+
+    <div class="filter-content">
+      <div class="filter-group d-flex justify-content-between align-items-center pt-0">
+        <span class="fw-bold">In stock only</span>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="inStockOnly" role="switch" />
         </div>
       </div>
 
-      <div class="row main-content-animate">
-        <div class="col-12">
-          <div class="row g-4">
-            <div class="col-6 col-md-4 col-xl-3">
-              <a href="./singleProductPage.html" class="product-card-link">
-                <div class="product-card">
-                  <div class="card-img-wrapper">
-                    <div class="badge-overlay">
-                      <span class="sale-badge">Save 70%</span>
-                    </div>
-                    <img
-                      src="../images/15 backcover.jpeg"
-                      alt="iPhone 15 Case"
-                    />
-                  </div>
-                  <div class="product-info">
-                    <div class="product-vendor">Karwan</div>
-                    <div class="product-title">iPhone 15 Plus Back Cover</div>
-                    <div class="price-row">
-                      <span class="current-price sale-price">Rs. 299</span
-                      ><span class="old-price">Rs. 999</span>
-                    </div>
-                    <div class="card-swatches">
-                      <span
-                        class="card-dot active"
-                        style="background: #333"
-                      ></span
-                      ><span class="card-dot" style="background: navy"></span>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
+      <div class="filter-group">
+        <div class="filter-header" data-bs-toggle="collapse" data-bs-target="#categoryCollapse">
+          Category <i class="fa-solid fa-chevron-down small"></i>
+        </div>
+        <div class="collapse show" id="categoryCollapse">
+          <ul class="filter-list" id="categoryList">
+            <!-- Categories will be populated by JavaScript -->
+          </ul>
+        </div>
+      </div>
 
-            <div class="col-6 col-md-4 col-xl-3">
-              <a href="./singleProductPage.html" class="product-card-link">
-                <div class="product-card">
-                  <div class="card-img-wrapper">
-                    <div class="badge-overlay">
-                      <span class="sale-badge">Best Seller</span>
-                    </div>
-                    <img src="../images/boatpower.jpeg" alt="Powerbank" />
-                  </div>
-                  <div class="product-info">
-                    <div class="product-vendor">boAt</div>
-                    <div class="product-title">
-                      Powerbank 30000mAh Fast Charge
-                    </div>
-                    <div class="price-row">
-                      <span class="current-price sale-price">Rs. 899</span
-                      ><span class="old-price">Rs. 1,499</span>
-                    </div>
-                    <div class="card-swatches">
-                      <span class="card-dot" style="background: black"></span
-                      ><span
-                        class="card-dot"
-                        style="background: #0d6efd"
-                      ></span>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
+      <div class="filter-group">
+        <div class="filter-header" data-bs-toggle="collapse" data-bs-target="#brandCollapse">
+          Brand <i class="fa-solid fa-chevron-down small"></i>
+        </div>
+        <div class="collapse show" id="brandCollapse">
+          <ul class="filter-list">
+            <li>
+              <input type="checkbox" class="form-check-input" /> Samsung
+            </li>
+            <li><input type="checkbox" class="form-check-input" /> Apple</li>
+            <li><input type="checkbox" class="form-check-input" /> boAt</li>
+            <li><input type="checkbox" class="form-check-input" /> Spigen</li>
+          </ul>
+        </div>
+      </div>
 
-            <div class="col-6 col-md-4 col-xl-3">
-              <a href="./singleProductPage.html" class="product-card-link">
-                <div class="product-card sold-out">
-                  <div class="card-img-wrapper">
-                    <div class="badge-overlay">
-                      <span class="sold-out-badge">Sold Out</span>
-                    </div>
-                    <img src="../images/mobile case.jpeg" alt="Samsung Case" />
-                  </div>
-                  <div class="product-info">
-                    <div class="product-vendor">Samsung</div>
-                    <div class="product-title">
-                      Galaxy S24 Ultra Silicone Case
-                    </div>
-                    <div class="price-row">
-                      <span class="current-price">Rs. 1,299</span>
-                    </div>
-                    <div class="card-swatches">
-                      <span class="card-dot" style="background: #6c757d"></span>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
+      <div class="filter-group">
+        <div class="filter-header">Color</div>
+        <div class="d-flex flex-wrap gap-2">
+          <span class="sidebar-swatch active" style="background: #000"></span>
+          <span class="sidebar-swatch" style="background: #fff"></span>
+          <span class="sidebar-swatch" style="background: #d32f2f"></span>
+          <span class="sidebar-swatch" style="background: #0d6efd"></span>
+          <span class="sidebar-swatch" style="background: #198754"></span>
+        </div>
+      </div>
 
-            <div class="col-6 col-md-4 col-xl-3">
-              <a href="./singleProductPage.html" class="product-card-link">
-                <div class="product-card">
-                  <div class="card-img-wrapper">
-                    <div class="badge-overlay">
-                      <span class="sale-badge">50% OFF</span>
-                    </div>
-                    <img src="../images/portronicsM2.jpeg" alt="Headphones" />
-                  </div>
-                  <div class="product-info">
-                    <div class="product-vendor">Portronics</div>
-                    <div class="product-title">Muffs M2 Bluetooth Headset</div>
-                    <div class="price-row">
-                      <span class="current-price sale-price">Rs. 999</span
-                      ><span class="old-price">Rs. 1,999</span>
-                    </div>
-                    <div class="card-swatches">
-                      <span class="card-dot" style="background: black"></span
-                      ><span class="card-dot" style="background: red"></span>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-
-            <div class="col-6 col-md-4 col-xl-3">
-              <a href="./singleProductPage.html" class="product-card-link">
-                <div class="product-card">
-                  <div class="card-img-wrapper">
-                    <div class="badge-overlay">
-                      <span class="sale-badge">New</span>
-                    </div>
-                    <img
-                      src="../images/16backcover.jpeg"
-                      alt="iPhone 16 Case"
-                    />
-                  </div>
-                  <div class="product-info">
-                    <div class="product-vendor">Enflamo</div>
-                    <div class="product-title">Apple iPhone 16 Back Cover</div>
-                    <div class="price-row">
-                      <span class="current-price sale-price">Rs. 299</span
-                      ><span class="old-price">Rs. 899</span>
-                    </div>
-                    <div class="card-swatches">
-                      <span class="card-dot" style="background: #0d6efd"></span>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-
-            <div class="col-6 col-md-4 col-xl-3">
-              <a href="./singleProductPage.html" class="product-card-link">
-                <div class="product-card">
-                  <div class="card-img-wrapper">
-                    <img
-                      src="https://placehold.co/300x300?text=Charger"
-                      alt="Charger"
-                    />
-                  </div>
-                  <div class="product-info">
-                    <div class="product-vendor">Samsung</div>
-                    <div class="product-title">25W Type-C Travel Adapter</div>
-                    <div class="price-row">
-                      <span class="current-price sale-price">Rs. 999</span
-                      ><span class="old-price">Rs. 1,699</span>
-                    </div>
-                    <div class="card-swatches">
-                      <span
-                        class="card-dot"
-                        style="background: white; border: 1px solid #ccc"
-                      ></span
-                      ><span class="card-dot" style="background: black"></span>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-
-            <div class="col-6 col-md-4 col-xl-3">
-              <a href="./singleProductPage.html" class="product-card-link">
-                <div class="product-card sold-out">
-                  <div class="card-img-wrapper">
-                    <div class="badge-overlay">
-                      <span class="sold-out-badge">Out of Stock</span>
-                    </div>
-                    <img
-                      src="https://placehold.co/300x300?text=Earbuds"
-                      alt="Earbuds"
-                    />
-                  </div>
-                  <div class="product-info">
-                    <div class="product-vendor">Realme</div>
-                    <div class="product-title">Buds Air 5 Pro TWS</div>
-                    <div class="price-row">
-                      <span class="current-price">Rs. 4,999</span>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-
-            <div class="col-6 col-md-4 col-xl-3">
-              <a href="./singleProductPage.html" class="product-card-link">
-                <div class="product-card">
-                  <div class="card-img-wrapper">
-                    <img
-                      src="https://placehold.co/300x300?text=Cable"
-                      alt="Cable"
-                    />
-                  </div>
-                  <div class="product-info">
-                    <div class="product-vendor">boAt</div>
-                    <div class="product-title">Rugged Type-C Cable (1M)</div>
-                    <div class="price-row">
-                      <span class="current-price sale-price">Rs. 199</span
-                      ><span class="old-price">Rs. 499</span>
-                    </div>
-                    <div class="card-swatches">
-                      <span class="card-dot" style="background: red"></span
-                      ><span class="card-dot" style="background: black"></span>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-          </div>
-
-          <nav class="mt-5">
-            <ul class="pagination justify-content-center">
-              <li class="page-item disabled">
-                <a class="page-link" href="#">Previous</a>
-              </li>
-              <li class="page-item active">
-                <a class="page-link" href="#">1</a>
-              </li>
-              <li class="page-item"><a class="page-link" href="#">2</a></li>
-              <li class="page-item"><a class="page-link" href="#">3</a></li>
-              <li class="page-item"><a class="page-link" href="#">Next</a></li>
-            </ul>
-          </nav>
+      <div class="filter-group">
+        <div class="filter-header">Price</div>
+        <input type="range" class="form-range" min="0" max="5000" id="priceRange" />
+        <div class="d-flex justify-content-between small text-muted">
+          <span>Rs. 99</span>
+          <span>Rs. 5,000+</span>
         </div>
       </div>
     </div>
+  </div>
 
-    <footer>
-      <div class="container">
-        <div class="row">
-          <div class="col-md-3">
-            <h5>Discover More</h5>
-            <ul>
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">Contact Us</a></li>
-              <li><a href="#">Blog</a></li>
-            </ul>
-          </div>
-          <div class="col-md-3">
-            <h5>Explore Products</h5>
-            <ul>
-              <li><a href="#">Mobiles</a></li>
-              <li><a href="#">Accessories</a></li>
-              <li><a href="#">Trendy Cases</a></li>
-            </ul>
-          </div>
-          <div class="col-md-3">
-            <h5>Customer Care</h5>
-            <ul>
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Terms of Service</a></li>
-              <li><a href="#">Return Policy</a></li>
-            </ul>
-          </div>
-          <div class="col-md-3">
-            <h5>Contact Us</h5>
-            <input
-              type="email"
-              class="newsletter-input"
-              placeholder="Enter email"
-            />
-            <button class="btn btn-light w-100">Subscribe</button>
-            <div class="mt-3">
-              <i class="fa-brands fa-facebook me-3"></i>
-              <i class="fa-brands fa-instagram me-3"></i>
-              <i class="fa-brands fa-twitter"></i>
-            </div>
+  <div class="container-fluid px-lg-5 pb-5">
+    <div class="shop-toolbar d-flex justify-content-between align-items-center gap-3">
+      <button class="btn-pill-outline" id="filterToggleBtn">
+        <i class="fa-solid fa-sliders"></i> Filter
+      </button>
+      <div class="d-flex align-items-center gap-2">
+        <span class="small text-muted fw-bold d-none d-md-inline">Sort by:</span>
+        <select class="custom-select-pill" id="sortSelect">
+          <option value="best-selling">Best selling</option>
+          <option value="featured">Featured</option>
+          <option value="price-low-high">Price: Low to High</option>
+          <option value="price-high-low">Price: High to Low</option>
+          <option value="newest">Newest Arrivals</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row main-content-animate">
+      <div class="col-12">
+        <div class="row g-4" id="productsContainer"></div>
+
+        <div id="loading">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
           </div>
         </div>
-        <hr class="border-secondary mt-4" />
-        <div class="text-center small">
-          &copy; 2025 Jinsa Mobiles. All rights reserved.
+
+        <div id="emptyState">
+          <i class="fa-solid fa-box-open fa-3x text-muted mb-3"></i>
+          <h5>No products found</h5>
+          <p class="text-muted">
+            Check back later or try a different category.
+          </p>
+        </div>
+
+        <nav class="mt-5">
+          <ul class="pagination justify-content-center" id="paginationContainer">
+            <!-- Pagination will be rendered here -->
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3">
+          <h5>Discover More</h5>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Blog</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h5>Explore Products</h5>
+          <ul>
+            <li><a href="#">Mobiles</a></li>
+            <li><a href="#">Accessories</a></li>
+            <li><a href="#">Trendy Cases</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h5>Customer Care</h5>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Return Policy</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h5>Contact Us</h5>
+          <input type="email" class="newsletter-input" placeholder="Enter email" />
+          <button class="btn btn-light w-100">Subscribe</button>
+          <div class="mt-3">
+            <i class="fa-brands fa-facebook me-3"></i>
+            <i class="fa-brands fa-instagram me-3"></i>
+            <i class="fa-brands fa-twitter"></i>
+          </div>
         </div>
       </div>
-    </footer>
+      <hr class="border-secondary mt-4" />
+      <div class="text-center small">
+        &copy; 2025 Jinsa Mobiles. All rights reserved.
+      </div>
+    </div>
+  </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      function openSidebar() {
-        document.getElementById("filterSidebar").classList.add("open");
-        document.getElementById("filterBackdrop").classList.add("show");
-      }
+  <!-- Local Bootstrap JS (root path) -->
+  <script src="/libs/bootstrap.bundle.min.js"></script>
+  <!-- JavaScript file (root path) -->
+  <script src="/js/productPage.js"></script>
+</body>
 
-      function closeSidebar() {
-        document.getElementById("filterSidebar").classList.remove("open");
-        document.getElementById("filterBackdrop").classList.remove("show");
-      }
-    </script>
-  </body>
 </html>

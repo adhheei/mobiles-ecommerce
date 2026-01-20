@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -29,7 +29,7 @@
       }
 
       /* --- ANIMATION CSS --- */
-      
+
       /* 1. Slide Up Fade In */
       .reveal-up {
         opacity: 0;
@@ -49,7 +49,8 @@
         opacity: 0;
         transform: scale(0.5);
         animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        animation-delay: 0.2s; /* Slight delay so card appears first */
+        animation-delay: 0.2s;
+        /* Slight delay so card appears first */
       }
 
       @keyframes popIn {
@@ -58,6 +59,7 @@
           transform: scale(1);
         }
       }
+
       /* -------------------- */
 
       .login-card {
@@ -138,37 +140,46 @@
       }
     </style>
   </head>
+
   <body>
     <div class="login-card reveal-up">
       <img
         src="../../images/logo.jpg"
         alt="Logo"
         class="brand-logo pop-in"
-        onerror="this.src='https://placehold.co/80'"
+        onerror="this.src = 'https://placehold.co/80'"
       />
 
       <h2 class="login-title">Admin Login</h2>
       <p class="login-subtitle">Sign in to manage your dashboard</p>
 
-      <form action="./adminDashboard.html">
+      <form id="loginForm">
         <input
           type="email"
+          name="email"
+          id="email"
           class="form-control"
           placeholder="Email Address"
           required
-          value="admin@example.com"
+          autocomplete="username"
         />
         <input
           type="password"
+          name="password"
+          id="password"
           class="form-control"
           placeholder="Password"
           required
-          value="password"
+          autocomplete="current-password"
         />
         <button type="submit" class="btn-login">Login</button>
       </form>
 
-      <a href="./adminForgotPassword.html" class="forgot-link">Forgot Password?</a>
+      <a href="./adminForgotPassword.html" class="forgot-link"
+        >Forgot Password?</a
+      >
     </div>
+    <script src="/libs/sweetalert2.all.min.js"></script>
+    <script src="/js/adminLogin.js"></script>
   </body>
 </html>
