@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load products initially
   loadProducts();
 
+  // Load categories for filter
+  loadCategoriesForFilter();
+
   // Setup event listeners
   setupEventListeners();
 });
