@@ -67,6 +67,13 @@ function setupEventListeners() {
   // Navbar search (debounced)
   const navbarSearch = document.getElementById('navbarSearch');
   if (navbarSearch) {
+    // Initialize value from URL param
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchParam = urlParams.get('search');
+    if (searchParam) {
+      navbarSearch.value = searchParam;
+    }
+
     navbarSearch.addEventListener('input', debounce(() => {
       currentPage = 1;
       loadProducts();
@@ -145,6 +152,12 @@ async function loadProducts() {
       params.append('maxPrice', priceRange.value);
     }
 
+    // Add search query from navbar
+    const navbarSearch = document.getElementById('navbarSearch');
+    if (navbarSearch && navbarSearch.value.trim() !== '') {
+      params.append('search', navbarSearch.value.trim());
+    }
+
     // Fetch products
     const res = await fetch(`/api/admin/products/public?${params}`);
     const data = await res.json();
@@ -152,15 +165,21 @@ async function loadProducts() {
     if (data.success && data.products && data.products.length > 0) {
       loading.style.display = 'none';
 
-      const html = data.products.map(product => `
+      const html = data.products.map(product => {
+        const isOutOfStock = product.stock === 0 || product.status === 'outofstock';
+        // If out of stock, disable the link (void(0)) and add styling
+        const linkHref = isOutOfStock ? 'javascript:void(0)' : `./singleProductPage.html?id=${product.id}`;
+        const cursorStyle = isOutOfStock ? 'cursor: not-allowed;' : '';
+
+        return `
         <div class="col-6 col-md-4 col-xl-3">
-          <a href="./singleProductPage.html?id=${product.id}" class="product-card-link">
-            <div class="product-card ${product.stock === 0 ? 'sold-out' : ''}">
+          <a href="${linkHref}" class="product-card-link" style="${cursorStyle}">
+            <div class="product-card ${isOutOfStock ? 'sold-out' : ''}">
               <div class="card-img-wrapper">
-                ${product.stock === 0 ?
-          '<div class="badge-overlay"><span class="sold-out-badge">Sold Out</span></div>' :
-          ''
-        }
+                ${isOutOfStock ?
+            '<div class="badge-overlay"><span class="sold-out-badge">Sold Out</span></div>' :
+            ''
+          }
                 <img 
                   src="${product.mainImage}" 
                   alt="${product.name}" 
@@ -168,20 +187,21 @@ async function loadProducts() {
                 />
               </div>
               <div class="product-info">
-                <div class="product-vendor">${product.categoryName}</div>
+                <div class="product-vendor">${product.brand}</div>
                 <div class="product-title">${product.name}</div>
                 <div class="price-row">
                   ${product.offerPrice < product.actualPrice ?
-          `<span class="current-price sale-price">Rs. ${product.offerPrice}</span>
+            `<span class="current-price sale-price">Rs. ${product.offerPrice}</span>
                      <span class="old-price">Rs. ${product.actualPrice}</span>` :
-          `<span class="current-price">Rs. ${product.offerPrice}</span>`
-        }
+            `<span class="current-price">Rs. ${product.offerPrice}</span>`
+          }
                 </div>
               </div>
             </div>
           </a>
         </div>
-      `).join('');
+      `;
+      }).join('');
 
       if (container) container.innerHTML = html;
 

@@ -157,15 +157,13 @@ exports.getCategoriesForDropdown = async (req, res) => {
   }
 };
 
-// Add this to your productController.js
+// ADD THIS FUNCTION
 exports.getCategoriesWithCounts = async (req, res) => {
   try {
     const Category = require('../models/Category');
     const Product = require('../models/Product');
 
     const categories = await Category.find({ isActive: true });
-
-    // Get product count for each category (only in-stock products)
     const categoriesWithCounts = await Promise.all(
       categories.map(async (cat) => {
         const productCount = await Product.countDocuments({
@@ -179,7 +177,6 @@ exports.getCategoriesWithCounts = async (req, res) => {
         };
       })
     );
-
     res.json({ success: true, categories: categoriesWithCounts });
   } catch (err) {
     console.error(err);
@@ -202,6 +199,7 @@ exports.addProduct = async (req, res) => {
       publishDate,
       tags = "",
       category,
+      brand
     } = req.body;
 
     if (!name || !actualPrice || !offerPrice || !stock || !category) {
@@ -226,6 +224,7 @@ exports.addProduct = async (req, res) => {
       visibility,
       publishDate: publishDate ? new Date(publishDate) : undefined,
       tags: tagArray,
+      brand: brand || 'Generic',
       category,
     };
 
@@ -268,6 +267,7 @@ exports.updateProduct = async (req, res) => {
       publishDate,
       tags = "",
       category,
+      brand
     } = req.body;
 
     if (!name || !actualPrice || !offerPrice || !stock || !category) {
@@ -292,6 +292,7 @@ exports.updateProduct = async (req, res) => {
       visibility,
       publishDate: publishDate ? new Date(publishDate) : undefined,
       tags: tagArray,
+      brand: brand || 'Generic',
       category,
     };
 

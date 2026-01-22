@@ -1,8 +1,6 @@
-const token = localStorage.getItem('token');
-  if (!token) {
-    window.location.href = './adminLogin.html';
-  }
-  
+// Token check removed as requested by user
+// const token = localStorage.getItem('token'); ...
+
 // public/js/adminAddCategory.js
 document.addEventListener('DOMContentLoaded', () => {
   const sidebar = document.getElementById('sidebar');
@@ -30,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (uploadArea && fileInput) {
     uploadArea.addEventListener('click', () => fileInput.click());
-    
+
     fileInput.addEventListener('change', (e) => {
       if (e.target.files[0]) {
         const reader = new FileReader();
@@ -137,9 +135,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Mobile sidebar close
   document.addEventListener('click', (e) => {
     if (window.innerWidth <= 991 &&
-        sidebar.classList.contains('active') &&
-        !e.target.closest('.sidebar') &&
-        !e.target.closest('.mobile-nav button')) {
+      sidebar.classList.contains('active') &&
+      !e.target.closest('.sidebar') &&
+      !e.target.closest('.mobile-nav button')) {
       sidebar.classList.remove('active');
       overlay.classList.remove('active');
     }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +9,8 @@
   <!-- Local CSS -->
   <link href="/libs/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
 
   <style>
     :root {
@@ -29,10 +31,20 @@
 
     /* Animations */
     @keyframes slideInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-    .content-animate { animation: slideInUp 0.6s ease-out forwards; }
+
+    .content-animate {
+      animation: slideInUp 0.6s ease-out forwards;
+    }
 
     /* Sidebar */
     .sidebar {
@@ -49,6 +61,7 @@
       z-index: 1000;
       transition: transform 0.3s ease;
     }
+
     .brand-section {
       display: flex;
       align-items: center;
@@ -57,19 +70,33 @@
       text-decoration: none;
       color: var(--primary-black);
     }
+
     .brand-logo {
       width: 40px;
       height: 40px;
       border-radius: 50%;
       object-fit: cover;
     }
+
     .brand-text-container {
       display: flex;
       flex-direction: column;
       line-height: 1.1;
     }
-    .brand-title { font-weight: 800; font-size: 1rem; color: #000; }
-    .brand-subtitle { font-size: 0.55rem; letter-spacing: 2px; color: #777; font-weight: 600; text-transform: uppercase; }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 1rem;
+      color: #000;
+    }
+
+    .brand-subtitle {
+      font-size: 0.55rem;
+      letter-spacing: 2px;
+      color: #777;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
 
     .sidebar-menu {
       list-style: none;
@@ -78,7 +105,11 @@
       flex-grow: 1;
       overflow-y: auto;
     }
-    .menu-item { margin-bottom: 5px; }
+
+    .menu-item {
+      margin-bottom: 5px;
+    }
+
     .menu-link {
       display: flex;
       align-items: center;
@@ -90,16 +121,34 @@
       border-radius: 8px;
       transition: all 0.2s;
     }
-    .menu-link i { width: 25px; font-size: 1.1rem; color: #777; }
-    .menu-link:hover { background-color: var(--bg-light); color: #000; }
-    .menu-link.active { background-color: var(--active-bg); color: #000; font-weight: 600; }
-    .menu-link.active i { color: #000; }
+
+    .menu-link i {
+      width: 25px;
+      font-size: 1.1rem;
+      color: #777;
+    }
+
+    .menu-link:hover {
+      background-color: var(--bg-light);
+      color: #000;
+    }
+
+    .menu-link.active {
+      background-color: var(--active-bg);
+      color: #000;
+      font-weight: 600;
+    }
+
+    .menu-link.active i {
+      color: #000;
+    }
 
     .admin-profile {
       margin-top: auto;
       padding-top: 20px;
       border-top: 1px solid var(--border-color);
     }
+
     .profile-info {
       display: flex;
       align-items: center;
@@ -108,14 +157,24 @@
       text-decoration: none;
       color: inherit;
     }
+
     .admin-avatar {
       width: 35px;
       height: 35px;
       border-radius: 50%;
       background: #ccc;
     }
-    .admin-details h6 { margin: 0; font-size: 0.9rem; font-weight: 600; }
-    .admin-details span { font-size: 0.75rem; color: var(--text-muted); }
+
+    .admin-details h6 {
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .admin-details span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
 
     .logout-btn {
       width: 100%;
@@ -133,7 +192,11 @@
       transition: 0.2s;
       text-decoration: none;
     }
-    .logout-btn:hover { background-color: #e2e6ea; color: #000; }
+
+    .logout-btn:hover {
+      background-color: #e2e6ea;
+      color: #000;
+    }
 
     /* Main Content */
     .main-content {
@@ -154,6 +217,7 @@
       top: 0;
       z-index: 999;
     }
+
     .mobile-nav .brand-section {
       display: flex;
       align-items: center;
@@ -162,18 +226,21 @@
       text-decoration: none;
       color: var(--primary-black);
     }
+
     .brand-text-mobile {
       display: flex;
       flex-direction: column;
       line-height: 1.1;
       text-align: left;
     }
+
     .brand-title-mobile {
       font-weight: 800;
       font-size: 1rem;
       color: #000;
       display: block;
     }
+
     .brand-subtitle-mobile {
       font-size: 0.6rem;
       letter-spacing: 1px;
@@ -192,6 +259,7 @@
       flex-wrap: wrap;
       gap: 15px;
     }
+
     .btn-back {
       text-decoration: none;
       color: #777;
@@ -202,7 +270,10 @@
       margin-bottom: 10px;
       transition: 0.2s;
     }
-    .btn-back:hover { color: #000; }
+
+    .btn-back:hover {
+      color: #000;
+    }
 
     .page-title {
       font-size: 1.8rem;
@@ -210,6 +281,7 @@
       margin: 0;
       color: #000;
     }
+
     .page-subtitle {
       color: var(--text-muted);
       font-size: 0.9rem;
@@ -285,6 +357,7 @@
       color: #aaa;
       margin-bottom: 10px;
     }
+
     .upload-text {
       font-size: 0.85rem;
       color: #777;
@@ -302,6 +375,7 @@
       position: relative;
       display: none;
     }
+
     .main-image-preview img {
       width: 100%;
       height: 100%;
@@ -314,6 +388,7 @@
       gap: 15px;
       flex-wrap: wrap;
     }
+
     .thumbnail-item {
       width: 100px;
       height: 100px;
@@ -323,6 +398,7 @@
       border: 1px solid #eee;
       background-color: #fff;
     }
+
     .thumbnail-item img {
       width: 100%;
       height: 100%;
@@ -348,6 +424,7 @@
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       transition: all 0.2s;
     }
+
     .remove-btn:hover {
       background: #dc3545;
       color: white;
@@ -368,6 +445,7 @@
       gap: 8px;
       text-decoration: none;
     }
+
     .btn-delete-prod:hover {
       background-color: #dc3545;
       color: #fff;
@@ -388,6 +466,7 @@
       z-index: 900;
       transition: width 0.3s ease;
     }
+
     .btn-cancel {
       background-color: var(--active-bg);
       color: #333;
@@ -397,9 +476,11 @@
       border-radius: 30px;
       transition: 0.2s;
     }
+
     .btn-cancel:hover {
       background-color: #dcdcdc;
     }
+
     .btn-submit {
       background-color: #000;
       color: #fff;
@@ -409,6 +490,7 @@
       border-radius: 30px;
       transition: 0.2s;
     }
+
     .btn-submit:hover {
       background-color: #333;
     }
@@ -417,21 +499,26 @@
       .sidebar {
         transform: translateX(-100%);
       }
+
       .sidebar.active {
         transform: translateX(0);
         box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
       }
+
       .main-content {
         margin-left: 0;
         padding: 20px;
       }
+
       .form-footer {
         width: 100%;
         padding: 15px 20px;
       }
+
       .mobile-nav {
         display: flex;
       }
+
       .sidebar-overlay {
         display: none;
         position: fixed;
@@ -442,13 +529,16 @@
         background: rgba(0, 0, 0, 0.5);
         z-index: 998;
       }
+
       .sidebar-overlay.active {
         display: block;
       }
+
       .page-header {
         flex-direction: column;
         align-items: flex-start;
       }
+
       .btn-delete-prod {
         width: 100%;
         justify-content: center;
@@ -456,6 +546,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="mobile-nav">
     <a href="#" class="brand-section">
@@ -482,27 +573,29 @@
     </a>
 
     <ul class="sidebar-menu">
-        <li class="menu-item"><a href="../Admin/adminDashboard.html" class="menu-link"><i class="fa-solid fa-border-all"></i> &nbsp;Dashboard</a></li>
-        <li class="menu-item"><a href="../Admin/adminOrders.html" class="menu-link"><i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a></li>
-        <li class="menu-item"><a href="../Admin/adminProducts.html" class="menu-link active"><i class="fa-solid fa-box-open"></i> &nbsp;Products</a></li>
-        <li class="menu-item"><a href="../Admin/adminCustomers.html" class="menu-link"><i class="fa-solid fa-users"></i> &nbsp;Customers</a></li>
-        <li class="menu-item"><a href="../Admin/adminMessages.html" class="menu-link"><i class="fa-regular fa-envelope"></i> &nbsp;Messages</a></li>
-        <li class="menu-item"><a href="../Admin/adminAnalytics.html" class="menu-link"><i class="fa-solid fa-chart-simple"></i> &nbsp;Analytics</a></li>
-        <li class="menu-item"><a href="../Admin/adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i> &nbsp;Coupon Management</a></li>
-        <li class="menu-item"><a href="../Admin/adminCategories.html" class="menu-link"><i class="fa-solid fa-layer-group"></i> &nbsp;Category Management</a></li>
-        <li class="menu-item"><a href="../Admin/adminOffers.html" class="menu-link"><i class="fa-solid fa-gift"></i> &nbsp;Offer</a></li>
-      </ul>
+      <li class="menu-item"><a href="../Admin/adminDashboard.html" class="menu-link"><i
+            class="fa-solid fa-border-all"></i> &nbsp;Dashboard</a></li>
+      <li class="menu-item"><a href="../Admin/adminOrders.html" class="menu-link"><i
+            class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a></li>
+      <li class="menu-item"><a href="../Admin/adminProducts.html" class="menu-link active"><i
+            class="fa-solid fa-box-open"></i> &nbsp;Products</a></li>
+      <li class="menu-item"><a href="../Admin/adminCustomers.html" class="menu-link"><i class="fa-solid fa-users"></i>
+          &nbsp;Customers</a></li>
+      <li class="menu-item"><a href="../Admin/adminMessages.html" class="menu-link"><i
+            class="fa-regular fa-envelope"></i> &nbsp;Messages</a></li>
+      <li class="menu-item"><a href="../Admin/adminAnalytics.html" class="menu-link"><i
+            class="fa-solid fa-chart-simple"></i> &nbsp;Analytics</a></li>
+      <li class="menu-item"><a href="../Admin/adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i>
+          &nbsp;Coupon Management</a></li>
+      <li class="menu-item"><a href="../Admin/adminCategories.html" class="menu-link"><i
+            class="fa-solid fa-layer-group"></i> &nbsp;Category Management</a></li>
+      <li class="menu-item"><a href="../Admin/adminOffers.html" class="menu-link"><i class="fa-solid fa-gift"></i>
+          &nbsp;Offer</a></li>
+    </ul>
 
     <div class="admin-profile">
-      <a
-        href="../Admin/adminProfile.html"
-        class="profile-info text-decoration-none text-reset"
-      >
-        <img
-          src="../images/logo.jpg"
-          alt="Admin"
-          class="admin-avatar"
-        />
+      <a href="../Admin/adminProfile.html" class="profile-info text-decoration-none text-reset">
+        <img src="../images/logo.jpg" alt="Admin" class="admin-avatar" />
         <div class="admin-details">
           <h6 id="sidebarName" class="m-0">Admin</h6>
           <span class="small text-muted">admin@example.com</span>
@@ -525,11 +618,7 @@
           Update product details, pricing, and media.
         </p>
       </div>
-      <a
-        href="#"
-        class="btn-delete-prod"
-        id="deleteProductBtn"
-      >
+      <a href="#" class="btn-delete-prod" id="deleteProductBtn">
         <i class="fa-solid fa-trash-can"></i> Delete Product
       </a>
     </div>
@@ -541,69 +630,36 @@
             <h5 class="form-section-title">Basic Information</h5>
             <div class="mb-3">
               <label for="productName" class="form-label">Product Name</label>
-              <input
-                type="text"
-                class="form-control"
-                id="productName"
-                placeholder="Enter Product Name"
-                required
-              />
+              <input type="text" class="form-control" id="productName" placeholder="Enter Product Name" required />
             </div>
             <div class="mb-3">
               <label for="productDescription" class="form-label">Description</label>
-              <textarea
-                class="form-control"
-                id="productDescription"
-                rows="4"
-                placeholder="Provide a detailed description of the product."
-              ></textarea>
+              <textarea class="form-control" id="productDescription" rows="4"
+                placeholder="Provide a detailed description of the product."></textarea>
             </div>
             <div class="row">
               <div class="col-md-6 mb-3">
                 <label for="productSku" class="form-label">SKU</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="productSku"
-                  placeholder="SKU-12345"
-                />
+                <input type="text" class="form-control" id="productSku" placeholder="SKU-12345" />
               </div>
               <div class="col-md-6 mb-3">
                 <label for="stockQuantity" class="form-label">Stock Quantity</label>
-                <input
-                  type="number"
-                  class="form-control"
-                  id="stockQuantity"
-                  placeholder="100"
-                  required
-                />
+                <input type="number" class="form-control" id="stockQuantity" placeholder="100" required />
               </div>
               <div class="col-md-6 mb-3">
                 <label for="actualPrice" class="form-label">Actual Price</label>
                 <div class="input-group">
                   <span class="input-group-text">₹</span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    class="form-control"
-                    id="actualPrice"
-                    placeholder="Enter actual price"
-                    required
-                  />
+                  <input type="number" step="0.01" class="form-control" id="actualPrice"
+                    placeholder="Enter actual price" required />
                 </div>
               </div>
               <div class="col-md-6 mb-3">
                 <label for="offerPrice" class="form-label">Offer Price</label>
                 <div class="input-group">
                   <span class="input-group-text">₹</span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    class="form-control"
-                    id="offerPrice"
-                    placeholder="Enter offer price"
-                    required
-                  />
+                  <input type="number" step="0.01" class="form-control" id="offerPrice" placeholder="Enter offer price"
+                    required />
                 </div>
               </div>
             </div>
@@ -673,13 +729,8 @@
               </select>
             </div>
             <div class="mb-3">
-              <label class="form-label">Tags</label>
-              <input
-                type="text"
-                class="form-control"
-                id="productTags"
-                placeholder="e.g. Case, New"
-              />
+              <label class="form-label">Brand</label>
+              <input type="text" class="form-control" id="productBrand" placeholder="e.g. Samsung, Apple" />
             </div>
           </div>
         </div>
@@ -699,4 +750,5 @@
   <script src="/libs/sweetalert2.all.min.js"></script>
   <script src="/js/adminEditProduct.js"></script>
 </body>
+
 </html>

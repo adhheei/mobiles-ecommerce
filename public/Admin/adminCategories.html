@@ -1,400 +1,512 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Categories - Jinsa Mobiles Admin</title>
 
-    <!-- Local CSS -->
-    <link href="/libs/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Categories - Jinsa Mobiles Admin</title>
 
-    <style>
-      :root {
-        --primary-black: #1a1a1a;
-        --bg-light: #f8f9fa;
-        --border-color: #eee;
-        --sidebar-width: 260px;
-        --active-bg: #e9ecef;
-        --text-muted: #6c757d;
+  <!-- Local CSS -->
+  <link href="/libs/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    :root {
+      --primary-black: #1a1a1a;
+      --bg-light: #f8f9fa;
+      --border-color: #eee;
+      --sidebar-width: 260px;
+      --active-bg: #e9ecef;
+      --text-muted: #6c757d;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: var(--bg-light);
+      overflow-x: hidden;
+      color: var(--primary-black);
+    }
+
+    /* Animations */
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
       }
 
-      body {
-        font-family: "Poppins", sans-serif;
-        background-color: var(--bg-light);
-        overflow-x: hidden;
-        color: var(--primary-black);
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
+    }
 
-      /* Animations */
-      @keyframes slideInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      .content-animate { animation: slideInUp 0.6s ease-out forwards; }
+    .content-animate {
+      animation: slideInUp 0.6s ease-out forwards;
+    }
 
-      /* Sidebar */
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      height: 100vh;
+      background-color: #fff;
+      border-right: 1px solid var(--border-color);
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 40px;
+      text-decoration: none;
+      color: var(--primary-black);
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .brand-text-container {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 1rem;
+      color: #000;
+    }
+
+    .brand-subtitle {
+      font-size: 0.55rem;
+      letter-spacing: 2px;
+      color: #777;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .menu-item {
+      margin-bottom: 5px;
+    }
+
+    .menu-link {
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      color: #555;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .menu-link i {
+      width: 25px;
+      font-size: 1.1rem;
+      color: #777;
+    }
+
+    .menu-link:hover {
+      background-color: var(--bg-light);
+      color: #000;
+    }
+
+    .menu-link.active {
+      background-color: var(--active-bg);
+      color: #000;
+      font-weight: 600;
+    }
+
+    .menu-link.active i {
+      color: #000;
+    }
+
+    .admin-profile {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .profile-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .admin-avatar {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: #ccc;
+    }
+
+    .admin-details h6 {
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .admin-details span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .logout-btn {
+      width: 100%;
+      background-color: var(--bg-light);
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: 0.2s;
+      text-decoration: none;
+    }
+
+    .logout-btn:hover {
+      background-color: #e2e6ea;
+      color: #000;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      padding: 30px;
+      transition: margin-left 0.3s ease;
+    }
+
+    .mobile-nav {
+      display: none;
+      background: #fff;
+      padding: 15px 20px;
+      border-bottom: 1px solid #eee;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .page-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0;
+      color: #000;
+    }
+
+    .btn-add-new {
+      background-color: #000;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+
+    .btn-add-new:hover {
+      background-color: #333;
+      color: #fff;
+    }
+
+    .table-toolbar {
+      background: #fff;
+      padding: 25px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 25px;
+    }
+
+    .search-box {
+      position: relative;
+      flex-grow: 1;
+      max-width: 400px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 12px 15px 12px 45px;
+      border-radius: 12px;
+      border: 1px solid #eee;
+      background-color: #fcfcfc;
+      font-size: 0.88rem;
+      font-family: "Poppins", sans-serif;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #aaa;
+    }
+
+    .table-card {
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      margin-bottom: 25px;
+    }
+
+    .table {
+      margin-bottom: 0;
+      width: 100%;
+    }
+
+    .table thead th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: #888;
+      padding: 15px 25px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+      letter-spacing: 0.5px;
+    }
+
+    .table tbody td {
+      padding: 15px 25px;
+      vertical-align: middle;
+      font-size: 0.9rem;
+      color: #333;
+      border-bottom: 1px solid #f9f9f9;
+      font-weight: 500;
+    }
+
+    .category-cell {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .cat-img {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #eee;
+      border: 1px solid #f0f0f0;
+    }
+
+    .cat-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #000;
+    }
+
+    .cat-desc {
+      font-size: 0.85rem;
+      color: #777;
+      max-width: 300px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #eee;
+      background: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #555;
+      transition: 0.2s;
+      margin-left: 5px;
+      text-decoration: none;
+    }
+
+    .action-btn:hover {
+      background: #f8f9fa;
+      color: #000;
+      border-color: #ccc;
+    }
+
+    .btn-delete:hover {
+      background: #ffe5e5;
+      color: #dc3545;
+      border-color: #f5c2c7;
+    }
+
+    @media (max-width: 991px) {
       .sidebar {
-        width: var(--sidebar-width);
-        height: 100vh;
-        background-color: #fff;
-        border-right: 1px solid var(--border-color);
-        position: fixed;
-        top: 0;
-        left: 0;
-        display: flex;
-        flex-direction: column;
-        padding: 20px;
-        z-index: 1000;
-        transition: transform 0.3s ease;
+        transform: translateX(-100%);
       }
-      .brand-section {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 40px;
-        text-decoration: none;
-        color: var(--primary-black);
-      }
-      .brand-logo {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        object-fit: cover;
-      }
-      .brand-text-container {
-        display: flex;
-        flex-direction: column;
-        line-height: 1.1;
-      }
-      .brand-title { font-weight: 800; font-size: 1rem; color: #000; }
-      .brand-subtitle { font-size: 0.55rem; letter-spacing: 2px; color: #777; font-weight: 600; text-transform: uppercase; }
 
-      .sidebar-menu {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        flex-grow: 1;
-        overflow-y: auto;
+      .sidebar.active {
+        transform: translateX(0);
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
       }
-      .menu-item { margin-bottom: 5px; }
-      .menu-link {
-        display: flex;
-        align-items: center;
-        padding: 12px 15px;
-        color: #555;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 0.9rem;
-        border-radius: 8px;
-        transition: all 0.2s;
-      }
-      .menu-link i { width: 25px; font-size: 1.1rem; color: #777; }
-      .menu-link:hover { background-color: var(--bg-light); color: #000; }
-      .menu-link.active { background-color: var(--active-bg); color: #000; font-weight: 600; }
-      .menu-link.active i { color: #000; }
 
-      .admin-profile {
-        margin-top: auto;
-        padding-top: 20px;
-        border-top: 1px solid var(--border-color);
-      }
-      .profile-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 15px;
-        text-decoration: none;
-        color: inherit;
-      }
-      .admin-avatar {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        background: #ccc;
-      }
-      .admin-details h6 { margin: 0; font-size: 0.9rem; font-weight: 600; }
-      .admin-details span { font-size: 0.75rem; color: var(--text-muted); }
-      .logout-btn {
-        width: 100%;
-        background-color: var(--bg-light);
-        border: none;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #333;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        transition: 0.2s;
-        text-decoration: none;
-      }
-      .logout-btn:hover { background-color: #e2e6ea; color: #000; }
-
-      /* Main Content */
       .main-content {
-        margin-left: var(--sidebar-width);
-        padding: 30px;
-        transition: margin-left 0.3s ease;
+        margin-left: 0;
+        padding: 20px;
       }
 
       .mobile-nav {
-        display: none;
-        background: #fff;
-        padding: 15px 20px;
-        border-bottom: 1px solid #eee;
-        justify-content: space-between;
-        align-items: center;
-        position: sticky;
-        top: 0;
-        z-index: 999;
-      }
-
-      .page-header {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
-      }
-      .page-title {
-        font-size: 1.8rem;
-        font-weight: 800;
-        margin: 0;
-        color: #000;
       }
 
-      .btn-add-new {
-        background-color: #000;
-        color: #fff;
-        padding: 10px 20px;
-        border-radius: 30px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: 0.2s;
+      .table {
+        min-width: 700px;
       }
-      .btn-add-new:hover {
-        background-color: #333;
-        color: #fff;
+
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 998;
+      }
+
+      .sidebar-overlay.active {
+        display: block;
       }
 
       .table-toolbar {
-        background: #fff;
-        padding: 25px;
-        border-radius: 16px;
-        border: 1px solid var(--border-color);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        flex-wrap: wrap;
-        margin-bottom: 25px;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 20px;
       }
+
       .search-box {
-        position: relative;
-        flex-grow: 1;
-        max-width: 400px;
+        max-width: 100%;
       }
-      .search-box input {
-        width: 100%;
-        padding: 12px 15px 12px 45px;
-        border-radius: 12px;
-        border: 1px solid #eee;
-        background-color: #fcfcfc;
-        font-size: 0.88rem;
-        font-family: "Poppins", sans-serif;
-      }
-      .search-box i {
-        position: absolute;
-        left: 18px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #aaa;
-      }
+    }
+  </style>
+</head>
 
-      .table-card {
-        background: #fff;
-        border-radius: 16px;
-        border: 1px solid var(--border-color);
-        overflow: hidden;
-        margin-bottom: 25px;
-      }
-      .table {
-        margin-bottom: 0;
-        width: 100%;
-      }
-      .table thead th {
-        background-color: #f8f9fa;
-        font-weight: 600;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        color: #888;
-        padding: 15px 25px;
-        border-bottom: 1px solid #eee;
-        text-align: left;
-        letter-spacing: 0.5px;
-      }
-      .table tbody td {
-        padding: 15px 25px;
-        vertical-align: middle;
-        font-size: 0.9rem;
-        color: #333;
-        border-bottom: 1px solid #f9f9f9;
-        font-weight: 500;
-      }
+<body>
+  <div class="mobile-nav">
+    <a href="#" class="brand-section">
+      <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
+      <div class="brand-text-container">
+        <span class="brand-title">JINSA MOBILES</span>
+        <span class="brand-subtitle">AND ACCESSORIES</span>
+      </div>
+    </a>
+    <button class="btn btn-light" id="sidebarToggleBtn">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </div>
 
-      .category-cell {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-      }
-      .cat-img {
-        width: 50px;
-        height: 50px;
-        border-radius: 8px;
-        object-fit: cover;
-        background: #eee;
-        border: 1px solid #f0f0f0;
-      }
-      .cat-name {
-        font-weight: 600;
-        font-size: 0.95rem;
-        color: #000;
-      }
-      .cat-desc {
-        font-size: 0.85rem;
-        color: #777;
-        max-width: 300px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-      .action-btn {
-        width: 32px;
-        height: 32px;
-        border-radius: 6px;
-        border: 1px solid #eee;
-        background: #fff;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        color: #555;
-        transition: 0.2s;
-        margin-left: 5px;
-        text-decoration: none;
-      }
-      .action-btn:hover {
-        background: #f8f9fa;
-        color: #000;
-        border-color: #ccc;
-      }
-      .btn-delete:hover {
-        background: #ffe5e5;
-        color: #dc3545;
-        border-color: #f5c2c7;
-      }
+  <nav class="sidebar" id="sidebar">
+    <a href="../adminDashboard.html" class="brand-section">
+      <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
+      <div class="brand-text-container">
+        <span class="brand-title">JINSA MOBILES</span>
+        <span class="brand-subtitle">AND ACCESSORIES</span>
+      </div>
+    </a>
 
-      @media (max-width: 991px) {
-        .sidebar { transform: translateX(-100%); }
-        .sidebar.active { transform: translateX(0); box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1); }
-        .main-content { margin-left: 0; padding: 20px; }
-        .mobile-nav { display: flex; }
-        .table { min-width: 700px; }
-        .sidebar-overlay {
-          display: none;
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          z-index: 998;
-        }
-        .sidebar-overlay.active { display: block; }
-        .table-toolbar {
-          flex-direction: column;
-          align-items: stretch;
-          padding: 20px;
-        }
-        .search-box { max-width: 100%; }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="mobile-nav">
-      <a href="#" class="brand-section">
-        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
-        <div class="brand-text-mobile">
-          <span class="brand-title-mobile">JINSA MOBILES</span>
-          <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
+    <ul class="sidebar-menu">
+      <li class="menu-item"><a href="../Admin/adminDashboard.html" class="menu-link"><i
+            class="fa-solid fa-border-all"></i> &nbsp;Dashboard</a></li>
+      <li class="menu-item"><a href="../Admin/adminOrders.html" class="menu-link"><i
+            class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a></li>
+      <li class="menu-item"><a href="../Admin/adminProducts.html" class="menu-link"><i class="fa-solid fa-box-open"></i>
+          &nbsp;Products</a></li>
+      <li class="menu-item"><a href="../Admin/adminCustomers.html" class="menu-link"><i class="fa-solid fa-users"></i>
+          &nbsp;Customers</a></li>
+      <li class="menu-item"><a href="../Admin/adminMessages.html" class="menu-link"><i
+            class="fa-regular fa-envelope"></i> &nbsp;Messages</a></li>
+      <li class="menu-item"><a href="../Admin/adminAnalytics.html" class="menu-link"><i
+            class="fa-solid fa-chart-simple"></i> &nbsp;Analytics</a></li>
+      <li class="menu-item"><a href="../Admin/adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i>
+          &nbsp;Coupon Management</a></li>
+      <li class="menu-item"><a href="../Admin/adminCategories.html" class="menu-link active"><i
+            class="fa-solid fa-layer-group"></i> &nbsp;Category Management</a></li>
+      <li class="menu-item"><a href="../Admin/adminOffers.html" class="menu-link"><i class="fa-solid fa-gift"></i>
+          &nbsp;Offer</a></li>
+    </ul>
+
+    <div class="admin-profile">
+      <a href="../Admin/adminProfile.html" class="profile-info text-decoration-none text-reset">
+        <img src="../images/logo.jpg" alt="Admin" class="admin-avatar" />
+        <div class="admin-details">
+          <h6 id="sidebarName" class="m-0">Admin</h6>
+          <span class="small text-muted">admin@example.com</span>
         </div>
       </a>
-      <button class="btn btn-light" id="sidebarToggleBtn">
-        <i class="fa-solid fa-bars"></i>
-      </button>
+      <a href="../adminLogin.html" class="logout-btn">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+      </a>
+    </div>
+  </nav>
+
+  <div class="main-content content-animate">
+    <div class="page-header">
+      <h2 class="page-title">Categories</h2>
+      <a href="./adminAddCategory.html" class="btn-add-new">
+        <i class="fa-solid fa-plus"></i> Add Category
+      </a>
     </div>
 
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <nav class="sidebar" id="sidebar">
-      <a href="../adminDashboard.html" class="brand-section">
-        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
-        <div class="brand-text-container">
-          <span class="brand-title">JINSA MOBILES</span>
-          <span class="brand-subtitle">AND ACCESSORIES</span>
-        </div>
-      </a>
-
-      <ul class="sidebar-menu">
-        <li class="menu-item"><a href="../Admin/adminDashboard.html" class="menu-link"><i class="fa-solid fa-border-all"></i> &nbsp;Dashboard</a></li>
-        <li class="menu-item"><a href="../Admin/adminOrders.html" class="menu-link"><i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a></li>
-        <li class="menu-item"><a href="../Admin/adminProducts.html" class="menu-link"><i class="fa-solid fa-box-open"></i> &nbsp;Products</a></li>
-        <li class="menu-item"><a href="../Admin/adminCustomers.html" class="menu-link"><i class="fa-solid fa-users"></i> &nbsp;Customers</a></li>
-        <li class="menu-item"><a href="../Admin/adminMessages.html" class="menu-link"><i class="fa-regular fa-envelope"></i> &nbsp;Messages</a></li>
-        <li class="menu-item"><a href="../Admin/adminAnalytics.html" class="menu-link"><i class="fa-solid fa-chart-simple"></i> &nbsp;Analytics</a></li>
-        <li class="menu-item"><a href="../Admin/adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i> &nbsp;Coupon Management</a></li>
-        <li class="menu-item"><a href="../Admin/adminCategories.html" class="menu-link active"><i class="fa-solid fa-layer-group"></i> &nbsp;Category Management</a></li>
-        <li class="menu-item"><a href="../Admin/adminOffers.html" class="menu-link"><i class="fa-solid fa-gift"></i> &nbsp;Offer</a></li>
-      </ul>
-
-      <div class="admin-profile">
-        <a href="../Admin/adminProfile.html" class="profile-info text-decoration-none text-reset">
-          <img src="../images/logo.jpg" alt="Admin" class="admin-avatar" />
-          <div class="admin-details">
-            <h6 id="sidebarName" class="m-0">Admin</h6>
-            <span class="small text-muted">admin@example.com</span>
-          </div>
-        </a>
-        <a href="../adminLogin.html" class="logout-btn">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
-        </a>
+    <div class="table-toolbar">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Search categories..." />
       </div>
-    </nav>
+    </div>
 
-    <div class="main-content content-animate">
-      <div class="page-header">
-        <h2 class="page-title">Categories</h2>
-        <a href="./adminAddCategory.html" class="btn-add-new">
-          <i class="fa-solid fa-plus"></i> Add Category
-        </a>
-      </div>
-
-      <div class="table-toolbar">
-        <div class="search-box">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="searchInput" placeholder="Search categories..." />
-        </div>
-      </div>
-
-      <div class="table-card">
-        <table class="table">
+    <div class="table-card">
+      <div class="table-responsive">
+        <table class="table align-middle">
           <thead>
             <tr>
               <th>Category Name</th>
@@ -408,9 +520,16 @@
       </div>
     </div>
 
-    <!-- External JS -->
-    <script src="/libs/bootstrap.bundle.min.js"></script>
-    <script src="/libs/sweetalert2.all.min.js"></script>
-    <script src="/js/adminCategories.js"></script>
-  </body>
+    <!-- Pagination Controls -->
+    <nav aria-label="Page navigation" class="mt-4">
+      <ul class="pagination justify-content-center" id="paginationContainer"></ul>
+    </nav>
+  </div>
+
+  <!-- External JS -->
+  <script src="/libs/bootstrap.bundle.min.js"></script>
+  <script src="/libs/sweetalert2.all.min.js"></script>
+  <script src="/js/adminCategories.js"></script>
+</body>
+
 </html>

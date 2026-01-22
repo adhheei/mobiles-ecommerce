@@ -13,7 +13,7 @@ async function fetchProductDetails(productId) {
   try {
     const response = await fetch(`/api/admin/products/${productId}`);
     const data = await response.json();
-    
+
     if (data.success && data.product) {
       return data.product;
     } else {
@@ -30,7 +30,7 @@ async function fetchRelatedProducts(categoryId, currentProductId) {
   try {
     const response = await fetch(`/api/admin/products/public?category=${categoryId}&limit=5`);
     const data = await response.json();
-    
+
     if (data.success && data.products) {
       // Filter out current product
       return data.products.filter(p => p.id !== currentProductId);
@@ -45,17 +45,17 @@ async function fetchRelatedProducts(categoryId, currentProductId) {
 // Render product details
 function renderProductDetails(product) {
   currentProduct = product;
-  
+
   // Basic info
   document.getElementById('mainImage').src = product.mainImage || '/images/logo.jpg';
   document.getElementById('mainImage').alt = product.name;
-  document.getElementById('vendorText').textContent = product.categoryName || 'Uncategorized';
+  document.getElementById('vendorText').textContent = product.brand || product.categoryName || 'Generic';
   document.getElementById('productTitle').textContent = product.name;
-  
+
   // Price
   const currentPriceEl = document.getElementById('currentPrice');
   const oldPriceEl = document.getElementById('oldPrice');
-  
+
   if (product.offerPrice < product.actualPrice) {
     currentPriceEl.textContent = `Rs. ${product.offerPrice}`;
     oldPriceEl.textContent = `Rs. ${product.actualPrice}`;
@@ -64,31 +64,48 @@ function renderProductDetails(product) {
     currentPriceEl.textContent = `Rs. ${product.offerPrice}`;
     oldPriceEl.style.display = 'none';
   }
-  
-   // Stock status logic
+
+  // Stock status logic
   const stockBadge = document.getElementById('stockBadge');
   const stockStatus = document.getElementById('stockStatus');
-  
-  if (product.stock === 0) {
+  const addToCartBtn = document.getElementById('addToCartBtn');
+  const buyNowBtn = document.getElementById('buyNowBtn');
+
+  if (product.stock === 0 || product.status === 'outofstock') {
     stockBadge.className = 'stock-badge out-of-stock';
     stockStatus.innerHTML = '<i class="fa-solid fa-times-circle me-1"></i> Out of stock';
-    document.getElementById('addToCartBtn').disabled = true;
+    addToCartBtn.disabled = true;
+    if (buyNowBtn) {
+      buyNowBtn.classList.add('disabled');
+      buyNowBtn.style.pointerEvents = 'none';
+      buyNowBtn.style.opacity = '0.6';
+    }
   } else if (product.stock < 10) {
     stockBadge.className = 'stock-badge low-stock';
     stockStatus.innerHTML = `<i class="fa-solid fa-exclamation-circle me-1"></i> Only ${product.stock} left in stock!`;
-    document.getElementById('addToCartBtn').disabled = false;
+    addToCartBtn.disabled = false;
+    if (buyNowBtn) {
+      buyNowBtn.classList.remove('disabled');
+      buyNowBtn.style.pointerEvents = 'auto';
+      buyNowBtn.style.opacity = '1';
+    }
   } else {
     stockBadge.className = 'stock-badge';
     stockStatus.innerHTML = '<i class="fa-solid fa-check-circle me-1"></i> In stock, ready to ship';
-    document.getElementById('addToCartBtn').disabled = false;
+    addToCartBtn.disabled = false;
+    if (buyNowBtn) {
+      buyNowBtn.classList.remove('disabled');
+      buyNowBtn.style.pointerEvents = 'auto';
+      buyNowBtn.style.opacity = '1';
+    }
   }
-  
+
   // Category display (no more "Uncategorized")
   document.getElementById('vendorText').textContent = product.categoryName || 'General';
-  
+
   // Description
   document.getElementById('descriptionBody').innerHTML = product.description || '<p>No description available.</p>';
-  
+
   // Tech specs
   let techSpecs = '';
   if (product.sku) {
@@ -96,20 +113,20 @@ function renderProductDetails(product) {
   }
   techSpecs += `<p class="mb-1"><strong>Category:</strong> ${product.categoryName}</p>`;
   techSpecs += `<p class="mb-0"><strong>Stock:</strong> ${product.stock} units</p>`;
-  
+
   document.getElementById('techSpecsBody').innerHTML = techSpecs;
-  
+
   // Gallery thumbnails
   const thumbnailContainer = document.getElementById('thumbnailContainer');
   thumbnailContainer.innerHTML = '';
-  
+
   // Main image as first thumbnail
   const mainThumb = document.createElement('div');
   mainThumb.className = 'thumbnail active';
   mainThumb.innerHTML = `<img src="${product.mainImage || '/images/logo.jpg'}" alt="Main" />`;
   mainThumb.onclick = () => changeImage(mainThumb, product.mainImage || '/images/logo.jpg');
   thumbnailContainer.appendChild(mainThumb);
-  
+
   // Gallery images
   if (product.gallery && product.gallery.length > 0) {
     product.gallery.forEach((img, index) => {
@@ -120,7 +137,7 @@ function renderProductDetails(product) {
       thumbnailContainer.appendChild(thumb);
     });
   }
-  
+
   // Color swatches (mock implementation - you can enhance this)
   const swatchGroup = document.getElementById('swatchGroup');
   swatchGroup.innerHTML = `
@@ -135,12 +152,12 @@ function renderProductDetails(product) {
 function renderRelatedProducts(products) {
   const slider = document.getElementById('relatedSlider');
   slider.innerHTML = '';
-  
+
   if (products.length === 0) {
     slider.innerHTML = '<div class="col-12 text-center py-4">No related products found.</div>';
     return;
   }
-  
+
   products.forEach(product => {
     const col = document.createElement('div');
     col.className = 'col-10 col-md-3';
@@ -189,12 +206,12 @@ function selectColor(swatchElement, colorName) {
 // Add to cart functionality
 function addToCart() {
   if (!currentProduct) return;
-  
+
   const quantity = parseInt(document.getElementById('qtyInput').value);
-  
+
   // Simple cart implementation (you can enhance this)
   let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  
+
   // Check if product already in cart
   const existingItem = cart.find(item => item.id === currentProduct.id);
   if (existingItem) {
@@ -208,9 +225,9 @@ function addToCart() {
       quantity: quantity
     });
   }
-  
+
   localStorage.setItem('cart', JSON.stringify(cart));
-  
+
   // Show success message
   alert('Product added to cart!');
 }
@@ -231,33 +248,33 @@ async function initPage() {
   const loading = document.getElementById('loading');
   const errorState = document.getElementById('errorState');
   const productContent = document.getElementById('productContent');
-  
+
   // Show loading
   loading.style.display = 'block';
-  
+
   try {
     const productId = getProductId();
     if (!productId) {
       throw new Error('No product ID provided');
     }
-    
+
     // Fetch product details
     const product = await fetchProductDetails(productId);
-    
+
     // Render product
     renderProductDetails(product);
-    
+
     // Fetch and render related products
     const relatedProducts = await fetchRelatedProducts(product.category, productId);
     renderRelatedProducts(relatedProducts);
-    
+
     // Hide loading, show content
     loading.style.display = 'none';
     productContent.style.display = 'block';
-    
+
     // Initialize animations
     initAnimations();
-    
+
   } catch (error) {
     console.error('Failed to load product:', error);
     loading.style.display = 'none';

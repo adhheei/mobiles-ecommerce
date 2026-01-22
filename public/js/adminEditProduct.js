@@ -17,11 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const mainImagePreview = document.getElementById('mainImagePreview');
   const mainImageSrc = document.getElementById('mainImageSrc');
   const removeMainBtn = document.getElementById('removeMainBtn');
-  
+
   const galleryUploadArea = document.getElementById('galleryUploadArea');
   const galleryInput = document.getElementById('galleryInput');
   const galleryContainer = document.getElementById('galleryContainer');
-  
+
   const categorySelect = document.getElementById('categorySelect');
 
   // Sidebar toggle
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const res = await fetch('/api/admin/products/categories');
       const data = await res.json();
-      
+
       if (data.success) {
         categorySelect.innerHTML = '<option value="">Select Category</option>';
         data.categories.forEach(cat => {
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (data.success && data.product) {
         const p = data.product;
-        
+
         // Basic info
         document.getElementById('productName').value = p.name || '';
         document.getElementById('productDescription').value = p.description || '';
@@ -78,27 +78,27 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('stockQuantity').value = p.stock || '';
         document.getElementById('actualPrice').value = p.actualPrice || '';
         document.getElementById('offerPrice').value = p.offerPrice || '';
-        
+
         // Status
         document.getElementById('productStatus').value = p.status || 'active';
         document.getElementById('productVisibility').value = p.visibility || 'public';
         if (p.publishDate) {
           document.getElementById('publishDate').valueAsDate = new Date(p.publishDate);
         }
-        
-        // Tags
-        document.getElementById('productTags').value = Array.isArray(p.tags) ? p.tags.join(', ') : '';
-        
+
+        // Brand
+        document.getElementById('productBrand').value = p.brand || '';
+
         // Category
         document.getElementById('categorySelect').value = p.category || '';
-        
+
         // Main image
         if (p.mainImage) {
           mainImageSrc.src = p.mainImage;
           mainImagePreview.style.display = 'block';
           mainUploadArea.style.display = 'none';
         }
-        
+
         // Gallery images
         if (Array.isArray(p.gallery) && p.gallery.length > 0) {
           p.gallery.forEach(imgUrl => {
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <button type="button" class="remove-btn">×</button>
             `;
             galleryContainer.appendChild(div);
-            
+
             div.querySelector('.remove-btn').addEventListener('click', () => {
               div.remove();
             });
@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const status = document.getElementById('productStatus').value;
     const visibility = document.getElementById('productVisibility').value;
     const publishDate = document.getElementById('publishDate').value;
-    const tags = document.getElementById('productTags').value.trim();
+    const brand = document.getElementById('productBrand').value.trim();
     const category = categorySelect.value;
 
     if (!name || !actualPrice || !offerPrice || !stock || !category) {
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
     formData.append('status', status);
     formData.append('visibility', visibility);
     if (publishDate) formData.append('publishDate', publishDate);
-    if (tags) formData.append('tags', tags);
+    if (brand) formData.append('brand', brand);
     formData.append('category', category);
 
     if (mainImageInput.files[0]) {
@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
           method: 'DELETE'
         });
         const data = await res.json();
-        if ( data.success ) {
+        if (data.success) {
           Swal.fire('Deleted!', 'Product has been deleted.', 'success').then(() => {
             window.location.href = './adminProducts.html';
           });
