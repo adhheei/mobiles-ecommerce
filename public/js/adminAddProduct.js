@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const status = document.getElementById("productStatus").value;
       const visibility = document.getElementById("productVisibility").value;
       const publishDate = document.getElementById("publishDate").value;
-      const tags = document.getElementById("productTags").value.trim();
+      const brand = document.getElementById("productBrand").value.trim();
       const category = categorySelect.value;
 
       if (!name || !actualPrice || !offerPrice || !stock || !category) {
@@ -133,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
       formData.append("status", status);
       formData.append("visibility", visibility);
       if (publishDate) formData.append("publishDate", publishDate);
-      if (tags) formData.append("tags", tags);
+      if (brand) formData.append("brand", brand);
       formData.append("category", category);
 
       if (mainImageInput.files[0]) {

@@ -8,6 +8,11 @@ const productSchema = new mongoose.Schema({
     trim: true,
     maxlength: 100
   },
+  brand: {
+    type: String,
+    default: 'Generic',
+    trim: true
+  },
   description: {
     type: String,
     default: '',
@@ -63,7 +68,7 @@ const productSchema = new mongoose.Schema({
     type: String,
     trim: true,
     validate: {
-      validator: function(v) {
+      validator: function (v) {
         return v.trim().length > 0;
       },
       message: 'Tags cannot be empty'

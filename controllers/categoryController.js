@@ -9,7 +9,24 @@ const fs = require("fs");
 // @access  Public
 exports.getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.find().sort({ createdAt: -1 });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
+    const skip = (page - 1) * limit;
+
+    let query = {};
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    const total = await Category.countDocuments(query);
+    const categories = await Category.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     // For each category, count related products
     const formatted = await Promise.all(
@@ -32,7 +49,15 @@ exports.getAllCategories = async (req, res) => {
       }),
     );
 
-    res.json({ success: true, data: formatted });
+    res.json({
+      success: true,
+      data: formatted,
+      pagination: {
+        total,
+        page,
+        pages: Math.ceil(total / limit),
+      },
+    });
   } catch (err) {
     console.error("Error in getAllCategories:", err);
     res
