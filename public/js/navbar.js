@@ -187,5 +187,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         }
+
+        // Load dynamic categories for navbar
+        loadNavbarCategories();
+    });
+
+async function loadNavbarCategories() {
+    try {
+        const res = await fetch('/api/admin/products/categories-with-counts');
+        const data = await res.json();
+
+        if (data.success && data.categories) {
+            // Find the Categories dropdown
+            const navLinks = document.querySelectorAll('.nav-link');
+            const catLink = Array.from(navLinks).find(link => link.textContent.trim().includes('Categories'));
+
+            if (catLink) {
+                const dropdownMenu = catLink.nextElementSibling;
+                if (dropdownMenu && dropdownMenu.classList.contains('dropdown-menu')) {
+                    dropdownMenu.innerHTML = ''; // Clear existing
+
+                    data.categories.forEach(cat => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<a class="dropdown-item" href="./productPage.html?category=${cat._id}">${cat.name}</a>`;
+                        dropdownMenu.appendChild(li);
+                    });
+                }
+            }
+        }
+    } catch (err) {
+        console.error('Error loading navbar categories:', err);
     }
-});
+}

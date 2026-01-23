@@ -92,9 +92,6 @@ router.put('/products/:id', uploadProduct, updateProduct);
 // DELETE product permanently
 router.delete('/products/:id', deleteProduct);
 
-const authController = require("../controllers/authController");
-
-router.post("/signup", authController.signup);
-router.post("/google-signup", authController.googleSignup);
+// Signup routes have been moved to authRoutes.js
 
 module.exports = router;
