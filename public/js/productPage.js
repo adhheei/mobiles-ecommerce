@@ -172,7 +172,7 @@ async function loadProducts() {
         const cursorStyle = isOutOfStock ? 'cursor: not-allowed;' : '';
 
         return `
-        <div class="col-6 col-md-4 col-xl-3">
+        <div class="col-6 col-md-4 col-xl-20-percent">
           <a href="${linkHref}" class="product-card-link" style="${cursorStyle}">
             <div class="product-card ${isOutOfStock ? 'sold-out' : ''}">
               <div class="card-img-wrapper">

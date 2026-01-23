@@ -12,7 +12,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
     rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
 
   <style>
     /* --- GLOBAL VARIABLES & FONTS --- */
@@ -546,6 +547,14 @@
       text-align: center;
       padding: 40px 0;
     }
+
+    /* Custom 5-column layout for XL screens */
+    @media (min-width: 1200px) {
+      .col-xl-20-percent {
+        flex: 0 0 auto;
+        width: 20%;
+      }
+    }
   </style>
 </head>
 
@@ -555,8 +564,8 @@
       <a class="navbar-brand d-flex align-items-center" href="../index.html">
         <img src="../images/logo.jpg" alt="Logo" width="50" height="50" class="me-2 rounded-circle" />
         <div class="d-flex flex-column">
-          <span class="fw-bold text-dark" style="line-height: 1.1; font-size: 1.2rem">JINSA MOBILES</span>
-          <span class="text-secondary" style="font-size: 0.6rem; letter-spacing: 4.2px; font-weight: 500">AND
+          <span class="text-dark" style="line-height: 1.1; font-size: 1.2rem; font-weight: 800;">JINSA MOBILES</span>
+          <span class="text-secondary" style="font-size: 0.6rem; letter-spacing: 5.5px; font-weight: 500">AND
             ACCESSORIES</span>
         </div>
       </a>
@@ -607,7 +616,7 @@
           </li>
         </ul>
 
-        <div class="nav-icons align-items-center">
+        <div class="nav-icons align-items-center d-flex">
           <div class="position-relative">
             <input type="text" id="navbarSearch" class="form-control border-secondary rounded-pill pe-5"
               placeholder="Search products..." style="width: 200px; height: 35px; font-size: 0.9rem" />
@@ -615,40 +624,14 @@
               style="cursor: pointer"></i>
           </div>
 
-          <a href="../cart.html" class="position-relative ms-lg-4 mt-3 mt-lg-0 text-dark" style="cursor: pointer">
+          <a href="../cart.html" class="position-relative ms-2 text-dark" style="cursor: pointer">
             <i class="fa-solid fa-cart-shopping fs-5"></i>
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
               style="font-size: 0.6rem">2</span>
           </a>
 
-          <div class="dropdown ms-lg-4 mt-3 mt-lg-0">
-            <a class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" href="#" role="button"
-              data-bs-toggle="dropdown" aria-expanded="false">
-              <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2"
-                style="width: 35px; height: 35px; border: 1px solid #dee2e6">
-                <i class="fa-regular fa-user"></i>
-              </div>
-              <span class="fw-semibold small">Jinsa</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end border-0 shadow mt-2">
-              <li>
-                <a class="dropdown-item" href="../userProfilePage.html"><i
-                    class="fa-solid fa-user me-2 text-muted"></i>My
-                  Profile</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="../userWishListPage.html"><i
-                    class="fa-regular fa-heart me-2 text-muted"></i>Wishlist</a>
-              </li>
-              <li>
-                <hr class="dropdown-divider" />
-              </li>
-              <li>
-                <a class="dropdown-item text-danger" href="../userLogin.html"><i
-                    class="fa-solid fa-arrow-right-from-bracket me-2"></i>Logout</a>
-              </li>
-            </ul>
-          </div>
+          <a href="../userLogin.html" class="ms-4 text-dark text-decoration-none fw-bold"
+            style="font-size: 1rem;">LOGIN</a>
         </div>
       </div>
     </div>

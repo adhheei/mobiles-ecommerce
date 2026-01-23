@@ -1,5 +1,5 @@
 // PASSWORD VISIBILITY TOGGLE
-document.querySelectorAll(".password-toggle").forEach(icon => {
+document.querySelectorAll(".password-toggle").forEach((icon) => {
   icon.addEventListener("click", () => {
     const input = icon.closest(".input-group").querySelector("input");
     input.type = input.type === "password" ? "text" : "password";
@@ -9,61 +9,47 @@ document.querySelectorAll(".password-toggle").forEach(icon => {
 });
 
 // SIGNUP FORM SUBMIT
-document.getElementById("signupForm").addEventListener("submit", async e => {
-  e.preventDefault();
+document
+  .getElementById("signupForm")
+  .addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-  const data = {
-    firstName: firstName.value,
-    lastName: lastName.value,
-    email: email.value,
-    phone: phone.value,
-    password: password.value,
-    confirmPassword: confirmPassword.value
-  };
+    console.log("Form submitted");
 
-  try {
-    const res = await fetch("http://localhost:3000/api/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
+    const data = {
+      firstName: document.getElementById("firstName").value,
+      lastName: document.getElementById("lastName").value,
+      email: document.getElementById("email").value,
+      phone: document.getElementById("phone").value,
+      password: document.getElementById("password").value,
+      confirmPassword: document.getElementById("confirmPassword").value,
+    };
 
-    const result = await res.json();
-    alert(result.message);
+    try {
+      // Use relative URL to avoid port mismatch issues
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-    if (res.ok) {
-      window.location.href = "userLogin.html";
+      const result = await res.json();
+
+      if (res.ok) {
+        alert(result.message);
+        window.location.href = "userLogin.html";
+      } else {
+        alert(result.message || "Signup failed");
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert("An error occurred during signup");
     }
-  } catch (err) {
-    alert("Something went wrong");
-  }
-});
-
-// GOOGLE SIGNUP (UNCHANGED)
-function handleCredentialResponse(response) {
-  alert("Google signup successful");
-}
-
-window.onload = function () {
-  google.accounts.id.initialize({
-    client_id: "YOUR_GOOGLE_CLIENT_ID",
-    callback: handleCredentialResponse
   });
-
-  google.accounts.id.renderButton(
-    document.getElementById("google-btn-container"),
-    {
-      theme: "outline",
-      size: "large",
-      width: "420",
-      text: "signup_with"
-    }
-  );
-};
 
 // GOOGLE SIGNUP FUNCTIONALITY
 function handleCredentialResponse(response) {
-  fetch("http://localhost:3000/api/auth/google-signup", {
+  fetch("/api/auth/google-signup", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -72,21 +58,30 @@ function handleCredentialResponse(response) {
       credential: response.credential,
     }),
   })
-    .then(res => res.json())
-    .then(data => {
+    .then((res) => res.json())
+    .then((data) => {
       if (data.success) {
         alert("Signup successful");
         window.location.href = "userLogin.html";
       } else {
-        alert(data.message);
+        alert(data.message || "Google signup failed");
       }
     })
-    .catch(() => alert("Google signup failed"));
+    .catch((err) => {
+      console.error("Google signup error:", err);
+      alert("Google signup failed");
+    });
 }
 
 window.onload = function () {
+  const YOUR_GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID"; // TODO: Replace this with your actual Client ID
+
+  if (YOUR_GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID") {
+    console.warn("⚠️ Google Client ID is not set. Google Sign-In will not work.");
+  }
+
   google.accounts.id.initialize({
-    client_id: "YOUR_GOOGLE_CLIENT_ID",
+    client_id: YOUR_GOOGLE_CLIENT_ID,
     callback: handleCredentialResponse,
   });
 
@@ -98,6 +93,6 @@ window.onload = function () {
       width: "420",
       text: "signup_with",
       shape: "pill",
-    }
+    },
   );
 };
