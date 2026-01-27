@@ -34,12 +34,13 @@ document
       });
 
       const result = await res.json();
+      console.log("Signup Response:", res.status, result);
 
       if (res.ok) {
         alert(result.message);
         window.location.href = "userLogin.html";
       } else {
-        alert(result.message || "Signup failed");
+        alert(result.message || JSON.stringify(result) || "Signup failed");
       }
     } catch (error) {
       console.error("Signup error:", error);
@@ -76,8 +77,10 @@ function handleCredentialResponse(response) {
 window.onload = function () {
   const YOUR_GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID"; // TODO: Replace this with your actual Client ID
 
-  if (YOUR_GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID") {
-    console.warn("⚠️ Google Client ID is not set. Google Sign-In will not work.");
+  if (YOUR_GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID" || !YOUR_GOOGLE_CLIENT_ID) {
+    console.warn("⚠️ Google Client ID is not set. Google Sign-In is disabled.");
+    document.getElementById("google-btn-container").style.display = "none";
+    return;
   }
 
   google.accounts.id.initialize({

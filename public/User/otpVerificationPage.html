@@ -1,207 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OTP Verification - Jinsa Mobiles</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
 
-    <style>
-      :root {
-        --primary-black: #1a1a1a;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OTP Verification - Jinsa Mobiles</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
 
-      body {
-        font-family: "Poppins", sans-serif;
-        background-color: #fff;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-        padding-top: 0px; 
-      }
+  <style>
+    :root {
+      --primary-black: #1a1a1a;
+    }
 
-      /* --- OTP SECTION --- */
-      .otp-wrapper {
-        flex: 1; 
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px 20px;
-      }
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #fff;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding-top: 0px;
+    }
 
-      .otp-container {
-        width: 100%;
-        max-width: 500px;
-        padding: 40px 20px;
-        text-align: center;
-      }
+    /* --- OTP SECTION --- */
+    .otp-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 20px;
+    }
 
-      .page-title {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 15px;
-        color: var(--primary-black);
-      }
+    .otp-container {
+      width: 100%;
+      max-width: 500px;
+      padding: 40px 20px;
+      text-align: center;
+    }
 
-      .page-desc {
-        color: #666;
-        font-size: 0.95rem;
-        margin-bottom: 40px;
-        line-height: 1.5;
-        max-width: 400px;
-        margin-left: auto;
-        margin-right: auto;
-      }
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: var(--primary-black);
+    }
 
-      .otp-inputs {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        margin-bottom: 30px;
-      }
+    .page-desc {
+      color: #666;
+      font-size: 0.95rem;
+      margin-bottom: 40px;
+      line-height: 1.5;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
 
-      .otp-field {
-        width: 50px;
-        height: 50px;
-        text-align: center;
-        font-size: 1.2rem;
-        font-weight: 600;
-        border: 1px solid #ced4da;
-        border-radius: 8px;
-      }
-      
-      .otp-field:focus {
-        border-color: var(--primary-black);
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
-      }
+    .otp-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
 
-      .btn-verify {
-        background-color: var(--primary-black);
-        color: white;
-        width: 100%;
-        padding: 12px;
-        border-radius: 8px;
-        font-weight: 600;
-        border: none;
-        font-size: 1rem;
-        transition: background 0.2s;
-        margin-bottom: 25px;
-        cursor: pointer;
-      }
-      .btn-verify:hover {
-        background-color: #333;
-      }
+    .otp-field {
+      width: 50px;
+      height: 50px;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border: 1px solid #ced4da;
+      border-radius: 8px;
+    }
 
-      .bottom-links {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-      }
+    .otp-field:focus {
+      border-color: var(--primary-black);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    }
 
-      .resend-link, .back-link {
-        color: var(--primary-black);
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 0.95rem;
-      }
-      .resend-link:hover, .back-link:hover {
-        text-decoration: underline;
-      }
-    </style>
-  </head>
-  <body>
+    .btn-verify {
+      background-color: var(--primary-black);
+      color: white;
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      border: none;
+      font-size: 1rem;
+      transition: background 0.2s;
+      margin-bottom: 25px;
+      cursor: pointer;
+    }
 
-    <div class="otp-wrapper">
-      <div class="otp-container">
-        
-        <h1 class="page-title">OTP Verification</h1>
-        
-        <p class="page-desc">
-          Enter the 6-digit code sent to your email address below.
-        </p>
+    .btn-verify:hover {
+      background-color: #333;
+    }
 
-        <form onsubmit="handleVerify(event)">
-          <div class="otp-inputs">
-            <input type="text" class="otp-field" maxlength="1" oninput="moveToNext(this, 'digit2')" required>
-            <input type="text" id="digit2" class="otp-field" maxlength="1" oninput="moveToNext(this, 'digit3')" required>
-            <input type="text" id="digit3" class="otp-field" maxlength="1" oninput="moveToNext(this, 'digit4')" required>
-            <input type="text" id="digit4" class="otp-field" maxlength="1" oninput="moveToNext(this, 'digit5')" required>
-            <input type="text" id="digit5" class="otp-field" maxlength="1" oninput="moveToNext(this, 'digit6')" required>
-            <input type="text" id="digit6" class="otp-field" maxlength="1" required>
-          </div>
+    .bottom-links {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
 
-          <button type="submit" class="btn-verify">Verify Code</button>
-        </form>
+    .resend-link,
+    .back-link {
+      color: var(--primary-black);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      line-height: inherit;
+    }
 
-        <div class="bottom-links">
-          <a href="#" class="resend-link">Resend Code</a>
-          <a href="./forgotPassword.html" class="back-link">Back to Forgot Password</a>
+    .resend-link:hover,
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+  <link href="/css/navbar.css" rel="stylesheet" />
+</head>
+
+<body>
+
+  <div class="otp-wrapper">
+    <div class="otp-container">
+
+      <h1 class="page-title">OTP Verification</h1>
+
+      <p class="page-desc">
+        Enter the 6-digit code sent to your email address below.
+      </p>
+
+      <form onsubmit="handleVerify(event)">
+        <div class="otp-inputs">
+          <input type="text" class="otp-field" maxlength="1" oninput="moveToNext(this, 'digit2')" required>
+          <input type="text" id="digit2" class="otp-field" maxlength="1" oninput="moveToNext(this, 'digit3')" required>
+          <input type="text" id="digit3" class="otp-field" maxlength="1" oninput="moveToNext(this, 'digit4')" required>
+          <input type="text" id="digit4" class="otp-field" maxlength="1" oninput="moveToNext(this, 'digit5')" required>
+          <input type="text" id="digit5" class="otp-field" maxlength="1" oninput="moveToNext(this, 'digit6')" required>
+          <input type="text" id="digit6" class="otp-field" maxlength="1" required>
         </div>
 
+        <button type="submit" class="btn-verify">Verify Code</button>
+      </form>
+
+      <div class="bottom-links">
+        <a href="#" class="resend-link">Resend Code</a>
+        <a href="./forgotPassword.html" class="back-link">Back to Forgot Password</a>
       </div>
+
     </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      // Function to auto-focus next field
-      function moveToNext(current, nextFieldID) {
-        if (current.value.length >= 1) {
-          document.getElementById(nextFieldID).focus();
-        }
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Function to auto-focus next field
+    function moveToNext(current, nextFieldID) {
+      if (current.value.length >= 1) {
+        document.getElementById(nextFieldID).focus();
+      }
+    }
+
+    // Handle Form Submission & Redirection
+    async function handleVerify(event) {
+      event.preventDefault();
+
+      const inputs = document.querySelectorAll(".otp-field");
+      let otpCode = "";
+      inputs.forEach(input => otpCode += input.value);
+
+      if (otpCode.length !== 6) {
+        alert("Please enter a 6-digit code");
+        return;
       }
 
-      // Handle Form Submission & Redirection
-      function handleVerify(event) {
-        event.preventDefault(); // Prevent default form submission
-        
-        // Simple validation check: Ensure all fields are filled (HTML 'required' handles UI prompt)
-        const inputs = document.querySelectorAll(".otp-field");
-        let otpCode = "";
-        inputs.forEach(input => otpCode += input.value);
+      const urlParams = new URLSearchParams(window.location.search);
+      const email = urlParams.get('email');
 
-        if (otpCode.length === 6) {
-            // Redirect to Reset Password Page
-            window.location.href = "./resetPassword.html";
-        }
+      if (!email) {
+        alert("Email missing from URL");
+        return;
       }
 
-      // Advanced logic for backspace and pasting
-      const otpInputs = document.querySelectorAll(".otp-field");
-
-      otpInputs.forEach((input, index) => {
-        input.addEventListener("keydown", (e) => {
-          // Move backwards on backspace if empty
-          if (e.key === "Backspace" && input.value === "" && index > 0) {
-            otpInputs[index - 1].focus();
-          }
+      try {
+        const res = await fetch('/api/auth/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, otp: otpCode })
         });
 
-        // Allow pasting a 6 digit code
-        input.addEventListener("paste", (e) => {
-          e.preventDefault();
-          const pasteData = e.clipboardData.getData("text").slice(0, 6);
-          if (/^\d+$/.test(pasteData)) {
-            pasteData.split("").forEach((char, i) => {
-              if (otpInputs[i]) otpInputs[i].value = char;
-            });
-            // Focus last input
-            otpInputs[Math.min(pasteData.length - 1, 5)].focus();
-          }
-        });
+        const data = await res.json();
+
+        if (data.success) {
+          // Redirect to Reset Password Page
+          window.location.href = `./resetPassword.html?email=${encodeURIComponent(email)}&otp=${otpCode}`;
+        } else {
+          alert(data.message || "Invalid OTP");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Verification failed");
+      }
+    }
+
+    // Advanced logic for backspace and pasting
+    const otpInputs = document.querySelectorAll(".otp-field");
+
+    otpInputs.forEach((input, index) => {
+      input.addEventListener("keydown", (e) => {
+        // Move backwards on backspace if empty
+        if (e.key === "Backspace" && input.value === "" && index > 0) {
+          otpInputs[index - 1].focus();
+        }
       });
-    </script>
-  </body>
+
+      // Allow pasting a 6 digit code
+      input.addEventListener("paste", (e) => {
+        e.preventDefault();
+        const pasteData = e.clipboardData.getData("text").slice(0, 6);
+        if (/^\d+$/.test(pasteData)) {
+          pasteData.split("").forEach((char, i) => {
+            if (otpInputs[i]) otpInputs[i].value = char;
+          });
+          // Focus last input
+          otpInputs[Math.min(pasteData.length - 1, 5)].focus();
+        }
+      });
+    });
+  </script>
+</body>
+
 </html>

@@ -15,10 +15,7 @@ const priceRange = document.getElementById('priceRange');
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  // Load products initially
-  loadProducts();
-
-  // Load categories for filter
+  // Load categories for filter (and then load products)
   loadCategoriesForFilter();
 
   // Setup event listeners
@@ -188,13 +185,15 @@ async function loadProducts() {
               </div>
               <div class="product-info">
                 <div class="product-vendor">${product.brand}</div>
-                <div class="product-title">${product.name}</div>
-                <div class="price-row">
-                  ${product.offerPrice < product.actualPrice ?
-            `<span class="current-price sale-price">Rs. ${product.offerPrice}</span>
-                     <span class="old-price">Rs. ${product.actualPrice}</span>` :
-            `<span class="current-price">Rs. ${product.offerPrice}</span>`
+                <div class="d-flex justify-content-between align-items-start">
+                   <div class="product-title mb-0 text-truncate" style="max-width: 60%;" title="${product.name}">${product.name}</div>
+                   <div class="text-end">
+                      ${product.offerPrice < product.actualPrice ?
+            `<div class="current-price sale-price" style="font-size: 0.95rem;">Rs. ${product.offerPrice}</div>
+                         <div class="old-price" style="font-size: 0.75rem;">Rs. ${product.actualPrice}</div>` :
+            `<div class="current-price" style="font-size: 0.95rem;">Rs. ${product.offerPrice}</div>`
           }
+                   </div>
                 </div>
               </div>
             </div>
@@ -301,8 +300,25 @@ async function loadCategoriesForFilter() {
         categoryList.appendChild(li);
       });
 
+      // CHECK URL AND PRE-SELECT CATEGORY
+      const urlParams = new URLSearchParams(window.location.search);
+      const categoryId = urlParams.get('category');
+
+      if (categoryId) {
+        const checkbox = document.getElementById(`category-${categoryId}`);
+        if (checkbox) {
+          checkbox.checked = true;
+        }
+      }
+
       // Setup event listeners for category checkboxes
       setupCategoryFilterListeners();
+
+      // NOW load products (after filters are set)
+      loadProducts();
+
+
+
     }
   } catch (err) {
     console.error('Error loading categories:', err);

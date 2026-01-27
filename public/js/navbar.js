@@ -187,10 +187,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         }
+    }
 
-        // Load dynamic categories for navbar
-        loadNavbarCategories();
-    });
+    // Load dynamic categories for navbar
+    loadNavbarCategories();
+});
 
 async function loadNavbarCategories() {
     try {
@@ -209,7 +210,7 @@ async function loadNavbarCategories() {
 
                     data.categories.forEach(cat => {
                         const li = document.createElement('li');
-                        li.innerHTML = `<a class="dropdown-item" href="./productPage.html?category=${cat._id}">${cat.name}</a>`;
+                        li.innerHTML = `<a class="dropdown-item" href="/User/productPage.html?category=${cat._id}">${cat.name}</a>`;
                         dropdownMenu.appendChild(li);
                     });
                 }
@@ -219,3 +220,59 @@ async function loadNavbarCategories() {
         console.error('Error loading navbar categories:', err);
     }
 }
+
+// Check for User Login State
+function checkUserLogin() {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    // Updated selector to match index.html
+    const navIcons = document.querySelector('.nav-icons');
+
+    if (user && navIcons) {
+        // Find existing login button: It's the 'a' tag with text 'LOGIN'
+        const loginBtn = Array.from(navIcons.children).find(child =>
+            child.tagName === 'A' && child.textContent.trim() === 'LOGIN'
+        );
+
+        if (loginBtn) {
+            loginBtn.remove(); // Remove Login Button
+
+            // Create User Dropdown
+            const userDropdown = document.createElement('div');
+            userDropdown.className = 'dropdown ms-4'; // Add margin to match spacing
+            userDropdown.innerHTML = `
+                <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa-solid fa-user-circle fa-lg"></i>
+                    <span class="fw-bold">${user.name ? user.name.split(' ')[0] : 'User'}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm mt-2">
+                    <li><a class="dropdown-item" href="./userProfile.html"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="./wishlist.html"><i class="fa-solid fa-heart me-2"></i>Wishlist</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</a></li>
+                </ul>
+            `;
+            navIcons.appendChild(userDropdown);
+        } else {
+            // console.log("Login button element NOT found inside .nav-icons");
+        }
+    } else {
+        // console.log("User or navIcons missing. User:", !!user, "NavIcons:", !!navIcons);
+    }
+}
+
+// Handle Logout
+window.handleLogout = async function () {
+    try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        localStorage.removeItem('user');
+        window.location.href = './index.html';
+    } catch (error) {
+        console.error('Logout failed:', error);
+        localStorage.removeItem('user');
+        window.location.href = './index.html';
+    }
+};
+
+// Run check on load
+document.addEventListener('DOMContentLoaded', checkUserLogin);

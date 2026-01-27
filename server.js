@@ -33,15 +33,22 @@ app.use(
         "'self'",
         "https://accounts.google.com",
         "https://cdn.jsdelivr.net",
+        "'unsafe-inline'",
       ],
       styleSrc: [
         "'self'",
         "https://cdn.jsdelivr.net",
         "https://cdnjs.cloudflare.com",
         "https://accounts.google.com",
+        "https://fonts.googleapis.com",
         "'unsafe-inline'",
       ],
-      imgSrc: ["'self'", "data:", "https://lh3.googleusercontent.com"],
+      imgSrc: [
+        "'self'",
+        "data:",
+        "https://lh3.googleusercontent.com",
+        "https://placehold.co"
+      ],
       connectSrc: [
         "'self'",
         "https://accounts.google.com",
@@ -53,14 +60,19 @@ app.use(
         "https://cdnjs.cloudflare.com",
         "https://fonts.gstatic.com",
       ],
+      scriptSrcAttr: ["'unsafe-inline'"], // Allow inline event handlers
     },
   }),
 );
+app.use(require("cookie-parser")()); // 🍪 Cookie parser
 app.use(cors());
 app.use(morgan("combined"));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express.static("public"));
+
+//  favicon.ico ignore
+app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 // 🛣️ Routes
 const adminRoutes = require("./routes/adminRoutes");
