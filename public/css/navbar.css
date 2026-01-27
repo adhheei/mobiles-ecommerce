@@ -1,0 +1,143 @@
+/* Navbar Font Standardization from productPage.html */
+
+/* Import Poppins Font if not already loaded (though most pages load it) */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+/* Navbar Specific Styles */
+.navbar {
+    padding: 10px 0;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #1a1a1a;
+}
+
+.nav-subtitle {
+    font-size: 0.6rem !important;
+    letter-spacing: 4px !important;
+    font-weight: 500 !important;
+}
+
+/* Links Centered & Styled */
+.navbar-nav .nav-link {
+    font-family: "Poppins", sans-serif !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+    transition: color 0.3s;
+    margin: 0 10px;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    color: #0d6efd !important;
+}
+
+/* Search Bar Styling */
+.search-container {
+    position: relative;
+}
+
+.search-input {
+    width: 200px;
+    height: 35px;
+    font-size: 0.9rem;
+    padding-right: 35px;
+    border-radius: 50px;
+    border: 1px solid #dee2e6;
+    padding-left: 15px;
+    font-family: "Poppins", sans-serif;
+}
+
+.search-icon {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    color: #6c757d;
+    cursor: pointer;
+}
+
+.dropdown-item {
+    padding: 10px 20px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #333;
+    font-family: "Poppins", sans-serif;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #d32f2f;
+    padding-left: 25px;
+}
+
+/* Dropdown Menu Styles */
+.dropdown-menu {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 10px 0;
+    margin-top: 10px !important;
+    /* Ensure gap and override BS utility if needed */
+    z-index: 1050;
+}
+
+/* --- FOOTER STYLES (Global) --- */
+footer {
+    background-color: #111;
+    color: #aaa;
+    padding: 60px 0 20px;
+}
+
+footer h5 {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+footer ul {
+    padding-left: 0;
+    list-style: none;
+}
+
+footer ul li {
+    margin-bottom: 10px;
+}
+
+footer a {
+    color: #aaa;
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: white;
+}
+
+.newsletter-input {
+    background: #333;
+    border: none;
+    color: white;
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.newsletter-input::placeholder {
+    color: #bbb;
+}
+
+.newsletter-input:focus {
+    outline: 1px solid #555;
+    background: #444;
+}
+
+textarea.newsletter-input {
+    resize: none;
+}
