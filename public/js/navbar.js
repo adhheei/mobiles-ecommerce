@@ -353,7 +353,7 @@ async function loadNavbarCategories() {
 }
 
 // Check for User Login State
-function checkUserLogin() {
+async function checkUserLogin() {
     const user = JSON.parse(localStorage.getItem('user'));
 
     // Updated selector to match index.html
@@ -366,13 +366,21 @@ function checkUserLogin() {
         if (loginBtn) {
             loginBtn.remove(); // Remove Login Button
 
-            // Create User Dropdown
+            // Create User Dropdown Container
             const userDropdown = document.createElement('div');
             userDropdown.className = 'dropdown ms-4'; // Add margin to match spacing
+
+            // initial placeholder
+            let avatarHtml = `<i class="fa-solid fa-user-circle fa-lg"></i>`;
+            let userName = user.name ? user.name.split(' ')[0] : 'User';
+
+            // Construct Dropdown HTML
             userDropdown.innerHTML = `
-                <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-dark" href="#" role="button" aria-expanded="false">
-                    <i class="fa-solid fa-user-circle fa-lg"></i>
-                    <span class="fw-bold">${user.name ? user.name.split(' ')[0] : 'User'}</span>
+                <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-dark" href="#" role="button" aria-expanded="false" id="userDropdownToggle">
+                    <div id="nav-avatar-container" class="d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                        ${avatarHtml}
+                    </div>
+                    <span class="fw-bold" id="nav-username">${userName}</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm mt-2">
                     <li><a class="dropdown-item" href="/User/userProfilePage.html"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
@@ -383,7 +391,7 @@ function checkUserLogin() {
             `;
             navIcons.appendChild(userDropdown);
 
-            // --- Manual Toggle for User Dropdown (Fix for missing Bootstrap events) ---
+            // --- Manual Toggle for User Dropdown ---
             const userToggle = userDropdown.querySelector('.dropdown-toggle');
             if (userToggle) {
                 userToggle.addEventListener('click', function (e) {
@@ -396,6 +404,50 @@ function checkUserLogin() {
                         this.setAttribute('aria-expanded', this.classList.contains('show'));
                     }
                 });
+            }
+
+            // --- Fetch Fresh Profile Data ---
+            try {
+                const res = await fetch('/api/user/profile');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && data.user) {
+                        // Update Name
+                        const newName = data.user.firstName || userName;
+                        document.getElementById('nav-username').innerText = newName;
+
+                        // Update Avatar
+                        const avatarContainer = document.getElementById('nav-avatar-container');
+                        if (data.user.profileImage) {
+                            let imgSrc = data.user.profileImage;
+
+                            // Normalize path
+                            if (!imgSrc.startsWith('http') && !imgSrc.startsWith('/')) {
+                                imgSrc = '/' + imgSrc;
+                            }
+
+                            // Cache busting
+                            if (!imgSrc.startsWith('http')) {
+                                imgSrc += `?v=${new Date().getTime()}`;
+                            }
+
+                            avatarContainer.innerHTML = `
+                                <img src="${imgSrc}" alt="Avatar" 
+                                     class="rounded-circle border" 
+                                     style="width: 35px; height: 35px; object-fit: cover;">
+                            `;
+                        } else {
+                            // Ensure default icon if no image
+                            avatarContainer.innerHTML = `<i class="fa-solid fa-user-circle fa-2x text-secondary"></i>`;
+                        }
+
+                        // Update local storage to keep it fresh
+                        const updatedUser = { ...user, name: newName };
+                        localStorage.setItem('user', JSON.stringify(updatedUser));
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to fetch fresh user data for navbar", err);
             }
         }
     }
