@@ -16,6 +16,8 @@ const storage = multer.diskStorage({
       uploadPath = 'public/uploads/categories';
     } else if (req.originalUrl.includes('/products')) {
       uploadPath = 'public/uploads/products';
+    } else if (req.originalUrl.includes('/user') || req.originalUrl.includes('/avatar')) {
+      uploadPath = 'public/uploads/profiles';
     }
     ensureDir(uploadPath);
     cb(null, uploadPath);
