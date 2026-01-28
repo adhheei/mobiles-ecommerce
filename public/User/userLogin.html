@@ -44,15 +44,12 @@
             border-color: #dee2e6;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
             position: relative;
-            /* Ensure proper stacking */
             z-index: 1;
-            /* Ensure input is above other elements */
         }
 
         .input-group-text {
             position: relative;
             z-index: 2;
-            /* Keep icon clickable */
         }
 
         .form-control:hover {
@@ -63,130 +60,7 @@
             box-shadow: none;
             border-color: #000;
             z-index: 3;
-            /* Bring to front on focus */
         }
-
-        /* ... existing styles ... */
-        <script> // ... existing password toggle ...
-
-        // LOGIN FUNCTION
-        async function handleLogin() {
-            const email=document.getElementById('email').value;
-            const password=document.getElementById('password').value;
-
-            try {
-                const res=await fetch('/api/auth/login', {
-
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-
-                    ,
-                    body: JSON.stringify({
-                        email, password
-                    })
-            });
-
-        const data=await res.json();
-
-        if (data.success) {
-            // Save user to localStorage
-            localStorage.setItem('user', JSON.stringify(data.user));
-
-            // Success Alert
-            Swal.fire({
-                icon: 'success',
-                title: 'Logged In Successfully',
-                text: 'Redirecting to home...',
-                timer: 1500,
-                showConfirmButton: false
-
-            }).then(()=> {
-                window.location.href='./index.html';
-            });
-        }
-
-        else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Login Failed',
-                text: data.message || 'Invalid credentials',
-                confirmButtonColor: '#000'
-            });
-        }
-        }
-
-        catch (error) {
-            console.error('Login error:', error);
-
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'An error occurred during login',
-                confirmButtonColor: '#000'
-            });
-        }
-        }
-
-        document.querySelector('.btn-black').addEventListener('click', handleLogin);
-
-        // 3. GOOGLE LOGIN SCRIPT
-        async function handleCredentialResponse(response) {
-            try {
-                const res=await fetch('/api/auth/google-signup', {
-
-                    // Corrected endpoint
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-
-                    ,
-                    body: JSON.stringify({
-                        credential: response.credential
-                    })
-            });
-
-        const data=await res.json();
-
-        if (data.success) {
-            localStorage.setItem('user', JSON.stringify(data.user));
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Google Login Successful',
-                timer: 1500,
-                showConfirmButton: false
-
-            }).then(()=> {
-                window.location.href='./index.html';
-            });
-        }
-
-        else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Google Login Failed',
-                text: data.message,
-                confirmButtonColor: '#000'
-            });
-        }
-        }
-
-        catch (error) {
-            console.error('Google Auth Error:', error);
-
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'An error occurred during Google Sign-In',
-                confirmButtonColor: '#000'
-            });
-        }
-        }
-
-        /* ... rest of script ... */
 
         /* --- PASSWORD EYE ICON --- */
         .password-toggle {
@@ -249,6 +123,7 @@
         /* --- LINKS HOVER --- */
         a {
             transition: color 0.2s ease;
+            text-decoration: none;
         }
 
         a:hover {
@@ -256,18 +131,17 @@
             color: #000 !important;
         }
 
-        /* Container for Google Button to ensure it centers */
+        /* Container for Google Button */
         #google-btn-container {
             width: 100%;
             display: flex;
             justify-content: center;
         }
     </style>
-
-    <link href="/css/navbar.css" rel="stylesheet" />
+    <link href="/css/navbar.css" rel="stylesheet">
 </head>
 
-<body>
+<body style="padding-top: 0;">
 
     <div class="container-fluid login-container">
 
@@ -279,17 +153,18 @@
                 <p class="text-muted small">Log in to your account</p>
             </div>
 
-            <form>
+            <form onsubmit="event.preventDefault(); handleLogin();" autocomplete="off">
                 <div class="mb-1">
                     <label for="email" class="form-label fw-semibold small">Email or Username</label>
-                    <input type="email" class="form-control" id="email" placeholder="Enter your Username">
+                    <input type="email" class="form-control" id="email" placeholder="Enter your Username" required
+                        autocomplete="off">
                 </div>
 
                 <div class="mb-2">
                     <label for="password" class="form-label fw-semibold small">Password</label>
                     <div class="input-group">
                         <input type="password" class="form-control border-end-0" id="password"
-                            placeholder="Enter your password">
+                            placeholder="Enter your password" required autocomplete="new-password">
                         <span class="input-group-text bg-white border-start-0">
                             <i class="fa-regular fa-eye password-toggle"></i>
                         </span>
@@ -300,7 +175,7 @@
                     <a href="forgotPassword.html" class="text-decoration-none text-dark small">Forgot Password?</a>
                 </div>
 
-                <button type="button" class="btn btn-black w-100 mb-2">Login</button>
+                <button type="submit" class="btn btn-black w-100 mb-2">Login</button>
 
                 <div class="divider">OR</div>
 
@@ -324,13 +199,15 @@
         const togglePassword = document.querySelector('.password-toggle');
         const password = document.querySelector('#password');
 
-        togglePassword.addEventListener('click', function (e) {
-            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-            password.setAttribute('type', type);
+        if (togglePassword && password) {
+            togglePassword.addEventListener('click', function (e) {
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
 
-            this.classList.toggle('fa-eye-slash');
-            this.classList.toggle('fa-eye');
-        });
+                this.classList.toggle('fa-eye-slash');
+                this.classList.toggle('fa-eye');
+            });
+        }
 
         // LOGIN FUNCTION
         async function handleLogin() {
@@ -347,25 +224,53 @@
                 const data = await res.json();
 
                 if (data.success) {
-                    // Save user to localStorage
+                    // Save user and token to localStorage
                     localStorage.setItem('user', JSON.stringify(data.user));
-                    // Redirect to home
-                    window.location.href = './index.html';
+                    if (data.token) {
+                        localStorage.setItem('token', data.token);
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Logged In Successfully',
+                        text: 'Redirecting...',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        // CHECK FOR REDIRECT PARAM
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const redirectUrl = urlParams.get('redirect');
+
+                        if (redirectUrl) {
+                            window.location.href = decodeURIComponent(redirectUrl);
+                        } else {
+                            window.location.href = './index.html';
+                        }
+                    });
+
                 } else {
-                    alert(data.message || 'Login failed');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Login Failed',
+                        text: data.message || 'Invalid credentials',
+                        confirmButtonColor: '#000'
+                    });
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                alert('An error occurred during login');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred during login',
+                    confirmButtonColor: '#000'
+                });
             }
         }
 
-        document.querySelector('.btn-black').addEventListener('click', handleLogin);
-
-        // 3. GOOGLE LOGIN SCRIPT
+        // GOOGLE LOGIN SCRIPT
         async function handleCredentialResponse(response) {
             try {
-                const res = await fetch('/api/auth/google-signup', { // Corrected endpoint
+                const res = await fetch('/api/auth/google-signup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ credential: response.credential })
@@ -375,19 +280,68 @@
 
                 if (data.success) {
                     localStorage.setItem('user', JSON.stringify(data.user));
-                    window.location.href = './index.html';
+                    if (data.token) {
+                        localStorage.setItem('token', data.token);
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Google Login Successful',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const redirectUrl = urlParams.get('redirect');
+
+                        if (redirectUrl) {
+                            window.location.href = decodeURIComponent(redirectUrl);
+                        } else {
+                            window.location.href = './index.html';
+                        }
+                    });
                 } else {
-                    alert(data.message || 'Google Login failed');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Google Login Failed',
+                        text: data.message,
+                        confirmButtonColor: '#000'
+                    });
                 }
             } catch (error) {
                 console.error('Google Auth Error:', error);
-                alert('An error occurred during Google Sign-In');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred during Google Sign-In',
+                    confirmButtonColor: '#000'
+                });
             }
         }
 
         window.onload = function () {
-            // Check if Google Client ID is configured
-            // NOTE: Replace 'YOUR_GOOGLE_CLIENT_ID' with your actual ID from Google Cloud Console
+            // Check for Login Required Message
+            const urlParams = new URLSearchParams(window.location.search);
+            const msg = urlParams.get('msg');
+
+            if (msg === 'login_required') {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                Toast.fire({
+                    icon: "info",
+                    title: "Please log in to continue"
+                });
+            }
+
+            // Google Sign In
             google.accounts.id.initialize({
                 client_id: "YOUR_GOOGLE_CLIENT_ID",
                 callback: handleCredentialResponse

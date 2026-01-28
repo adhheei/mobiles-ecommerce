@@ -1,7 +1,104 @@
 
 // navbar.js - Global navbar functionality
 
-document.addEventListener('DOMContentLoaded', () => {
+// navbar.js - Global navbar functionality
+
+// Function to load the navbar dynamically
+async function loadNavbar() {
+    const placeholder = document.getElementById('navbar-placeholder');
+    if (!placeholder) return;
+
+    try {
+        const response = await fetch('/components/navbar.html');
+        if (!response.ok) throw new Error('Failed to load navbar');
+
+        const html = await response.text();
+        placeholder.innerHTML = html;
+
+        // Initialize features after navbar is loaded
+        initializeNavbarFeatures();
+        setActiveLink();
+
+        // --- ROBUST DROPDOWN TOGGLE (Vanilla JS) ---
+        // This ensures the dropdown works even if Bootstrap's JS fails or events are blocked.
+        const catLink = document.getElementById('nav-categories');
+        if (catLink) {
+            catLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation(); // Stop bubbling
+
+                const dropdownMenu = this.nextElementSibling;
+                if (dropdownMenu) {
+                    // Toggle visibility classes manually
+                    dropdownMenu.classList.toggle('show');
+                    this.classList.toggle('show');
+                    this.setAttribute('aria-expanded', this.classList.contains('show'));
+                }
+            });
+
+            // Close when clicking outside (Generic for all dropdowns)
+            document.addEventListener('click', function (e) {
+                // Close Categories Dropdown
+                if (catLink && !catLink.contains(e.target)) {
+                    const dropdownMenu = catLink.nextElementSibling;
+                    if (dropdownMenu && dropdownMenu.classList.contains('show')) {
+                        dropdownMenu.classList.remove('show');
+                        catLink.classList.remove('show');
+                        catLink.setAttribute('aria-expanded', 'false');
+                    }
+                }
+
+                // Close User Dropdown (target any shown dropdown toggle not clicked)
+                const userDropdownToggle = document.querySelector('.nav-icons .dropdown-toggle.show');
+                if (userDropdownToggle && !userDropdownToggle.contains(e.target)) {
+                    const dropdownMenu = userDropdownToggle.nextElementSibling;
+                    if (dropdownMenu) {
+                        dropdownMenu.classList.remove('show');
+                        userDropdownToggle.classList.remove('show');
+                        userDropdownToggle.setAttribute('aria-expanded', 'false');
+                    }
+                }
+            });
+        }
+
+        // Add click outside listener to close navbar mobile menu
+        document.addEventListener('click', function (event) {
+            const navbarCollapse = document.getElementById('navbarNav');
+            const navbarToggler = document.querySelector('.navbar-toggler');
+
+            if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+                // Check if click is outside navbar and toggler
+                if (!navbarCollapse.contains(event.target) && !navbarToggler.contains(event.target)) {
+                    const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
+                        toggle: false
+                    });
+                    bsCollapse.hide();
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Error loading navbar:', error);
+    }
+}
+
+// Set active link based on current URL
+function setActiveLink() {
+    const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    navLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && (currentPath.includes(href.replace('./', '')) || (currentPath === '/' && href.includes('index.html')))) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+}
+
+// Main initialization function
+function initializeNavbarFeatures() {
     const navbarSearch = document.getElementById('navbarSearch');
 
     // Create autocomplete dropdown container
@@ -191,6 +288,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load dynamic categories for navbar
     loadNavbarCategories();
+
+    // Check login state
+    checkUserLogin();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // If placeholder exists, load dynamic navbar
+    if (document.getElementById('navbar-placeholder')) {
+        loadNavbar();
+    } else {
+        // Fallback for pages without placeholder (like login)
+        initializeNavbarFeatures();
+    }
 });
 
 async function loadNavbarCategories() {
@@ -198,26 +308,47 @@ async function loadNavbarCategories() {
         const res = await fetch('/api/admin/products/categories-with-counts');
         const data = await res.json();
 
-        if (data.success && data.categories) {
-            // Find the Categories dropdown
-            const navLinks = document.querySelectorAll('.nav-link');
-            const catLink = Array.from(navLinks).find(link => link.textContent.trim().includes('Categories'));
+        // Robustly find the dropdown menu
+        // 1. Try finding by the toggler ID
+        const catLink = document.getElementById('nav-categories');
+        let dropdownMenu = null;
 
-            if (catLink) {
-                const dropdownMenu = catLink.nextElementSibling;
-                if (dropdownMenu && dropdownMenu.classList.contains('dropdown-menu')) {
-                    dropdownMenu.innerHTML = ''; // Clear existing
-
-                    data.categories.forEach(cat => {
-                        const li = document.createElement('li');
-                        li.innerHTML = `<a class="dropdown-item" href="/User/productPage.html?category=${cat._id}">${cat.name}</a>`;
-                        dropdownMenu.appendChild(li);
-                    });
+        if (catLink) {
+            // Standard Bootstrap structure: sibling ul
+            dropdownMenu = catLink.nextElementSibling;
+            // Validate it's actually the menu
+            if (!dropdownMenu || !dropdownMenu.classList.contains('dropdown-menu')) {
+                // Fallback: look within parent li
+                const parentLi = catLink.closest('.dropdown');
+                if (parentLi) {
+                    dropdownMenu = parentLi.querySelector('.dropdown-menu');
                 }
+            }
+        }
+
+        if (dropdownMenu) {
+            dropdownMenu.innerHTML = ''; // Clear "Loading..."
+
+            if (data.success && data.categories && data.categories.length > 0) {
+                data.categories.forEach(cat => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a class="dropdown-item" href="/User/productPage.html?category=${cat._id}">${cat.name}</a>`;
+                    dropdownMenu.appendChild(li);
+                });
+            } else {
+                // Handle empty state
+                const li = document.createElement('li');
+                li.innerHTML = `<span class="dropdown-item text-muted">No categories found</span>`;
+                dropdownMenu.appendChild(li);
             }
         }
     } catch (err) {
         console.error('Error loading navbar categories:', err);
+        // Clean up loading state if error
+        const catLink = document.getElementById('nav-categories');
+        if (catLink && catLink.nextElementSibling) {
+            catLink.nextElementSibling.innerHTML = `<li><span class="dropdown-item text-danger">Failed to load</span></li>`;
+        }
     }
 }
 
@@ -229,10 +360,8 @@ function checkUserLogin() {
     const navIcons = document.querySelector('.nav-icons');
 
     if (user && navIcons) {
-        // Find existing login button: It's the 'a' tag with text 'LOGIN'
-        const loginBtn = Array.from(navIcons.children).find(child =>
-            child.tagName === 'A' && child.textContent.trim() === 'LOGIN'
-        );
+        // Find existing login button: It's the element with id 'nav-login'
+        const loginBtn = document.getElementById('nav-login');
 
         if (loginBtn) {
             loginBtn.remove(); // Remove Login Button
@@ -241,38 +370,91 @@ function checkUserLogin() {
             const userDropdown = document.createElement('div');
             userDropdown.className = 'dropdown ms-4'; // Add margin to match spacing
             userDropdown.innerHTML = `
-                <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-dark" href="#" role="button" aria-expanded="false">
                     <i class="fa-solid fa-user-circle fa-lg"></i>
                     <span class="fw-bold">${user.name ? user.name.split(' ')[0] : 'User'}</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm mt-2">
-                    <li><a class="dropdown-item" href="./userProfile.html"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
-                    <li><a class="dropdown-item" href="./wishlist.html"><i class="fa-solid fa-heart me-2"></i>Wishlist</a></li>
+                    <li><a class="dropdown-item" href="/User/userProfilePage.html"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="/User/userWishListPage.html"><i class="fa-solid fa-heart me-2"></i>Wishlist</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item text-danger" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</a></li>
                 </ul>
             `;
             navIcons.appendChild(userDropdown);
-        } else {
-            // console.log("Login button element NOT found inside .nav-icons");
+
+            // --- Manual Toggle for User Dropdown (Fix for missing Bootstrap events) ---
+            const userToggle = userDropdown.querySelector('.dropdown-toggle');
+            if (userToggle) {
+                userToggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const menu = this.nextElementSibling;
+                    if (menu) {
+                        menu.classList.toggle('show');
+                        this.classList.toggle('show');
+                        this.setAttribute('aria-expanded', this.classList.contains('show'));
+                    }
+                });
+            }
         }
-    } else {
-        // console.log("User or navIcons missing. User:", !!user, "NavIcons:", !!navIcons);
     }
 }
 
 // Handle Logout
+// Helper to load SweetAlert2 dynamically
+function loadSweetAlert() {
+    return new Promise((resolve, reject) => {
+        if (window.Swal) return resolve();
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+}
+
+// Handle Logout with Confirmation
 window.handleLogout = async function () {
     try {
-        await fetch('/api/auth/logout', { method: 'POST' });
-        localStorage.removeItem('user');
-        window.location.href = './index.html';
+        // Ensure SweetAlert2 is loaded
+        await loadSweetAlert();
+
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You will be logged out.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#000',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Logout'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await fetch('/api/auth/logout', { method: 'POST' });
+            } catch (err) {
+                console.warn('Logout API call failed, clearing local state anyway', err);
+            }
+
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+
+            await Swal.fire({
+                title: 'Logged Out',
+                text: 'See you soon!',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
+
+            window.location.href = '/User/index.html';
+        }
     } catch (error) {
-        console.error('Logout failed:', error);
+        console.error('Logout error:', error);
+        // Fallback force logout
         localStorage.removeItem('user');
-        window.location.href = './index.html';
+        localStorage.removeItem('token');
+        window.location.href = '/User/index.html';
     }
 };
-
-// Run check on load
-document.addEventListener('DOMContentLoaded', checkUserLogin);

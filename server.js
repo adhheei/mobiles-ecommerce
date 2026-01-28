@@ -77,8 +77,10 @@ app.get('/favicon.ico', (req, res) => res.status(204).end());
 // 🛣️ Routes
 const adminRoutes = require("./routes/adminRoutes");
 const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
 app.use("/api/admin", adminRoutes); // admin routes
 app.use("/api/auth", authRoutes); // auth routes
+app.use("/api/user", userRoutes); // user routes
 
 // 🏠 Home route
 app.get("/", (req, res) => {

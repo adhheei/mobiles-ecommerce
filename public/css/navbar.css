@@ -1,19 +1,26 @@
 /* Navbar Font Standardization from productPage.html */
 
-/* Import Poppins Font if not already loaded (though most pages load it) */
+/* Import Poppins Font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+    --navbar-height: 76px;
+    --primary-black: #1a1a1a;
+    --primary-red: #d32f2f;
+}
 
 /* Navbar Specific Styles */
 .navbar {
     padding: 10px 0;
     background: white;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    height: var(--navbar-height);
 }
 
 .navbar-brand {
     font-weight: 700;
     font-size: 1.5rem;
-    color: #1a1a1a;
+    color: var(--primary-black);
 }
 
 .nav-subtitle {
@@ -62,6 +69,16 @@
     cursor: pointer;
 }
 
+/* Dropdown Menu Styles */
+.dropdown-menu {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 10px 0;
+    margin-top: 10px !important;
+    z-index: 1050;
+}
+
 .dropdown-item {
     padding: 10px 20px;
     font-weight: 500;
@@ -73,19 +90,62 @@
 
 .dropdown-item:hover {
     background-color: #f8f9fa;
-    color: #d32f2f;
+    color: var(--primary-red);
     padding-left: 25px;
 }
 
-/* Dropdown Menu Styles */
-.dropdown-menu {
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    padding: 10px 0;
-    margin-top: 10px !important;
-    /* Ensure gap and override BS utility if needed */
-    z-index: 1050;
+/* Mobile Adjustments */
+@media (max-width: 991px) {
+    .navbar-nav {
+        text-align: center;
+        margin-bottom: 15px;
+        align-items: center;
+        width: 100%;
+    }
+
+    .nav-icons {
+        justify-content: center;
+        margin-top: 15px;
+        width: 100%;
+        border-top: 1px solid #eee;
+        padding-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .search-container {
+        margin-bottom: 10px;
+    }
+
+    /* Reset fixed height for mobile & Smooth Height Transition */
+    .navbar {
+        height: auto;
+        transition: height 0.3s ease-in-out;
+    }
+
+    /* Override Bootstrap Transition for Smooth Slide */
+    .navbar-collapse.collapsing {
+        transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+
+    .navbar-collapse.show {
+        transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+}
+
+@media (min-width: 992px) {
+    .navbar-collapse {
+        margin-left: 50px;
+    }
+
+    .nav-icons {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+    }
 }
 
 /* --- FOOTER STYLES (Global) --- */

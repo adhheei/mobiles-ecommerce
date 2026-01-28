@@ -4,9 +4,14 @@ const User = require("../models/User");
 const protect = async (req, res, next) => {
   let token;
 
-  // 1. Check for token in cookies
+  // 1. Check for token in cookies or Authorization header
   if (req.cookies.jwt) {
     token = req.cookies.jwt;
+  } else if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
   }
 
   if (!token) {

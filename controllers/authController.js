@@ -138,44 +138,70 @@ exports.logout = (req, res) => {
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
-// 4. FORGOT PASSWORD (OTP)
-exports.forgotPassword = async (req, res) => {
+// 4. SEND OTP (Email or Phone)
+exports.sendOtp = async (req, res) => {
   try {
-    const { email } = req.body;
-    const user = await User.findOne({ email });
+    const { emailOrPhone } = req.body;
+
+    if (!emailOrPhone) {
+      return res.status(400).json({ message: "Please provide Email or Phone" });
+    }
+
+    // Find user by email OR phone
+    const user = await User.findOne({
+      $or: [{ email: emailOrPhone }, { phone: emailOrPhone }]
+    });
 
     if (!user) {
-      // Security: Don't reveal if user exists or not, but for now we will for UX
+      // Security: Fake success to prevent enumeration, or return 404 if UX > Security
+      // For this project, we'll return 404 for clarity
       return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check Lock
+    if (user.lockUntil && user.lockUntil > Date.now()) {
+      return res.status(429).json({ message: "Too many attempts. Please try again later." });
     }
 
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Save to DB (expires in 10 mins)
-    user.otp = otp;
-    user.otpExpires = Date.now() + 10 * 60 * 1000;
+    // Securely Hash OTP
+    const salt = await bcrypt.genSalt(10);
+    const hashedOtp = await bcrypt.hash(otp, salt);
+
+    // Update User
+    user.otp = hashedOtp;
+    user.otpExpires = Date.now() + 5 * 60 * 1000; // 5 mins
+    user.otpAttempts = 0; // Reset attempts on new OTP
     await user.save();
 
-    // Send Email
-    const message = `Your Password Reset OTP is: ${otp}\n\nIt expires in 10 minutes.`;
+    // Determine if Email or Phone
+    const isEmail = emailOrPhone.includes("@");
 
-    try {
+    if (isEmail) {
+      // Send Email
+      const message = `Your Password Reset OTP is: ${otp}\n\nIt expires in 5 minutes.`;
+
+      if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        console.log("⚠️ [MOCK EMAIL] OTP for " + user.email + ": " + otp);
+        return res.status(200).json({ success: true, message: "OTP sent (Mock Mode check console)" });
+      }
+
       await transporter.sendMail({
         from: process.env.EMAIL_USER,
-        to: email,
+        to: user.email,
         subject: "Password Reset OTP - Jinsa Mobiles",
         text: message,
       });
 
       res.status(200).json({ success: true, message: "OTP sent to email" });
-    } catch (err) {
-      console.error("Email Error:", err);
-      user.otp = undefined;
-      user.otpExpires = undefined;
-      await user.save();
-      return res.status(500).json({ message: "Email could not be sent" });
+    } else {
+      // Send Phone (Mock)
+      console.log("📲 [MOCK SMS] OTP for " + user.phone + ": " + otp);
+      res.status(200).json({ success: true, message: "OTP sent to phone" });
     }
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -185,28 +211,42 @@ exports.forgotPassword = async (req, res) => {
 // 5. VERIFY OTP
 exports.verifyOtp = async (req, res) => {
   try {
-    const { otp } = req.body; // In a real flow verification might just check, not login yet
-
-    // We need to find *which* user has this OTP. 
-    // Usually frontend sends email + OTP, or we rely on session.
-    // For simplicity, let's assume the frontend sends { email, otp } OR
-    // just OTP if we assume uniqueness (risky). 
-    // Let's ask for EMAIL + OTP for security.
-    const { email } = req.body;
+    const { emailOrPhone, otp } = req.body;
 
     const user = await User.findOne({
-      email,
-      otp,
-      otpExpires: { $gt: Date.now() }
+      $or: [{ email: emailOrPhone }, { phone: emailOrPhone }]
     });
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid or expired OTP" });
+      return res.status(400).json({ message: "User not found" });
     }
 
-    // OTP Correct. 
-    // You might want to return a temporary token here to allow password reset.
-    // For this simple flow, we'll just say success. 
+    // Check Lock
+    if (user.lockUntil && user.lockUntil > Date.now()) {
+      return res.status(429).json({ message: "Too many attempts. Try again later." });
+    }
+
+    // Check Expiry
+    if (!user.otpExpires || user.otpExpires < Date.now()) {
+      return res.status(400).json({ message: "OTP has expired" });
+    }
+
+    // Verify OTP
+    const isMatch = await bcrypt.compare(otp, user.otp);
+
+    if (!isMatch) {
+      user.otpAttempts += 1;
+      if (user.otpAttempts >= 5) {
+        user.lockUntil = Date.now() + 15 * 60 * 1000; // Lock for 15 mins
+        await user.save();
+        return res.status(429).json({ message: "Too many failed attempts. Locked for 15 mins." });
+      }
+      await user.save();
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    // Success (Don't clear yet, clear on reset)
+    // Optionally return a temporary token here if stateless
     res.status(200).json({ success: true, message: "OTP Verified" });
 
   } catch (err) {
@@ -218,25 +258,37 @@ exports.verifyOtp = async (req, res) => {
 // 6. RESET PASSWORD
 exports.resetPassword = async (req, res) => {
   try {
-    const { email, otp, password } = req.body;
+    const { emailOrPhone, otp, password } = req.body;
 
     const user = await User.findOne({
-      email,
-      otp,
-      otpExpires: { $gt: Date.now() }
+      $or: [{ email: emailOrPhone }, { phone: emailOrPhone }]
     });
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid or expired Token" });
+      return res.status(400).json({ message: "User not found" });
     }
 
-    // Update password (pre-save hook will hash it)
+    // Re-verify OTP (Critical Security)
+    if (!user.otpExpires || user.otpExpires < Date.now()) {
+      return res.status(400).json({ message: "OTP expired, please request new one" });
+    }
+
+    const isMatch = await bcrypt.compare(otp, user.otp);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    // Update password
     user.password = password;
     user.otp = undefined;
     user.otpExpires = undefined;
+    user.otpAttempts = 0;
+    user.lockUntil = undefined;
+
     await user.save();
 
     sendTokenResponse(user, 200, res);
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
