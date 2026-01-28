@@ -1,759 +1,643 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Return Order - Jinsa Mobiles</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <style>
-      :root {
-        --primary-black: #1a1a1a;
-        --bg-light: #f8f9fa;
-        --border-color: #eee;
+<head>
+  <meta charset="UTF-8" />
+  <script src="/js/authGuard.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Return Order - Jinsa Mobiles</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    :root {
+      --primary-black: #1a1a1a;
+      --bg-light: #f8f9fa;
+      --border-color: #eee;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #fff;
+      color: var(--primary-black);
+      padding-top: 100px;
+      overflow-x: hidden;
+    }
+
+    /* --- ANIMATIONS START --- */
+    @keyframes slideInFromBottom {
+      0% {
+        transform: translateY(30px);
+        opacity: 0;
       }
 
-      body {
-        font-family: "Poppins", sans-serif;
-        background-color: #fff;
-        color: var(--primary-black);
-        padding-top: 100px;
-        overflow-x: hidden;
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* Apply ONLY to Main Content */
+    .content-animate {
+      animation: slideInFromBottom 0.6s ease-out forwards;
+    }
+
+    /* --- ANIMATIONS END --- */
+
+    /* --- HEADER STYLES --- */
+    .navbar {
+      padding: 10px 0;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--primary-black);
+    }
+
+    /* Links Centered & Styled */
+    .navbar-nav .nav-link {
+      font-family: "Poppins";
+      font-size: 0.95rem;
+      /* Adjusted for better readability */
+      font-weight: 600;
+      color: #333 !important;
+      transition: color 0.3s;
+      margin: 0 10px;
+      /* Added spacing between links */
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: #0d6efd !important;
+    }
+
+    /* Search Bar Styling */
+    .search-container {
+      position: relative;
+    }
+
+    .search-input {
+      width: 200px;
+      height: 35px;
+      font-size: 0.9rem;
+      padding-right: 35px;
+      /* Space for icon */
+      border-radius: 50px;
+      border: 1px solid #dee2e6;
+      padding-left: 15px;
+    }
+
+    .search-icon {
+      position: absolute;
+      top: 50%;
+      right: 15px;
+      transform: translateY(-50%);
+      color: #6c757d;
+      cursor: pointer;
+    }
+
+    /* Mobile Adjustments */
+    @media (max-width: 991px) {
+      .navbar-nav {
+        text-align: center;
+        margin-bottom: 15px;
       }
 
-      /* --- ANIMATIONS START --- */
-      @keyframes slideInFromBottom {
-        0% {
-          transform: translateY(30px);
-          opacity: 0;
-        }
-        100% {
-          transform: translateY(0);
-          opacity: 1;
-        }
+      /* Nav Icons on Mobile */
+      .nav-icons {
+        justify-content: center;
+        margin-top: 15px;
+        width: 100%;
+        border-top: 1px solid #eee;
+        padding-top: 20px;
+        display: flex;
+        flex-direction: column;
+        /* Stack icons vertically on mobile */
+        /* gap: 15px; */
+        align-items: center;
       }
 
-      .content-animate {
-        animation: slideInFromBottom 0.6s ease-out forwards;
-      }
-
-      /* Interactive Click Effects */
-      .shipping-option:active,
-      .btn-submit-return:active,
-      .sidebar-link:active {
-        transform: scale(0.98) !important;
-        transition: transform 0.1s ease;
-      }
-      /* --- ANIMATIONS END --- */
-
-      /* --- HEADER STYLES --- */
-      .navbar {
-        padding: 10px 0;
-        background: white;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-      }
-
-      .navbar-brand {
-        font-weight: 700;
-        font-size: 1.5rem;
-        color: var(--primary-black);
-      }
-
-      /* Links Centered & Styled */
-      .navbar-nav .nav-link {
-        font-family: "Poppins";
-        font-size: 0.95rem; /* Adjusted for better readability */
-        font-weight: 600;
-        color: #333 !important;
-        transition: color 0.3s;
-        margin: 0 10px; /* Added spacing between links */
-      }
-
-      .navbar-nav .nav-link:hover {
-        color: #0d6efd !important;
-      }
-
-      /* Search Bar Styling */
       .search-container {
-        position: relative;
+        margin-bottom: 10px;
       }
-      .search-input {
-        width: 200px;
-        height: 35px;
-        font-size: 0.9rem;
-        padding-right: 35px; /* Space for icon */
-        border-radius: 50px;
-        border: 1px solid #dee2e6;
-        padding-left: 15px;
-      }
-      .search-icon {
-        position: absolute;
-        top: 50%;
-        right: 15px;
-        transform: translateY(-50%);
-        color: #6c757d;
-        cursor: pointer;
-      }
+    }
 
-      /* Mobile Adjustments */
-      @media (max-width: 991px) {
-        .navbar-nav {
-          text-align: center;
-          margin-bottom: 15px;
-          align-items: center; /* This ensures links are perfectly centered */
-          width: 100%;
-        }
-
-        .nav-icons {
-          justify-content: center;
-          margin-top: 15px;
-          width: 100%;
-          border-top: 1px solid #eee;
-          padding-top: 20px;
-          display: flex;
-          flex-direction: column;
-          gap: 15px;
-          align-items: center;
-        }
-
-        .search-container {
-          margin-bottom: 10px;
-        }
+    @media (min-width: 992px) {
+      .nav-icons {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+        /* Push to the right on desktop */
       }
+    }
 
-      @media (min-width: 992px) {
-        /* Moved the margin here so it doesn't break mobile centering */
-        .navbar-collapse {
-          margin-left: 50px;
-        }
+    /* User Icon / Right Side */
+    .nav-icons i {
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: var(--primary-black);
+    }
 
-        .nav-icons {
-          display: flex;
-          align-items: center;
-          margin-left: auto;
-        }
-      }
+    /* Dropdown Menu Styles */
+    .dropdown-menu {
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      padding: 10px 0;
+      margin-top: 10px;
+    }
 
-      /* Dropdown Menu Styles */
-      .dropdown-menu {
-        border: none;
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        padding: 10px 0;
-        margin-top: 10px;
-      }
-      .dropdown-item {
-        padding: 10px 20px;
-        font-weight: 500;
-        font-size: 0.9rem;
-        color: #333;
-        transition: all 0.2s ease;
-      }
-      .dropdown-item:hover {
-        background-color: #f8f9fa;
-        color: #d32f2f;
-        padding-left: 25px;
-      }
+    .dropdown-item {
+      padding: 10px 20px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #333;
+      transition: all 0.2s ease;
+    }
 
-      /* --- PAGE LAYOUT --- */
+    .dropdown-item:hover {
+      background-color: #f8f9fa;
+      color: #d32f2f;
+      padding-left: 25px;
+    }
+
+    /* --- PAGE LAYOUT --- */
+    .profile-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 20px;
+    }
+
+    /* Sidebar (Same as Profile Page) */
+    .sidebar {
+      background-color: #fff;
+      border-right: 1px solid var(--border-color);
+      min-height: 600px;
+      padding-right: 20px;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-item {
+      margin-bottom: 5px;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      color: #555;
+      text-decoration: none;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .sidebar-link i {
+      margin-right: 15px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-link:hover {
+      background-color: #f8f9fa;
+      color: #000;
+    }
+
+    .sidebar-link.active {
+      background-color: #000;
+      color: #fff;
+    }
+
+    .logout-btn {
+      color: #dc3545;
+    }
+
+    .logout-btn:hover {
+      color: #b02a37;
+      background-color: #f8f9fa;
+    }
+
+    /* --- MOBILE SIDEBAR --- */
+    @media (max-width: 991px) {
       .profile-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px 20px;
+        padding: 0 15px 40px 15px;
       }
 
-      /* Sidebar Navigation (Desktop Default) */
       .sidebar {
-        background-color: #fff;
-        border-right: 1px solid var(--border-color);
-        min-height: 600px;
+        border-right: none;
+        min-height: auto;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+        position: sticky;
+        top: 85px;
+        z-index: 99;
+        background: #fff;
+        overflow-x: auto;
+        white-space: nowrap;
+        width: 100vw;
+        margin-left: -15px;
+        padding-left: 15px;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      .sidebar::-webkit-scrollbar {
+        display: none;
+      }
+
+      .sidebar-menu {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
         padding-right: 20px;
       }
-      .sidebar-menu {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      }
+
       .sidebar-item {
-        margin-bottom: 5px;
+        margin-bottom: 0;
+        display: inline-block;
       }
+
       .sidebar-link {
-        display: flex;
-        align-items: center;
-        padding: 12px 20px;
-        color: #555;
-        text-decoration: none;
-        font-weight: 500;
-        border-radius: 8px;
-        transition: all 0.2s;
-        white-space: nowrap;
-      }
-      .sidebar-link i {
-        margin-right: 15px;
-        width: 20px;
-        text-align: center;
-      }
-      .sidebar-link:hover {
-        background-color: #f8f9fa;
-        color: #000;
-      }
-      .sidebar-link.active {
-        background-color: #000;
-        color: #fff;
-      }
-      .logout-btn {
-        color: #dc3545;
-      }
-      .logout-btn:hover {
-        color: #b02a37;
-        background-color: #f8f9fa;
-      }
-
-      /* --- MOBILE SIDEBAR (SCROLLING BAR) --- */
-      @media (max-width: 991px) {
-        .profile-container {
-          padding: 0 15px 40px 15px;
-        }
-        .sidebar {
-          border-right: none;
-          min-height: auto;
-          padding: 10px 0;
-          border-bottom: 1px solid #eee;
-          position: sticky;
-          top: 85px;
-          z-index: 99;
-          background: #fff;
-          overflow-x: auto;
-          white-space: nowrap;
-          width: 100vw;
-          margin-left: -15px;
-          padding-left: 15px;
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .sidebar::-webkit-scrollbar {
-          display: none;
-        }
-        .sidebar-menu {
-          display: flex;
-          flex-direction: row;
-          gap: 10px;
-          padding-right: 20px;
-        }
-        .sidebar-item {
-          margin-bottom: 0;
-          display: inline-block;
-        }
-        .sidebar-link {
-          border: 1px solid #eee;
-          padding: 8px 16px;
-          font-size: 0.9rem;
-          background: #fff;
-        }
-        .sidebar-link:hover {
-          transform: none;
-        }
-        .sidebar-link.active {
-          border-color: #000;
-        }
-        .main-content {
-          padding-left: 0;
-          margin-top: 20px;
-        }
-      }
-
-      /* Main Content Area */
-      .main-content {
-        padding-left: 40px;
-      }
-      @media (max-width: 991px) {
-        .main-content {
-          padding-left: 0;
-        }
-      }
-
-      .page-title {
-        font-size: 1.8rem;
-        font-weight: 700;
-        margin-bottom: 20px;
-      }
-
-      /* --- RETURN ORDER SPECIFIC STYLES --- */
-      .form-container-limit {
-        max-width: 850px;
-      }
-
-      .status-banner {
-        background-color: #d1e7dd;
-        color: #0f5132;
-        border: 1px solid #badbcc;
-        padding: 15px 20px;
-        border-radius: 8px;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        margin-bottom: 30px;
-      }
-      .status-banner i {
-        margin-right: 10px;
-        font-size: 1.2rem;
-      }
-
-      /* Table Styles */
-      .return-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0 15px;
-      }
-      .return-table th {
-        font-size: 0.85rem;
-        color: #999;
-        font-weight: 600;
-        text-transform: uppercase;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #eee;
-      }
-      .return-table td {
-        vertical-align: middle;
-        padding: 15px 0;
-        border-bottom: 1px solid #f9f9f9;
-      }
-
-      .product-col {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-      }
-      .product-img {
-        width: 50px;
-        height: 50px;
-        object-fit: contain;
-        background: #f8f9fa;
-        border-radius: 6px;
         border: 1px solid #eee;
-      }
-      .product-name {
-        font-weight: 600;
-        font-size: 0.95rem;
-        display: block;
-      }
-
-      .form-select-sm {
-        border-radius: 6px;
-        border-color: #dee2e6;
-        padding: 8px 10px;
+        padding: 8px 16px;
         font-size: 0.9rem;
-      }
-      .custom-checkbox {
-        width: 18px;
-        height: 18px;
-        cursor: pointer;
-        accent-color: #000;
+        background: #fff;
       }
 
-      /* Shipping Options */
-      .shipping-option {
-        border: 1px solid #eee;
-        padding: 15px;
-        border-radius: 8px;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        cursor: pointer;
-        transition: 0.2s;
-      }
-      .shipping-option:hover {
-        background-color: #f9f9f9;
-      }
-      .form-check-input {
-        cursor: pointer;
-        accent-color: #000;
+      .sidebar-link.active {
+        border-color: #000;
       }
 
-      /* Return Summary */
-      .return-summary h5 {
-        font-weight: 600;
-      }
-      .estimated-amount {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #000;
-        margin-top: 5px;
-      }
-
-      .btn-submit-return {
-        background-color: #000;
-        color: white;
-        width: 100%;
-        padding: 15px;
-        font-weight: 600;
-        border-radius: 8px;
-        border: none;
-        font-size: 1rem;
+      .main-content {
         margin-top: 20px;
-        transition: background 0.3s;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 10px;
-      }
-      .btn-submit-return:hover {
-        background-color: #333;
-      }
-      .btn-submit-return i {
-        font-size: 1.2rem;
-      }
-
-      /* Footer */
-      footer {
-        background-color: #111;
-        color: #aaa;
-        padding: 60px 0 20px;
-        margin-top: 60px;
-      }
-      footer h5 {
-        color: white;
-        font-weight: 600;
-        margin-bottom: 20px;
-      }
-      footer ul {
         padding-left: 0;
-        list-style: none;
       }
-      footer ul li {
-        margin-bottom: 10px;
-      }
-      footer a {
-        color: #aaa;
-        text-decoration: none;
-      }
-      footer a:hover {
-        color: white;
-      }
-      .newsletter-input {
-        background: #333;
-        border: none;
-        color: white;
-        padding: 10px;
-        width: 100%;
-        margin-bottom: 10px;
-      }
-    </style>
-  
-  <link href="/css/navbar.css" rel="stylesheet" /></head>
-  <body>
-   <nav class="navbar navbar-expand-lg fixed-top">
-    <div class="container">
-      <a class="navbar-brand d-flex align-items-center" href="./index.html">
-        <img src="../images/logo.jpg" alt="Logo" width="50" height="50" class="me-2 rounded-circle" />
-        <div class="d-flex flex-column">
-          <span class="text-dark" style="line-height: 1.1; font-size: 1.2rem; font-weight: 800;">JINSA MOBILES</span>
-          <span class="text-secondary" style="font-size: 0.6rem; letter-spacing: 5.5px; font-weight: 500">AND
-            ACCESSORIES</span>
-        </div>
-      </a>
+    }
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+    /* --- RETURN PAGE CONTENT --- */
+    .main-content {
+      padding-left: 40px;
+    }
 
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav align-items-center mx-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="./index.html">Home</a>
+    @media (max-width: 991px) {
+      .main-content {
+        padding-left: 0;
+      }
+    }
+
+    .page-header-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .page-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 0;
+      color: #000;
+    }
+
+    .close-icon {
+      font-size: 1.2rem;
+      color: #333;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .close-icon:hover {
+      color: #000;
+    }
+
+    /* Select Products */
+    .return-item-card {
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+      background: #fff;
+    }
+
+    .return-item-check {
+      margin-top: 5px;
+      margin-right: 15px;
+    }
+
+    .form-check-input {
+      width: 1.2em;
+      height: 1.2em;
+      cursor: pointer;
+    }
+
+    .form-check-input:checked {
+      background-color: #000;
+      border-color: #000;
+    }
+
+    .return-img {
+      width: 70px;
+      height: 80px;
+      object-fit: contain;
+      background: #f9f9f9;
+      border-radius: 6px;
+      margin-right: 20px;
+    }
+
+    .return-details {
+      flex-grow: 1;
+    }
+
+    .return-details h6 {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+
+    .return-details p {
+      font-size: 0.85rem;
+      color: #555;
+      margin: 0;
+    }
+
+    .return-price {
+      font-weight: 600;
+      margin-top: 5px;
+    }
+
+    /* Return Form */
+    .return-reason-section {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 25px;
+      margin-top: 30px;
+    }
+
+    .form-label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      color: #111;
+    }
+
+    .form-select,
+    .form-control {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-size: 0.9rem;
+    }
+
+    .form-select:focus,
+    .form-control:focus {
+      border-color: #000;
+      box-shadow: none;
+    }
+
+    /* Refund Info */
+    .refund-info {
+      background: #e8f5e9;
+      border: 1px solid #c8e6c9;
+      border-radius: 8px;
+      padding: 15px;
+      color: #2e7d32;
+      font-size: 0.9rem;
+      margin-top: 20px;
+    }
+
+    .refund-info strong {
+      font-weight: 600;
+    }
+
+    /* Submit Button */
+    .btn-submit {
+      background-color: #000;
+      color: #fff;
+      padding: 14px 0;
+      border-radius: 8px;
+      font-weight: 600;
+      border: none;
+      width: 100%;
+      margin-top: 30px;
+      transition: background 0.3s;
+    }
+
+    .btn-submit:hover {
+      background-color: #333;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #111;
+      color: #aaa;
+      padding: 60px 0 20px;
+      margin-top: 80px;
+    }
+
+    footer h5 {
+      color: white;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    footer ul {
+      padding-left: 0;
+      list-style: none;
+    }
+
+    footer ul li {
+      margin-bottom: 10px;
+    }
+
+    footer a {
+      color: #aaa;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: white;
+    }
+
+    .newsletter-input {
+      background: #333;
+      border: none;
+      color: white;
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  </style>
+
+  <link href="/css/navbar.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <div class="profile-container">
+    <div class="row">
+      <!-- SIDEBAR (Consistent) -->
+      <div class="col-lg-3 sidebar">
+        <ul class="sidebar-menu">
+          <li class="sidebar-item">
+            <a href="./userProfilePage.html" class="sidebar-link"><i class="fa-regular fa-user"></i> Profile</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="./productPage.html">Shop Products</a>
+          <li class="sidebar-item">
+            <a href="./userOrdersPage.html" class="sidebar-link active"><i class="fa-solid fa-bag-shopping"></i>
+              Orders</a>
           </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Categories
-            </a>
-            <ul class="dropdown-menu border-0 shadow-sm">
-              <li>
-                <a class="dropdown-item" href="./productPage.html">Mobiles Case</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="./productPage.html">Chargers</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="./productPage.html">Earphones</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="./productPage.html">Powerbanks</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="./productPage.html">Screen Protectors</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="./productPage.html">Cables</a>
-              </li>
-            </ul>
+          <li class="sidebar-item">
+            <a href="./userWalletPage.html" class="sidebar-link"><i class="fa-solid fa-wallet"></i> Wallet</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="./aboutUs.html">About Us</a>
+          <li class="sidebar-item">
+            <a href="./userWishListPage.html" class="sidebar-link"><i class="fa-regular fa-heart"></i> Wishlist</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="./contactUs.html">Contact</a>
+          <li class="sidebar-item">
+            <a href="./userAddressPage.html" class="sidebar-link"><i class="fa-solid fa-location-dot"></i> Address</a>
+          </li>
+          <li class="sidebar-item">
+            <a href="./userPassword.html" class="sidebar-link"><i class="fa-solid fa-lock"></i> Password</a>
+          </li>
+          <li class="sidebar-item">
+            <a href="./userCoupon.html" class="sidebar-link"><i class="fa-solid fa-ticket"></i> Coupon</a>
+          </li>
+          <li class="sidebar-item">
+            <a href="./userLogin.html" class="sidebar-link logout-btn"><i
+                class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
           </li>
         </ul>
+      </div>
 
-        <div class="nav-icons align-items-center d-flex">
-          <div class="position-relative">
-            <input type="text" id="navbarSearch" class="form-control border-secondary rounded-pill pe-5"
-              placeholder="Search products..." style="width: 200px; height: 35px; font-size: 0.9rem" />
-            <i class="fa-solid fa-magnifying-glass position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"
-              style="cursor: pointer"></i>
+      <!-- MAIN CONTENT -->
+      <div class="col-lg-9 main-content ps-lg-5 ps-0 content-animate">
+        <div class="page-header-flex">
+          <div>
+            <h2 class="page-title">Return Order</h2>
+            <p class="text-muted small mb-0">Order ID: #ORD-456123</p>
+          </div>
+          <a href="./userOrdersPage.html" class="close-icon"><i class="fa-solid fa-xmark"></i></a>
+        </div>
+
+        <!-- Select Specific Items -->
+        <h5 class="mb-3 fw-bold" style="font-size: 1rem">
+          Select items to return
+        </h5>
+
+        <!-- Item 1 -->
+        <div class="return-item-card">
+          <div class="return-item-check">
+            <input class="form-check-input item-checkbox" type="checkbox" value="499" onchange="calculateTotal()" />
+          </div>
+          <img src="https://placehold.co/100x100/eee/333?text=Case" class="return-img" alt="Prod" />
+          <div class="return-details">
+            <h6>Pikkme iPhone 16 Pro Max Silicone</h6>
+            <p>Color: Black | Qty: 1</p>
+            <div class="return-price">Rs. 499.00</div>
+          </div>
+        </div>
+
+        <!-- Item 2 (Multi-item example) -->
+        <div class="return-item-card">
+          <div class="return-item-check">
+            <input class="form-check-input item-checkbox" type="checkbox" value="299" onchange="calculateTotal()" />
+          </div>
+          <img src="https://placehold.co/100x100/ddd/333?text=Glass" class="return-img" alt="Prod" />
+          <div class="return-details">
+            <h6>Tempered Glass Screen Protector</h6>
+            <p>Type: Matte | Qty: 1</p>
+            <div class="return-price">Rs. 299.00</div>
+          </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="return-reason-section">
+          <div class="mb-3">
+            <label class="form-label">Reason for Return</label>
+            <select class="form-select">
+              <option selected disabled>Select a reason</option>
+              <option value="defective">Item is defective/damaged</option>
+              <option value="wrong_item">Received wrong item</option>
+              <option value="better_price">Found better price elsewhere</option>
+              <option value="changed_mind">Changed my mind</option>
+              <option value="not_fit">Item does not fit</option>
+            </select>
           </div>
 
-          <a href="./cart.html" class="position-relative ms-2 text-dark" style="cursor: pointer">
-            <i class="fa-solid fa-cart-shopping fs-5"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-              style="font-size: 0.6rem">2</span>
-          </a>
+          <div class="mb-3">
+            <label class="form-label">
+              Additional Comments (Optional)
+            </label>
+            <textarea class="form-control" rows="3" placeholder="Describe the issue in detail..."></textarea>
+          </div>
 
-          <a href="./userLogin.html" class="ms-4 text-dark text-decoration-none fw-bold"
-            style="font-size: 1rem;">LOGIN</a>
+          <div class="mb-3">
+            <label class="form-label">Upload Images (Optional)</label>
+            <input type="file" class="form-control" multiple />
+            <div class="form-text">
+              Upload clear images of the product if damaged.
+            </div>
+          </div>
         </div>
+
+        <!-- Refund Summary -->
+        <div class="refund-info">
+          <i class="fa-solid fa-circle-info me-2"></i>
+          Estimated Refund Amount:
+          <strong id="refundAmount">Rs. 0.00</strong>
+          <br />
+          <span class="small ms-4 text-muted">
+            Refund will be processed to source payment method within 5-7
+            business days after pickup.
+          </span>
+        </div>
+
+        <button class="btn-submit" onclick="submitReturn()">
+          Confirm Return
+        </button>
       </div>
     </div>
-  </nav>
+  </div>
 
-    <div class="profile-container">
+  <footer>
+    <div class="container">
       <div class="row">
-        <div class="col-lg-3 sidebar">
-          <ul class="sidebar-menu">
-            <li class="sidebar-item">
-              <a href="./userProfilePage.html" class="sidebar-link"
-                ><i class="fa-regular fa-user"></i> Profile</a
-              >
-            </li>
-            <li class="sidebar-item">
-              <a href="./userOrdersPage.html" class="sidebar-link active"
-                ><i class="fa-solid fa-bag-shopping"></i> Orders</a
-              >
-            </li>
-            <li class="sidebar-item">
-              <a href="./userWalletPage.html" class="sidebar-link"
-                ><i class="fa-solid fa-wallet"></i> Wallet</a
-              >
-            </li>
-            <li class="sidebar-item">
-              <a href="./userWishListPage.html" class="sidebar-link"
-                ><i class="fa-regular fa-heart"></i> Wishlist</a
-              >
-            </li>
-            <li class="sidebar-item">
-              <a href="./userAddressPage.html" class="sidebar-link"
-                ><i class="fa-solid fa-location-dot"></i> Address</a
-              >
-            </li>
-            <li class="sidebar-item">
-              <a href="./userPassword.html" class="sidebar-link"
-                ><i class="fa-solid fa-lock"></i> Password</a
-              >
-            </li>
-            <li class="sidebar-item">
-              <a href="./userCoupon.html" class="sidebar-link"
-                ><i class="fa-solid fa-ticket"></i> Coupon</a
-              >
-            </li>
-            <li class="sidebar-item">
-              <a href="./userLogin.html" class="sidebar-link logout-btn"
-                ><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a
-              >
-            </li>
+        <div class="col-md-3">
+          <h5>Discover More</h5>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact</a></li>
           </ul>
         </div>
-
-        <div class="col-lg-9 main-content content-animate">
-          <div class="form-container-limit">
-            <h2 class="page-title">Return Order #12345678</h2>
-
-            <div class="status-banner">
-              <i class="fa-regular fa-circle-check"></i>
-              <span>Status: Return Initiated - December 23, 2025</span>
-            </div>
-
-            <h5 class="fw-bold mb-3">Select Items to Return</h5>
-
-            <form id="returnForm">
-              <div class="table-responsive">
-                <table class="return-table">
-                  <thead>
-                    <tr>
-                      <th style="width: 40%">Product</th>
-                      <th style="width: 15%">Quantity</th>
-                      <th style="width: 15%">Price</th>
-                      <th style="width: 30%">Reason for Return</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <div class="product-col">
-                          <input
-                            type="checkbox"
-                            class="custom-checkbox item-check"
-                            data-price="29.99"
-                            checked
-                          />
-                          <img
-                            src="../images/16backcover.jpeg"
-                            alt="Item"
-                            class="product-img"
-                          />
-                          <span class="product-name">iPhone 17 Pro Case</span>
-                        </div>
-                      </td>
-                      <td>1</td>
-                      <td>$29.99</td>
-                      <td>
-                        <select class="form-select form-select-sm">
-                          <option>Reason for Return</option>
-                          <option>Defective / Damaged</option>
-                          <option>Wrong Item Sent</option>
-                          <option>Changed Mind</option>
-                        </select>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td>
-                        <div class="product-col">
-                          <input
-                            type="checkbox"
-                            class="custom-checkbox item-check"
-                            data-price="19.99"
-                          />
-                          <img
-                            src="https://placehold.co/100x100/f5f5f5/333?text=Adapter"
-                            alt="Item"
-                            class="product-img"
-                          />
-                          <span class="product-name">20W Fast Adapter</span>
-                        </div>
-                      </td>
-                      <td>1</td>
-                      <td>$19.99</td>
-                      <td>
-                        <select class="form-select form-select-sm">
-                          <option>Reason for Return</option>
-                          <option>Defective / Damaged</option>
-                          <option>Wrong Item Sent</option>
-                          <option>No Longer Needed</option>
-                        </select>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <div class="mt-4 mb-4">
-                <h5 class="fw-bold mb-3">Return Shipping Options</h5>
-                <div class="row">
-                  <div class="col-md-6">
-                    <label class="shipping-option">
-                      <input
-                        type="radio"
-                        name="shipping"
-                        class="form-check-input"
-                        checked
-                      />
-                      <div>
-                        <strong>Drop-off at Carrier</strong>
-                        <div class="small text-muted">
-                          Print label and drop off at nearest store.
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                  <div class="col-md-6">
-                    <label class="shipping-option">
-                      <input
-                        type="radio"
-                        name="shipping"
-                        class="form-check-input"
-                      />
-                      <div>
-                        <strong>Schedule Pickup</strong>
-                        <div class="small text-muted">
-                          Carrier will pick up from your address.
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <hr class="border-secondary opacity-25 my-4" />
-
-              <div class="return-summary">
-                <h5>Return Summary</h5>
-                <div class="text-muted small">Items selected for refund</div>
-                <div class="estimated-amount" id="totalRefund">$29.99</div>
-              </div>
-
-              <button
-                type="button"
-                class="btn-submit-return"
-                onclick="submitReturn()"
-              >
-                Submit Return <i class="fa-solid fa-arrow-right"></i>
-              </button>
-            </form>
-          </div>
+        <div class="col-md-3">
+          <h5>Products</h5>
+          <ul>
+            <li><a href="#">Mobiles</a></li>
+            <li><a href="#">Cases</a></li>
+          </ul>
         </div>
-      </div>
-    </div>
-
-    <footer>
-      <div class="container">
-        <div class="row">
-          <div class="col-md-3">
-            <h5>Discover More</h5>
-            <ul>
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">Contact Us</a></li>
-              <li><a href="#">Blog</a></li>
-            </ul>
-          </div>
-          <div class="col-md-3">
-            <h5>Explore Products</h5>
-            <ul>
-              <li><a href="#">Mobiles</a></li>
-              <li><a href="#">Accessories</a></li>
-              <li><a href="#">Trendy Cases</a></li>
-            </ul>
-          </div>
-          <div class="col-md-3">
-            <h5>Customer Care</h5>
-            <ul>
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Terms of Service</a></li>
-              <li><a href="#">Return Policy</a></li>
-            </ul>
-          </div>
-          <div class="col-md-3">
+        <div class="col-md-3">
           <h5>Contact Us</h5>
           <form id="footerContactForm" style="margin-bottom: 0;">
-            <input type="text" class="newsletter-input mb-2" placeholder="Name" style="font-size: 0.85rem; padding: 8px;" required />
-            <input type="email" class="newsletter-input mb-2" placeholder="Email" style="font-size: 0.85rem; padding: 8px;" required />
-            <textarea class="newsletter-input mb-2" rows="2" placeholder="Message" style="font-size: 0.85rem; padding: 8px; resize: none;" required></textarea>
+            <input type="text" class="newsletter-input mb-2" placeholder="Name"
+              style="font-size: 0.85rem; padding: 8px;" required />
+            <input type="email" class="newsletter-input mb-2" placeholder="Email"
+              style="font-size: 0.85rem; padding: 8px;" required />
+            <textarea class="newsletter-input mb-2" rows="2" placeholder="Message"
+              style="font-size: 0.85rem; padding: 8px; resize: none;" required></textarea>
             <button type="submit" class="btn btn-light w-100 btn-sm fw-bold">Send</button>
           </form>
           <div class="mt-3">
@@ -762,69 +646,65 @@
             <i class="fa-brands fa-twitter"></i>
           </div>
         </div>
-          </div>
-        </div>
-        <hr class="border-secondary mt-4" />
-        <div class="text-center small">
-          &copy; 2025 Jinsa Mobiles. All rights reserved.
-        </div>
       </div>
-    </footer>
+      <hr class="border-secondary mt-4" />
+      <div class="text-center small">
+        &copy; 2025 Jinsa Mobiles. All rights reserved.
+      </div>
+    </div>
+  </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      // 1. DYNAMIC REFUND CALCULATOR
-      const checkboxes = document.querySelectorAll(".item-check");
-      const totalDisplay = document.getElementById("totalRefund");
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function calculateTotal() {
+      const checkboxes = document.querySelectorAll(".item-checkbox");
+      let total = 0;
+      checkboxes.forEach((cb) => {
+        if (cb.checked) {
+          total += parseFloat(cb.value);
+        }
+      });
+      document.getElementById(
+        "refundAmount"
+      ).innerText = "Rs. " + total.toFixed(2);
+    }
 
-      function calculateTotal() {
-        let total = 0;
-        checkboxes.forEach((box) => {
-          if (box.checked) {
-            total += parseFloat(box.getAttribute("data-price"));
-          }
-        });
-        totalDisplay.innerText = "$" + total.toFixed(2);
-      }
-
-      checkboxes.forEach((box) => {
-        box.addEventListener("change", calculateTotal);
+    function submitReturn() {
+      // Validation: Check if at least one item is selected
+      const checkboxes = document.querySelectorAll(".item-checkbox");
+      let anyChecked = false;
+      checkboxes.forEach((cb) => {
+        if (cb.checked) anyChecked = true;
       });
 
-      // 2. SUBMIT BUTTON FUNCTIONALITY
-      function submitReturn() {
-        let anyChecked = false;
-        checkboxes.forEach((box) => {
-          if (box.checked) anyChecked = true;
-        });
-
-        if (!anyChecked) {
-          Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Please select at least one item to return.",
-            confirmButtonColor: "#1a1a1a",
-          });
-          return;
-        }
-
+      if (!anyChecked) {
         Swal.fire({
-          title: "Return Requested!",
-          text: "Your return request has been submitted successfully. We will email you the shipping label shortly.",
-          icon: "success",
-          confirmButtonText: "Back to Orders",
+          icon: "error",
+          title: "Oops...",
+          text: "Please select at least one item to return.",
           confirmButtonColor: "#1a1a1a",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            window.location.href = "#";
-          }
         });
+        return;
       }
 
-      // Run calculation once on load
-      calculateTotal();
-    </script>
-  
+      Swal.fire({
+        title: "Return Requested!",
+        text: "Your return request has been submitted successfully. We will email you the shipping label shortly.",
+        icon: "success",
+        confirmButtonText: "Back to Orders",
+        confirmButtonColor: "#1a1a1a",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = "#";
+        }
+      });
+    }
+
+    // Run calculation once on load
+    calculateTotal();
+  </script>
+
   <script src="/js/navbar.js"></script>
 </body>
+
 </html>

@@ -11,8 +11,8 @@ router.post("/login", authController.login);
 // /api/auth/logout
 router.post("/logout", authController.logout);
 
-// /api/auth/forgot-password
-router.post("/forgot-password", authController.forgotPassword);
+// /api/auth/send-otp (was forgot-password)
+router.post("/send-otp", authController.sendOtp);
 
 // /api/auth/verify-otp
 router.post("/verify-otp", authController.verifyOtp);

@@ -43,55 +43,6 @@
 
     /* -------------------------------- */
 
-    .navbar {
-      padding: 10px 0;
-      background: white;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-      height: var(--navbar-height);
-    }
-
-    .navbar-brand {
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: var(--primary-black);
-    }
-
-    .navbar-nav .nav-link {
-      font-family: "Poppins";
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: #333 !important;
-      transition: color 0.3s;
-      margin: 0 10px;
-    }
-
-    .navbar-nav .nav-link:hover {
-      color: #0d6efd !important;
-    }
-
-    .search-container {
-      position: relative;
-    }
-
-    .search-input {
-      width: 200px;
-      height: 35px;
-      font-size: 0.9rem;
-      padding-right: 35px;
-      border-radius: 50px;
-      border: 1px solid #dee2e6;
-      padding-left: 15px;
-    }
-
-    .search-icon {
-      position: absolute;
-      top: 50%;
-      right: 15px;
-      transform: translateY(-50%);
-      color: #6c757d;
-      cursor: pointer;
-    }
-
     /* --- OFFER BANNER STYLES --- */
     .offer-banner {
       background: linear-gradient(90deg, #111 0%, #d32f2f 100%);
@@ -117,73 +68,14 @@
       margin-top: 0 !important;
     }
 
-    /* Mobile Adjustments */
+    /* Mobile Adjustments for Banner */
     @media (max-width: 991px) {
-      .navbar-nav {
-        text-align: center;
-        margin-bottom: 15px;
-        align-items: center;
-        width: 100%;
-      }
-
-      .nav-icons {
-        justify-content: center;
-        margin-top: 15px;
-        width: 100%;
-        border-top: 1px solid #eee;
-        padding-top: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        align-items: center;
-      }
-
-      .search-container {
-        margin-bottom: 10px;
-      }
-
-      .navbar {
-        height: auto;
-      }
-
       .offer-banner {
         margin-top: 76px;
       }
     }
 
-    @media (min-width: 992px) {
-      .navbar-collapse {
-        margin-left: 50px;
-      }
 
-      .nav-icons {
-        display: flex;
-        align-items: center;
-        margin-left: auto;
-      }
-    }
-
-    .dropdown-menu {
-      border: none;
-      border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      padding: 10px 0;
-      margin-top: 10px;
-    }
-
-    .dropdown-item {
-      padding: 10px 20px;
-      font-weight: 500;
-      font-size: 0.9rem;
-      color: #333;
-      transition: all 0.2s ease;
-    }
-
-    .dropdown-item:hover {
-      background-color: #f8f9fa;
-      color: #d32f2f;
-      padding-left: 25px;
-    }
 
     /* --- HERO CAROUSEL ANIMATIONS --- */
     .carousel-item .hero-title,
@@ -533,83 +425,7 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg fixed-top">
-    <div class="container">
-      <a class="navbar-brand d-flex align-items-center" href="./index.html">
-        <img src="../images/logo.jpg" alt="Logo" width="50" height="50" class="me-2 rounded-circle" />
-        <div class="d-flex flex-column">
-          <span class="text-dark" style="line-height: 1.1; font-size: 1.2rem; font-weight: 800;">JINSA MOBILES</span>
-          <span class="text-secondary nav-subtitle">AND
-            ACCESSORIES</span>
-        </div>
-      </a>
-
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav align-items-center mx-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="./index.html">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="./productPage.html">Shop Products</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Categories
-            </a>
-            <ul class="dropdown-menu border-0 shadow-sm">
-              <li>
-                <a class="dropdown-item" href="./productPage.html">Mobiles Case</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="./productPage.html">Chargers</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="./productPage.html">Earphones</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="./productPage.html">Powerbanks</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="./productPage.html">Screen Protectors</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="./productPage.html">Cables</a>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="./aboutUs.html">About Us</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="./contactUs.html">Contact</a>
-          </li>
-        </ul>
-
-        <div class="nav-icons align-items-center d-flex">
-          <div class="position-relative">
-            <input type="text" id="navbarSearch" class="form-control border-secondary rounded-pill pe-5"
-              placeholder="Search products..." style="width: 200px; height: 35px; font-size: 0.9rem" />
-            <i class="fa-solid fa-magnifying-glass position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"
-              style="cursor: pointer"></i>
-          </div>
-
-          <a href="./cart.html" class="position-relative ms-2 text-dark" style="cursor: pointer">
-            <i class="fa-solid fa-cart-shopping fs-5"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-              style="font-size: 0.6rem">2</span>
-          </a>
-
-          <a href="./userLogin.html" class="ms-4 text-dark text-decoration-none fw-bold"
-            style="font-size: 1rem;">LOGIN</a>
-        </div>
-      </div>
-    </div>
-  </nav>
+  <div id="navbar-placeholder"></div>
 
   <div id="offer-banner" class="offer-banner d-flex justify-content-center align-items-center text-center">
     <div class="container d-flex flex-wrap justify-content-center align-items-center gap-3">
