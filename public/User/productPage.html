@@ -359,9 +359,8 @@
       background: transparent;
     }
 
-    .product-card:hover .card-img-wrapper img {
-      transform: scale(1.05);
-    }
+    /* Removed old scale(1.05) to favor new specific image zoom logic */
+    /* .product-card:hover .card-img-wrapper img { ... } override below */
 
     .card-img-wrapper {
       position: relative;
@@ -495,6 +494,128 @@
       border-color: #000;
       transform: scale(1.1);
     }
+
+    /* --- NEW CARD ENHANCEMENTS --- */
+
+    /* 1. Wishlist Icon */
+    .wishlist-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: white;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 1.1rem;
+      color: #333;
+    }
+
+    .wishlist-btn:hover {
+      transform: scale(1.1);
+      color: #d32f2f;
+    }
+
+    .wishlist-btn.active {
+      color: #d32f2f;
+    }
+
+    .wishlist-btn.active i {
+      font-weight: 900;
+    }
+
+    /* 2. Add To Cart Banner */
+    .add-to-cart-banner {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #1a1a1a;
+      color: white;
+      text-align: center;
+      padding: 12px 0;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transform: translateY(100%);
+      /* Hidden by default (slid down) */
+      transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      z-index: 5;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .add-to-cart-banner:hover {
+      background: black;
+    }
+
+    /* 3. Zoom & Hover Logic */
+    .card-img-wrapper {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      /* CRITICAL for zoom constraint */
+      background-color: #f1f1f1;
+      margin-bottom: 12px;
+      padding-top: 100%;
+      /* Fix for Safari border-radius overflow issue */
+      -webkit-mask-image: -webkit-radial-gradient(white, black);
+      mask-image: radial-gradient(white, black);
+    }
+
+    .card-img-wrapper img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+      /* Smoother zoom */
+      padding: 0;
+    }
+
+    /* Hover triggers */
+    .product-card:hover .card-img-wrapper img {
+      transform: scale(1.03);
+      /* Subtle zoom */
+    }
+
+    .product-card:hover .add-to-cart-banner {
+      transform: translateY(0);
+      /* Slide up */
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 991px) {
+      .product-card:hover .card-img-wrapper img {
+        transform: none;
+        /* Disable hover zoom on touch */
+      }
+
+      .add-to-cart-banner {
+        /* Always show on mobile for better UX */
+        transform: translateY(0);
+      }
+    }
+
+    .add-to-cart-banner {
+      /* Optional: Make it always visible on mobile or keep slide up? 
+                User req: "Always visible or appears on tap". 
+                Let's make it appear on tap/focus or stick with hover logic which works on some mobile taps.
+                Better UX: Always visible but maybe smaller? Or just let it be. 
+                Let's stick to reference behavior (hover) first, but maybe ensure 
+                wishlist is easily tappable.
+             */
+    }
+
 
     /* --- FOOTER --- */
     footer {
