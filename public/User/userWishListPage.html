@@ -439,80 +439,14 @@
         <h2 class="page-title text-center text-lg-start">My Wishlist</h2>
 
         <div class="row g-4" id="wishlistGrid">
-
-          <div class="col-md-6 col-lg-4 product-item">
-            <div class="wishlist-card">
-              <a href="product-details.html?id=1" class="product-link">
-                <div class="wishlist-img-box">
-                  <img src="https://placehold.co/200x200/f5f5f5/333?text=Earbuds" alt="Product" class="wishlist-img">
-                </div>
-                <h6 class="product-title">Wireless Earbuds - Black</h6>
-              </a>
-              <div class="product-price">$149.99</div>
-              <div class="card-actions">
-                <button class="btn-add-cart" onclick="addToCart(this)">Add to Cart</button>
-                <button class="btn-remove" onclick="removeItem(this)"><i class="fa-solid fa-trash-can"></i></button>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4 product-item">
-            <div class="wishlist-card">
-              <a href="product-details.html?id=2" class="product-link">
-                <div class="wishlist-img-box">
-                  <img src="../images/16backcover.jpeg" alt="Product" class="wishlist-img">
-                </div>
-                <h6 class="product-title">iPhone 17 Protection Case</h6>
-              </a>
-              <div class="product-price">$29.99</div>
-              <div class="card-actions">
-                <button class="btn-add-cart" onclick="addToCart(this)">Add to Cart</button>
-                <button class="btn-remove" onclick="removeItem(this)"><i class="fa-solid fa-trash-can"></i></button>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4 product-item">
-            <div class="wishlist-card">
-              <a href="product-details.html?id=3" class="product-link">
-                <div class="wishlist-img-box">
-                  <img src="https://placehold.co/200x200/f5f5f5/333?text=Adapter" alt="Product" class="wishlist-img">
-                </div>
-                <h6 class="product-title">Fast Charger & Cable</h6>
-              </a>
-              <div class="product-price">$19.99</div>
-              <div class="card-actions">
-                <button class="btn-add-cart" onclick="addToCart(this)">Add to Cart</button>
-                <button class="btn-remove" onclick="removeItem(this)"><i class="fa-solid fa-trash-can"></i></button>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4 product-item">
-            <div class="wishlist-card sold-out">
-              <a href="product-details.html?id=4" class="product-link">
-                <div class="wishlist-img-box">
-                  <span class="sold-out-badge">Out of Stock</span>
-                  <img src="https://placehold.co/200x200/f5f5f5/333?text=OnePlus+11R" alt="Product"
-                    class="wishlist-img">
-                </div>
-                <h6 class="product-title">OnePlus 11R 5G (Red)</h6>
-              </a>
-              <div class="product-price">$399.00</div>
-              <div class="card-actions">
-                <button class="btn-add-cart" disabled>Out of Stock</button>
-                <button class="btn-remove" onclick="removeItem(this)"><i class="fa-solid fa-trash-can"></i></button>
-              </div>
-            </div>
-          </div>
-
+          <!-- Dynamic Content -->
         </div>
 
         <div id="emptyState" class="text-center py-5 d-none">
           <i class="fa-regular fa-heart empty-state-icon fa-4x"></i>
           <h3 class="fw-bold mb-2">Your Wishlist is Empty</h3>
           <p class="text-muted mb-4">Looks like you haven't added anything to your wishlist yet.</p>
-          <a href="#" class="btn-shop-now">Start Shopping</a>
+          <a href="/User/productPage.html" class="btn-shop-now">Start Shopping</a>
         </div>
 
       </div>
@@ -560,55 +494,8 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    function checkEmptyState() {
-      const products = document.querySelectorAll('.product-item');
-      const grid = document.getElementById('wishlistGrid');
-      const emptyState = document.getElementById('emptyState');
-      if (products.length === 0) {
-        grid.classList.add('d-none');
-        emptyState.classList.remove('d-none');
-      } else {
-        grid.classList.remove('d-none');
-        emptyState.classList.add('d-none');
-      }
-    }
-
-    function removeItem(button) {
-      const productCard = button.closest('.product-item');
-      if (productCard) {
-        Swal.fire({
-          title: 'Remove Item?',
-          text: "Are you sure you want to remove this from your wishlist?",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#1a1a1a',
-          cancelButtonColor: '#dc3545',
-          confirmButtonText: 'Yes, remove it!'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            productCard.remove();
-            checkEmptyState();
-            Swal.fire({ title: 'Removed!', text: 'Item has been removed.', icon: 'success', confirmButtonColor: '#1a1a1a' });
-          }
-        })
-      }
-    }
-
-    function addToCart(button) {
-      const originalText = button.innerText;
-      button.innerText = "Added!";
-      button.classList.add('btn-success');
-      button.style.backgroundColor = "#28a745";
-      setTimeout(() => {
-        Swal.fire({ title: 'Added to Cart!', text: 'Product added successfully.', icon: 'success', confirmButtonColor: '#1a1a1a', timer: 2000, timerProgressBar: true });
-        button.innerText = originalText;
-        button.style.backgroundColor = "#000";
-      }, 500);
-    }
-  </script>
-
   <script src="/js/navbar.js"></script>
+  <script src="/js/wishlist.js"></script>
 </body>
 
 </html>

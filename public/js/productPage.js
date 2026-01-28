@@ -76,6 +76,41 @@ function setupEventListeners() {
       loadProducts();
     }, 300));
   }
+
+  // EVENT DELEGATION for Products Container (Wishlist & Cart)
+  const container = document.getElementById('productsContainer');
+  if (container) {
+    container.addEventListener('click', handleProductClicks);
+  }
+}
+
+// Handle clicks inside products container (Event Delegation)
+async function handleProductClicks(event) {
+  // 1. Handle Wishlist Click
+  const wishlistBtn = event.target.closest('.wishlist-btn');
+  if (wishlistBtn) {
+    event.preventDefault(); // Stop link navigation
+    event.stopPropagation();
+    const productId = wishlistBtn.dataset.id;
+    if (productId) {
+      await toggleWishlist(wishlistBtn, productId);
+    }
+    return;
+  }
+
+  // 2. Handle Add To Cart Click (Banner)
+  const cartBanner = event.target.closest('.add-to-cart-banner');
+  if (cartBanner) {
+    event.preventDefault();
+    event.stopPropagation();
+    const productId = cartBanner.dataset.id;
+    if (productId) {
+      console.log('Added to cart:', productId);
+      // alert('Product added to cart! (Demo)');
+      addToCart(productId);
+    }
+    return;
+  }
 }
 
 // Open filter sidebar
@@ -155,18 +190,26 @@ async function loadProducts() {
       params.append('search', navbarSearch.value.trim());
     }
 
-    // Fetch products
-    const res = await fetch(`/api/admin/products/public?${params}`);
-    const data = await res.json();
+    // Fetch products and wishlist in parallel
+    const [productsRes, _] = await Promise.all([
+      fetch(`/api/admin/products/public?${params}`),
+      loadUserWishlist()
+    ]);
+
+    const data = await productsRes.json();
 
     if (data.success && data.products && data.products.length > 0) {
       loading.style.display = 'none';
 
       const html = data.products.map(product => {
+        // Use _id preferably, fallback to id
+        const pId = product._id || product.id;
         const isOutOfStock = product.stock === 0 || product.status === 'outofstock';
         // If out of stock, disable the link (void(0)) and add styling
-        const linkHref = isOutOfStock ? 'javascript:void(0)' : `./singleProductPage.html?id=${product.id}`;
+        const linkHref = isOutOfStock ? 'javascript:void(0)' : `./singleProductPage.html?id=${pId}`;
         const cursorStyle = isOutOfStock ? 'cursor: not-allowed;' : '';
+
+        const isInWishlist = userWishlistIds.has(pId);
 
         return `
         <div class="col-6 col-md-4 col-xl-20-percent">
@@ -177,6 +220,17 @@ async function loadProducts() {
             '<div class="badge-overlay"><span class="sold-out-badge">Sold Out</span></div>' :
             ''
           }
+                <!-- Wishlist Icon (Event Delegated) -->
+                <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" data-id="${pId}">
+                    <i class="${isInWishlist ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+                </button>
+
+                <!-- Add To Cart Banner (Event Delegated) -->
+                ${!isOutOfStock ?
+            `<div class="add-to-cart-banner" data-id="${pId}">
+                    Add to Cart
+                </div>` : ''}
+
                 <img 
                   src="${product.mainImage}" 
                   alt="${product.name}" 
@@ -336,3 +390,126 @@ function setupCategoryFilterListeners() {
     });
   });
 }
+
+// --- Card Interactions ---
+// --- Wishlist Logic ---
+let userWishlistIds = new Set();
+let isUserLoggedIn = false;
+
+// Fetch user wishlist IDs
+async function loadUserWishlist() {
+  try {
+    const res = await fetch('/api/user/wishlist');
+    if (res.status === 401) {
+      isUserLoggedIn = false;
+      userWishlistIds.clear();
+      return;
+    }
+    const data = await res.json();
+    if (data.success) {
+      isUserLoggedIn = true;
+      userWishlistIds = new Set(data.wishlist.map(item => item._id || item));
+    }
+  } catch (err) {
+    console.error('Error loading wishlist:', err);
+  }
+}
+
+// Internal toggle logic (called by event delegation)
+async function toggleWishlist(btn, productId) {
+  // Check login logic implicitly by API response or pre-check
+  if (!isUserLoggedIn) {
+    window.location.href = '/User/userLogin.html';
+    return;
+  }
+
+  const icon = btn.querySelector('i');
+  const isAdding = !btn.classList.contains('active');
+
+  // Optimistic UI Update
+  btn.classList.toggle('active');
+  if (isAdding) {
+    icon.classList.remove('fa-regular');
+    icon.classList.add('fa-solid');
+  } else {
+    icon.classList.remove('fa-solid');
+    icon.classList.add('fa-regular');
+  }
+
+  try {
+    const url = isAdding ? '/api/user/wishlist' : `/api/user/wishlist/${productId}`;
+    const method = isAdding ? 'POST' : 'DELETE';
+    const body = isAdding ? JSON.stringify({ productId }) : null;
+
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body
+    });
+
+    if (res.status === 401) {
+      window.location.href = '/User/userLogin.html';
+      return;
+    }
+
+    const data = await res.json();
+    if (!data.success) {
+      throw new Error(data.message || 'Failed to update wishlist');
+    }
+
+    // Update local set
+    if (isAdding) userWishlistIds.add(productId);
+    else userWishlistIds.delete(productId);
+
+    // Show toast/notification (optional)
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 1500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    })
+
+    Toast.fire({
+      icon: 'success',
+      title: isAdding ? 'Product added to wishlist ❤️' : 'Product removed from wishlist'
+    })
+
+  } catch (error) {
+    console.error('Error updating wishlist:', error);
+    // Revert UI
+    btn.classList.toggle('active');
+    if (isAdding) {
+      icon.classList.remove('fa-solid');
+      icon.classList.add('fa-regular');
+    } else {
+      icon.classList.remove('fa-regular');
+      icon.classList.add('fa-solid');
+    }
+
+    // Show warning for known errors like OOS (which we send as 400)
+    // Or just generic error
+    Swal.fire({
+      icon: 'warning',
+      title: 'Action Failed',
+      text: error.message || 'Something went wrong!',
+      confirmButtonColor: '#1a1a1a',
+    })
+  }
+};
+
+function addToCart(productId) {
+  console.log('Added to cart:', productId);
+  Swal.fire({
+    title: 'Added to Cart!',
+    text: 'Product added successfully (Demo).',
+    icon: 'success',
+    confirmButtonColor: '#1a1a1a',
+    timer: 2000,
+    timerProgressBar: true
+  });
+};

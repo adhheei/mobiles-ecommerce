@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Product = require("../models/Product");
 
 // @desc    Get current user profile
 // @route   GET /api/user/profile
@@ -132,4 +133,131 @@ const updateAvatar = async (req, res) => {
     }
 };
 
-module.exports = { getProfile, updateProfile, updateAvatar };
+// @desc    Get user wishlist
+// @route   GET /api/user/wishlist
+// @access  Private
+const getWishlist = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).populate("wishlist");
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            wishlist: user.wishlist,
+        });
+    } catch (error) {
+        console.error("Error fetching wishlist:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server Error",
+        });
+    }
+};
+
+// @desc    Add product to wishlist
+// @route   POST /api/user/wishlist
+// @access  Private
+const addToWishlist = async (req, res) => {
+    try {
+        const { productId } = req.body;
+
+        if (!productId) {
+            return res.status(400).json({
+                success: false,
+                message: "Product ID is required",
+            });
+        }
+
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        // Check product stock status
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found"
+            });
+        }
+
+        if (product.stock <= 0 || product.status === 'outofstock') {
+            return res.status(400).json({
+                success: false,
+                message: "This product is currently out of stock and cannot be added to the wishlist."
+            });
+        }
+
+        // Use addToSet to handle duplicates automatically and robustly
+        user.wishlist.addToSet(productId);
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Product added to wishlist",
+            wishlist: user.wishlist,
+        });
+    } catch (error) {
+        console.error("Error adding to wishlist:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server Error",
+        });
+    }
+};
+
+// @desc    Remove product from wishlist
+// @route   DELETE /api/user/wishlist/:productId
+// @access  Private
+const removeFromWishlist = async (req, res) => {
+    try {
+        const { productId } = req.params;
+
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        user.wishlist = user.wishlist.filter(
+            (id) => id.toString() !== productId
+        );
+
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Product removed from wishlist",
+            wishlist: user.wishlist,
+        });
+    } catch (error) {
+        console.error("Error removing from wishlist:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server Error",
+        });
+    }
+};
+
+module.exports = {
+    getProfile,
+    updateProfile,
+    updateAvatar,
+    getWishlist,
+    addToWishlist,
+    removeFromWishlist
+};

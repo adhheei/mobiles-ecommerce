@@ -80,6 +80,12 @@ function renderProductDetails(product) {
       buyNowBtn.style.pointerEvents = 'none';
       buyNowBtn.style.opacity = '0.6';
     }
+    // Visually disable wishlist button (but keep clickable for alert)
+    const wishlistBtn = document.getElementById('wishlistBtn');
+    if (wishlistBtn) {
+      wishlistBtn.style.opacity = '0.6';
+      wishlistBtn.style.cursor = 'not-allowed';
+    }
   } else if (product.stock < 10) {
     stockBadge.className = 'stock-badge low-stock';
     stockStatus.innerHTML = `<i class="fa-solid fa-exclamation-circle me-1"></i> Only ${product.stock} left in stock!`;
@@ -89,6 +95,11 @@ function renderProductDetails(product) {
       buyNowBtn.style.pointerEvents = 'auto';
       buyNowBtn.style.opacity = '1';
     }
+    const wishlistBtn = document.getElementById('wishlistBtn');
+    if (wishlistBtn) {
+      wishlistBtn.style.opacity = '1';
+      wishlistBtn.style.cursor = 'pointer';
+    }
   } else {
     stockBadge.className = 'stock-badge';
     stockStatus.innerHTML = '<i class="fa-solid fa-check-circle me-1"></i> In stock, ready to ship';
@@ -97,6 +108,11 @@ function renderProductDetails(product) {
       buyNowBtn.classList.remove('disabled');
       buyNowBtn.style.pointerEvents = 'auto';
       buyNowBtn.style.opacity = '1';
+    }
+    const wishlistBtn = document.getElementById('wishlistBtn');
+    if (wishlistBtn) {
+      wishlistBtn.style.opacity = '1';
+      wishlistBtn.style.cursor = 'pointer';
     }
   }
 
@@ -258,11 +274,25 @@ async function initPage() {
       throw new Error('No product ID provided');
     }
 
-    // Fetch product details
-    const product = await fetchProductDetails(productId);
+    // Fetch product and wishlist parallel
+    const [product, _] = await Promise.all([
+      fetchProductDetails(productId),
+      loadUserWishlist()
+    ]);
 
     // Render product
     renderProductDetails(product);
+
+    // Update Wishlist Button State
+    if (isUserLoggedIn && userWishlistIds.has(product.id || product._id)) {
+      const btn = document.getElementById('wishlistBtn');
+      if (btn) {
+        btn.classList.add('active'); // Ensure button is active (red)
+        const icon = btn.querySelector('i');
+        icon.classList.remove('fa-regular');
+        icon.classList.add('fa-solid');
+      }
+    }
 
     // Fetch and render related products
     const relatedProducts = await fetchRelatedProducts(product.category, productId);
@@ -302,6 +332,127 @@ function initAnimations() {
   const animatedElements = document.querySelectorAll(".reveal-up");
   animatedElements.forEach((el) => observer.observe(el));
 }
+
+// --- Wishlist Logic ---
+let userWishlistIds = new Set();
+let isUserLoggedIn = false;
+
+// Fetch user wishlist IDs
+async function loadUserWishlist() {
+  try {
+    const res = await fetch('/api/user/wishlist');
+    if (res.status === 401) {
+      isUserLoggedIn = false;
+      userWishlistIds.clear();
+      return;
+    }
+    const data = await res.json();
+    if (data.success) {
+      isUserLoggedIn = true;
+      userWishlistIds = new Set(data.wishlist.map(item => item._id || item));
+    }
+  } catch (err) {
+    console.error('Error loading wishlist:', err);
+  }
+}
+
+window.toggleWishlist = async function () {
+  if (!currentProduct) return;
+  const productId = currentProduct.id || currentProduct._id;
+
+  if (!isUserLoggedIn) {
+    window.location.href = '/User/userLogin.html';
+    return;
+  }
+
+  // Check stock before adding
+  if (currentProduct && (currentProduct.stock <= 0 || currentProduct.status === 'outofstock')) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Out of Stock',
+      text: 'This product is currently out of stock and cannot be added to the wishlist.',
+      confirmButtonColor: '#1a1a1a'
+    });
+    return;
+  }
+
+  const btn = document.getElementById('wishlistBtn');
+  const icon = btn.querySelector('i');
+
+  // Determine if adding or removing based on current icon class
+  const isAdding = icon.classList.contains('fa-regular');
+
+  // Optimistic UI Update
+  btn.classList.toggle('active'); // Toggle active class for color change
+
+  if (isAdding) {
+    icon.classList.remove('fa-regular');
+    icon.classList.add('fa-solid');
+  } else {
+    icon.classList.remove('fa-solid');
+    icon.classList.add('fa-regular');
+  }
+
+  try {
+    const url = isAdding ? '/api/user/wishlist' : `/api/user/wishlist/${productId}`;
+    const method = isAdding ? 'POST' : 'DELETE';
+    const body = isAdding ? JSON.stringify({ productId }) : null;
+
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body
+    });
+
+    if (res.status === 401) {
+      window.location.href = '/User/userLogin.html';
+      return;
+    }
+
+    const data = await res.json();
+    if (!data.success) {
+      throw new Error(data.message || 'Failed to update wishlist');
+    }
+
+    // Update local set
+    if (isAdding) userWishlistIds.add(productId);
+    else userWishlistIds.delete(productId);
+
+    // Show toast
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 1500,
+      timerProgressBar: true
+    })
+
+    Toast.fire({
+      icon: 'success',
+      title: isAdding ? 'Product added to wishlist ❤️' : 'Product removed from wishlist'
+    })
+
+  } catch (error) {
+    console.error('Error updating wishlist:', error);
+    // Revert UI
+    btn.classList.toggle('active'); // Revert color change
+    if (isAdding) {
+      icon.classList.remove('fa-solid');
+      icon.classList.add('fa-regular');
+    } else {
+      icon.classList.remove('fa-regular');
+      icon.classList.add('fa-solid');
+    }
+
+    // Show warning details
+    Swal.fire({
+      icon: 'warning',
+      title: 'Action Failed',
+      text: error.message || 'Something went wrong!',
+      confirmButtonColor: '#1a1a1a',
+    })
+  }
+};
 
 // Start everything when DOM is ready
 document.addEventListener('DOMContentLoaded', initPage);
