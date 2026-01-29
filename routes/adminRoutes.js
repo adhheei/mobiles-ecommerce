@@ -93,5 +93,23 @@ router.put('/products/:id', uploadProduct, updateProduct);
 router.delete('/products/:id', deleteProduct);
 
 // Signup routes have been moved to authRoutes.js
+// ────────────────
+// MESSAGE ROUTES
+// ────────────────
+
+const { protectAdmin } = require('../middleware/adminAuthMiddleware');
+const {
+  getMessages,
+  markAsRead,
+  getUnreadCount
+} = require('../controllers/messageController');
+
+// All message routes are protected
+router.get('/messages', protectAdmin, getMessages);
+router.patch('/messages/:id/seen', protectAdmin, require('../controllers/messageController').markAsSeen);
+router.patch('/messages/:id/replied', protectAdmin, require('../controllers/messageController').markAsReplied);
+router.get('/messages/unread-count', protectAdmin, getUnreadCount);
+// router.post('/messages/:id/reply', protectAdmin, require('../controllers/messageController').replyToMessage);
+router.delete('/messages/:id', protectAdmin, require('../controllers/messageController').deleteMessage);
 
 module.exports = router;

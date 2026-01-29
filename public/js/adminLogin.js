@@ -33,10 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const data = await res.json();
 
-                if (data.success) {
-                    // Save token if needed (e.g., localStorage)
-                    // localStorage.setItem('adminToken', data.token);
-
+                if (res.ok && data.success) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Login Successful',
@@ -47,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         window.location.href = '/Admin/adminDashboard.html';
                     });
                 } else {
-                    Swal.fire('Login Failed', data.error || 'Invalid credentials', 'error');
+                    Swal.fire('Login Failed', data.error || data.message || 'Invalid credentials', 'error');
                 }
 
             } catch (err) {
