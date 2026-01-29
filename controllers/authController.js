@@ -134,6 +134,10 @@ exports.logout = (req, res) => {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
   });
+  res.cookie("admin_jwt", "none", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
 
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
@@ -331,10 +335,24 @@ exports.googleSignup = async (req, res) => {
   }
 };
 
+// In-memory rate limiter (simple implementation)
+const loginAttempts = new Map();
+
 // 8. ADMIN LOGIN
 exports.loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const ip = req.ip;
+
+    // Check Rate Limit (5 attempts per 15 mins)
+    const attempts = loginAttempts.get(ip) || { count: 0, time: Date.now() };
+    if (Date.now() - attempts.time > 15 * 60 * 1000) {
+      attempts.count = 0;
+      attempts.time = Date.now();
+    }
+    if (attempts.count >= 5) {
+      return res.status(429).json({ success: false, error: "Too many login attempts. Please try again later." });
+    }
 
     if (!email || !password) {
       return res
@@ -351,24 +369,32 @@ exports.loginAdmin = async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
+      // Increment attempts
+      attempts.count++;
+      loginAttempts.set(ip, attempts);
       return res
         .status(401)
         .json({ success: false, error: "Invalid credentials" });
     }
 
+    // Reset attempts on success
+    loginAttempts.delete(ip);
+
     // Reuse helper or explicit for Admin
-    const token = jwt.sign({ id: admin._id }, JWT_SECRET, { expiresIn: "1d" });
+    const token = jwt.sign({ id: admin._id, role: admin.role || 'admin' }, JWT_SECRET, { expiresIn: "1d" });
 
     // Cookie for admin too
-    res.cookie("jwt", token, {
+    res.cookie("admin_jwt", token, {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-      httpOnly: true
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production"
     }).json({
       success: true,
       token,
       admin: {
         id: admin._id,
         email: admin.email,
+        role: admin.role || 'admin'
       },
     });
   } catch (err) {
