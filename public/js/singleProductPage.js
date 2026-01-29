@@ -124,11 +124,20 @@ function renderProductDetails(product) {
 
   // Tech specs
   let techSpecs = '';
-  if (product.sku) {
-    techSpecs += `<p class="mb-1"><strong>SKU:</strong> ${product.sku}</p>`;
-  }
-  techSpecs += `<p class="mb-1"><strong>Category:</strong> ${product.categoryName}</p>`;
-  techSpecs += `<p class="mb-0"><strong>Stock:</strong> ${product.stock} units</p>`;
+  techSpecs += `
+    <div class="row mb-2">
+      <div class="col-4 fw-bold">SKU</div>
+      <div class="col-8 text-muted">${product.sku || 'N/A'}</div>
+    </div>
+    <div class="row mb-2">
+      <div class="col-4 fw-bold">Category</div>
+      <div class="col-8 text-muted">${product.categoryName || 'General'}</div>
+    </div>
+    <div class="row mb-0">
+      <div class="col-4 fw-bold">Stock</div>
+      <div class="col-8 text-muted">${product.stock > 0 ? product.stock + ' units' : 'Out of Stock'}</div>
+    </div>
+  `;
 
   document.getElementById('techSpecsBody').innerHTML = techSpecs;
 
@@ -202,13 +211,39 @@ function changeImage(thumbElement, srcUrl) {
 }
 
 // Quantity selector
+// Quantity selector
 function updateQty(change) {
+  if (!currentProduct) return;
+
   const input = document.getElementById("qtyInput");
   let val = parseInt(input.value);
-  val += change;
-  if (val < 1) val = 1;
-  // You can add max quantity based on stock later
-  input.value = val;
+  const stock = currentProduct.stock || 0;
+
+  // Prevent changes if essentially out of stock (though buttons should be disabled)
+  if (stock <= 0) return;
+
+  const newQuantity = val + change;
+
+  if (newQuantity < 1) {
+    // Minimum limit
+    input.value = 1;
+  } else if (newQuantity > stock) {
+    // Maximum limit (Stock)
+    input.value = stock; // Ensure we stick to max available
+
+    // Show warning if trying to increase beyond stock
+    if (change > 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Stock Limit Reached',
+        text: `Only ${stock} units available for this product.`,
+        confirmButtonColor: '#1a1a1a'
+      });
+    }
+  } else {
+    // Valid range
+    input.value = newQuantity;
+  }
 }
 
 // Color selection
@@ -245,7 +280,15 @@ function addToCart() {
   localStorage.setItem('cart', JSON.stringify(cart));
 
   // Show success message
-  alert('Product added to cart!');
+  Swal.fire({
+    toast: true,
+    position: 'top-end',
+    icon: 'success',
+    title: 'Product added to cart!',
+    showConfirmButton: false,
+    timer: 1500,
+    timerProgressBar: true
+  });
 }
 
 // Scroll related products

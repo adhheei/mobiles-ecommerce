@@ -51,6 +51,8 @@ app.use(
       ],
       connectSrc: [
         "'self'",
+        "http://localhost:*",
+        "ws://localhost:*",
         "https://accounts.google.com",
         "https://cdn.jsdelivr.net",
       ],
