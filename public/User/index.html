@@ -178,11 +178,14 @@
 
     .product-card {
       border: none;
-      background: white;
-      border-radius: 15px;
-      overflow: hidden;
+      background: transparent;
+      /* Changed from white to transparent to let inner card stand out */
+      /* border-radius: 15px; removed main card radius as inner card handles it */
+      overflow: visible;
+      /* Allow hover effects */
       transition: transform 0.3s;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      box-shadow: none;
+      /* Shadow moved to inner card */
       margin-bottom: 20px;
     }
 
@@ -190,13 +193,39 @@
       transform: translateY(-5px);
     }
 
-    .card-img-top {
-      height: 250px;
-      object-fit: contain;
-      padding: 20px;
-      background: #fff;
+    /* New Inner Image Card */
+    .card-img-wrapper {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background-color: #ffffff;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      margin-bottom: 12px;
+      padding-top: 100%;
+      /* Aspect Ratio 1:1 */
+      border: 1px solid #f0f0f0;
     }
 
+    .card-img-wrapper img {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      width: calc(100% - 30px);
+      height: calc(100% - 30px);
+      object-fit: contain;
+      transition: transform 0.4s ease;
+    }
+
+    .product-card:hover .card-img-wrapper {
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      border-color: transparent;
+    }
+
+    .product-card:hover .card-img-wrapper img {
+      transform: scale(1.05);
+    }
+
+    /* Update badges to sit inside wrapper */
     .sale-badge {
       position: absolute;
       top: 10px;
@@ -207,6 +236,7 @@
       border-radius: 4px;
       font-size: 0.8rem;
       font-weight: 600;
+      z-index: 5;
     }
 
     .hot-deal-badge {
@@ -516,106 +546,75 @@
       </div>
 
       <div class="row scrolling-wrapper g-2" id="cardSlider">
-        <div class="col-10 col-md-3">
-          <a href="./productDetails.html" class="text-decoration-none text-dark">
-            <div class="card product-card mb-3">
-              <img src="../images/s25 ultra.jpeg" class="card-img-top" alt="S24" />
-            </div>
-            <div class="text-center">
-              <h5 class="card-title fw-bold">Samsung S25 Ultra</h5>
-              <p class="text-muted small">5G AI Smartphone</p>
-            </div>
-          </a>
-        </div>
-
-        <div class="col-10 col-md-3">
-          <a href="./productDetails.html" class="text-decoration-none text-dark">
-            <div class="card product-card mb-3">
-              <img src="../images/iphone.jpeg" class="card-img-top" alt="iPhone 15" />
-            </div>
-            <div class="text-center">
-              <h5 class="card-title fw-bold">iPhone 17 Pro Max</h5>
-              <p class="text-muted small">Titanium Blue</p>
-            </div>
-          </a>
-        </div>
-
-        <div class="col-10 col-md-3">
-          <a href="./productDetails.html" class="text-decoration-none text-dark">
-            <div class="card product-card mb-3">
-              <img src="../images/pixel10.jpeg" class="card-img-top" alt="iPhone 14" />
-            </div>
-            <div class="text-center">
-              <h5 class="card-title fw-bold">Google Pixel 10</h5>
-              <p class="text-muted small">Obsidian</p>
-            </div>
-          </a>
-        </div>
-
-        <div class="col-10 col-md-3">
-          <a href="./productDetails.html" class="text-decoration-none text-dark">
-            <div class="card product-card mb-3">
-              <img src="../images/vivoX300.jpeg" class="card-img-top" alt="Vivo" />
-            </div>
-            <div class="text-center">
-              <h5 class="card-title fw-bold">vivo X300</h5>
-              <p class="text-muted small">Elite Black</p>
-            </div>
-          </a>
-        </div>
-
-        <div class="col-10 col-md-3">
-          <a href="./productDetails.html" class="text-decoration-none text-dark">
-            <div class="card product-card mb-3">
-              <img src="../images/pixel8a.jpeg" class="card-img-top" alt="Pixel" />
-            </div>
-            <div class="text-center">
-              <h5 class="card-title fw-bold">Google Pixel 8a</h5>
-              <p class="text-muted small">Pure Android</p>
-            </div>
-          </a>
-        </div>
-
-        <div class="col-10 col-md-3">
-          <a href="./productDetails.html" class="text-decoration-none text-dark">
-            <div class="card product-card mb-3">
-              <img src="../images/oneplus12.jpeg" class="card-img-top" alt="OnePlus" />
-            </div>
-            <div class="text-center">
-              <h5 class="card-title fw-bold">OnePlus 12</h5>
-              <p class="text-muted small">Snapdragon Gen 3</p>
-            </div>
-          </a>
-        </div>
-
-        <div class="col-10 col-md-3">
-          <a href="./productDetails.html" class="text-decoration-none text-dark">
-            <div class="card product-card mb-3">
-              <img src="../images/nothing3a.jpg" class="card-img-top" alt="Nothing" />
-            </div>
-            <div class="text-center">
-              <h5 class="card-title fw-bold">Nothing Phone 3a</h5>
-              <p class="text-muted small">Hello, Snapdragon</p>
-            </div>
-          </a>
-        </div>
-
-        <div class="col-10 col-md-3">
-          <a href="./productDetails.html" class="text-decoration-none text-dark">
-            <div class="card product-card mb-3">
-              <img src="../images/oppoK13x.jpeg" class="card-img-top" alt="Sony" />
-            </div>
-            <div class="text-center">
-              <h5 class="card-title fw-bold">OPPO K13x 5G</h5>
-              <p class="text-muted small">45W SUPERVOOC</p>
-            </div>
-          </a>
+        <!-- Content will be loaded dynamically -->
+        <div class="text-center w-100 py-5">
+          <div class="spinner-border text-secondary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <script>
+    document.addEventListener('DOMContentLoaded', loadNewArrivals);
+
+    async function loadNewArrivals() {
+      try {
+        const res = await fetch('/api/admin/products/public?sort=newest&limit=10');
+        const data = await res.json();
+        const container = document.getElementById('cardSlider');
+
+        if (data.success && data.products && data.products.length > 0) {
+          const productCards = data.products.map(product => {
+            const isOutOfStock = product.stock === 0 || product.status === 'outofstock';
+            const linkHref = isOutOfStock ? 'javascript:void(0)' : `./singleProductPage.html?id=${product.id || product._id}`;
+
+            return `
+                <div class="col-10 col-md-3">
+                  <a href="${linkHref}" class="text-decoration-none text-dark">
+                    <div class="card product-card mb-3 ${isOutOfStock ? 'opacity-75' : ''}">
+                      <div class="card-img-wrapper">
+                        ${isOutOfStock ?
+                '<div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-50 z-2"><span class="badge bg-dark">Sold Out</span></div>' :
+                ''}
+                        <img src="${product.mainImage}" alt="${product.name}" onerror="this.src='/images/logo.jpg'" />
+                      </div>
+                    </div>
+                    <div class="text-center">
+                      <h5 class="card-title fw-bold text-truncate px-2">${product.name}</h5>
+                      <p class="text-muted small">${product.brand || 'Latest Model'}</p>
+                    </div>
+                  </a>
+                </div>
+                `;
+          }).join('');
+
+          // Add "Go to Shop" Card at the end
+          const seeAllCard = `
+                <div class="col-10 col-md-3">
+                  <a href="./productPage.html" class="text-decoration-none text-dark h-100 d-block">
+                    <div class="card product-card mb-3 h-100 d-flex flex-column justify-content-center align-items-center bg-light border-0" style="min-height: 300px;">
+                      <div class="rounded-circle bg-white p-4 shadow-sm mb-3">
+                        <i class="fa-solid fa-arrow-right fa-2x text-dark"></i>
+                      </div>
+                      <h5 class="fw-bold">View All</h5>
+                      <p class="text-muted small">Go to Shop</p>
+                    </div>
+                  </a>
+                </div>
+            `;
+
+          container.innerHTML = productCards + seeAllCard;
+        } else {
+          container.innerHTML = '<div class="col-12 text-center text-muted">No new arrivals found.</div>';
+        }
+      } catch (err) {
+        console.error('Error loading new arrivals:', err);
+        document.getElementById('cardSlider').innerHTML = '<div class="col-12 text-center text-danger">Failed to load products.</div>';
+      }
+    }
+
     function scrollSlider(direction) {
       const slider = document.getElementById("cardSlider");
       const scrollAmount = slider.clientWidth;
@@ -644,9 +643,11 @@
     <div class="row scrolling-wrapper g-2" id="hotDealsSlider">
       <div class="col-lg-3 col-md-3">
         <a href="./productDetails.html" class="text-decoration-none text-dark">
-          <div class="card product-card mb-2 border-0 position-relative">
-            <span class="hot-deal-badge">Save 50%</span>
-            <img src="../images/boatpower.jpeg" class="card-img-top rounded-4" alt="Powerbank" />
+          <div class="card product-card mb-2 border-0">
+            <div class="card-img-wrapper">
+              <span class="hot-deal-badge">Save 50%</span>
+              <img src="../images/boatpower.jpeg" alt="Powerbank" />
+            </div>
           </div>
           <div class="px-1">
             <p class="brand-name mb-1">boat</p>
@@ -663,9 +664,11 @@
 
       <div class="col-lg-3 col-md-3">
         <a href="./productDetails.html" class="text-decoration-none text-dark">
-          <div class="card product-card mb-2 border-0 position-relative">
-            <span class="hot-deal-badge">Save 70%</span>
-            <img src="../images/15 backcover.jpeg" class="card-img-top rounded-4" alt="Case" />
+          <div class="card product-card mb-2 border-0">
+            <div class="card-img-wrapper">
+              <span class="hot-deal-badge">Save 70%</span>
+              <img src="../images/15 backcover.jpeg" alt="Case" />
+            </div>
           </div>
           <div class="px-1">
             <p class="brand-name mb-1">KARWAN</p>
@@ -682,9 +685,11 @@
 
       <div class="col-lg-3 col-md-3">
         <a href="./productDetails.html" class="text-decoration-none text-dark">
-          <div class="card product-card mb-2 border-0 position-relative">
-            <span class="hot-deal-badge">Save 50%</span>
-            <img src="../images/portronicsM2.jpeg" class="card-img-top rounded-4" alt="Headphone" />
+          <div class="card product-card mb-2 border-0">
+            <div class="card-img-wrapper">
+              <span class="hot-deal-badge">Save 50%</span>
+              <img src="../images/portronicsM2.jpeg" alt="Headphone" />
+            </div>
           </div>
           <div class="px-1">
             <p class="brand-name mb-1">PORTRONICS</p>
@@ -701,9 +706,11 @@
 
       <div class="col-lg-3 col-md-3">
         <a href="./productDetails.html" class="text-decoration-none text-dark">
-          <div class="card product-card mb-2 border-0 position-relative">
-            <span class="hot-deal-badge">Save 70%</span>
-            <img src="../images/16backcover.jpeg" class="card-img-top rounded-4" alt="Blue Case" />
+          <div class="card product-card mb-2 border-0">
+            <div class="card-img-wrapper">
+              <span class="hot-deal-badge">Save 70%</span>
+              <img src="../images/16backcover.jpeg" alt="Blue Case" />
+            </div>
           </div>
           <div class="px-1">
             <p class="brand-name mb-1">Enflamo</p>
@@ -720,9 +727,11 @@
 
       <div class="col-lg-3 col-md-3">
         <a href="./productDetails.html" class="text-decoration-none text-dark">
-          <div class="card product-card mb-2 border-0 position-relative">
-            <span class="hot-deal-badge">Save 40%</span>
-            <img src="https://placehold.co/300x300?text=Charger" class="card-img-top rounded-4" alt="Charger" />
+          <div class="card product-card mb-2 border-0">
+            <div class="card-img-wrapper">
+              <span class="hot-deal-badge">Save 40%</span>
+              <img src="https://placehold.co/300x300?text=Charger" alt="Charger" />
+            </div>
           </div>
           <div class="px-1">
             <p class="brand-name mb-1">SAMSUNG</p>
@@ -737,9 +746,11 @@
 
       <div class="col-lg-3 col-md-3">
         <a href="./productDetails.html" class="text-decoration-none text-dark">
-          <div class="card product-card mb-2 border-0 position-relative">
-            <span class="hot-deal-badge">Save 60%</span>
-            <img src="https://placehold.co/300x300?text=Cable" class="card-img-top rounded-4" alt="Cable" />
+          <div class="card product-card mb-2 border-0">
+            <div class="card-img-wrapper">
+              <span class="hot-deal-badge">Save 60%</span>
+              <img src="https://placehold.co/300x300?text=Cable" alt="Cable" />
+            </div>
           </div>
           <div class="px-1">
             <p class="brand-name mb-1">BOAT</p>
@@ -754,9 +765,11 @@
 
       <div class="col-lg-3 col-md-3">
         <a href="./productDetails.html" class="text-decoration-none text-dark">
-          <div class="card product-card mb-2 border-0 position-relative">
-            <span class="hot-deal-badge">Save 30%</span>
-            <img src="https://placehold.co/300x300?text=Earbuds" class="card-img-top rounded-4" alt="Earbuds" />
+          <div class="card product-card mb-2 border-0">
+            <div class="card-img-wrapper">
+              <span class="hot-deal-badge">Save 30%</span>
+              <img src="https://placehold.co/300x300?text=Earbuds" alt="Earbuds" />
+            </div>
           </div>
           <div class="px-1">
             <p class="brand-name mb-1">REALME</p>
@@ -771,10 +784,11 @@
 
       <div class="col-lg-3 col-md-3">
         <a href="./productDetails.html" class="text-decoration-none text-dark">
-          <div class="card product-card mb-2 border-0 position-relative">
-            <span class="hot-deal-badge">Save 80%</span>
-            <img src="https://placehold.co/300x300?text=Screen+Guard" class="card-img-top rounded-4"
-              alt="Screen Guard" />
+          <div class="card product-card mb-2 border-0">
+            <div class="card-img-wrapper">
+              <span class="hot-deal-badge">Save 80%</span>
+              <img src="https://placehold.co/300x300?text=Screen+Guard" alt="Screen Guard" />
+            </div>
           </div>
           <div class="px-1">
             <p class="brand-name mb-1">SPIGEN</p>
