@@ -19,47 +19,19 @@ async function loadNavbar() {
         initializeNavbarFeatures();
         setActiveLink();
 
-        // --- ROBUST DROPDOWN TOGGLE (Vanilla JS) ---
-        // This ensures the dropdown works even if Bootstrap's JS fails or events are blocked.
-        const catLink = document.getElementById('nav-categories');
-        if (catLink) {
-            catLink.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation(); // Stop bubbling
-
-                const dropdownMenu = this.nextElementSibling;
+        // Close User Dropdown when clicking outside
+        document.addEventListener('click', function (e) {
+            // Close User Dropdown (target any shown dropdown toggle not clicked)
+            const userDropdownToggle = document.querySelector('.nav-icons .dropdown-toggle.show');
+            if (userDropdownToggle && !userDropdownToggle.contains(e.target)) {
+                const dropdownMenu = userDropdownToggle.nextElementSibling;
                 if (dropdownMenu) {
-                    // Toggle visibility classes manually
-                    dropdownMenu.classList.toggle('show');
-                    this.classList.toggle('show');
-                    this.setAttribute('aria-expanded', this.classList.contains('show'));
+                    dropdownMenu.classList.remove('show');
+                    userDropdownToggle.classList.remove('show');
+                    userDropdownToggle.setAttribute('aria-expanded', 'false');
                 }
-            });
-
-            // Close when clicking outside (Generic for all dropdowns)
-            document.addEventListener('click', function (e) {
-                // Close Categories Dropdown
-                if (catLink && !catLink.contains(e.target)) {
-                    const dropdownMenu = catLink.nextElementSibling;
-                    if (dropdownMenu && dropdownMenu.classList.contains('show')) {
-                        dropdownMenu.classList.remove('show');
-                        catLink.classList.remove('show');
-                        catLink.setAttribute('aria-expanded', 'false');
-                    }
-                }
-
-                // Close User Dropdown (target any shown dropdown toggle not clicked)
-                const userDropdownToggle = document.querySelector('.nav-icons .dropdown-toggle.show');
-                if (userDropdownToggle && !userDropdownToggle.contains(e.target)) {
-                    const dropdownMenu = userDropdownToggle.nextElementSibling;
-                    if (dropdownMenu) {
-                        dropdownMenu.classList.remove('show');
-                        userDropdownToggle.classList.remove('show');
-                        userDropdownToggle.setAttribute('aria-expanded', 'false');
-                    }
-                }
-            });
-        }
+            }
+        });
 
         // Add click outside listener to close navbar mobile menu
         document.addEventListener('click', function (event) {
@@ -286,8 +258,7 @@ function initializeNavbarFeatures() {
         }
     }
 
-    // Load dynamic categories for navbar
-    loadNavbarCategories();
+
 
     // Check login state
     checkUserLogin();
@@ -303,54 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-async function loadNavbarCategories() {
-    try {
-        const res = await fetch('/api/admin/products/categories-with-counts');
-        const data = await res.json();
 
-        // Robustly find the dropdown menu
-        // 1. Try finding by the toggler ID
-        const catLink = document.getElementById('nav-categories');
-        let dropdownMenu = null;
-
-        if (catLink) {
-            // Standard Bootstrap structure: sibling ul
-            dropdownMenu = catLink.nextElementSibling;
-            // Validate it's actually the menu
-            if (!dropdownMenu || !dropdownMenu.classList.contains('dropdown-menu')) {
-                // Fallback: look within parent li
-                const parentLi = catLink.closest('.dropdown');
-                if (parentLi) {
-                    dropdownMenu = parentLi.querySelector('.dropdown-menu');
-                }
-            }
-        }
-
-        if (dropdownMenu) {
-            dropdownMenu.innerHTML = ''; // Clear "Loading..."
-
-            if (data.success && data.categories && data.categories.length > 0) {
-                data.categories.forEach(cat => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<a class="dropdown-item" href="/User/productPage.html?category=${cat._id}">${cat.name}</a>`;
-                    dropdownMenu.appendChild(li);
-                });
-            } else {
-                // Handle empty state
-                const li = document.createElement('li');
-                li.innerHTML = `<span class="dropdown-item text-muted">No categories found</span>`;
-                dropdownMenu.appendChild(li);
-            }
-        }
-    } catch (err) {
-        console.error('Error loading navbar categories:', err);
-        // Clean up loading state if error
-        const catLink = document.getElementById('nav-categories');
-        if (catLink && catLink.nextElementSibling) {
-            catLink.nextElementSibling.innerHTML = `<li><span class="dropdown-item text-danger">Failed to load</span></li>`;
-        }
-    }
-}
 
 // Check for User Login State
 async function checkUserLogin() {

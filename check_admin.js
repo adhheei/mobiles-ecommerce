@@ -1,14 +1,15 @@
 const mongoose = require('mongoose');
-const Admin = require('./models/Admin');
+const User = require('./models/User'); // Updated to User model
 require('dotenv').config();
 
 mongoose.connect(process.env.MONGO_URI)
     .then(async () => {
         console.log('Connected to MongoDB');
-        const count = await Admin.countDocuments();
+        // Count users with role 'admin'
+        const count = await User.countDocuments({ role: 'admin' });
         console.log(`Admin count: ${count}`);
         if (count > 0) {
-            const admins = await Admin.find().select('email');
+            const admins = await User.find({ role: 'admin' }).select('email firstName role');
             console.log('Admins:', admins);
         } else {
             console.log('No admins found! You might need to seed the database or register an admin.');

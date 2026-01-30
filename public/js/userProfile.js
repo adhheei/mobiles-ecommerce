@@ -123,10 +123,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const data = await response.json();
 
                 if (data.success) {
-                    textElement.innerHTML = newValue;
-                    btn.innerText = "Edit";
-                    btn.classList.remove("text-success");
-                    // Optionally show success toast
+                    window.location.reload();
                 } else {
                     alert(data.message || "Update failed");
                     btn.innerText = "Save"; // Reset button text on error

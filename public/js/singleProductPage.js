@@ -234,10 +234,13 @@ function updateQty(change) {
     // Show warning if trying to increase beyond stock
     if (change > 0) {
       Swal.fire({
+        toast: true,
+        position: 'top-end',
         icon: 'warning',
         title: 'Stock Limit Reached',
-        text: `Only ${stock} units available for this product.`,
-        confirmButtonColor: '#1a1a1a'
+        text: `Only ${stock} units available`,
+        showConfirmButton: false,
+        timer: 1500
       });
     }
   } else {
@@ -256,6 +259,25 @@ function selectColor(swatchElement, colorName) {
 
 // Add to cart functionality
 function addToCart() {
+  const user = localStorage.getItem('user');
+  if (!user) {
+    Swal.fire({
+      title: 'Login Required',
+      text: 'Please login to add products to your cart.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Login Now',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#0d6efd',
+      cancelButtonColor: '#d33'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = '/User/userLogin.html?redirect=' + encodeURIComponent(window.location.pathname);
+      }
+    });
+    return;
+  }
+
   if (!currentProduct) return;
 
   const quantity = parseInt(document.getElementById('qtyInput').value);
@@ -280,15 +302,7 @@ function addToCart() {
   localStorage.setItem('cart', JSON.stringify(cart));
 
   // Show success message
-  Swal.fire({
-    toast: true,
-    position: 'top-end',
-    icon: 'success',
-    title: 'Product added to cart!',
-    showConfirmButton: false,
-    timer: 1500,
-    timerProgressBar: true
-  });
+  alert('Product added to cart!');
 }
 
 // Scroll related products
@@ -404,7 +418,20 @@ window.toggleWishlist = async function () {
   const productId = currentProduct.id || currentProduct._id;
 
   if (!isUserLoggedIn) {
-    window.location.href = '/User/userLogin.html';
+    Swal.fire({
+      title: 'Login Required',
+      text: 'Please login to add products to your wishlist.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Login Now',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#0d6efd',
+      cancelButtonColor: '#d33'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = '/User/userLogin.html?redirect=' + encodeURIComponent(window.location.pathname);
+      }
+    });
     return;
   }
 
@@ -498,4 +525,79 @@ window.toggleWishlist = async function () {
 };
 
 // Start everything when DOM is ready
-document.addEventListener('DOMContentLoaded', initPage);
+document.addEventListener('DOMContentLoaded', (() => {
+  initPage();
+
+  // --- SHARE FUNCTIONALITY ---
+  const shareBtn = document.getElementById('shareBtn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', async () => {
+      const product = window.currentProduct || {}; // Access global product object set in fetch
+      const shareData = {
+        title: product.name || document.title,
+        text: `Check out ${product.name} on Jinsa Mobiles!`,
+        url: window.location.href
+      };
+
+      // 1. Try Web Share API (Mobile Native)
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+        } catch (err) {
+          console.log('Error sharing:', err);
+        }
+      } else {
+        // 2. Fallback: SweetAlert2 Custom Options
+        const socialUrl = encodeURIComponent(window.location.href);
+        const socialText = encodeURIComponent(shareData.text);
+
+        Swal.fire({
+          title: 'Share Product',
+          html: `
+                        <div class="d-flex justify-content-center gap-3 mt-2">
+                            <a href="https://api.whatsapp.com/send?text=${socialText}%20${socialUrl}" target="_blank" class="btn btn-success rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-size: 1.5rem; text-decoration: none;">
+                                <i class="fa-brands fa-whatsapp"></i>
+                            </a>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=${socialUrl}" target="_blank" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-size: 1.5rem; text-decoration: none;">
+                                <i class="fa-brands fa-facebook-f"></i>
+                            </a>
+                            <a href="https://twitter.com/intent/tweet?text=${socialText}&url=${socialUrl}" target="_blank" class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-size: 1.5rem; background: black; text-decoration: none;">
+                               <i class="fa-brands fa-x-twitter"></i>
+                            </a>
+                            <button id="copyLinkBtn" class="btn btn-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                                <i class="fa-solid fa-link"></i>
+                            </button>
+                        </div>
+                    `,
+          showConfirmButton: false,
+          showCloseButton: true,
+          didOpen: () => {
+            // Attach copy event
+            const copyBtn = Swal.getHtmlContainer().querySelector('#copyLinkBtn');
+            if (copyBtn) {
+              copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                  Swal.close(); // Close share modal
+                  // Show success toast
+                  const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true
+                  });
+                  Toast.fire({
+                    icon: 'success',
+                    title: 'Link copied to clipboard!'
+                  });
+                }).catch(err => {
+                  console.error('Failed to copy: ', err);
+                });
+              });
+            }
+          }
+        });
+      }
+    });
+  }
+}));

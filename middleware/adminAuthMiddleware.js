@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const Admin = require("../models/Admin");
+const User = require("../models/User");
 
 const protectAdmin = async (req, res, next) => {
     let token;
@@ -32,27 +32,29 @@ const protectAdmin = async (req, res, next) => {
         );
         console.log("Token decoded, ID:", decoded.id);
 
-        // 3. Attach admin to request
-        const admin = await Admin.findById(decoded.id);
-        if (!admin) {
-            console.log("Admin not found for ID:", decoded.id);
+        // 3. Attach admin (user with admin role) to request
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            console.log("User not found for ID:", decoded.id);
             return res.status(401).json({
                 success: false,
-                message: "Not authorized (Admin not found)"
+                message: "Not authorized (User not found)"
             });
         }
 
         // Check Role
-        if (admin.role && admin.role !== 'admin') {
-            console.log("Access denied. Not an admin role:", admin.role);
+        if (user.role !== 'admin') {
+            console.log("Access denied. Not an admin role:", user.role);
             return res.status(403).json({
                 success: false,
                 message: "Access denied. Admins only."
             });
         }
 
-        req.admin = admin;
+        req.admin = user; // Keeping req.admin for consistency in other controllers
         next();
+
+
     } catch (err) {
         console.error("Auth Middleware Error:", err.message);
         return res.status(401).json({

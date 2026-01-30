@@ -17,10 +17,9 @@ router.post("/send-otp", authController.sendOtp);
 // /api/auth/verify-otp
 router.post("/verify-otp", authController.verifyOtp);
 
-// /api/auth/reset-password
-router.post("/reset-password", authController.resetPassword);
+// /api/auth/resend-otp
+// router.post("/resend-otp", authController.resendOTP);
 
-// /api/auth/google-signup
-router.post("/google-signup", authController.googleSignup);
+// /api/auth/reset-password
 
 module.exports = router;
