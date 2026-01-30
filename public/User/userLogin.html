@@ -137,6 +137,23 @@
             display: flex;
             justify-content: center;
         }
+
+        /* Slide Up Animation */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-up {
+            animation: slideUp 0.6s ease-out forwards;
+        }
     </style>
     <link href="/css/navbar.css" rel="stylesheet">
 </head>
@@ -145,7 +162,7 @@
 
     <div class="container-fluid login-container">
 
-        <div class="card login-card">
+        <div class="card login-card slide-up">
 
             <div class="text-center mb-3">
                 <h3 class="fw-bold mb-0">Welcome Back</h3>

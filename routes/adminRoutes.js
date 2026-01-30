@@ -112,4 +112,19 @@ router.get('/messages/unread-count', protectAdmin, getUnreadCount);
 // router.post('/messages/:id/reply', protectAdmin, require('../controllers/messageController').replyToMessage);
 router.delete('/messages/:id', protectAdmin, require('../controllers/messageController').deleteMessage);
 
+// ────────────────
+// COUPON ROUTES
+// ────────────────
+
+const {
+  createCoupon,
+  getCoupons,
+  deleteCoupon
+} = require('../controllers/couponController');
+
+// All coupon routes protected
+router.post('/coupons', protectAdmin, createCoupon);
+router.get('/coupons', protectAdmin, getCoupons);
+router.delete('/coupons/:id', protectAdmin, deleteCoupon);
+
 module.exports = router;

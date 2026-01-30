@@ -91,6 +91,27 @@ async function handleProductClicks(event) {
   if (wishlistBtn) {
     event.preventDefault(); // Stop link navigation
     event.stopPropagation();
+
+    // Auth Check
+    const user = localStorage.getItem('user');
+    if (!user) {
+      Swal.fire({
+        title: 'Login Required',
+        text: 'Please login to add products to your wishlist.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Login Now',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#0d6efd',
+        cancelButtonColor: '#d33'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = '/User/userLogin.html?redirect=' + encodeURIComponent(window.location.pathname);
+        }
+      });
+      return;
+    }
+
     const productId = wishlistBtn.dataset.id;
     if (productId) {
       await toggleWishlist(wishlistBtn, productId);
@@ -103,6 +124,27 @@ async function handleProductClicks(event) {
   if (cartBanner) {
     event.preventDefault();
     event.stopPropagation();
+
+    // Auth Check
+    const user = localStorage.getItem('user');
+    if (!user) {
+      Swal.fire({
+        title: 'Login Required',
+        text: 'Please login to add products to your cart.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Login Now',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#0d6efd',
+        cancelButtonColor: '#d33'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = '/User/userLogin.html?redirect=' + encodeURIComponent(window.location.pathname);
+        }
+      });
+      return;
+    }
+
     const productId = cartBanner.dataset.id;
     if (productId) {
       console.log('Added to cart:', productId);
@@ -240,8 +282,8 @@ async function loadProducts() {
               <div class="product-info">
                 <div class="product-vendor">${product.brand}</div>
                 <div class="d-flex justify-content-between align-items-start">
-                   <div class="product-title mb-0 text-truncate" style="max-width: 60%;" title="${product.name}">${product.name}</div>
-                   <div class="text-end">
+                   <div class="product-title mb-0" style="padding-right: 10px;" title="${product.name}">${product.name}</div>
+                   <div class="text-end flex-shrink-0">
                       ${product.offerPrice < product.actualPrice ?
             `<div class="current-price sale-price" style="font-size: 0.95rem;">Rs. ${product.offerPrice}</div>
                          <div class="old-price" style="font-size: 0.75rem;">Rs. ${product.actualPrice}</div>` :
@@ -503,6 +545,24 @@ async function toggleWishlist(btn, productId) {
 };
 
 function addToCart(productId) {
+  const user = localStorage.getItem('user');
+  if (!user) {
+    Swal.fire({
+      title: 'Login Required',
+      text: 'Please login to add products to your cart.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Login Now',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#0d6efd',
+      cancelButtonColor: '#d33'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = '/User/userLogin.html?redirect=' + encodeURIComponent(window.location.pathname);
+      }
+    });
+    return;
+  }
   console.log('Added to cart:', productId);
   Swal.fire({
     title: 'Added to Cart!',

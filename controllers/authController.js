@@ -1,4 +1,4 @@
-const Admin = require("../models/Admin");
+
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -360,14 +360,22 @@ exports.loginAdmin = async (req, res) => {
         .json({ success: false, error: "Please provide email and password" });
     }
 
-    const admin = await Admin.findOne({ email });
-    if (!admin) {
+    // Check User model instead of Admin
+    const user = await User.findOne({ email });
+    if (!user) {
       return res
         .status(401)
         .json({ success: false, error: "Invalid credentials" });
     }
 
-    const isMatch = await bcrypt.compare(password, admin.password);
+    // Check Role
+    if (user.role !== 'admin') {
+      return res
+        .status(403)
+        .json({ success: false, error: "Access denied. Not an admin." });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       // Increment attempts
       attempts.count++;
@@ -380,10 +388,10 @@ exports.loginAdmin = async (req, res) => {
     // Reset attempts on success
     loginAttempts.delete(ip);
 
-    // Reuse helper or explicit for Admin
-    const token = jwt.sign({ id: admin._id, role: admin.role || 'admin' }, JWT_SECRET, { expiresIn: "1d" });
+    // Generate Token
+    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "1d" });
 
-    // Cookie for admin too
+    // Cookie for admin
     res.cookie("admin_jwt", token, {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
       httpOnly: true,
@@ -392,9 +400,9 @@ exports.loginAdmin = async (req, res) => {
       success: true,
       token,
       admin: {
-        id: admin._id,
-        email: admin.email,
-        role: admin.role || 'admin'
+        id: user._id,
+        email: user.email,
+        role: user.role
       },
     });
   } catch (err) {
