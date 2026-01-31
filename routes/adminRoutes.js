@@ -119,12 +119,16 @@ router.delete('/messages/:id', protectAdmin, require('../controllers/messageCont
 const {
   createCoupon,
   getCoupons,
-  deleteCoupon
+  deleteCoupon,
+  getCoupon,
+  updateCoupon
 } = require('../controllers/couponController');
 
 // All coupon routes protected
 router.post('/coupons', protectAdmin, createCoupon);
 router.get('/coupons', protectAdmin, getCoupons);
+router.get('/coupons/:id', protectAdmin, getCoupon);
+router.put('/coupons/:id', protectAdmin, updateCoupon);
 router.delete('/coupons/:id', protectAdmin, deleteCoupon);
 
 module.exports = router;

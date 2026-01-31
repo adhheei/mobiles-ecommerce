@@ -51,15 +51,13 @@ const couponSchema = new mongoose.Schema({
 
     maxDiscount: { // Maximum Discount Value (INR) - Optional
         type: Number,
-        default: null,
-        min: [0, 'Maximum discount cannot be negative']
+        default: null
     },
 
     // Usage Limits
     totalLimit: { // Total Usage Limit
         type: Number,
-        default: null, // null means unlimited
-        min: [1, 'Total limit must be at least 1']
+        default: null // null means unlimited
     },
 
     perUserLimit: { // Limit Per Customer
@@ -87,20 +85,5 @@ const couponSchema = new mongoose.Schema({
     }
 
 }, { timestamps: true });
-
-// Pre-save validation for dates and percentage
-couponSchema.pre('save', function (next) {
-    // Validate Dates
-    if (this.endDate <= this.startDate) {
-        return next(new Error('End date must be after start date'));
-    }
-
-    // Validate Percentage
-    if (this.discountType === 'percentage' && this.value > 100) {
-        return next(new Error('Percentage discount cannot exceed 100%'));
-    }
-
-    next();
-});
 
 module.exports = mongoose.model('Coupon', couponSchema);

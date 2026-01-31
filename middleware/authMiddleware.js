@@ -4,12 +4,12 @@ const User = require("../models/User");
 const protect = async (req, res, next) => {
   let token;
 
-  // 1. Check for token in cookies or Authorization header
-  if (req.cookies.jwt) {
+  // ✅ Check for token in cookies (preferred) or Authorization header
+  if (req.cookies && req.cookies.jwt) {
     token = req.cookies.jwt;
   } else if (
     req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
+    req.headers.authorization.startsWith("Bearer ")
   ) {
     token = req.headers.authorization.split(" ")[1];
   }
@@ -17,32 +17,41 @@ const protect = async (req, res, next) => {
   if (!token) {
     return res.status(401).json({
       success: false,
-      message: "Not authorized to access this route"
+      message: "Login required",
     });
   }
 
   try {
-    // 2. Verify token
+    // 4. Verify Token
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET || "supersecretkey"
+      process.env.JWT_SECRET || "supersecretkey",
     );
 
-    // 3. Attach user to request
-    const user = await User.findById(decoded.id);
+    // 5. Check if User still exists
+    const user = await User.findById(decoded.id).select("-password");
+
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "User not found"
+        message: "User belonging to this token no longer exists",
       });
     }
 
+    // 6. Grant Access
     req.user = user;
     next();
   } catch (err) {
+    console.error("Auth Error:", err.message);
+    let message = "Not authorized to access this route";
+    if (err.name === "TokenExpiredError") {
+      message = "Session expired, please login again";
+    } else if (err.name === "JsonWebTokenError") {
+      message = "Invalid token";
+    }
     return res.status(401).json({
       success: false,
-      message: "Not authorized to access this route"
+      message,
     });
   }
 };
