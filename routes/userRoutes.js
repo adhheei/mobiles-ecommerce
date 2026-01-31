@@ -8,6 +8,7 @@ const {
     addToWishlist,
     removeFromWishlist
 } = require("../controllers/userController");
+const { getAvailableCoupons } = require("../controllers/couponController");
 const { protect } = require("../middleware/authMiddleware");
 const upload = require("../middleware/upload");
 
@@ -18,5 +19,7 @@ router.put("/avatar", protect, upload.single, updateAvatar);
 router.get("/wishlist", protect, getWishlist);
 router.post("/wishlist", protect, addToWishlist);
 router.delete("/wishlist/:productId", protect, removeFromWishlist);
+
+router.get("/coupons", protect, getAvailableCoupons);
 
 module.exports = router;

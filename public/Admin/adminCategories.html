@@ -66,7 +66,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 40px;
+      /* margin-bottom: 40px; */
       text-decoration: none;
       color: var(--primary-black);
     }
@@ -438,12 +438,12 @@
         <span class="brand-subtitle">AND ACCESSORIES</span>
       </div>
     </a>
-    <button class="btn btn-light" id="sidebarToggleBtn">
+    <button class="btn btn-light" id="mobileNavToggle" onclick="toggleSidebar()">
       <i class="fa-solid fa-bars"></i>
     </button>
   </div>
 
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
   <nav class="sidebar" id="sidebar">
     <a href="../adminDashboard.html" class="brand-section">
@@ -530,6 +530,12 @@
   <script src="/libs/bootstrap.bundle.min.js"></script>
   <script src="/libs/sweetalert2.all.min.js"></script>
   <script src="/js/adminCategories.js"></script>
+  <script>
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("active");
+      document.getElementById("sidebarOverlay").classList.toggle("active");
+    }
+  </script>
 </body>
 
 </html>

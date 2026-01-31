@@ -4,23 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentSearch = '';
   const limit = 10;
 
-  // Sidebar toggle
-  const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebarOverlay');
 
-  if (sidebarToggleBtn) {
-    sidebarToggleBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('active');
-      overlay.classList.toggle('active');
-    });
-  }
-  if (overlay) {
-    overlay.addEventListener('click', () => {
-      sidebar.classList.remove('active');
-      overlay.classList.remove('active');
-    });
-  }
 
   // Load categories from API
   async function loadCategories(page = 1, search = '') {

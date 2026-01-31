@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
@@ -56,10 +56,6 @@
     }
 
     /* --- ANIMATIONS END --- */
-
-
-
-
 
     /* --- PAGE LAYOUT --- */
     .profile-container {
@@ -224,7 +220,7 @@
     }
 
     .tab-btn.active::after {
-      content: '';
+      content: "";
       position: absolute;
       bottom: -1px;
       left: 0;
@@ -426,110 +422,64 @@
 </head>
 
 <body>
-
   <div id="navbar-placeholder"></div>
 
   <div class="profile-container">
     <div class="row">
-
       <div class="col-lg-3 sidebar">
         <ul class="sidebar-menu">
-          <li class="sidebar-item"><a href="./userProfilePage.html" class="sidebar-link"><i
-                class="fa-regular fa-user"></i> Profile</a></li>
-          <li class="sidebar-item"><a href="./userOrdersPage.html" class="sidebar-link"><i
-                class="fa-solid fa-bag-shopping"></i> Orders</a></li>
-          <li class="sidebar-item"><a href="./userWalletPage.html" class="sidebar-link"><i
-                class="fa-solid fa-wallet"></i> Wallet</a></li>
-          <li class="sidebar-item"><a href="./userWishListPage.html" class="sidebar-link"><i
-                class="fa-regular fa-heart"></i> Wishlist</a></li>
-          <li class="sidebar-item"><a href="./userAddressPage.html" class="sidebar-link"><i
-                class="fa-solid fa-location-dot"></i> Address</a></li>
-          <li class="sidebar-item"><a href="./userPassword.html" class="sidebar-link"><i class="fa-solid fa-lock"></i>
-              Password</a></li>
-          <li class="sidebar-item"><a href="./userCoupon.html" class="sidebar-link active"><i
-                class="fa-solid fa-ticket"></i> Coupon</a></li>
-          <li class="sidebar-item"><a href="./userLogin.html" class="sidebar-link logout-btn"><i
-                class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a></li>
+          <li class="sidebar-item">
+            <a href="./userProfilePage.html" class="sidebar-link"><i class="fa-regular fa-user"></i> Profile</a>
+          </li>
+          <li class="sidebar-item">
+            <a href="./userOrdersPage.html" class="sidebar-link"><i class="fa-solid fa-bag-shopping"></i> Orders</a>
+          </li>
+          <li class="sidebar-item">
+            <a href="./userWalletPage.html" class="sidebar-link"><i class="fa-solid fa-wallet"></i> Wallet</a>
+          </li>
+          <li class="sidebar-item">
+            <a href="./userWishListPage.html" class="sidebar-link"><i class="fa-regular fa-heart"></i> Wishlist</a>
+          </li>
+          <li class="sidebar-item">
+            <a href="./userAddressPage.html" class="sidebar-link"><i class="fa-solid fa-location-dot"></i> Address</a>
+          </li>
+          <li class="sidebar-item">
+            <a href="./userPassword.html" class="sidebar-link"><i class="fa-solid fa-lock"></i> Password</a>
+          </li>
+          <li class="sidebar-item">
+            <a href="./userCoupon.html" class="sidebar-link active"><i class="fa-solid fa-ticket"></i> Coupon</a>
+          </li>
+          <li class="sidebar-item">
+            <a href="./userLogin.html" class="sidebar-link logout-btn"><i
+                class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+          </li>
         </ul>
       </div>
 
       <div class="col-lg-9 main-content content-animate">
-
         <h2 class="page-title">My Coupons</h2>
 
         <div class="coupon-tabs">
-          <button class="tab-btn active" onclick="switchTab('active')">Available Coupons</button>
-          <button class="tab-btn" onclick="switchTab('used')">Used / Expired</button>
+          <button class="tab-btn active" onclick="switchTab('active')">
+            Available Coupons
+          </button>
+          <button class="tab-btn" onclick="switchTab('used')">
+            Used / Expired
+          </button>
         </div>
 
         <div id="active-coupons">
-
-          <div class="coupon-card">
-            <div class="coupon-left">
-              <span class="coupon-value">20%</span>
-              <span class="coupon-type">OFF</span>
-            </div>
-            <div class="coupon-middle">
-              <div class="coupon-title">New User Bonus</div>
-              <div class="coupon-desc">Save 20% on your first order of accessories.</div>
-              <div class="coupon-expiry"><i class="fa-regular fa-clock me-1"></i> Expires: Dec 31, 2023</div>
-            </div>
-            <div class="coupon-right">
-              <button class="btn-copy" onclick="copyCode(this, 'WELCOME20')">Copy Code</button>
+          <!-- Dynamic Content -->
+          <div class="d-flex justify-content-center py-5">
+            <div class="spinner-border text-dark" role="status">
+              <span class="visually-hidden">Loading...</span>
             </div>
           </div>
-
-          <div class="coupon-card">
-            <div class="coupon-left">
-              <span class="coupon-value">$50</span>
-              <span class="coupon-type">FLAT</span>
-            </div>
-            <div class="coupon-middle">
-              <div class="coupon-title">Festive Sale</div>
-              <div class="coupon-desc">Flat $50 off on purchase above $500.</div>
-              <div class="coupon-expiry"><i class="fa-regular fa-clock me-1"></i> Expires: Nov 15, 2023</div>
-            </div>
-            <div class="coupon-right">
-              <button class="btn-copy" onclick="copyCode(this, 'FESTIVE50')">Copy Code</button>
-            </div>
-          </div>
-
         </div>
 
         <div id="used-coupons" class="d-none">
-
-          <div class="coupon-card used">
-            <div class="coupon-left">
-              <span class="coupon-value">10%</span>
-              <span class="coupon-type">OFF</span>
-            </div>
-            <div class="coupon-middle">
-              <div class="coupon-title">Summer Sale</div>
-              <div class="coupon-desc">10% off on all audio devices.</div>
-              <div class="coupon-expiry">Redeemed on: Aug 20, 2023</div>
-            </div>
-            <div class="coupon-right">
-              <span class="badge-used">REDEEMED</span>
-            </div>
-          </div>
-
-          <div class="coupon-card used">
-            <div class="coupon-left">
-              <span class="coupon-value">$10</span>
-              <span class="coupon-type">FLAT</span>
-            </div>
-            <div class="coupon-middle">
-              <div class="coupon-title">Flash Deal</div>
-              <div class="coupon-desc">$10 off on screen protectors.</div>
-              <div class="coupon-expiry">Expired on: Sep 01, 2023</div>
-            </div>
-            <div class="coupon-right">
-              <span class="badge-used">EXPIRED</span>
-            </div>
-          </div>
-
+          <!-- Dynamic Content -->
         </div>
-
       </div>
     </div>
   </div>
@@ -553,14 +503,16 @@
         </div>
         <div class="col-md-3">
           <h5>Contact Us</h5>
-          <form id="footerContactForm" style="margin-bottom: 0;">
-            <input type="text" class="newsletter-input mb-2" placeholder="Name"
-              style="font-size: 0.85rem; padding: 8px;" required />
+          <form id="footerContactForm" style="margin-bottom: 0">
+            <input type="text" class="newsletter-input mb-2" placeholder="Name" style="font-size: 0.85rem; padding: 8px"
+              required />
             <input type="email" class="newsletter-input mb-2" placeholder="Email"
-              style="font-size: 0.85rem; padding: 8px;" required />
+              style="font-size: 0.85rem; padding: 8px" required />
             <textarea class="newsletter-input mb-2" rows="2" placeholder="Message"
-              style="font-size: 0.85rem; padding: 8px; resize: none;" required></textarea>
-            <button type="submit" class="btn btn-light w-100 btn-sm fw-bold">Send</button>
+              style="font-size: 0.85rem; padding: 8px; resize: none" required></textarea>
+            <button type="submit" class="btn btn-light w-100 btn-sm fw-bold">
+              Send
+            </button>
           </form>
           <div class="mt-3">
             <i class="fa-brands fa-facebook me-3"></i>
@@ -570,55 +522,15 @@
         </div>
       </div>
       <hr class="border-secondary mt-4" />
-      <div class="text-center small">&copy; 2025 Jinsa Mobiles. All rights reserved.</div>
+      <div class="text-center small">
+        &copy; 2025 Jinsa Mobiles. All rights reserved.
+      </div>
     </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Tab Switching Logic
-    function switchTab(type) {
-      const activeContainer = document.getElementById('active-coupons');
-      const usedContainer = document.getElementById('used-coupons');
-      const tabs = document.querySelectorAll('.tab-btn');
-
-      // Remove active class from all tabs
-      tabs.forEach(btn => btn.classList.remove('active'));
-
-      if (type === 'active') {
-        activeContainer.classList.remove('d-none');
-        usedContainer.classList.add('d-none');
-        tabs[0].classList.add('active'); // First button
-      } else {
-        activeContainer.classList.add('d-none');
-        usedContainer.classList.remove('d-none');
-        tabs[1].classList.add('active'); // Second button
-      }
-    }
-
-    // Copy Code Logic with SweetAlert
-    function copyCode(btn, code) {
-      navigator.clipboard.writeText(code).then(() => {
-        const originalText = btn.innerText;
-        btn.innerText = "Copied!";
-
-        Swal.fire({
-          icon: 'success',
-          title: 'Copied!',
-          text: 'Coupon code ' + code + ' copied to clipboard.',
-          showConfirmButton: false,
-          timer: 1500,
-          width: '300px'
-        });
-
-        setTimeout(() => {
-          btn.innerText = originalText;
-        }, 2000);
-      });
-    }
-  </script>
-
   <script src="/js/navbar.js"></script>
+  <script src="/js/userCoupons.js"></script>
 </body>
 
 </html>

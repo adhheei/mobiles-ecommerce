@@ -241,11 +241,10 @@
                 const data = await res.json();
 
                 if (data.success) {
-                    // Save user and token to localStorage
+                    // Save user to localStorage for UI (Cookie handles auth)
                     localStorage.setItem('user', JSON.stringify(data.user));
-                    if (data.token) {
-                        localStorage.setItem('token', data.token);
-                    }
+                    // Clear legacy token if exists
+                    localStorage.removeItem('token');
 
                     Swal.fire({
                         icon: 'success',
@@ -297,9 +296,7 @@
 
                 if (data.success) {
                     localStorage.setItem('user', JSON.stringify(data.user));
-                    if (data.token) {
-                        localStorage.setItem('token', data.token);
-                    }
+                    localStorage.removeItem('token'); // Clear legacy
 
                     Swal.fire({
                         icon: 'success',

@@ -1,4 +1,3 @@
-
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -21,27 +20,29 @@ const transporter = nodemailer.createTransport({
 
 // Helper: Send Token Response
 const sendTokenResponse = (model, statusCode, res) => {
-  const token = jwt.sign({ id: model._id }, JWT_SECRET, {
-    expiresIn: "30d",
-  });
+  // 1. Generate JWT with ID and Role
+  const token = jwt.sign(
+    { id: model._id, role: model.role },
+    JWT_SECRET,
+    { expiresIn: "30d" }
+  );
 
+  // 2. Cookie Options (Secure, HttpOnly)
   const options = {
     expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-    httpOnly: true,
-    // secure: true // Enable in production with HTTPS
+    httpOnly: true, // Prevents XSS attacks (JS cannot access cookie)
+    secure: process.env.NODE_ENV === "production", // HTTPS only in production
   };
 
-  if (process.env.NODE_ENV === "production") {
-    options.secure = true;
-  }
-
+  // 3. Send Response with Cookie and Token
   res.status(statusCode).cookie("jwt", token, options).json({
     success: true,
-    token,
+    token, // Include for clients preferring Bearer header
     user: {
       id: model._id,
-      name: model.firstName || "Admin",
+      name: model.firstName,
       email: model.email,
+      role: model.role,
     },
   });
 };
@@ -118,7 +119,15 @@ exports.login = async (req, res) => {
     }
 
     if (user.status === "blocked") {
-      return res.status(403).json({ message: "Account is blocked. Contact support." });
+      return res
+        .status(403)
+        .json({ message: "Account is blocked. Contact support." });
+    }
+
+    if (user.role === "admin") {
+      return res
+        .status(403)
+        .json({ message: "Admins must login via the Admin Portal." });
     }
 
     sendTokenResponse(user, 200, res);
@@ -153,7 +162,7 @@ exports.sendOtp = async (req, res) => {
 
     // Find user by email OR phone
     const user = await User.findOne({
-      $or: [{ email: emailOrPhone }, { phone: emailOrPhone }]
+      $or: [{ email: emailOrPhone }, { phone: emailOrPhone }],
     });
 
     if (!user) {
@@ -164,7 +173,9 @@ exports.sendOtp = async (req, res) => {
 
     // Check Lock
     if (user.lockUntil && user.lockUntil > Date.now()) {
-      return res.status(429).json({ message: "Too many attempts. Please try again later." });
+      return res
+        .status(429)
+        .json({ message: "Too many attempts. Please try again later." });
     }
 
     // Generate 6-digit OTP
@@ -189,7 +200,12 @@ exports.sendOtp = async (req, res) => {
 
       if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
         console.log("⚠️ [MOCK EMAIL] OTP for " + user.email + ": " + otp);
-        return res.status(200).json({ success: true, message: "OTP sent (Mock Mode check console)" });
+        return res
+          .status(200)
+          .json({
+            success: true,
+            message: "OTP sent (Mock Mode check console)",
+          });
       }
 
       await transporter.sendMail({
@@ -205,7 +221,6 @@ exports.sendOtp = async (req, res) => {
       console.log("📲 [MOCK SMS] OTP for " + user.phone + ": " + otp);
       res.status(200).json({ success: true, message: "OTP sent to phone" });
     }
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -218,7 +233,7 @@ exports.verifyOtp = async (req, res) => {
     const { emailOrPhone, otp } = req.body;
 
     const user = await User.findOne({
-      $or: [{ email: emailOrPhone }, { phone: emailOrPhone }]
+      $or: [{ email: emailOrPhone }, { phone: emailOrPhone }],
     });
 
     if (!user) {
@@ -227,7 +242,9 @@ exports.verifyOtp = async (req, res) => {
 
     // Check Lock
     if (user.lockUntil && user.lockUntil > Date.now()) {
-      return res.status(429).json({ message: "Too many attempts. Try again later." });
+      return res
+        .status(429)
+        .json({ message: "Too many attempts. Try again later." });
     }
 
     // Check Expiry
@@ -243,7 +260,9 @@ exports.verifyOtp = async (req, res) => {
       if (user.otpAttempts >= 5) {
         user.lockUntil = Date.now() + 15 * 60 * 1000; // Lock for 15 mins
         await user.save();
-        return res.status(429).json({ message: "Too many failed attempts. Locked for 15 mins." });
+        return res
+          .status(429)
+          .json({ message: "Too many failed attempts. Locked for 15 mins." });
       }
       await user.save();
       return res.status(400).json({ message: "Invalid OTP" });
@@ -252,7 +271,6 @@ exports.verifyOtp = async (req, res) => {
     // Success (Don't clear yet, clear on reset)
     // Optionally return a temporary token here if stateless
     res.status(200).json({ success: true, message: "OTP Verified" });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -265,7 +283,7 @@ exports.resetPassword = async (req, res) => {
     const { emailOrPhone, otp, password } = req.body;
 
     const user = await User.findOne({
-      $or: [{ email: emailOrPhone }, { phone: emailOrPhone }]
+      $or: [{ email: emailOrPhone }, { phone: emailOrPhone }],
     });
 
     if (!user) {
@@ -274,7 +292,9 @@ exports.resetPassword = async (req, res) => {
 
     // Re-verify OTP (Critical Security)
     if (!user.otpExpires || user.otpExpires < Date.now()) {
-      return res.status(400).json({ message: "OTP expired, please request new one" });
+      return res
+        .status(400)
+        .json({ message: "OTP expired, please request new one" });
     }
 
     const isMatch = await bcrypt.compare(otp, user.otp);
@@ -292,7 +312,6 @@ exports.resetPassword = async (req, res) => {
     await user.save();
 
     sendTokenResponse(user, 200, res);
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -351,7 +370,12 @@ exports.loginAdmin = async (req, res) => {
       attempts.time = Date.now();
     }
     if (attempts.count >= 5) {
-      return res.status(429).json({ success: false, error: "Too many login attempts. Please try again later." });
+      return res
+        .status(429)
+        .json({
+          success: false,
+          error: "Too many login attempts. Please try again later.",
+        });
     }
 
     if (!email || !password) {
@@ -369,7 +393,7 @@ exports.loginAdmin = async (req, res) => {
     }
 
     // Check Role
-    if (user.role !== 'admin') {
+    if (user.role !== "admin") {
       return res
         .status(403)
         .json({ success: false, error: "Access denied. Not an admin." });
@@ -389,25 +413,28 @@ exports.loginAdmin = async (req, res) => {
     loginAttempts.delete(ip);
 
     // Generate Token
-    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "1d" });
+    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, {
+      expiresIn: "1d",
+    });
 
     // Cookie for admin
-    res.cookie("admin_jwt", token, {
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production"
-    }).json({
-      success: true,
-      token,
-      admin: {
-        id: user._id,
-        email: user.email,
-        role: user.role
-      },
-    });
+    res
+      .cookie("admin_jwt", token, {
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+      })
+      .json({
+        success: true,
+        token,
+        admin: {
+          id: user._id,
+          email: user.email,
+          role: user.role,
+        },
+      });
   } catch (err) {
     console.error("Login Error:", err);
     res.status(500).json({ success: false, error: "Server error" });
   }
 };
-

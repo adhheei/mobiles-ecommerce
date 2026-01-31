@@ -278,102 +278,117 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Check for User Login State
 async function checkUserLogin() {
-    const user = JSON.parse(localStorage.getItem('user'));
-
-    // Updated selector to match index.html
+    let user = JSON.parse(localStorage.getItem('user'));
     const navIcons = document.querySelector('.nav-icons');
 
-    if (user && navIcons) {
-        // Find existing login button: It's the element with id 'nav-login'
+    if (!navIcons) return;
+
+    const renderLoggedInParams = (userData) => {
+        // Find existing login button
         const loginBtn = document.getElementById('nav-login');
+        if (loginBtn) loginBtn.remove();
 
-        if (loginBtn) {
-            loginBtn.remove(); // Remove Login Button
-
-            // Create User Dropdown Container
-            const userDropdown = document.createElement('div');
-            userDropdown.className = 'dropdown ms-4'; // Add margin to match spacing
-
-            // initial placeholder
-            let avatarHtml = `<i class="fa-solid fa-user-circle fa-lg"></i>`;
-            let userName = user.name ? user.name.split(' ')[0] : 'User';
-
-            // Construct Dropdown HTML
-            userDropdown.innerHTML = `
-                <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-dark" href="#" role="button" aria-expanded="false" id="userDropdownToggle">
-                    <div id="nav-avatar-container" class="d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
-                        ${avatarHtml}
-                    </div>
-                    <span class="fw-bold" id="nav-username">${userName}</span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm mt-2">
-                    <li><a class="dropdown-item" href="/User/userProfilePage.html"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
-                    <li><a class="dropdown-item" href="/User/userWishListPage.html"><i class="fa-solid fa-heart me-2"></i>Wishlist</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</a></li>
-                </ul>
-            `;
+        // Check if dropdown already exists
+        let userDropdown = document.querySelector('.dropdown.ms-4');
+        if (!userDropdown) {
+            userDropdown = document.createElement('div');
+            userDropdown.className = 'dropdown ms-4';
             navIcons.appendChild(userDropdown);
+        }
 
-            // --- Manual Toggle for User Dropdown ---
-            const userToggle = userDropdown.querySelector('.dropdown-toggle');
-            if (userToggle) {
-                userToggle.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const menu = this.nextElementSibling;
-                    if (menu) {
-                        menu.classList.toggle('show');
-                        this.classList.toggle('show');
-                        this.setAttribute('aria-expanded', this.classList.contains('show'));
-                    }
-                });
+        // initial placeholder
+        let avatarHtml = `<i class="fa-solid fa-user-circle fa-lg"></i>`;
+        let userName = userData.name ? userData.name.split(' ')[0] : 'User';
+
+        if (userData.profileImage) {
+            let imgSrc = userData.profileImage;
+            // Normalize path
+            imgSrc = imgSrc.replace(/\\/g, "/");
+            if (imgSrc.startsWith("public/")) imgSrc = imgSrc.replace("public/", "");
+            if (!imgSrc.startsWith("http") && !imgSrc.startsWith("/")) {
+                imgSrc = '/' + imgSrc;
+            }
+            if (!imgSrc.startsWith('http')) {
+                imgSrc += (imgSrc.includes("?") ? "&" : "?") + `t=${new Date().getTime()}`;
             }
 
-            // --- Fetch Fresh Profile Data ---
-            try {
-                const res = await fetch('/api/user/profile');
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.success && data.user) {
-                        // Update Name
-                        const newName = data.user.firstName || userName;
-                        document.getElementById('nav-username').innerText = newName;
+            avatarHtml = `<img src="${imgSrc}" alt="Avatar" class="rounded-circle border" style="width: 35px; height: 35px; object-fit: cover;">`;
+        }
 
-                        // Update Avatar
-                        const avatarContainer = document.getElementById('nav-avatar-container');
-                        if (data.user.profileImage) {
-                            let imgSrc = data.user.profileImage;
+        userDropdown.innerHTML = `
+            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-dark" href="#" role="button" aria-expanded="false" id="userDropdownToggle">
+                <div id="nav-avatar-container" class="d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                    ${avatarHtml}
+                </div>
+                <span class="fw-bold" id="nav-username">${userName}</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm mt-2">
+                <li><a class="dropdown-item" href="/User/userProfilePage.html"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
+                <li><a class="dropdown-item" href="/User/userWishListPage.html"><i class="fa-solid fa-heart me-2"></i>Wishlist</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</a></li>
+            </ul>
+        `;
 
-                            // Normalize path
-                            if (!imgSrc.startsWith('http') && !imgSrc.startsWith('/')) {
-                                imgSrc = '/' + imgSrc;
-                            }
-
-                            // Cache busting
-                            if (!imgSrc.startsWith('http')) {
-                                imgSrc += `?v=${new Date().getTime()}`;
-                            }
-
-                            avatarContainer.innerHTML = `
-                                <img src="${imgSrc}" alt="Avatar" 
-                                     class="rounded-circle border" 
-                                     style="width: 35px; height: 35px; object-fit: cover;">
-                            `;
-                        } else {
-                            // Ensure default icon if no image
-                            avatarContainer.innerHTML = `<i class="fa-solid fa-user-circle fa-2x text-secondary"></i>`;
-                        }
-
-                        // Update local storage to keep it fresh
-                        const updatedUser = { ...user, name: newName };
-                        localStorage.setItem('user', JSON.stringify(updatedUser));
-                    }
+        // Toggle logic
+        const userToggle = userDropdown.querySelector('.dropdown-toggle');
+        if (userToggle) {
+            userToggle.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const menu = this.nextElementSibling;
+                if (menu) {
+                    menu.classList.toggle('show');
+                    this.classList.toggle('show');
+                    this.setAttribute('aria-expanded', this.classList.contains('show'));
                 }
-            } catch (err) {
-                console.error("Failed to fetch fresh user data for navbar", err);
+            });
+        }
+    };
+
+    // Optimistic render if local user exists
+    if (user) {
+        renderLoggedInParams(user);
+    }
+
+    // Always verify with backend (Cookie Check)
+    try {
+        const res = await fetch('/api/user/profile');
+        if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.user) {
+                // Update Local Storage
+                const userData = { ...data.user, name: data.user.firstName || 'User' };
+                localStorage.setItem('user', JSON.stringify(userData));
+                // Update UI (refreshes image/name)
+                renderLoggedInParams(userData);
+            }
+        } else if (res.status === 401) {
+            // Cookie invalid or expired
+            localStorage.removeItem('user');
+            localStorage.removeItem('token'); // Just in case
+
+            // If we optimistically rendered, we must revert (reload or remove)
+            if (user) {
+                // Simplest way to clear UI is reload or remove element
+                // Removing element is smoother
+                const userDropdown = document.querySelector('.dropdown.ms-4');
+                if (userDropdown) userDropdown.remove();
+
+                // Restore Login Button if not present
+                if (!document.getElementById('nav-login')) {
+                    // We probably need to reload to restore original state or manually re-add text
+                    // Reload is safer to ensure consistent state
+                    // But might loop if checking on every page load?
+                    // No, if localstorage is cleared, next load won't render optimistic.
+                    // And 401 response means we stay logged out.
+                    // So reload is acceptable ONLY if we were optimistically logged in.
+                    window.location.reload();
+                }
             }
         }
+    } catch (err) {
+        console.error("Auth check failed", err);
     }
 }
 
@@ -434,3 +449,5 @@ window.handleLogout = async function () {
         window.location.href = '/User/index.html';
     }
 };
+
+

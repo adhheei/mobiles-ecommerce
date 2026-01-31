@@ -53,6 +53,9 @@ const createCoupon = async (req, res) => {
         const start = startDate ? new Date(startDate) : new Date();
         const end = new Date(endDate);
 
+        // Set end date to end of day (23:59:59.999) to allow same-day coupons
+        end.setHours(23, 59, 59, 999);
+
         if (end <= start) {
             return res.status(400).json({
                 success: false,
@@ -92,6 +95,7 @@ const createCoupon = async (req, res) => {
 
     } catch (error) {
         console.error('Create Coupon Error:', error);
+
         // Handle Mongoose Validation Errors
         if (error.name === 'ValidationError') {
             const messages = Object.values(error.errors).map(val => val.message);
@@ -100,10 +104,27 @@ const createCoupon = async (req, res) => {
                 message: messages.join(', ')
             });
         }
+
+        // Handle Generic Errors (e.g., from pre-save hooks)
+        if (error.message && (error.message.includes('End date must be') || error.message.includes('Percentage'))) {
+            return res.status(400).json({
+                success: false,
+                message: error.message
+            });
+        }
+
+        // Handle Duplicate Key Error (E11000)
+        if (error.code === 11000) {
+            return res.status(409).json({
+                success: false,
+                message: 'Coupon code already exists'
+            });
+        }
+
         // General Server Error
         res.status(500).json({
             success: false,
-            message: 'Server Error: Failed to create coupon'
+            message: 'Server Error: Failed to create coupon. Check logs.'
         });
     }
 };
@@ -139,8 +160,126 @@ const deleteCoupon = async (req, res) => {
 };
 
 
+
+// @desc    Get single coupon
+// @route   GET /api/admin/coupons/:id
+// @access  Private/Admin
+const getCoupon = async (req, res) => {
+    try {
+        const coupon = await Coupon.findById(req.params.id);
+        if (!coupon) {
+            return res.status(404).json({ success: false, message: 'Coupon not found' });
+        }
+        res.status(200).json({ success: true, data: coupon });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
+// @desc    Update coupon
+// @route   PUT /api/admin/coupons/:id
+// @access  Private/Admin
+const updateCoupon = async (req, res) => {
+    try {
+        const {
+            code,
+            discountType,
+            value,
+            startDate,
+            endDate,
+            minPurchase,
+            maxDiscount,
+            totalLimit,
+            perUserLimit,
+            isActive
+        } = req.body;
+
+        const coupon = await Coupon.findById(req.params.id);
+        if (!coupon) {
+            return res.status(404).json({ success: false, message: 'Coupon not found' });
+        }
+
+        // Validate Dates
+        const start = startDate ? new Date(startDate) : coupon.startDate;
+        const end = endDate ? new Date(endDate) : coupon.endDate;
+        if (endDate) end.setHours(23, 59, 59, 999);
+
+        if (end <= start) {
+            return res.status(400).json({ success: false, message: 'End date must be after start date' });
+        }
+
+        // Check Duplicate Code (if changed)
+        if (code && code !== coupon.code) {
+            const existing = await Coupon.findOne({ code: code.toUpperCase() });
+            if (existing) {
+                return res.status(409).json({ success: false, message: 'Coupon code already exists' });
+            }
+            coupon.code = code.toUpperCase();
+        }
+
+        // Update Fields
+        if (discountType) coupon.discountType = discountType;
+        if (value) coupon.value = value;
+        coupon.startDate = start;
+        coupon.endDate = end;
+        if (minPurchase !== undefined) coupon.minPurchase = minPurchase;
+        if (maxDiscount !== undefined) coupon.maxDiscount = maxDiscount;
+        if (totalLimit !== undefined) coupon.totalLimit = totalLimit;
+        if (perUserLimit !== undefined) coupon.perUserLimit = perUserLimit;
+        if (isActive !== undefined) coupon.isActive = isActive;
+
+        await coupon.save();
+
+        res.status(200).json({
+            success: true,
+            data: coupon,
+            message: 'Coupon updated successfully'
+        });
+
+    } catch (error) {
+        console.error('Update Coupon Error:', error);
+        if (error.code === 11000) {
+            return res.status(409).json({ success: false, message: 'Coupon code already exists' });
+        }
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
+// @desc    Get coupons for user (Active & Used/Expired)
+// @route   GET /api/user/coupons
+// @access  Private/User
+const getAvailableCoupons = async (req, res) => {
+    try {
+        const userId = req.user._id.toString();
+
+        // Fetch all coupons (you might want to limit this if there are many)
+        const coupons = await Coupon.find({}).sort({ endDate: -1 }).lean();
+
+        const processedCoupons = coupons.map(coupon => {
+            const usageCount = coupon.userUsage ? (coupon.userUsage[userId] || 0) : 0;
+            const isRedeemed = coupon.perUserLimit && usageCount >= coupon.perUserLimit;
+            const isExpired = new Date(coupon.endDate) < new Date();
+
+            return {
+                ...coupon,
+                isUsed: isRedeemed, // Renamed for frontend consistency
+                isExpired: isExpired
+            };
+        });
+
+        res.status(200).json({ success: true, count: processedCoupons.length, data: processedCoupons });
+    } catch (error) {
+        console.error("Get User Coupons Error:", error);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
 module.exports = {
     createCoupon,
     getCoupons,
-    deleteCoupon
+    deleteCoupon,
+    getCoupon,
+    updateCoupon,
+    getAvailableCoupons
 };

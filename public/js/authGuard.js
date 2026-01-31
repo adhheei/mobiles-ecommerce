@@ -3,36 +3,43 @@
  * Include this script in the <head> of any page that requires authentication.
  * It strictly checks for the presence of a user in localStorage.
  */
-(function () {
-    function checkAuth() {
-        const user = localStorage.getItem('user');
-        const currentPath = window.location.pathname;
+(async function () {
+    const currentPath = window.location.pathname;
 
-        // List of public pages where this script might accidentally be included
-        // (Safety check, though we should only include it in protected pages)
-        const publicPages = [
-            'userLogin.html',
-            'userSignup.html',
-            'forgotPassword.html',
-            'resetPassword.html',
-            'index.html'
-        ];
+    // List of public pages where this script might accidentally be included
+    const publicPages = [
+        'userLogin.html',
+        'userSignup.html',
+        'forgotPassword.html',
+        'resetPassword.html',
+        'index.html'
+    ];
 
-        // If we are on a public page, do nothing (shouldn't happen if used correctly)
-        for (const page of publicPages) {
-            if (currentPath.includes(page)) return;
-        }
-
-        if (!user) {
-            // Save current location for redirect after login
-            const redirectUrl = encodeURIComponent(currentPath);
-            window.location.replace('/User/userLogin.html?redirect=' + redirectUrl + '&msg=login_required');
-
-            // Stop further execution and hide body to prevent flash content
-            // (Though script in <head> usually runs before body render)
-            document.documentElement.style.display = 'none';
-        }
+    // If we are on a public page, do nothing
+    for (const page of publicPages) {
+        if (currentPath.includes(page)) return;
     }
 
-    checkAuth();
+    try {
+        const response = await fetch('/api/user/profile', {
+            method: 'GET',
+            credentials: 'include' // 🍪 Send cookies
+        });
+
+        if (response.status === 401) {
+            // Unauthorized - redirect to login
+            console.warn("Session expired or invalid, redirecting to login...");
+            const redirectUrl = encodeURIComponent(currentPath);
+            window.location.replace('/User/userLogin.html?redirect=' + redirectUrl + '&msg=login_required');
+        } else if (!response.ok) {
+            // Other errors (500, etc) - optional: let it slide or show error
+            // For now, if it's not 401, we assume it's okay-ish or let the page handle it
+            console.error("Auth check failed with status:", response.status);
+        }
+
+    } catch (error) {
+        console.error("Auth check network error:", error);
+        // On network error, maybe don't redirect immediately to avoid loops if server is down?
+        // Or redirect to login safely.
+    }
 })();
