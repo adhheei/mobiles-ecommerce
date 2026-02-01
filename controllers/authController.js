@@ -3,66 +3,71 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
 const nodemailer = require("nodemailer");
-const crypto = require("crypto");
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
-
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-// 📧 Email Configuration
+/*
+  -------------------------------------------------------------------------
+  📧 EMAIL TRANSPORT CONFIGURATION
+  -------------------------------------------------------------------------
+*/
 const transporter = nodemailer.createTransport({
-  service: "gmail", // Use your email provider
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
 });
 
-// Helper: Send Token Response
+/*
+  -------------------------------------------------------------------------
+  🛠️ HELPER FUNCTIONS
+  -------------------------------------------------------------------------
+*/
+
+// Generate JWT & Send Cookie
 const sendTokenResponse = (model, statusCode, res) => {
-  // 1. Generate JWT with ID and Role
   const token = jwt.sign(
     { id: model._id, role: model.role },
     JWT_SECRET,
     { expiresIn: "30d" }
   );
 
-  // 2. Cookie Options (Secure, HttpOnly)
   const options = {
     expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-    httpOnly: true, // Prevents XSS attacks (JS cannot access cookie)
-    secure: process.env.NODE_ENV === "production", // HTTPS only in production
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
   };
 
-  // 3. Send Response with Cookie and Token
-  res.status(statusCode).cookie("jwt", token, options).json({
-    success: true,
-    token, // Include for clients preferring Bearer header
-    user: {
-      id: model._id,
-      name: model.firstName,
-      firstName: model.firstName,
-      lastName: model.lastName,
-      email: model.email,
-      role: model.role,
-    },
-  });
+  res
+    .status(statusCode)
+    .cookie("jwt", token, options)
+    .json({
+      success: true,
+      token,
+      user: {
+        id: model._id,
+        firstName: model.firstName,
+        lastName: model.lastName,
+        email: model.email,
+        role: model.role,
+      },
+    });
 };
 
-// 1. REGISTER USER
+/*
+  -------------------------------------------------------------------------
+  🛂 AUTH CONTROLLERS
+  -------------------------------------------------------------------------
+*/
+
+// 1. SIGNUP
 exports.signup = async (req, res) => {
   try {
-    const { firstName, lastName, email, phone, password, confirmPassword } =
-      req.body;
+    const { firstName, lastName, email, phone, password, confirmPassword } = req.body;
 
-    if (
-      !firstName ||
-      !lastName ||
-      !email ||
-      !phone ||
-      !password ||
-      !confirmPassword
-    ) {
+    if (!firstName || !lastName || !email || !phone || !password || !confirmPassword) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -70,14 +75,9 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ message: "Passwords do not match" });
     }
 
-    const existingUser = await User.findOne({
-      $or: [{ email }, { phone }],
-    });
-
+    const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
     if (existingUser) {
-      return res
-        .status(409)
-        .json({ message: "User already exists with this email or phone" });
+      return res.status(409).json({ message: "User already exists" });
     }
 
     const user = await User.create({
@@ -85,56 +85,46 @@ exports.signup = async (req, res) => {
       lastName,
       email,
       phone,
-      password,
+      password, // Pre-save hook will hash this
     });
 
     sendTokenResponse(user, 201, res);
   } catch (error) {
-    console.error(error);
+    console.error("Signup Error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// 2. LOGIN USER
+// 2. LOGIN
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Please provide valid credentials" });
+      return res.status(400).json({ message: "Please provide credentials" });
     }
 
-    // Check for user
     const user = await User.findOne({ email });
-
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Check password
-    const isMatch = await bcrypt.compare(password, user.password);
+    if (user.status === "blocked") {
+      return res.status(403).json({ message: "Account is blocked" });
+    }
 
+    if (user.role === "admin") {
+      return res.status(403).json({ message: "Admins must login via Admin Portal" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    if (user.status === "blocked") {
-      return res
-        .status(403)
-        .json({ message: "Account is blocked. Contact support." });
-    }
-
-    if (user.role === "admin") {
-      return res
-        .status(403)
-        .json({ message: "Admins must login via the Admin Portal." });
-    }
-
     sendTokenResponse(user, 200, res);
   } catch (err) {
-    console.error(err);
+    console.error("Login Error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -145,6 +135,7 @@ exports.logout = (req, res) => {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
   });
+  // Clear admin cookie too just in case
   res.cookie("admin_jwt", "none", {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
@@ -153,61 +144,48 @@ exports.logout = (req, res) => {
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
-// 4. SEND OTP (Email or Phone)
+// 4. SEND OTP
 exports.sendOtp = async (req, res) => {
   try {
     const { emailOrPhone } = req.body;
-
     if (!emailOrPhone) {
       return res.status(400).json({ message: "Please provide Email or Phone" });
     }
 
-    // Find user by email OR phone
     const user = await User.findOne({
       $or: [{ email: emailOrPhone }, { phone: emailOrPhone }],
     });
 
     if (!user) {
-      // Security: Fake success to prevent enumeration, or return 404 if UX > Security
-      // For this project, we'll return 404 for clarity
       return res.status(404).json({ message: "User not found" });
     }
 
     // Check Lock
     if (user.lockUntil && user.lockUntil > Date.now()) {
-      return res
-        .status(429)
-        .json({ message: "Too many attempts. Please try again later." });
+      return res.status(429).json({ message: "Too many attempts. Try again later." });
     }
 
-    // Generate 6-digit OTP
+    // Generate 6-digit numeric OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Securely Hash OTP
+    // Hash OTP
     const salt = await bcrypt.genSalt(10);
     const hashedOtp = await bcrypt.hash(otp, salt);
 
     // Update User
     user.otp = hashedOtp;
     user.otpExpires = Date.now() + 5 * 60 * 1000; // 5 mins
-    user.otpAttempts = 0; // Reset attempts on new OTP
-    await user.save();
+    user.otpAttempts = 0;
+    await user.save(); // Triggers pre-save hook but password check handles it
 
-    // Determine if Email or Phone
-    const isEmail = emailOrPhone.includes("@");
-
-    if (isEmail) {
-      // Send Email
+    // Send Email
+    if (emailOrPhone.includes("@")) {
       const message = `Your Password Reset OTP is: ${otp}\n\nIt expires in 5 minutes.`;
 
+      // Mock Check
       if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.log("⚠️ [MOCK EMAIL] OTP for " + user.email + ": " + otp);
-        return res
-          .status(200)
-          .json({
-            success: true,
-            message: "OTP sent (Mock Mode check console)",
-          });
+        console.log(`⚠️ [MOCK EMAIL] OTP for ${user.email}: ${otp}`);
+        return res.status(200).json({ success: true, message: "OTP sent (Mock Mode)" });
       }
 
       await transporter.sendMail({
@@ -217,14 +195,14 @@ exports.sendOtp = async (req, res) => {
         text: message,
       });
 
-      res.status(200).json({ success: true, message: "OTP sent to email" });
+      return res.status(200).json({ success: true, message: "OTP sent to email" });
     } else {
-      // Send Phone (Mock)
-      console.log("📲 [MOCK SMS] OTP for " + user.phone + ": " + otp);
-      res.status(200).json({ success: true, message: "OTP sent to phone" });
+      // Mock SMS
+      console.log(`📲 [MOCK SMS] OTP for ${user.phone}: ${otp}`);
+      return res.status(200).json({ success: true, message: "OTP sent to phone" });
     }
   } catch (err) {
-    console.error(err);
+    console.error("sendOtp Error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -244,9 +222,7 @@ exports.verifyOtp = async (req, res) => {
 
     // Check Lock
     if (user.lockUntil && user.lockUntil > Date.now()) {
-      return res
-        .status(429)
-        .json({ message: "Too many attempts. Try again later." });
+      return res.status(429).json({ message: "Too many attempts. Locked." });
     }
 
     // Check Expiry
@@ -254,27 +230,24 @@ exports.verifyOtp = async (req, res) => {
       return res.status(400).json({ message: "OTP has expired" });
     }
 
-    // Verify OTP
-    const isMatch = await bcrypt.compare(otp, user.otp);
+    // Verify Match (Explicit String Cast)
+    const isMatch = await bcrypt.compare(String(otp), user.otp);
 
     if (!isMatch) {
       user.otpAttempts += 1;
       if (user.otpAttempts >= 5) {
-        user.lockUntil = Date.now() + 15 * 60 * 1000; // Lock for 15 mins
+        user.lockUntil = Date.now() + 15 * 60 * 1000; // 15 min lock
         await user.save();
-        return res
-          .status(429)
-          .json({ message: "Too many failed attempts. Locked for 15 mins." });
+        return res.status(429).json({ message: "Locked for 15 minutes due to too many failed attempts." });
       }
       await user.save();
       return res.status(400).json({ message: "Invalid OTP" });
     }
 
-    // Success (Don't clear yet, clear on reset)
-    // Optionally return a temporary token here if stateless
+    // Success - Do NOT clear OTP yet (needed for reset step)
     res.status(200).json({ success: true, message: "OTP Verified" });
   } catch (err) {
-    console.error(err);
+    console.error("verifyOtp Error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -282,30 +255,38 @@ exports.verifyOtp = async (req, res) => {
 // 6. RESET PASSWORD
 exports.resetPassword = async (req, res) => {
   try {
-    const { emailOrPhone, otp, password } = req.body;
+    // Expect: email, otp, newPassword
+    const { email, otp, newPassword } = req.body;
 
-    const user = await User.findOne({
-      $or: [{ email: emailOrPhone }, { phone: emailOrPhone }],
-    });
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({ message: "Missing required fields (email, otp, newPassword)" });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 chars" });
+    }
+
+    const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
 
-    // Re-verify OTP (Critical Security)
+    // Re-Verify OTP (Security)
     if (!user.otpExpires || user.otpExpires < Date.now()) {
-      return res
-        .status(400)
-        .json({ message: "OTP expired, please request new one" });
+      return res.status(400).json({ message: "OTP has expired" });
     }
 
-    const isMatch = await bcrypt.compare(otp, user.otp);
+    // Explicit string cast
+    const isMatch = await bcrypt.compare(String(otp), user.otp);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid OTP" });
     }
 
-    // Update password
-    user.password = password;
+    // Set New Password
+    user.password = newPassword;
+
+    // Clear OTP fields
     user.otp = undefined;
     user.otpExpires = undefined;
     user.otpAttempts = 0;
@@ -313,130 +294,91 @@ exports.resetPassword = async (req, res) => {
 
     await user.save();
 
-    sendTokenResponse(user, 200, res);
+    // Clear Auth Cookie to force re-login
+    res.clearCookie("jwt");
+    res.clearCookie("admin_jwt");
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset successfully. Please login."
+    });
+
   } catch (err) {
-    console.error(err);
+    console.error("resetPassword Error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// 7. GOOGLE SIGNUP/LOGIN
+// 7. GOOGLE AUTH
 exports.googleSignup = async (req, res) => {
   try {
     const { credential } = req.body;
-
     const ticket = await client.verifyIdToken({
       idToken: credential,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
-
-    const payload = ticket.getPayload();
-    const { email, given_name, family_name } = payload;
+    const { email, given_name, family_name } = ticket.getPayload();
 
     let user = await User.findOne({ email });
-
     if (!user) {
       user = await User.create({
         firstName: given_name,
         lastName: family_name || "",
         email,
-        phone: "google-" + Date.now(), // Placeholder
-        password: email + process.env.JWT_SECRET, // Dummy securely hashed
+        phone: "google-" + Date.now(),
+        password: email + process.env.JWT_SECRET,
         isGoogleUser: true,
       });
     }
-
     sendTokenResponse(user, 200, res);
   } catch (error) {
-    console.error(error);
-    res.status(401).json({
-      success: false,
-      message: "Invalid Google token",
-    });
+    res.status(401).json({ success: false, message: "Invalid Google token" });
   }
 };
 
-// In-memory rate limiter (simple implementation)
-const loginAttempts = new Map();
-
 // 8. ADMIN LOGIN
+const loginAttempts = new Map();
 exports.loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
     const ip = req.ip;
 
-    // Check Rate Limit (5 attempts per 15 mins)
     const attempts = loginAttempts.get(ip) || { count: 0, time: Date.now() };
-    if (Date.now() - attempts.time > 15 * 60 * 1000) {
-      attempts.count = 0;
-      attempts.time = Date.now();
-    }
+    if (Date.now() - attempts.time > 15 * 60 * 1000) attempts.count = 0;
+
     if (attempts.count >= 5) {
-      return res
-        .status(429)
-        .json({
-          success: false,
-          error: "Too many login attempts. Please try again later.",
-        });
+      return res.status(429).json({ error: "Too many attempts" });
     }
 
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ success: false, error: "Please provide email and password" });
+      return res.status(400).json({ error: "Missing credentials" });
     }
 
-    // Check User model instead of Admin
     const user = await User.findOne({ email });
-    if (!user) {
-      return res
-        .status(401)
-        .json({ success: false, error: "Invalid credentials" });
-    }
-
-    // Check Role
-    if (user.role !== "admin") {
-      return res
-        .status(403)
-        .json({ success: false, error: "Access denied. Not an admin." });
+    if (!user || user.role !== "admin") {
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      // Increment attempts
       attempts.count++;
       loginAttempts.set(ip, attempts);
-      return res
-        .status(401)
-        .json({ success: false, error: "Invalid credentials" });
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    // Reset attempts on success
     loginAttempts.delete(ip);
 
-    // Generate Token
-    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, {
-      expiresIn: "1d",
+    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "1d" });
+    res.cookie("admin_jwt", token, {
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production"
+    }).json({
+      success: true,
+      token,
+      admin: { id: user._id, email: user.email, role: user.role }
     });
-
-    // Cookie for admin
-    res
-      .cookie("admin_jwt", token, {
-        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-      })
-      .json({
-        success: true,
-        token,
-        admin: {
-          id: user._id,
-          email: user.email,
-          role: user.role,
-        },
-      });
   } catch (err) {
-    console.error("Login Error:", err);
-    res.status(500).json({ success: false, error: "Server error" });
+    res.status(500).json({ error: "Server error" });
   }
 };

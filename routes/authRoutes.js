@@ -21,5 +21,6 @@ router.post("/verify-otp", authController.verifyOtp);
 // router.post("/resend-otp", authController.resendOTP);
 
 // /api/auth/reset-password
+router.post("/reset-password", authController.resetPassword);
 
 module.exports = router;
