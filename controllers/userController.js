@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Product = require("../models/Product");
+const bcrypt = require("bcryptjs");
 
 // @desc    Get current user profile
 // @route   GET /api/user/profile
@@ -253,7 +254,7 @@ const removeFromWishlist = async (req, res) => {
     }
 };
 
-exports.changePassword = async (req, res) => {
+const changePassword = async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
         const userId = req.user.id; // from JWT middleware
