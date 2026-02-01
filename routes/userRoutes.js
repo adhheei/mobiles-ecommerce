@@ -6,7 +6,8 @@ const {
     updateAvatar,
     getWishlist,
     addToWishlist,
-    removeFromWishlist
+    removeFromWishlist,
+    changePassword
 } = require("../controllers/userController");
 const { getAvailableCoupons } = require("../controllers/couponController");
 const { protect } = require("../middleware/authMiddleware");
@@ -22,6 +23,6 @@ router.delete("/wishlist/:productId", protect, removeFromWishlist);
 
 router.get("/coupons", protect, getAvailableCoupons);
 
-router.post("/change-password", authMiddleware, changePassword);
+router.post("/change-password", protect, changePassword);
 
 module.exports = router;
