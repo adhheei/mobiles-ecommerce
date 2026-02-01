@@ -298,7 +298,7 @@ async function checkUserLogin() {
 
         // initial placeholder
         let avatarHtml = `<i class="fa-solid fa-user-circle fa-lg"></i>`;
-        let userName = userData.name ? userData.name.split(' ')[0] : 'User';
+        let userName = userData.firstName || (userData.name ? userData.name.split(' ')[0] : 'User');
 
         if (userData.profileImage) {
             let imgSrc = userData.profileImage;

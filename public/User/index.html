@@ -545,7 +545,7 @@
         </div>
       </div>
 
-      <div class="row scrolling-wrapper g-2" id="cardSlider">
+      <div class="row scrolling-wrapper gap-1" id="cardSlider">
         <!-- Content will be loaded dynamically -->
         <div class="text-center w-100 py-5">
           <div class="spinner-border text-secondary" role="status">
@@ -571,7 +571,7 @@
             const linkHref = isOutOfStock ? 'javascript:void(0)' : `./singleProductPage.html?id=${product.id || product._id}`;
 
             return `
-                <div class="col-10 col-md-3">
+            <div class="col-10 col-md-3">
                   <a href="${linkHref}" class="text-decoration-none text-dark">
                     <div class="card product-card mb-3 ${isOutOfStock ? 'opacity-75' : ''}">
                       <div class="card-img-wrapper">
@@ -580,12 +580,12 @@
                 ''}
                         <img src="${product.mainImage}" alt="${product.name}" onerror="this.src='/images/logo.jpg'" />
                       </div>
-                    </div>
+                      </div>
                     <div class="text-center">
                       <h5 class="card-title fw-bold text-truncate px-2">${product.name}</h5>
                       <p class="text-muted small">${product.brand || 'Latest Model'}</p>
                     </div>
-                  </a>
+                    </a>
                 </div>
                 `;
           }).join('');
@@ -597,10 +597,10 @@
                     <div class="card product-card mb-3 h-100 d-flex flex-column justify-content-center align-items-center bg-light border-0" style="min-height: 300px;">
                       <div class="rounded-circle bg-white p-4 shadow-sm mb-3">
                         <i class="fa-solid fa-arrow-right fa-2x text-dark"></i>
-                      </div>
-                      <h5 class="fw-bold">View All</h5>
-                      <p class="text-muted small">Go to Shop</p>
-                    </div>
+                        </div>
+                        <h5 class="fw-bold">View All</h5>
+                        <p class="text-muted small">Go to Shop</p>
+                        </div>
                   </a>
                 </div>
             `;
@@ -804,6 +804,7 @@
       </div>
     </div>
   </section>
+
   <script>
     function scrollSection(sliderId, direction) {
       const slider = document.getElementById(sliderId);
@@ -930,46 +931,133 @@
   </div>
   <section class="container text-center mb-5">
     <p class="lead">Your One-Stop Shop for Trendy Essentials</p>
-    <div class="mt-4">
-      <div class="comparison-container reveal-up" id="compareContainer">
-        <img src="../images/banner 2.png" class="comparison-img" alt="Interior" />
 
-        <div class="img-overlay" id="imgOverlay">
-          <img src="../images/banner 1.png" id="overlayImage" alt="Exterior" />
+    <h2 class="section-header text-center mt-5 mb-4">Categories</h2>
+
+
+    <!-- Category Circular Slider -->
+    <div class="mt-1">
+      <div class="category-scroll-container d-flex justify-content-start justify-content-md-center flex-nowrap"
+        id="categorySlider">
+        <!-- Dynamic Categories Will Load Here -->
+        <div class="spinner-border text-secondary m-auto" role="status">
+          <span class="visually-hidden">Loading...</span>
         </div>
-
-        <div class="slider-handle" id="sliderHandle">
-          <i class="fa-solid fa-arrows-left-right"></i>
-        </div>
-
-        <input type="range" min="0" max="100" value="50" class="slider-range-input" oninput="moveSlider(this.value)" />
       </div>
     </div>
 
-    <script>
-      function moveSlider(val) {
-        const container = document.getElementById("compareContainer");
-        const overlay = document.getElementById("imgOverlay");
-        const handle = document.getElementById("sliderHandle");
-
-        // Update width of the top image container
-        overlay.style.width = val + "%";
-        // Update position of the handle
-        handle.style.left = val + "%";
+    <style>
+      /* Category Slider Styles */
+      .category-scroll-container {
+        overflow-x: auto;
+        gap: 30px;
+        padding: 10px 0;
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE/Edge */
       }
 
-      // Ensure the inner image stays full width relative to container
-      function fixImageWidth() {
-        const container = document.getElementById("compareContainer");
-        const overlayImg = document.getElementById("overlayImage");
-        if (container && overlayImg) {
-          overlayImg.style.width = container.offsetWidth + "px";
+      .category-scroll-container::-webkit-scrollbar {
+        display: none;
+        /* Chrome/Safari/Opera */
+      }
+
+      .category-item {
+        text-decoration: none;
+        color: var(--primary-black);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 100px;
+        /* Ensure consistent spacing */
+        transition: transform 0.3s ease;
+      }
+
+      .category-item:hover {
+        transform: translateY(-5px);
+        color: #d32f2f;
+      }
+
+      .category-circle {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid #eee;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .category-item:hover .category-circle {
+        border-color: #d32f2f;
+        box-shadow: 0 8px 15px rgba(211, 47, 47, 0.15);
+      }
+
+      .category-circle img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .category-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      @media (max-width: 768px) {
+        .category-scroll-container {
+          padding-left: 20px;
+          /* Add padding for mobile scroll */
+          padding-right: 20px;
+        }
+
+        .category-circle {
+          width: 80px;
+          height: 80px;
+        }
+
+        .category-name {
+          font-size: 0.8rem;
+        }
+
+        .category-item {
+          min-width: 80px;
         }
       }
+    </style>
 
-      // Run on load and resize
-      window.addEventListener("DOMContentLoaded", fixImageWidth);
-      window.addEventListener("resize", fixImageWidth);
+    <script>
+      document.addEventListener('DOMContentLoaded', loadCategories);
+
+      async function loadCategories() {
+        const container = document.getElementById('categorySlider');
+        try {
+          // Fetch categories from existing API
+          const res = await fetch('/api/admin/categories');
+          const data = await res.json();
+
+          if (data.success && data.data && data.data.length > 0) {
+            // Using mapped data from controller (id, name, img)
+            container.innerHTML = data.data.map(cat => `
+              <a href="./productPage.html?category=${cat.id}" class="category-item">
+                <div class="category-circle">
+                  <img src="${cat.img}" alt="${cat.name}" onerror="this.src='/images/logo.jpg'">
+                </div>
+                <span class="category-name">${cat.name}</span>
+              </a>
+            `).join('');
+          } else {
+            container.innerHTML = '<p class="text-muted w-100">No categories found.</p>';
+          }
+        } catch (err) {
+          console.error('Failed to load categories:', err);
+          container.innerHTML = '<p class="text-danger w-100">Failed to load categories.</p>';
+        }
+      }
     </script>
   </section>
 

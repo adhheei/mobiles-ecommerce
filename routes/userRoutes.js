@@ -22,4 +22,6 @@ router.delete("/wishlist/:productId", protect, removeFromWishlist);
 
 router.get("/coupons", protect, getAvailableCoupons);
 
+router.post("/change-password", authMiddleware, changePassword);
+
 module.exports = router;

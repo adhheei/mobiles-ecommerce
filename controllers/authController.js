@@ -41,6 +41,8 @@ const sendTokenResponse = (model, statusCode, res) => {
     user: {
       id: model._id,
       name: model.firstName,
+      firstName: model.firstName,
+      lastName: model.lastName,
       email: model.email,
       role: model.role,
     },
