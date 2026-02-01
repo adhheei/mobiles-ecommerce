@@ -100,32 +100,23 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ message: "Please provide credentials" });
-    }
-
     const user = await User.findOne({ email });
+
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    if (user.status === "blocked") {
-      return res.status(403).json({ message: "Account is blocked" });
-    }
-
-    if (user.role === "admin") {
-      return res.status(403).json({ message: "Admins must login via Admin Portal" });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    sendTokenResponse(user, 200, res);
+    sendTokenResponse(user, 200, res); // Use helper function
+
   } catch (err) {
-    console.error("Login Error:", err);
-    res.status(500).json({ message: "Server error" });
+    console.log("Login Error:", err);
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -176,7 +167,7 @@ exports.sendOtp = async (req, res) => {
     user.otp = hashedOtp;
     user.otpExpires = Date.now() + 5 * 60 * 1000; // 5 mins
     user.otpAttempts = 0;
-    await user.save(); // Triggers pre-save hook but password check handles it
+    await user.save();
 
     // Send Email
     if (emailOrPhone.includes("@")) {

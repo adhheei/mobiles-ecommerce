@@ -256,11 +256,16 @@ const removeFromWishlist = async (req, res) => {
 
 const changePassword = async (req, res) => {
     try {
-        const { currentPassword, newPassword } = req.body;
+        console.log("Change Password Request Body:", req.body); // Log for debugging
+        const { oldPassword, newPassword, confirmPassword } = req.body;
         const userId = req.user.id; // from JWT middleware
 
-        if (!currentPassword || !newPassword) {
+        if (!oldPassword || !newPassword || !confirmPassword) {
             return res.status(400).json({ message: "All fields are required" });
+        }
+
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({ message: "New password and confirm password do not match" });
         }
 
         const user = await User.findById(userId);
@@ -269,9 +274,9 @@ const changePassword = async (req, res) => {
         }
 
         // Check current password
-        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
         if (!isMatch) {
-            return res.status(400).json({ message: "Current password is incorrect" });
+            return res.status(400).json({ message: "Incorrect old password" });
         }
 
         // Hash new password
