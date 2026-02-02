@@ -43,7 +43,7 @@ exports.getTransactions = async (req, res) => {
         // Filter by Date Range
         if (range || (fromDate && toDate)) {
             const now = new Date();
-            let start, end = now;
+            let start, end = new Date(now);
 
             if (range === 'today') {
                 start = new Date(now.setHours(0, 0, 0, 0));
@@ -103,7 +103,7 @@ exports.downloadTransactions = async (req, res) => {
 
         if (range || (fromDate && toDate)) {
             const now = new Date();
-            let start, end = now;
+            let start, end = new Date(now);
 
             if (range === 'today') {
                 start = new Date(now.setHours(0, 0, 0, 0));

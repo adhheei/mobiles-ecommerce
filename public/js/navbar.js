@@ -18,6 +18,7 @@ async function loadNavbar() {
         // Initialize features after navbar is loaded
         initializeNavbarFeatures();
         setActiveLink();
+        window.updateCartBadge(); // Update badge
 
         // Close User Dropdown when clicking outside
         document.addEventListener('click', function (e) {
@@ -264,6 +265,70 @@ function initializeNavbarFeatures() {
     checkUserLogin();
 }
 
+
+
+
+// --- Global Cart Badge Logic ---
+window.updateCartBadge = async function () {
+    try {
+        // Find badge element (search for .fa-cart-shopping parent/sibling)
+        // Assuming typical navbar structure: <a href="/User/cart.html" ...><i class="fa-solid fa-cart-shopping"></i> <span class="badge">...</span></a>
+        // Let's look for a generic selector or specific ID if exists. 
+        // If not, we will try to find it relative to the icon.
+
+        // Strategy: find all cart icons and check for badge suffix
+        const cartIcons = document.querySelectorAll('.fa-cart-shopping, .fa-shopping-cart');
+
+        if (cartIcons.length === 0) return;
+
+        // Fetch count
+        const token = localStorage.getItem("token") || sessionStorage.getItem("token"); // Optional: if using cookies, this might be null but browser sends cookie
+
+        // Logic: if not logged in (no cookie/token), count is 0? 
+        // Or if using cookies, we just request.
+
+        const res = await fetch('/api/cart/count', {
+            method: 'GET',
+            headers: {
+                // If you use token-based auth mixed with cookies, include header if available
+                ...(token ? { "Authorization": "Bearer " + token } : {})
+            }
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            const count = data.count || 0;
+
+            cartIcons.forEach(icon => {
+                let badge = icon.parentElement.querySelector('.badge, .cart-badge');
+
+                // If badge doesn't exist, create it
+                if (!badge && count > 0) {
+                    badge = document.createElement('span');
+                    badge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge';
+                    badge.style.fontSize = '0.65rem';
+                    icon.parentElement.style.position = 'relative'; // Ensure parent is relative
+                    icon.parentElement.appendChild(badge);
+                }
+
+                if (badge) {
+                    if (count > 0) {
+                        badge.innerText = count > 9 ? '9+' : count;
+                        badge.classList.remove('d-none');
+                    } else {
+                        badge.classList.add('d-none');
+                        // Optional: remove it
+                        // badge.remove(); 
+                    }
+                }
+            });
+        }
+    } catch (error) {
+        console.error("Failed to update cart badge:", error);
+    }
+};
+
+// Call on load
 document.addEventListener('DOMContentLoaded', () => {
     // If placeholder exists, load dynamic navbar
     if (document.getElementById('navbar-placeholder')) {
@@ -271,6 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         // Fallback for pages without placeholder (like login)
         initializeNavbarFeatures();
+        window.updateCartBadge();
     }
 });
 

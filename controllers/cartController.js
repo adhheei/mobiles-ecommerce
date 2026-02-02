@@ -176,10 +176,32 @@ function formatCart(cart) {
     };
 }
 
+
+// Get cart count
+const getCartCount = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const cart = await Cart.findOne({ userId });
+
+        if (!cart || !cart.items) {
+            return res.status(200).json({ count: 0 });
+        }
+
+        // Sum up quantities
+        const count = cart.items.reduce((acc, item) => acc + (item.quantity || 0), 0);
+
+        res.status(200).json({ count });
+    } catch (error) {
+        console.error("Get cart count error:", error);
+        res.status(200).json({ count: 0 }); // Fallback to 0 on error
+    }
+};
+
 module.exports = {
     getCart,
     addToCart,
     updateCart,
     removeFromCart,
-    clearCart
+    clearCart,
+    getCartCount
 };
