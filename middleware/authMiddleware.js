@@ -38,7 +38,15 @@ const protect = async (req, res, next) => {
       });
     }
 
-    // 6. Grant Access
+    // 6. Check Blocked Status
+    if (user.isBlocked) {
+      return res.status(403).json({
+        success: false,
+        message: "Your account is blocked. Please contact support."
+      });
+    }
+
+    // 7. Grant Access
     req.user = user;
     next();
   } catch (err) {

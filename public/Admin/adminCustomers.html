@@ -1,816 +1,1069 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Customers - Jinsa Mobiles Admin</title>
 
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customers - Jinsa Mobiles Admin</title>
 
-    <style>
-      :root {
-        --primary-black: #1a1a1a;
-        --bg-light: #f8f9fa;
-        --border-color: #eee;
-        --sidebar-width: 260px;
-        --active-bg: #e9ecef;
-        --text-muted: #6c757d;
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    :root {
+      --primary-black: #1a1a1a;
+      --bg-light: #f8f9fa;
+      --border-color: #eee;
+      --sidebar-width: 260px;
+      --active-bg: #e9ecef;
+      --text-muted: #6c757d;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: var(--bg-light);
+      overflow-x: hidden;
+      color: var(--primary-black);
+    }
+
+    /* --- ANIMATIONS --- */
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
       }
 
-      body {
-        font-family: "Poppins", sans-serif;
-        background-color: var(--bg-light);
-        overflow-x: hidden;
-        color: var(--primary-black);
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
+    }
 
-      /* --- ANIMATIONS --- */
-      @keyframes slideInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      .content-animate { animation: slideInUp 0.6s ease-out forwards; }
+    .content-animate {
+      animation: slideInUp 0.6s ease-out forwards;
+    }
 
-      /* --- SIDEBAR --- */
+    /* --- SIDEBAR --- */
+    .sidebar {
+      width: var(--sidebar-width);
+      height: 100vh;
+      background-color: #fff;
+      border-right: 1px solid var(--border-color);
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 40px;
+      text-decoration: none;
+      color: var(--primary-black);
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .brand-text-container {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 1rem;
+      color: #000;
+    }
+
+    .brand-subtitle {
+      font-size: 0.55rem;
+      letter-spacing: 2px;
+      color: #777;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .menu-item {
+      margin-bottom: 5px;
+    }
+
+    .menu-link {
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      color: #555;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .menu-link i {
+      width: 25px;
+      font-size: 1.1rem;
+      color: #777;
+    }
+
+    .menu-link:hover {
+      background-color: var(--bg-light);
+      color: #000;
+    }
+
+    .menu-link.active {
+      background-color: var(--active-bg);
+      color: #000;
+      font-weight: 600;
+    }
+
+    .menu-link.active i {
+      color: #000;
+    }
+
+    .admin-profile {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .profile-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .admin-avatar {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: #ccc;
+    }
+
+    .admin-details h6 {
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .admin-details span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .logout-btn {
+      width: 100%;
+      background-color: var(--bg-light);
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: 0.2s;
+      text-decoration: none;
+    }
+
+    .logout-btn:hover {
+      background-color: #e2e6ea;
+      color: #000;
+    }
+
+    /* --- MAIN CONTENT --- */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      padding: 30px;
+      transition: margin-left 0.3s ease;
+    }
+
+    /* Mobile Nav */
+    .mobile-nav {
+      display: none;
+      background: #fff;
+      padding: 15px 20px;
+      border-bottom: 1px solid #eee;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    .mobile-nav .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 0;
+      text-decoration: none;
+      color: var(--primary-black);
+    }
+
+    .brand-text-mobile {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+      text-align: left;
+    }
+
+    .brand-title-mobile {
+      font-weight: 800;
+      font-size: 1rem;
+      color: #000;
+      display: block;
+    }
+
+    .brand-subtitle-mobile {
+      font-size: 0.6rem;
+      letter-spacing: 1px;
+      color: #777;
+      font-weight: 600;
+      text-transform: uppercase;
+      display: block;
+    }
+
+    /* Header */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .page-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0;
+      color: #000;
+    }
+
+    /* Toolbar */
+    .table-toolbar {
+      background: #fff;
+      padding: 25px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 25px;
+    }
+
+    .search-group {
+      flex-grow: 1;
+      max-width: 400px;
+      position: relative;
+    }
+
+    .search-group input {
+      border-radius: 12px;
+      padding-left: 45px;
+      height: 46px;
+      border: 1px solid #eee;
+      background-color: #fcfcfc;
+      width: 100%;
+      font-size: 0.88rem;
+      font-family: "Poppins", sans-serif;
+    }
+
+    .search-group i {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #aaa;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 12px;
+    }
+
+    .custom-select {
+      border-radius: 12px;
+      border: 1px solid #eee;
+      padding: 8px 35px 8px 18px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      height: 46px;
+      appearance: none;
+      background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") no-repeat right 0.75rem center/16px 12px;
+      font-family: "Poppins", sans-serif;
+      min-width: 160px;
+    }
+
+    /* Table Card */
+    .table-card {
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      margin-bottom: 25px;
+    }
+
+    .table {
+      margin-bottom: 0;
+      width: 100%;
+    }
+
+    .table thead th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: #888;
+      padding: 15px 25px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+      letter-spacing: 0.5px;
+    }
+
+    .table tbody td {
+      padding: 15px 25px;
+      vertical-align: middle;
+      font-size: 0.9rem;
+      color: #333;
+      border-bottom: 1px solid #f9f9f9;
+      font-weight: 500;
+    }
+
+    /* Customer Specifics */
+    .customer-cell {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .customer-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .customer-info h6 {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #000;
+    }
+
+    .customer-info span {
+      font-size: 0.8rem;
+      color: #777;
+    }
+
+    .contact-info div {
+      margin-bottom: 2px;
+    }
+
+    .contact-email {
+      font-weight: 500;
+    }
+
+    .contact-phone {
+      font-size: 0.8rem;
+      color: #777;
+    }
+
+    /* Status Badges */
+    .badge-custom {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .status-active {
+      background-color: #d1e7dd;
+      color: #0f5132;
+    }
+
+    .status-suspended {
+      background-color: #f8d7da;
+      color: #842029;
+    }
+
+    .status-pending {
+      background-color: #fff3cd;
+      color: #664d03;
+    }
+
+    /* Action Buttons */
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #eee;
+      background: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #555;
+      transition: 0.2s;
+      text-decoration: none;
+      margin-left: 5px;
+      cursor: pointer;
+    }
+
+    .action-btn:hover {
+      background: #f8f9fa;
+      color: #000;
+      border-color: #ccc;
+    }
+
+    .btn-view:hover {
+      background-color: #e2e6ea;
+      color: #0d6efd;
+      border-color: #0d6efd;
+    }
+
+    .btn-block:hover {
+      background: #fff3cd;
+      color: #856404;
+      border-color: #ffeaa7;
+    }
+
+    .btn-unblock:hover {
+      background: #d1e7dd;
+      color: #0f5132;
+      border-color: #bae0bb;
+    }
+
+    /* Pagination */
+    .pagination-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 25px;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+    }
+
+    .page-info {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .page-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid #eee;
+      background: white;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+      color: #000;
+      text-decoration: none;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      background: #f1f1f1;
+      color: #000;
+    }
+
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .page-number {
+      font-weight: 700;
+      margin: 0 10px;
+      font-size: 0.9rem;
+    }
+
+    /* Modal */
+    .modal-content {
+      border-radius: 16px;
+      border: none;
+    }
+
+    .modal-header {
+      border-bottom: 1px solid #eee;
+      padding: 20px 25px;
+    }
+
+    .modal-body {
+      padding: 25px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #f9f9f9;
+    }
+
+    .detail-label {
+      color: #777;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .detail-value {
+      font-weight: 600;
+      color: #000;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 991px) {
       .sidebar {
-        width: var(--sidebar-width);
-        height: 100vh;
-        background-color: #fff;
-        border-right: 1px solid var(--border-color);
+        transform: translateX(-100%);
+      }
+
+      .sidebar.active {
+        transform: translateX(0);
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 15px;
+      }
+
+      .mobile-nav {
+        display: flex;
+      }
+
+      .table-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px;
+        gap: 15px;
+      }
+
+      .search-group {
+        max-width: 100%;
+      }
+
+      .filter-group {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .custom-select {
+        width: 100%;
+      }
+
+      .sidebar-overlay {
+        display: none;
         position: fixed;
         top: 0;
         left: 0;
-        display: flex;
-        flex-direction: column;
-        padding: 20px;
-        z-index: 1000;
-        transition: transform 0.3s ease;
-      }
-      .brand-section {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 40px;
-        text-decoration: none;
-        color: var(--primary-black);
-      }
-      .brand-logo {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        object-fit: cover;
-      }
-      .brand-text-container {
-        display: flex;
-        flex-direction: column;
-        line-height: 1.1;
-      }
-      .brand-title {
-        font-weight: 800;
-        font-size: 1rem;
-        color: #000;
-      }
-      .brand-subtitle {
-        font-size: 0.55rem;
-        letter-spacing: 2px;
-        color: #777;
-        font-weight: 600;
-        text-transform: uppercase;
-      }
-      
-      .sidebar-menu {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        flex-grow: 1;
-        overflow-y: auto;
-      }
-      .menu-item {
-        margin-bottom: 5px;
-      }
-      .menu-link {
-        display: flex;
-        align-items: center;
-        padding: 12px 15px;
-        color: #555;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 0.9rem;
-        border-radius: 8px;
-        transition: all 0.2s;
-      }
-      .menu-link i {
-        width: 25px;
-        font-size: 1.1rem;
-        color: #777;
-      }
-      .menu-link:hover {
-        background-color: var(--bg-light);
-        color: #000;
-      }
-      .menu-link.active {
-        background-color: var(--active-bg);
-        color: #000;
-        font-weight: 600;
-      }
-      .menu-link.active i {
-        color: #000;
-      }
-
-      .admin-profile {
-        margin-top: auto;
-        padding-top: 20px;
-        border-top: 1px solid var(--border-color);
-      }
-      .profile-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 15px;
-        text-decoration: none;
-        color: inherit;
-      }
-      .admin-avatar {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        background: #ccc;
-      }
-      .admin-details h6 {
-        margin: 0;
-        font-size: 0.9rem;
-        font-weight: 600;
-      }
-      .admin-details span {
-        font-size: 0.75rem;
-        color: var(--text-muted);
-      }
-      .logout-btn {
         width: 100%;
-        background-color: var(--bg-light);
-        border: none;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #333;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        transition: 0.2s;
-        text-decoration: none;
-      }
-      .logout-btn:hover {
-        background-color: #e2e6ea;
-        color: #000;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 998;
       }
 
-      /* --- MAIN CONTENT --- */
-      .main-content {
-        margin-left: var(--sidebar-width);
-        padding: 30px;
-        transition: margin-left 0.3s ease;
-      }
-      
-      /* Mobile Nav */
-      .mobile-nav {
-        display: none;
-        background: #fff;
-        padding: 15px 20px;
-        border-bottom: 1px solid #eee;
-        justify-content: space-between;
-        align-items: center;
-        position: sticky;
-        top: 0;
-        z-index: 999;
-      }
-      .mobile-nav .brand-section {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 0;
-        text-decoration: none;
-        color: var(--primary-black);
-      }
-      .brand-text-mobile {
-        display: flex;
-        flex-direction: column;
-        line-height: 1.1;
-        text-align: left;
-      }
-      .brand-title-mobile {
-        font-weight: 800;
-        font-size: 1rem;
-        color: #000;
-        display: block;
-      }
-      .brand-subtitle-mobile {
-        font-size: 0.6rem;
-        letter-spacing: 1px;
-        color: #777;
-        font-weight: 600;
-        text-transform: uppercase;
+      .sidebar-overlay.active {
         display: block;
       }
 
-      /* Header */
-      .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
-      }
-      .page-title {
-        font-size: 1.8rem;
-        font-weight: 800;
-        margin: 0;
-        color: #000;
-      }
-
-      /* Toolbar */
-      .table-toolbar {
-        background: #fff;
-        padding: 25px;
-        border-radius: 16px;
-        border: 1px solid var(--border-color);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        flex-wrap: wrap;
-        margin-bottom: 25px;
-      }
-      .search-group {
-        flex-grow: 1;
-        max-width: 400px;
-        position: relative;
-      }
-      .search-group input {
-        border-radius: 12px;
-        padding-left: 45px;
-        height: 46px;
-        border: 1px solid #eee;
-        background-color: #fcfcfc;
-        width: 100%;
-        font-size: 0.88rem;
-        font-family: "Poppins", sans-serif;
-      }
-      .search-group i {
-        position: absolute;
-        left: 18px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #aaa;
-      }
-      .filter-group {
-        display: flex;
-        gap: 12px;
-      }
-      .custom-select {
-        border-radius: 12px;
-        border: 1px solid #eee;
-        padding: 8px 35px 8px 18px;
-        font-size: 0.85rem;
-        font-weight: 500;
-        height: 46px;
-        appearance: none;
-        background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") no-repeat right 0.75rem center/16px 12px;
-        font-family: "Poppins", sans-serif;
-        min-width: 160px;
-      }
-
-      /* Table Card */
+      /* Responsive Card Layout for Table on Mobile */
       .table-card {
-        background: #fff;
-        border-radius: 16px;
-        border: 1px solid var(--border-color);
-        overflow: hidden;
-        margin-bottom: 25px;
+        border: none;
+        background: transparent;
       }
-      .table {
-        margin-bottom: 0;
+
+      .table thead {
+        display: none;
+        /* Hide headers */
+      }
+
+      .table,
+      .table tbody,
+      .table tr,
+      .table td {
+        display: block;
         width: 100%;
       }
-      .table thead th {
-        background-color: #f8f9fa;
-        font-weight: 600;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        color: #888;
-        padding: 15px 25px;
-        border-bottom: 1px solid #eee;
-        text-align: left;
-        letter-spacing: 0.5px;
-      }
-      .table tbody td {
-        padding: 15px 25px;
-        vertical-align: middle;
-        font-size: 0.9rem;
-        color: #333;
-        border-bottom: 1px solid #f9f9f9;
-        font-weight: 500;
-      }
 
-      /* Customer Specifics */
-      .customer-cell {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-      }
-      .customer-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        object-fit: cover;
-        background: #eee;
-      }
-      .customer-info h6 {
-        margin: 0;
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: #000;
-      }
-      .customer-info span {
-        font-size: 0.8rem;
-        color: #777;
-      }
-
-      .contact-info div {
-        margin-bottom: 2px;
-      }
-      .contact-email {
-        font-weight: 500;
-      }
-      .contact-phone {
-        font-size: 0.8rem;
-        color: #777;
-      }
-
-      /* Status Badges — MATCH DASHBOARD STYLE */
-      .badge-custom {
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: inline-block;
-      }
-      .status-active {
-        background-color: #e3e3e3;
-        color: #4a4a4a;
-      }
-      .status-suspended {
-        background-color: #ffe5e5;
-        color: #dc3545;
-      }
-      .status-pending {
-        background-color: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffeaa7;
-      }
-
-      /* Action Buttons */
-      .action-btn {
-        width: 32px;
-        height: 32px;
-        border-radius: 6px;
-        border: 1px solid #eee;
+      .table tr {
         background: #fff;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        color: #555;
-        transition: 0.2s;
-        text-decoration: none;
-        margin-left: 5px;
-      }
-      .action-btn:hover {
-        background: #f8f9fa;
-        color: #000;
-        border-color: #ccc;
-      }
-      .btn-delete:hover {
-        background: #ffe5e5;
-        color: #dc3545;
-        border-color: #f5c2c7;
-      }
-      .btn-block:hover {
-        background: #fff3cd;
-        color: #856404;
-        border-color: #ffeaa7;
-      }
-      .btn-unblock:hover {
-        background: #d1e7dd;
-        color: #0f5132;
-        border-color: #bae0bb;
+        margin-bottom: 15px;
+        border-radius: 12px;
+        padding: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        /* Card effect */
+        border: 1px solid #eee;
       }
 
-      /* Pagination */
-      .pagination-wrapper {
+      .table td {
+        text-align: right;
+        padding: 10px 0;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 20px 25px;
-        background: #fff;
-        border-radius: 16px;
-        border: 1px solid var(--border-color);
+        border-bottom: 1px solid #f9f9f9;
       }
-      .page-info {
+
+      .table td:last-child {
+        border-bottom: none;
+        justify-content: flex-end;
+        /* Actions at end */
+      }
+
+      .table td::before {
+        content: attr(data-label);
+        font-weight: 600;
         font-size: 0.85rem;
-        color: var(--text-muted);
-      }
-      .page-btn {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        border: 1px solid #eee;
-        background: white;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        transition: 0.2s;
-        color: #000;
-        text-decoration: none;
-      }
-      .page-btn:hover:not(:disabled) {
-        background: #f1f1f1;
-        color: #000;
-      }
-      .page-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-      .page-number {
-        font-weight: 700;
-        margin: 0 10px;
-        font-size: 0.9rem;
+        color: #777;
+        text-transform: uppercase;
       }
 
-      @media (max-width: 991px) {
-        .sidebar {
-          transform: translateX(-100%);
-        }
-        .sidebar.active {
-          transform: translateX(0);
-          box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
-        }
-        .main-content {
-          margin-left: 0;
-          padding: 20px;
-        }
-        .mobile-nav {
-          display: flex;
-        }
-        .table-toolbar {
-          flex-direction: column;
-          align-items: stretch;
-          padding: 20px;
-        }
-        .search-group {
-          max-width: 100%;
-        }
-        .filter-group {
-          flex-direction: column;
-          gap: 10px;
-        }
-        .custom-select {
-          width: 100%;
-        }
-        .table-container {
-          overflow-x: auto;
-        }
-        .table {
-          min-width: 700px;
-        }
-        .sidebar-overlay {
-          display: none;
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          z-index: 998;
-        }
-        .sidebar-overlay.active {
-          display: block;
-        }
+      .customer-cell {
+        flex-direction: row;
+        /* Keep avatar/name row normal */
+        text-align: left;
       }
-    </style>
-  </head>
-  <body>
-    <div class="mobile-nav">
-      <a href="#" class="brand-section">
-        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
-        <div class="brand-text-mobile">
-          <span class="brand-title-mobile">JINSA MOBILES</span>
-          <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
+    }
+  </style>
+</head>
+
+<body>
+  <div class="mobile-nav">
+    <a href="#" class="brand-section">
+      <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
+      <div class="brand-text-mobile">
+        <span class="brand-title-mobile">JINSA MOBILES</span>
+        <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
+      </div>
+    </a>
+    <button class="btn btn-light" onclick="toggleSidebar()">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <nav class="sidebar" id="sidebar">
+    <a href="./adminDashboard.html" class="brand-section">
+      <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
+      <div class="brand-text-container">
+        <span class="brand-title">JINSA MOBILES</span>
+        <span class="brand-subtitle">AND ACCESSORIES</span>
+      </div>
+    </a>
+
+    <ul class="sidebar-menu">
+      <li class="menu-item"><a href="../Admin/adminDashboard.html" class="menu-link"><i
+            class="fa-solid fa-border-all"></i> &nbsp;Dashboard</a></li>
+      <li class="menu-item"><a href="../Admin/adminOrders.html" class="menu-link"><i
+            class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a></li>
+      <li class="menu-item"><a href="../Admin/adminTransactions.html" class="menu-link"><i
+            class="fa-solid fa-money-bill-transfer"></i> &nbsp;Transactions</a></li>
+      <li class="menu-item"><a href="../Admin/adminProducts.html" class="menu-link"><i class="fa-solid fa-box-open"></i>
+          &nbsp;Products</a></li>
+      <li class="menu-item"><a href="../Admin/adminCustomers.html" class="menu-link active"><i
+            class="fa-solid fa-users"></i> &nbsp;Customers</a></li>
+      <li class="menu-item"><a href="../Admin/adminMessages.html" class="menu-link"><i
+            class="fa-regular fa-envelope"></i> &nbsp;Messages</a></li>
+      <li class="menu-item"><a href="../Admin/adminAnalytics.html" class="menu-link"><i
+            class="fa-solid fa-chart-simple"></i> &nbsp;Analytics</a></li>
+      <li class="menu-item"><a href="../Admin/adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i>
+          &nbsp;Coupon Management</a></li>
+      <li class="menu-item"><a href="../Admin/adminCategories.html" class="menu-link"><i
+            class="fa-solid fa-layer-group"></i> &nbsp;Category Management</a></li>
+      <li class="menu-item"><a href="../Admin/adminOffers.html" class="menu-link"><i class="fa-solid fa-gift"></i>
+          &nbsp;Offer</a></li>
+    </ul>
+
+    <div class="admin-profile">
+      <a href="../Admin/adminProfile.html" class="profile-info text-decoration-none text-reset">
+        <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
+        <div class="admin-details">
+          <h6 id="sidebarName" class="m-0">Admin</h6>
+          <span class="small text-muted">admin@example.com</span>
         </div>
       </a>
-      <button class="btn btn-light" onclick="toggleSidebar()">
-        <i class="fa-solid fa-bars"></i>
-      </button>
+      <a href="./adminLogin.html" class="logout-btn">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+      </a>
+    </div>
+  </nav>
+
+  <div class="main-content content-animate">
+    <div class="page-header">
+      <h2 class="page-title">Customers</h2>
     </div>
 
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-    <nav class="sidebar" id="sidebar">
-      <a href="./adminDashboard.html" class="brand-section">
-        <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
-        <div class="brand-text-container">
-          <span class="brand-title">JINSA MOBILES</span>
-          <span class="brand-subtitle">AND ACCESSORIES</span>
-        </div>
-      </a>
-
-      <ul class="sidebar-menu">
-        <li class="menu-item"><a href="../Admin/adminDashboard.html" class="menu-link"><i class="fa-solid fa-border-all"></i> &nbsp;Dashboard</a></li>
-        <li class="menu-item"><a href="../Admin/adminOrders.html" class="menu-link"><i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a></li>
-        <li class="menu-item"><a href="../Admin/adminProducts.html" class="menu-link"><i class="fa-solid fa-box-open"></i> &nbsp;Products</a></li>
-        <li class="menu-item"><a href="../Admin/adminCustomers.html" class="menu-link active"><i class="fa-solid fa-users"></i> &nbsp;Customers</a></li>
-        <li class="menu-item"><a href="../Admin/adminMessages.html" class="menu-link"><i class="fa-regular fa-envelope"></i> &nbsp;Messages</a></li>
-        <li class="menu-item"><a href="../Admin/adminAnalytics.html" class="menu-link"><i class="fa-solid fa-chart-simple"></i> &nbsp;Analytics</a></li>
-        <li class="menu-item"><a href="../Admin/adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i> &nbsp;Coupon Management</a></li>
-        <li class="menu-item"><a href="../Admin/adminCategories.html" class="menu-link"><i class="fa-solid fa-layer-group"></i> &nbsp;Category Management</a></li>
-        <li class="menu-item"><a href="../Admin/adminOffers.html" class="menu-link"><i class="fa-solid fa-gift"></i> &nbsp;Offer</a></li>
-      </ul>
-
-      <div class="admin-profile">
-        <a href="../Admin/adminProfile.html" class="profile-info text-decoration-none text-reset">
-          <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
-          <div class="admin-details">
-            <h6 id="sidebarName" class="m-0">Admin</h6>
-            <span class="small text-muted">admin@example.com</span>
-          </div>
-        </a>
-        <a href="./adminLogin.html" class="logout-btn">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
-        </a>
+    <div class="table-toolbar">
+      <div class="search-group">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Search customers..." onkeyup="handleSearch()" />
       </div>
-    </nav>
-
-    <div class="main-content content-animate">
-      <div class="page-header">
-        <h2 class="page-title">Customers</h2>
-      </div>
-
-      <div class="table-toolbar">
-        <div class="search-group">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="searchInput" placeholder="Search customers..." onkeyup="handleSearch()" />
-        </div>
-        <div class="filter-group">
-          <select class="custom-select" id="filterStatus" onchange="handleFilter()">
-            <option value="all">Filter by Status</option>
-            <option value="active">Active</option>
-            <option value="suspended">Suspended</option>
-            <option value="pending">Pending</option>
-          </select>
-          <select class="custom-select" id="sortCustomers" onchange="handleSort()">
-            <option value="name">Sort by Name</option>
-            <option value="orders">Sort by Orders</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="table-card">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Customer</th>
-              <th>Contact</th>
-              <th>Orders</th>
-              <th>Status</th>
-              <th class="text-end">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="customerTableBody">
-          </tbody>
-        </table>
-      </div>
-
-      <div class="pagination-wrapper">
-        <span class="page-info" id="pageInfoText">Showing 0 to 0 of 0 customers</span>
-        <div>
-          <a href="#" class="page-btn" id="prevBtn" onclick="changePage(-1)">
-            <i class="fa-solid fa-chevron-left"></i>
-          </a>
-          <span class="page-number" id="pageNumberDisplay">1</span>
-          <a href="#" class="page-btn" id="nextBtn" onclick="changePage(1)">
-            <i class="fa-solid fa-chevron-right"></i>
-          </a>
-        </div>
+      <div class="filter-group">
+        <select class="custom-select" id="filterStatus" onchange="handleFilter()">
+          <option value="all">Filter by Status</option>
+          <option value="active">Active</option>
+          <option value="suspended">Suspended</option>
+        </select>
+        <select class="custom-select" id="sortCustomers" onchange="handleSort()">
+          <option value="name">Sort by Name</option>
+          <option value="date">Sort by Date</option>
+        </select>
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      function toggleSidebar() {
-        document.getElementById("sidebar").classList.toggle("active");
-        document.getElementById("sidebarOverlay").classList.toggle("active");
-      }
+    <div class="table-card">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Contact</th>
+            <th>Orders</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="customerTableBody">
+          <tr>
+            <td colspan="5" class="text-center p-4">Loading customers...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-      // --- DUMMY DATA ---
-      const allCustomers = [
-        { id: 1, name: "John Doe", email: "john.doe@example.com", phone: "+1-202-555-0104", date: "2023-01-15", orders: 5, status: "Active", img: "https://placehold.co/50x50/333/fff?text=JD" },
-        { id: 2, name: "Jane Smith", email: "jane.smith@example.com", phone: "+1-202-555-0145", date: "2023-02-20", orders: 12, status: "Active", img: "https://placehold.co/50x50/e9ecef/333?text=JS" },
-        { id: 3, name: "Michael Johnson", email: "michael.j@example.com", phone: "+1-202-555-0189", date: "2023-03-10", orders: 1, status: "Suspended", img: "https://placehold.co/50x50/333/fff?text=MJ" },
-        { id: 4, name: "Emily Davis", email: "emily.d@example.com", phone: "+1-202-555-0132", date: "2023-04-05", orders: 8, status: "Active", img: "https://placehold.co/50x50/e9ecef/333?text=ED" },
-        { id: 5, name: "Chris Martinez", email: "chris.m@example.com", phone: "+1-202-555-0199", date: "2023-05-18", orders: 3, status: "Pending", img: "https://placehold.co/50x50/333/fff?text=CM" },
-        { id: 6, name: "Sarah Wilson", email: "sarah.w@example.com", phone: "+1-202-555-0201", date: "2023-06-22", orders: 6, status: "Active", img: "https://placehold.co/50x50/e9ecef/333?text=SW" },
-      ];
+    <div class="pagination-wrapper">
+      <span class="page-info" id="pageInfoText">Showing 0 to 0 of 0 customers</span>
+      <div>
+        <button class="page-btn" id="prevBtn" onclick="changePage(-1)">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <span class="page-number" id="pageNumberDisplay">1</span>
+        <button class="page-btn" id="nextBtn" onclick="changePage(1)">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
 
-      // --- STATE VARIABLES ---
-      let currentCustomers = [...allCustomers];
-      let currentPage = 1;
-      const rowsPerPage = 5;
+  <!-- Customer Details Modal -->
+  <div class="modal fade" id="customerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content shadow">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Customer Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="modalBodyContent">
+          <!-- Dynamic Content -->
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-      // --- INITIALIZE ---
-      document.addEventListener("DOMContentLoaded", () => renderTable());
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/adminBadge.js"></script> <!-- Optional common badge script if needed -->
+  <script>
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("active");
+      document.getElementById("sidebarOverlay").classList.toggle("active");
+    }
 
-      // --- CORE LOGIC ---
-      function applyLogic() {
-        const searchTerm = document.getElementById("searchInput").value.toLowerCase();
-        const status = document.getElementById("filterStatus").value.toLowerCase();
-        const sort = document.getElementById("sortCustomers").value;
+    // --- STATE VARIABLES ---
+    let allCustomers = [];
+    let currentCustomers = [];
+    let currentPage = 1;
+    const rowsPerPage = 10;
 
-        // 1. Filter
-        currentCustomers = allCustomers.filter(c => {
-            const matchesSearch = c.name.toLowerCase().includes(searchTerm) || c.email.toLowerCase().includes(searchTerm);
-            const matchesStatus = status === 'all' || c.status.toLowerCase() === status;
-            return matchesSearch && matchesStatus;
+    // --- INITIALIZE ---
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchUsers();
+    });
+
+    // --- FETCH DATA ---
+    async function fetchUsers() {
+      try {
+        const response = await fetch('/api/admin/users', {
+          credentials: 'include'
         });
 
-        // 2. Sort
-        currentCustomers.sort((a, b) => {
-            if (sort === 'orders') return b.orders - a.orders; 
-            return a.name.localeCompare(b.name);
-        });
-
-        currentPage = 1;
-        renderTable();
-      }
-
-      function handleSearch() { applyLogic(); }
-      function handleFilter() { applyLogic(); }
-      function handleSort() { applyLogic(); }
-
-      // --- RENDER TABLE ---
-      function renderTable() {
-        const tbody = document.getElementById("customerTableBody");
-        tbody.innerHTML = "";
-
-        const start = (currentPage - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        const paginated = currentCustomers.slice(start, end);
-
-        if (paginated.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">No customers found.</td></tr>';
-            updatePagination(0, 0, 0);
-            return;
+        if (response.status === 401) {
+          window.location.href = '/Admin/adminLogin.html';
+          return;
         }
 
-        paginated.forEach(c => {
-            let statusClass = 'status-active';
-            if(c.status === 'Suspended') statusClass = 'status-suspended';
-            if(c.status === 'Pending') statusClass = 'status-pending';
+        if (!response.ok) throw new Error('Failed to fetch users');
 
-            // Determine Block/Unblock Button State
-            let blockBtnClass = c.status === 'Suspended' ? 'btn-unblock' : 'btn-block';
-            let blockIcon = c.status === 'Suspended' ? 'fa-lock-open' : 'fa-ban';
-            let blockTitle = c.status === 'Suspended' ? 'Unblock Customer' : 'Block Customer';
+        allCustomers = await response.json();
+        currentCustomers = [...allCustomers];
+        applyLogic();
+      } catch (error) {
+        console.error(error);
+        document.getElementById("customerTableBody").innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Failed to load customers.</td></tr>';
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Could not load customers' });
+      }
+    }
 
-            const row = `
+    // --- CORE LOGIC ---
+    function applyLogic() {
+      const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+      const status = document.getElementById("filterStatus").value.toLowerCase();
+      const sort = document.getElementById("sortCustomers").value;
+
+      // 1. Filter
+      currentCustomers = allCustomers.filter(c => {
+        const fullName = (c.firstName + ' ' + c.lastName).toLowerCase();
+        const matchesSearch = fullName.includes(searchTerm) || c.email.toLowerCase().includes(searchTerm);
+
+        let userStatus = c.status ? c.status.toLowerCase() : (c.isBlocked ? 'suspended' : 'active');
+        const matchesStatus = status === 'all' || userStatus === status;
+
+        return matchesSearch && matchesStatus;
+      });
+
+      // 2. Sort
+      currentCustomers.sort((a, b) => {
+        if (sort === 'date') {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        }
+        // Default sort by name
+        const nameA = (a.firstName + ' ' + a.lastName).toLowerCase();
+        const nameB = (b.firstName + ' ' + b.lastName).toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+
+      currentPage = 1;
+      renderTable();
+    }
+
+    function handleSearch() { applyLogic(); }
+    function handleFilter() { applyLogic(); }
+    function handleSort() { applyLogic(); }
+
+    // --- RENDER TABLE ---
+    function renderTable() {
+      const tbody = document.getElementById("customerTableBody");
+      tbody.innerHTML = "";
+
+      const start = (currentPage - 1) * rowsPerPage;
+      const end = start + rowsPerPage;
+      const paginated = currentCustomers.slice(start, end);
+
+      if (paginated.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">No customers found.</td></tr>';
+        updatePagination(0, 0, 0);
+        return;
+      }
+
+      paginated.forEach(c => {
+        // Normalize status
+        let isBlocked = c.isBlocked;
+        let displayStatus = isBlocked ? 'Suspended' : 'Active';
+        let statusClass = isBlocked ? 'status-suspended' : 'status-active';
+
+        // Determine Block/Unblock Button State
+        let blockBtnClass = isBlocked ? 'btn-unblock' : 'btn-block';
+        let blockIcon = isBlocked ? 'fa-lock-open' : 'fa-ban';
+        let blockTitle = isBlocked ? 'Unblock Customer' : 'Block Customer';
+
+        // Name Initials or Image
+        let avatarHtml;
+        if (c.profileImage) {
+          avatarHtml = `<img src="${c.profileImage}" class="customer-avatar" alt="${c.firstName}">`;
+        } else {
+          const initials = (c.firstName.charAt(0) + c.lastName.charAt(0)).toUpperCase();
+          avatarHtml = `<div class="customer-avatar bg-light text-secondary border">${initials}</div>`;
+        }
+
+        const fullName = `${c.firstName} ${c.lastName}`;
+        const date = new Date(c.createdAt).toLocaleDateString();
+
+        const row = `
                 <tr>
-                    <td>
+                    <td data-label="Customer">
                         <div class="customer-cell">
-                            <img src="${c.img}" class="customer-avatar" alt="${c.name}">
+                            ${avatarHtml}
                             <div class="customer-info">
-                                <h6>${c.name}</h6>
-                                <span>Registered: ${c.date}</span>
+                                <h6>${fullName}</h6>
+                                <span>Registered: ${date}</span>
                             </div>
                         </div>
                     </td>
-                    <td>
+                    <td data-label="Contact">
                         <div class="contact-info">
-                            <div class="contact-email">${c.email}</div>
-                            <div class="contact-phone">${c.phone}</div>
+                            <div class="contact-email text-break" style="max-width: 200px;">${c.email}</div>
+                            <div class="contact-phone">${c.phone || 'N/A'}</div>
                         </div>
                     </td>
-                    <td>${c.orders} Orders</td>
-                    <td><span class="badge-custom ${statusClass}">${c.status}</span></td>
-                    <td class="text-end">
-                        <a href="#" class="action-btn ${blockBtnClass}" title="${blockTitle}" onclick="toggleBlockCustomer(${c.id}); return false;">
+                    <td data-label="Stats">${c.ordersCount || 0} Orders</td>
+                    <td data-label="Status"><span class="badge-custom ${statusClass}">${displayStatus}</span></td>
+                    <td data-label="Actions" class="text-end">
+                        <button class="action-btn btn-view" title="View Details" onclick='viewDetails(${JSON.stringify(c).replace(/'/g, "&apos;")})'>
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                        <button class="action-btn ${blockBtnClass}" title="${blockTitle}" onclick="toggleBlockCustomer('${c._id}', ${c.isBlocked}, '${fullName.replace(/'/g, "\\'")}')">
                             <i class="fa-solid ${blockIcon}"></i>
-                        </a>
-                        <a href="#" class="action-btn btn-delete" title="Delete" onclick="deleteCustomer(${c.id}); return false;">
-                            <i class="fa-solid fa-trash"></i>
-                        </a>
+                        </button>
                     </td>
                 </tr>
             `;
-            tbody.innerHTML += row;
-        });
+        tbody.innerHTML += row;
+      });
 
-        updatePagination(start + 1, Math.min(end, currentCustomers.length), currentCustomers.length);
-      }
+      updatePagination(start + 1, Math.min(end, currentCustomers.length), currentCustomers.length);
+    }
 
-      // --- PAGINATION LOGIC ---
-      function updatePagination(start, end, total) {
-        document.getElementById("pageInfoText").innerText = `Showing ${start} to ${end} of ${total} customers`;
-        document.getElementById("pageNumberDisplay").innerText = currentPage;
-        
-        const totalPages = Math.ceil(total / rowsPerPage);
-        const prevBtn = document.getElementById("prevBtn");
-        const nextBtn = document.getElementById("nextBtn");
-        
-        if (currentPage === 1) {
-            prevBtn.style.opacity = '0.5';
-            prevBtn.style.pointerEvents = 'none';
-        } else {
-            prevBtn.style.opacity = '1';
-            prevBtn.style.pointerEvents = 'auto';
+    // --- PAGINATION LOGIC ---
+    function updatePagination(start, end, total) {
+      document.getElementById("pageInfoText").innerText = `Showing ${start} to ${end} of ${total} customers`;
+      document.getElementById("pageNumberDisplay").innerText = currentPage;
+
+      const totalPages = Math.ceil(total / rowsPerPage);
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = currentPage === totalPages || total === 0;
+    }
+
+    function changePage(dir) {
+      currentPage += dir;
+      renderTable();
+    }
+
+    // --- VIEW DETAILS ---
+    function viewDetails(c) {
+      const fullName = `${c.firstName} ${c.lastName}`;
+      const isBlocked = c.isBlocked;
+      const displayStatus = isBlocked ? 'Suspended' : 'Active';
+      const statusClass = isBlocked ? 'status-suspended' : 'status-active';
+
+      const modalBody = document.getElementById("modalBodyContent");
+      modalBody.innerHTML = `
+                <div class="text-center mb-4">
+                    ${c.profileImage
+          ? `<img src="${c.profileImage}" class="rounded-circle mb-2" width="80" height="80" style="object-fit:cover;">`
+          : `<div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-2 border" style="width:80px;height:80px;font-size:1.5rem;font-weight:600;">${c.firstName.charAt(0)}${c.lastName.charAt(0)}</div>`
         }
-        
-        if (currentPage === totalPages || total === 0) {
-            nextBtn.style.opacity = '0.5';
-            nextBtn.style.pointerEvents = 'none';
-        } else {
-            nextBtn.style.opacity = '1';
-            nextBtn.style.pointerEvents = 'auto';
-        }
-      }
-
-      function changePage(dir) {
-        currentPage += dir;
-        renderTable();
-      }
-
-      // --- BLOCK / UNBLOCK ACTION ---
-      function toggleBlockCustomer(id) {
-        const customer = allCustomers.find(c => c.id === id);
-        if(!customer) return;
-
-        const isSuspended = customer.status === 'Suspended';
-        const actionText = isSuspended ? 'Unblock' : 'Block';
-        const confirmColor = isSuspended ? '#198754' : '#dc3545';
-
-        Swal.fire({
-            title: `${actionText} Customer?`,
-            text: `Are you sure you want to ${actionText.toLowerCase()} ${customer.name}?`,
-            icon: isSuspended ? 'question' : 'warning',
-            showCancelButton: true,
-            confirmButtonColor: confirmColor,
-            cancelButtonColor: '#1a1a1a',
-            confirmButtonText: `Yes, ${actionText}!`
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Toggle Status Logic
-                customer.status = isSuspended ? 'Active' : 'Suspended';
-                applyLogic(); // Re-render table
+                    <h5 class="fw-bold mb-0">${fullName}</h5>
+                    <span class="text-muted small">Customer ID: ${c._id}</span>
+                </div>
                 
-                Swal.fire(
-                    `${actionText}ed!`,
-                    `Customer has been ${actionText.toLowerCase()}ed.`,
-                    'success'
-                );
-            }
-        });
-      }
+                <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="badge-custom ${statusClass}">${displayStatus}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email</span>
+                    <span class="detail-value text-break">${c.email}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Phone</span>
+                    <span class="detail-value">${c.phone || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Registered On</span>
+                    <span class="detail-value">${new Date(c.createdAt).toLocaleDateString()}</span>
+                </div>
+                <hr class="my-2 border-light">
+                <div class="detail-row">
+                    <span class="detail-label">Total Orders</span>
+                    <span class="detail-value fs-5">${c.ordersCount || 0}</span>
+                </div>
+          `;
 
-      // --- DELETE ACTION ---
-      function deleteCustomer(id) {
-        Swal.fire({
-            title: 'Delete Customer?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#1a1a1a',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const index = allCustomers.findIndex(c => c.id === id);
-                if (index > -1) {
-                    allCustomers.splice(index, 1);
-                    applyLogic(); // Re-render table
-                    Swal.fire('Deleted!', 'Customer has been removed.', 'success');
-                }
+      const modal = new bootstrap.Modal(document.getElementById("customerModal"));
+      modal.show();
+    }
+
+    // --- BLOCK / UNBLOCK ACTION ---
+    function toggleBlockCustomer(id, isBlocked, name) {
+      const actionText = isBlocked ? 'Unblock' : 'Block';
+      const confirmColor = isBlocked ? '#198754' : '#dc3545';
+      const btnText = isBlocked ? 'Yes, Unblock!' : 'Yes, Block!';
+
+      Swal.fire({
+        title: `${actionText} User?`,
+        text: `Are you sure you want to ${actionText.toLowerCase()} ${name}?`,
+        icon: isBlocked ? 'question' : 'warning',
+        showCancelButton: true,
+        confirmButtonColor: confirmColor,
+        cancelButtonColor: '#1a1a1a',
+        confirmButtonText: btnText
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch(`/api/admin/users/${id}/block`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ isBlocked: !isBlocked })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              // Update local state
+              const userIndex = allCustomers.findIndex(u => u._id === id);
+              if (userIndex > -1) {
+                allCustomers[userIndex].isBlocked = !isBlocked;
+                allCustomers[userIndex].status = !isBlocked ? 'Suspended' : 'Active';
+              }
+              applyLogic(); // Re-render
+
+              Swal.fire(
+                'Success!',
+                data.message,
+                'success'
+              );
+            } else {
+              Swal.fire('Error', data.message || 'Failed to update user', 'error');
             }
-        });
-      }
-    </script>
-  </body>
+          } catch (err) {
+            console.error(err);
+            Swal.fire('Error', 'Server error occurred', 'error');
+          }
+        }
+      });
+    }
+  </script>
+</body>
+
 </html>

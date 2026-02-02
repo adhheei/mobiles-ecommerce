@@ -296,6 +296,57 @@ const changePassword = async (req, res) => {
     }
 };
 
+// @desc    Get all users (Admin)
+// @route   GET /api/admin/users
+// @access  Private/Admin
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find({ role: { $ne: 'admin' } }).select('-password').sort({ createdAt: -1 });
+
+        // Since we don't have a real Order model yet, we'll return 0 or mock data for ordersCount
+        // In a real app, we would aggregate orders here
+        const usersWithStats = users.map(user => ({
+            ...user.toObject(),
+            ordersCount: user.orders ? user.orders.length : 0 // Assuming User model might have orders array later
+        }));
+
+        res.status(200).json(usersWithStats);
+    } catch (error) {
+        console.error("Error fetching all users:", error);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
+// @desc    Block/Unblock user (Admin)
+// @route   PATCH /api/admin/users/:id/block
+// @access  Private/Admin
+const toggleBlockUser = async (req, res) => {
+    try {
+        const { isBlocked } = req.body;
+        const user = await User.findById(req.params.id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        user.isBlocked = isBlocked;
+        user.status = isBlocked ? 'Suspended' : 'Active'; // Sync status with block state
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: `User ${isBlocked ? 'blocked' : 'unblocked'} successfully`,
+            user: {
+                _id: user._id,
+                status: user.status,
+                isBlocked: user.isBlocked
+            }
+        });
+    } catch (error) {
+        console.error("Error toggling block status:", error);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
 
 module.exports = {
     getProfile,
@@ -304,5 +355,7 @@ module.exports = {
     getWishlist,
     addToWishlist,
     removeFromWishlist,
-    changePassword
+    changePassword,
+    getAllUsers,     // Added
+    toggleBlockUser  // Added
 };
