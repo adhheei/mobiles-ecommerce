@@ -137,4 +137,22 @@ router.get('/coupons/:id', isAdmin, getCoupon);
 router.put('/coupons/:id', isAdmin, updateCoupon);
 router.delete('/coupons/:id', isAdmin, deleteCoupon);
 
+router.delete('/coupons/:id', isAdmin, deleteCoupon);
+
+// ────────────────
+// TRANSACTION ROUTES
+// ────────────────
+const { getTransactions, downloadTransactions } = require('../controllers/transactionController');
+
+router.get('/transactions', isAdmin, getTransactions);
+router.get('/transactions/download', isAdmin, downloadTransactions);
+
+// ────────────────
+// USER ROUTES
+// ────────────────
+const { getAllUsers, toggleBlockUser } = require('../controllers/userController');
+
+router.get('/users', isAdmin, getAllUsers);
+router.patch('/users/:id/block', isAdmin, toggleBlockUser);
+
 module.exports = router;
