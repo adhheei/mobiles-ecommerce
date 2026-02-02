@@ -300,24 +300,137 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
+      // --- ANIMATION SETUP ---
       const observerOptions = {
         root: null,
         rootMargin: "0px",
-        threshold: 0.1, // Trigger when 10% of element is visible
+        threshold: 0.1,
       };
 
       const observer = new IntersectionObserver((entries, observer) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("active");
-            observer.unobserve(entry.target); // Run animation only once
+            observer.unobserve(entry.target);
           }
         });
       }, observerOptions);
 
-      // Observe elements with animation classes
       const animatedElements = document.querySelectorAll(".reveal-up, .pop-in");
       animatedElements.forEach((el) => observer.observe(el));
+
+      // --- DYNAMIC DATA RENDERING ---
+      const orderDataJson = sessionStorage.getItem("lastOrderData");
+      if (!orderDataJson) {
+        // No order data? Redirect or show empty (User might have refreshed)
+        // For now, just leave static or redirect
+        console.warn("No order data found in session.");
+        return;
+      }
+
+      const orderData = JSON.parse(orderDataJson);
+
+      // 1. Order ID
+      const orderNumEl = document.querySelector('.order-number-text');
+      if (orderNumEl) orderNumEl.innerText = `Your order #${orderData.orderId} has been successfully placed.`;
+
+      // 2. Render Items
+      const container = document.querySelector('.order-card');
+      // Create separate container or find existing structure. 
+      // Strategy: Clear existing rows and append new ones.
+
+      // Find rows to replace (all .order-item-row)
+      const existingRows = document.querySelectorAll('.order-item-row');
+      existingRows.forEach(row => row.remove());
+
+      // Insert after header
+      const header = document.querySelector('.order-card-header');
+
+      if (orderData.items && orderData.items.length > 0) {
+        orderData.items.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'order-item-row';
+
+          // Format Image (Already formatted by backend, but handle relative check just in case)
+          let imgUrl = item.image || "https://placehold.co/100x100?text=No+Img";
+
+          row.innerHTML = `
+                <img src="${imgUrl}" class="item-thumb" alt="${item.name}" onerror="this.onerror=null;this.src='https://placehold.co/100x100?text=No+Img';" />
+                <div class="item-info text-start">
+                  <h6>${item.name}</h6>
+                  <p>Qty: ${item.quantity} | Price: Rs. ${item.price.toLocaleString()}</p>
+                </div>
+                <div class="item-total">Rs. ${item.lineTotal.toLocaleString()}</div>
+              `;
+
+          // Insert after header (or last row)
+          header.parentNode.insertBefore(row, document.querySelector('.order-totals-row')); // Insert before totals
+        });
+      }
+
+      // 3. Update Totals
+      const totals = orderData.totals || {};
+
+      // We need to rebuild the totals section dynamically to handle optional rows
+      const totalsContainer = document.querySelector('.order-card');
+      const startNode = document.querySelector('.order-totals-row'); // The first one usually
+
+      // Remove all existing total rows to rebuild clean
+      document.querySelectorAll('.order-totals-row').forEach(el => el.remove());
+
+      const createTotalRow = (label, value, isGreen = false, isBold = false) => {
+        const div = document.createElement('div');
+        div.className = `order-totals-row ${isBold ? 'final' : ''}`;
+        div.innerHTML = `
+            <span>${label}</span>
+            <span class="${isGreen ? 'text-success' : ''}">Rs. ${value.toLocaleString()}</span>
+          `;
+        return div;
+      };
+
+      // Subtotal
+      totalsContainer.insertBefore(createTotalRow('Subtotal', totals.subtotal || 0), totalsContainer.lastElementChild); // Insert before info row? No, append logic needed.
+
+      // Let's just append to container before shipping info
+      const shippingInfo = document.querySelector('.shipping-info-row');
+
+      const insertRow = (element) => totalsContainer.insertBefore(element, shippingInfo);
+
+      insertRow(createTotalRow('Subtotal', totals.subtotal || 0));
+
+      // Coupon
+      if (totals.couponDiscount > 0) {
+        insertRow(createTotalRow(`Coupon Discount (${orderData.appliedCoupon || 'Applied'})`, -totals.couponDiscount, true));
+      }
+
+      // Shipping
+      const shippingRow = document.createElement('div');
+      shippingRow.className = 'order-totals-row';
+      shippingRow.innerHTML = `<span>Shipping</span><span class="text-success">Free</span>`;
+      insertRow(shippingRow);
+
+      // Wallet
+      if (totals.walletDeducted > 0) {
+        insertRow(createTotalRow('Wallet Used', -totals.walletDeducted, true));
+      }
+
+      // Total
+      insertRow(createTotalRow('Total Payable', totals.totalAmount || 0, false, true));
+
+      // 4. Update Shipping Address
+      const address = orderData.address;
+      if (address) {
+        const addressP = document.querySelector('.shipping-info-row .info-column p');
+        if (addressP) {
+          addressP.innerHTML = `
+                <strong>${address.fullName}</strong> (${address.addressType})<br>
+                ${address.street}<br>
+                ${address.city}, ${address.state} - ${address.pincode}<br>
+                Phone: ${address.phone}
+              `;
+        }
+      }
+
     });
   </script>
 </body>

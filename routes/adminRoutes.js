@@ -150,9 +150,13 @@ router.get('/transactions/download', isAdmin, downloadTransactions);
 // ────────────────
 // USER ROUTES
 // ────────────────
-const { getAllUsers, toggleBlockUser } = require('../controllers/userController');
+const { getAllUsers, toggleBlockUser, adminGetWallet, adminUpdateWallet } = require('../controllers/userController');
 
 router.get('/users', isAdmin, getAllUsers);
 router.patch('/users/:id/block', isAdmin, toggleBlockUser);
+
+// Admin Wallet Routes
+router.get('/wallet/:userId', isAdmin, adminGetWallet);
+router.post('/wallet/update', isAdmin, adminUpdateWallet);
 
 module.exports = router;

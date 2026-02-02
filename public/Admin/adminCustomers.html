@@ -936,6 +936,7 @@
                     <td data-label="Stats">${c.ordersCount || 0} Orders</td>
                     <td data-label="Status"><span class="badge-custom ${statusClass}">${displayStatus}</span></td>
                     <td data-label="Actions" class="text-end">
+
                         <button class="action-btn btn-view" title="View Details" onclick='viewDetails(${JSON.stringify(c).replace(/'/g, "&apos;")})'>
                             <i class="fa-solid fa-eye"></i>
                         </button>
@@ -1014,6 +1015,7 @@
       modal.show();
     }
 
+
     // --- BLOCK / UNBLOCK ACTION ---
     function toggleBlockCustomer(id, isBlocked, name) {
       const actionText = isBlocked ? 'Unblock' : 'Block';
@@ -1063,6 +1065,7 @@
         }
       });
     }
+
   </script>
 </body>
 
