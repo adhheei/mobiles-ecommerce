@@ -96,12 +96,16 @@ function renderCart(cartData) {
            data-price="${item.price}" 
            data-mrp="${item.mrp}">
           <div class="cart-img-wrapper">
-            <img src="${imgSrc}" alt="${item.name}" onerror="this.src='${fallback}'" />
+            <a href="/User/singleProductPage.html?id=${item.productId}">
+                <img src="${imgSrc}" alt="${item.name}" onerror="this.src='${fallback}'" />
+            </a>
           </div>
           <div class="item-details">
             <div class="d-flex justify-content-between">
               <div>
-                <div class="item-name">${item.name}</div>
+                <a href="/User/singleProductPage.html?id=${item.productId}" class="text-decoration-none text-dark">
+                    <div class="item-name">${item.name}</div>
+                </a>
                 <div class="item-meta">Color: ${item.color || 'N/A'}</div>
                 <div class="item-price">
                   Rs. ${item.price} 
@@ -265,7 +269,9 @@ async function updateQty(productId, change) {
             // Re-render to sort out any server-side logic adjustments
             // Or just keep optimistic state. 
             // Re-rendering is safer for price sync but might interrupt user.
+            // Re-rendering is safer for price sync but might interrupt user.
             renderCart(data.cart); // Re-enabled to sync summary items!
+            window.updateCartBadge(); // Update badge
         } else {
             // Revert on error
             input.value = currentQty;
@@ -282,6 +288,7 @@ async function updateQty(productId, change) {
 
 // Function to Remove Item
 async function removeItem(productId) {
+    console.log("Removing item with ID:", productId);
     const result = await Swal.fire({
         title: 'Remove item?',
         text: "Do you want to remove this product from cart?",
@@ -315,6 +322,7 @@ async function removeItem(productId) {
                     showConfirmButton: false
                 });
                 renderCart(data.cart); // Finalize sync
+                window.updateCartBadge(); // Update badge
             } else {
                 // If empty or error
                 fetchCart();
