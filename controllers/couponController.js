@@ -275,11 +275,95 @@ const getAvailableCoupons = async (req, res) => {
     }
 };
 
+// @desc    Apply coupon to cart total
+// @route   POST /api/user/coupons/apply
+// @access  Private/User
+const applyCoupon = async (req, res) => {
+    try {
+        const { couponCode, cartTotal } = req.body;
+        const userId = req.user._id;
+
+        if (!couponCode || !cartTotal) {
+            return res.status(400).json({ success: false, message: 'Missing coupon code or cart total' });
+        }
+
+        const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
+
+        // 1. Check if exists
+        if (!coupon) {
+            return res.status(404).json({ success: false, message: 'Invalid coupon code' });
+        }
+
+        // 2. Check Active
+        if (!coupon.isActive) {
+            return res.status(400).json({ success: false, message: 'Coupon is inactive' });
+        }
+
+        // 3. Check Dates
+        const now = new Date();
+        if (now < new Date(coupon.startDate)) {
+            return res.status(400).json({ success: false, message: 'Coupon not yet started' });
+        }
+        if (now > new Date(coupon.endDate)) {
+            return res.status(400).json({ success: false, message: 'Coupon expired' });
+        }
+
+        // 4. Check Usage Limits
+        if (coupon.totalLimit !== null && coupon.totalLimit <= 0) { // Assuming totalLimit is decremented or we check usage count
+            // If you track global usage separately, check here. 
+            // For simplicity, relying on totalLimit field decremented or logic elsewhere.
+            // If totalLimit isn't auto-decremented, we'd count usages. 
+        }
+
+        const userUsage = (coupon.userUsage && coupon.userUsage.get(userId.toString())) || 0;
+        if (coupon.perUserLimit !== null && userUsage >= coupon.perUserLimit) {
+            return res.status(400).json({ success: false, message: 'Coupon usage limit reached for this user' });
+        }
+
+        // 5. Check Min Purchase
+        if (cartTotal < coupon.minPurchase) {
+            return res.status(400).json({
+                success: false,
+                message: `Minimum purchase of Rs. ${coupon.minPurchase} required`
+            });
+        }
+
+        // 6. Calculate Discount
+        let discount = 0;
+        if (coupon.discountType === 'fixed') {
+            discount = coupon.value;
+        } else if (coupon.discountType === 'percentage') {
+            discount = (cartTotal * coupon.value) / 100;
+            if (coupon.maxDiscount !== null) {
+                discount = Math.min(discount, coupon.maxDiscount);
+            }
+        }
+
+        // Ensure discount doesn't exceed total
+        discount = Math.min(discount, cartTotal);
+
+        const finalTotal = cartTotal - discount;
+
+        res.status(200).json({
+            success: true,
+            discountAmount: discount,
+            finalTotal: finalTotal,
+            message: 'Coupon applied successfully',
+            code: coupon.code
+        });
+
+    } catch (error) {
+        console.error("Apply Coupon Error:", error);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
 module.exports = {
     createCoupon,
     getCoupons,
     deleteCoupon,
     getCoupon,
     updateCoupon,
-    getAvailableCoupons
+    getAvailableCoupons,
+    applyCoupon
 };

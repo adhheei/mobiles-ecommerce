@@ -258,9 +258,11 @@ function selectColor(swatchElement, colorName) {
 }
 
 // Add to cart functionality
-function addToCart() {
+async function addToCart() {
   const user = localStorage.getItem('user');
-  if (!user) {
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+  if (!user || !token) {
     Swal.fire({
       title: 'Login Required',
       text: 'Please login to add products to your cart.',
@@ -279,30 +281,44 @@ function addToCart() {
   }
 
   if (!currentProduct) return;
+  const productId = currentProduct.id || currentProduct._id;
+  const quantity = parseInt(document.getElementById('qtyInput').value) || 1;
 
-  const quantity = parseInt(document.getElementById('qtyInput').value);
+  try {
+    const res = await fetch('/api/cart/add', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ productId, quantity })
+    });
 
-  // Simple cart implementation (you can enhance this)
-  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const data = await res.json();
 
-  // Check if product already in cart
-  const existingItem = cart.find(item => item.id === currentProduct.id);
-  if (existingItem) {
-    existingItem.quantity += quantity;
-  } else {
-    cart.push({
-      id: currentProduct.id,
-      name: currentProduct.name,
-      price: currentProduct.offerPrice,
-      image: currentProduct.mainImage,
-      quantity: quantity
+    if (res.ok) {
+      Swal.fire({
+        title: 'Added to Cart!',
+        text: 'Product added successfully',
+        icon: 'success',
+        confirmButtonColor: '#1a1a1a',
+        timer: 1500,
+        timerProgressBar: true,
+        showConfirmButton: false
+      });
+    } else {
+      throw new Error(data.message || "Failed to add to cart");
+    }
+
+  } catch (error) {
+    console.error("Add to cart error:", error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Action Failed',
+      text: error.message || 'Something went wrong!',
+      confirmButtonColor: '#1a1a1a'
     });
   }
-
-  localStorage.setItem('cart', JSON.stringify(cart));
-
-  // Show success message
-  alert('Product added to cart!');
 }
 
 // Scroll related products

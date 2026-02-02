@@ -84,6 +84,7 @@ app.use("/api/admin", adminRoutes); // admin routes
 app.use("/api/auth", authRoutes); // auth routes
 app.use("/api/user", userRoutes); // user routes
 app.use("/api/addresses", require("./routes/addressRoutes")); // address routes
+app.use("/api/cart", require("./routes/cartRoutes")); // cart routes
 app.use("/api/contact", require("./routes/contactRoutes")); // contact routes
 
 // 🏠 Home route

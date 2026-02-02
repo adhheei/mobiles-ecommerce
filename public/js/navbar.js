@@ -278,9 +278,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Check for User Login State
 async function checkUserLogin() {
-    let user = JSON.parse(localStorage.getItem('user'));
+    // No more localStorage. Rely on cookie.
     const navIcons = document.querySelector('.nav-icons');
-
     if (!navIcons) return;
 
     const renderLoggedInParams = (userData) => {
@@ -346,46 +345,21 @@ async function checkUserLogin() {
         }
     };
 
-    // Optimistic render if local user exists
-    if (user) {
-        renderLoggedInParams(user);
-    }
-
-    // Always verify with backend (Cookie Check)
+    // Verify with backend (Cookie Check)
     try {
         const res = await fetch('/api/user/profile');
         if (res.ok) {
             const data = await res.json();
             if (data.success && data.user) {
-                // Update Local Storage
                 const userData = { ...data.user, name: data.user.firstName || 'User' };
-                localStorage.setItem('user', JSON.stringify(userData));
                 // Update UI (refreshes image/name)
                 renderLoggedInParams(userData);
             }
         } else if (res.status === 401) {
             // Cookie invalid or expired
-            localStorage.removeItem('user');
-            localStorage.removeItem('token'); // Just in case
-
-            // If we optimistically rendered, we must revert (reload or remove)
-            if (user) {
-                // Simplest way to clear UI is reload or remove element
-                // Removing element is smoother
-                const userDropdown = document.querySelector('.dropdown.ms-4');
-                if (userDropdown) userDropdown.remove();
-
-                // Restore Login Button if not present
-                if (!document.getElementById('nav-login')) {
-                    // We probably need to reload to restore original state or manually re-add text
-                    // Reload is safer to ensure consistent state
-                    // But might loop if checking on every page load?
-                    // No, if localstorage is cleared, next load won't render optimistic.
-                    // And 401 response means we stay logged out.
-                    // So reload is acceptable ONLY if we were optimistically logged in.
-                    window.location.reload();
-                }
-            }
+            // Ensure no dropdown is shown
+            const userDropdown = document.querySelector('.dropdown.ms-4');
+            if (userDropdown) userDropdown.remove();
         }
     } catch (err) {
         console.error("Auth check failed", err);
@@ -425,11 +399,8 @@ window.handleLogout = async function () {
             try {
                 await fetch('/api/auth/logout', { method: 'POST' });
             } catch (err) {
-                console.warn('Logout API call failed, clearing local state anyway', err);
+                console.warn('Logout API call failed', err);
             }
-
-            localStorage.removeItem('user');
-            localStorage.removeItem('token');
 
             await Swal.fire({
                 title: 'Logged Out',
@@ -444,8 +415,6 @@ window.handleLogout = async function () {
     } catch (error) {
         console.error('Logout error:', error);
         // Fallback force logout
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
         window.location.href = '/User/index.html';
     }
 };

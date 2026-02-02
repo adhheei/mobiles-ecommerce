@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
     rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
     /* --- GLOBAL VARIABLES & FONTS --- */
@@ -471,27 +472,12 @@
         <div class="mb-5">
           <h4 class="section-title">Shipping Address</h4>
 
-          <label class="address-card">
-            <input class="form-check-input" type="radio" name="address" checked />
-            <span class="address-label">Address 1</span>
-          </label>
+          <div id="address-container">
+            <!-- Text asking to wait or loader could go here -->
+            <div class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Loading addresses...</div>
+          </div>
 
-          <label class="address-card">
-            <input class="form-check-input" type="radio" name="address" />
-            <span class="address-label">Address 2</span>
-          </label>
-
-          <label class="address-card">
-            <input class="form-check-input" type="radio" name="address" />
-            <span class="address-label">Address 3</span>
-          </label>
-
-          <label class="address-card">
-            <input class="form-check-input" type="radio" name="address" />
-            <span class="address-label fw-bold">New Address</span>
-          </label>
-
-          <a href="../User/paymentPage.html" class="btn-continue">Continue to Shipping</a>
+          <button id="continue-btn" class="btn-continue">Continue to Shipping</button>
         </div>
       </div>
 
@@ -616,42 +602,253 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Simple interaction to highlight selected address card
-    const addressRadios = document.querySelectorAll('input[name="address"]');
+    // --- ADDRESS FETCHING LOGIC ---
+    const API_URL = "/api/addresses";
+    const addressContainer = document.getElementById("address-container");
+    const continueBtn = document.getElementById("continue-btn");
 
-    addressRadios.forEach((radio) => {
-      radio.addEventListener("change", function () {
-        // Remove selected class from all parents
-        document.querySelectorAll(".address-card").forEach((card) => {
-          card.classList.remove("selected");
+    async function fetchAddresses() {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      if (!token) {
+        window.location.href = "/User/userLogin.html";
+        return;
+      }
+
+      try {
+        const res = await fetch(API_URL, {
+          headers: { "Authorization": `Bearer ${token}` }
         });
 
-        // Add selected class to the parent label of checked radio
-        if (this.checked) {
-          this.closest(".address-card").classList.add("selected");
+        if (!res.ok) throw new Error("Failed to fetch addresses");
+
+        const data = await res.json();
+        renderAddresses(data.addresses || []);
+      } catch (error) {
+        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to load addresses"
+        });
+      }
+    }
+
+    function renderAddresses(addresses) {
+      addressContainer.innerHTML = ""; // Clear loader/static
+
+      if (addresses.length === 0) {
+        Swal.fire({
+          icon: "info",
+          title: "No Address Found",
+          text: "Please add a new address to continue."
+        });
+        // Show only 'New Address' option logic is handled by appending it below
+      }
+
+      addresses.forEach((addr, index) => {
+        const isChecked = index === 0 ? "checked" : ""; // Default select first
+        const cardClass = index === 0 ? "address-card selected" : "address-card";
+
+        const html = `
+          <label class="${cardClass}" id="card-${addr._id}">
+            <input class="form-check-input" type="radio" name="address" value="${addr._id}" ${isChecked} onchange="selectAddress('${addr._id}')" />
+            <div class="address-details w-100 ms-3">
+               <div class="d-flex justify-content-between">
+                  <strong>${addr.fullName}</strong>
+                  <span class="badge bg-secondary">${addr.addressType}</span>
+               </div>
+               <div class="text-muted small">${addr.phone}</div>
+               <div class="mb-1">${addr.street}, ${addr.city}, ${addr.state} - ${addr.pincode}</div>
+               ${addr.country ? `<div class="text-muted small">${addr.country}</div>` : ''}
+            </div>
+          </label>
+        `;
+        addressContainer.innerHTML += html;
+      });
+
+      // Append New Address Option
+      const newAddressHtml = `
+          <label class="address-card">
+            <input class="form-check-input" type="radio" name="address" value="new" />
+            <span class="address-label fw-bold"> + Add New Address</span>
+          </label>
+      `;
+      addressContainer.innerHTML += newAddressHtml;
+
+      // Re-attach listeners for UI highlighting
+      attachRadioListeners();
+    }
+
+    function handleAddAddressClick() {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      if (!token) {
+        Swal.fire({
+          icon: "warning",
+          title: "Login Required",
+          text: "Please login to add address",
+          timer: 2000,
+          showConfirmButton: false
+        }).then(() => {
+          window.location.href = "/User/userLogin.html";
+        });
+        return;
+      }
+
+      Swal.fire({
+        title: 'Add New Address',
+        html: `
+                <div style="text-align: left; margin-bottom: 10px;">
+                    <input id="swal-fullname" class="form-control mb-2" placeholder="Full Name">
+                    <input id="swal-phone" class="form-control mb-2" placeholder="Phone Number (10 digits)">
+                    <input id="swal-street" class="form-control mb-2" placeholder="House / Building / Street">
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <input id="swal-city" class="form-control" placeholder="City" style="flex: 1;">
+                        <input id="swal-state" class="form-control" placeholder="State" style="flex: 1;">
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                         <input id="swal-pincode" class="form-control" placeholder="Pincode (6 digits)" style="flex: 1;">
+                         <input id="swal-country" class="form-control" placeholder="Country" value="India" style="flex: 1;">
+                    </div>
+                    
+                    <label style="display: block; margin-bottom: 5px; font-weight: 500;">Address Type:</label>
+                    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="swal-type" value="Home" id="type-home" checked>
+                            <label class="form-check-label" for="type-home">Home</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="swal-type" value="Work" id="type-work">
+                            <label class="form-check-label" for="type-work">Work</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="swal-type" value="Other" id="type-other">
+                            <label class="form-check-label" for="type-other">Other</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="swal-default">
+                        <label class="form-check-label" for="swal-default">Set as Default Address</label>
+                    </div>
+                </div>
+            `,
+        width: '600px',
+        showCancelButton: true,
+        confirmButtonText: 'Save Address',
+        confirmButtonColor: '#1a1a1a',
+        focusConfirm: false,
+        preConfirm: () => {
+          const fullName = document.getElementById('swal-fullname').value;
+          const phone = document.getElementById('swal-phone').value;
+          const street = document.getElementById('swal-street').value;
+          const city = document.getElementById('swal-city').value;
+          const state = document.getElementById('swal-state').value;
+          const pincode = document.getElementById('swal-pincode').value;
+          const country = document.getElementById('swal-country').value;
+          const addressType = document.querySelector('input[name="swal-type"]:checked').value;
+          const isDefault = document.getElementById('swal-default').checked;
+
+          if (!fullName || !phone || !street || !city || !state || !pincode || !country) {
+            Swal.showValidationMessage('Please fill all required fields');
+            return false;
+          }
+          if (!/^\d{10}$/.test(phone)) {
+            Swal.showValidationMessage('Phone number must be 10 digits');
+            return false;
+          }
+          if (!/^\d{6}$/.test(pincode)) {
+            Swal.showValidationMessage('Pincode must be 6 digits');
+            return false;
+          }
+
+          return { fullName, phone, street, city, state, pincode, country, addressType, isDefault };
+        }
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch('/api/addresses', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(result.value)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Address Added',
+                text: 'Your new address has been saved successfully!',
+                timer: 2000,
+                showConfirmButton: false
+              });
+              fetchAddresses(); // Refresh list
+            } else {
+              throw new Error(data.message || 'Failed to add address');
+            }
+          } catch (error) {
+            Swal.fire('Error', error.message, 'error');
+          }
         }
       });
+    }
+
+    function selectAddress(id) {
+      // Visual highlighting handled by radio change event listener
+    }
+
+    function attachRadioListeners() {
+      const addressRadios = document.querySelectorAll('input[name="address"]');
+      addressRadios.forEach((radio) => {
+        radio.addEventListener("change", function () {
+          document.querySelectorAll(".address-card").forEach((card) => card.classList.remove("selected"));
+
+          if (this.value === "new") {
+            handleAddAddressClick();
+            this.checked = false; // Add reset so it doesn't stay checked if back button used
+            return;
+          }
+
+          if (this.checked) {
+            this.closest(".address-card").classList.add("selected");
+          }
+        });
+      });
+    }
+
+    continueBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      const selected = document.querySelector('input[name="address"]:checked');
+
+      if (!selected || selected.value === "new") {
+        Swal.fire("Required", "Please select a delivery address", "warning");
+        return;
+      }
+
+      localStorage.setItem("selectedAddressId", selected.value);
+      window.location.href = "/User/paymentPage.html";
     });
+
+    // Initialize
+    document.addEventListener("DOMContentLoaded", fetchAddresses);
 
     // --- ANIMATION SCRIPT ---
     document.addEventListener("DOMContentLoaded", function () {
-      const observerOptions = {
-        root: null,
-        rootMargin: "0px",
-        threshold: 0.1, // Trigger when 10% is visible
-      };
-
-      const observer = new IntersectionObserver((entries, observer) => {
+      const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("active");
-            observer.unobserve(entry.target); // Run once
+            observer.unobserve(entry.target);
           }
         });
-      }, observerOptions);
+      }, { threshold: 0.1 });
 
-      const animatedElements = document.querySelectorAll(".reveal-up");
-      animatedElements.forEach((el) => observer.observe(el));
+      document.querySelectorAll(".reveal-up").forEach((el) => observer.observe(el));
     });
   </script>
 

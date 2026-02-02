@@ -30,12 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        // ✅ SAVE ADMIN TOKEN
-        localStorage.setItem("adminToken", data.token);
-
-        // OPTIONAL
-        localStorage.setItem("adminInfo", JSON.stringify(data.admin));
-
         Swal.fire({
           icon: "success",
           title: "Login Successful",

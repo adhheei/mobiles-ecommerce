@@ -38,6 +38,7 @@ const sendTokenResponse = (model, statusCode, res) => {
     expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
+    sameSite: "lax"
   };
 
   res
@@ -363,7 +364,8 @@ exports.loginAdmin = async (req, res) => {
     res.cookie("admin_jwt", token, {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production"
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax"
     }).json({
       success: true,
       token,

@@ -544,18 +544,17 @@ async function toggleWishlist(btn, productId) {
   }
 };
 
-function addToCart(productId) {
-  const user = localStorage.getItem('user');
-  if (!user) {
+async function addToCart(productId) {
+  // Check auth again (double check)
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  if (!token) {
     Swal.fire({
       title: 'Login Required',
       text: 'Please login to add products to your cart.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Login Now',
-      cancelButtonText: 'Cancel',
-      confirmButtonColor: '#0d6efd',
-      cancelButtonColor: '#d33'
+      cancelButtonText: 'Cancel'
     }).then((result) => {
       if (result.isConfirmed) {
         window.location.href = '/User/userLogin.html?redirect=' + encodeURIComponent(window.location.pathname);
@@ -563,13 +562,44 @@ function addToCart(productId) {
     });
     return;
   }
-  console.log('Added to cart:', productId);
-  Swal.fire({
-    title: 'Added to Cart!',
-    text: 'Product added successfully (Demo).',
-    icon: 'success',
-    confirmButtonColor: '#1a1a1a',
-    timer: 2000,
-    timerProgressBar: true
-  });
-};
+
+  try {
+    const res = await fetch('/api/cart/add', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ productId, quantity: 1 })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      Swal.fire({
+        title: 'Added to Cart!',
+        text: 'Product added successfully',
+        icon: 'success',
+        confirmButtonColor: '#1a1a1a',
+        timer: 1500,
+        timerProgressBar: true,
+        showConfirmButton: false
+      });
+
+      // Optional: Update cart count in navbar if exists
+      // updateCartCount();
+    } else {
+      throw new Error(data.message || "Failed to add to cart");
+    }
+
+  } catch (error) {
+    console.error("Add to cart error:", error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: error.message || 'Something went wrong!',
+      confirmButtonColor: '#1a1a1a'
+    });
+  }
+}
+

@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 const path = require('path');
+const { isAdmin } = require('../middleware/authMiddleware');
 
 // ────────────────
 // CATEGORY ROUTES
@@ -37,13 +38,13 @@ router.get('/categories', getAllCategories);
 router.get('/categories/:id', getCategoryById);
 
 // POST new category
-router.post('/categories', uploadCategory, createCategory);
+router.post('/categories', isAdmin, uploadCategory, createCategory);
 
 // PUT update category
-router.put('/categories/:id', uploadCategory, updateCategory);
+router.put('/categories/:id', isAdmin, uploadCategory, updateCategory);
 
 // DELETE category permanently
-router.delete('/categories/:id', deleteCategory);
+router.delete('/categories/:id', isAdmin, deleteCategory);
 
 // GET categories with product counts
 router.get('/products/categories-with-counts', getCategoriesWithCounts);
@@ -74,6 +75,9 @@ router.get('/search/suggestions', publicProductController.getSearchSuggestions);
 // Get brands with counts
 router.get('/products/brands-with-counts', publicProductController.getBrandsWithCounts);
 
+// Get suggestions based on cart
+router.post('/products/suggestions', publicProductController.getSuggestions);
+
 // GET categories for product dropdown
 router.get('/products/categories', getCategoriesForDropdown);
 
@@ -81,23 +85,24 @@ router.get('/products/categories', getCategoriesForDropdown);
 router.get('/products', getAllProducts);
 
 // POST new product
-router.post('/products', uploadProduct, addProduct);
+router.post('/products', isAdmin, uploadProduct, addProduct);
 
 // GET single product by ID
-router.get('/products/:id', getProductById);
+router.get('/products/:id', getProductById); // Public allowed to view ID? usually public route handles this, but admin checks ID too. Let's keep public for now or isAdmin if strictly admin edit page.
 
 // PUT update product
-router.put('/products/:id', uploadProduct, updateProduct);
+router.put('/products/:id', isAdmin, uploadProduct, updateProduct);
 
 // DELETE product permanently
-router.delete('/products/:id', deleteProduct);
+router.delete('/products/:id', isAdmin, deleteProduct);
 
 // Signup routes have been moved to authRoutes.js
 // ────────────────
 // MESSAGE ROUTES
 // ────────────────
 
-const { protectAdmin } = require('../middleware/adminAuthMiddleware');
+// Import middleware
+// const { isAdmin } = require('../middleware/authMiddleware'); // Already imported at top
 const {
   getMessages,
   markAsRead,
@@ -105,12 +110,13 @@ const {
 } = require('../controllers/messageController');
 
 // All message routes are protected
-router.get('/messages', protectAdmin, getMessages);
-router.patch('/messages/:id/seen', protectAdmin, require('../controllers/messageController').markAsSeen);
-router.patch('/messages/:id/replied', protectAdmin, require('../controllers/messageController').markAsReplied);
-router.get('/messages/unread-count', protectAdmin, getUnreadCount);
-// router.post('/messages/:id/reply', protectAdmin, require('../controllers/messageController').replyToMessage);
-router.delete('/messages/:id', protectAdmin, require('../controllers/messageController').deleteMessage);
+router.get('/messages', isAdmin, getMessages);
+router.patch('/messages/:id/seen', isAdmin, require('../controllers/messageController').markAsSeen);
+router.patch('/messages/:id/replied', isAdmin, require('../controllers/messageController').markAsReplied);
+router.get('/messages/unread-count', isAdmin, getUnreadCount);
+// router.post('/messages/:id/reply', isAdmin, require('../controllers/messageController').replyToMessage);
+router.post('/messages/:id/reply', isAdmin, require('../controllers/messageController').replyToMessage);
+router.delete('/messages/:id', isAdmin, require('../controllers/messageController').deleteMessage);
 
 // ────────────────
 // COUPON ROUTES
@@ -125,10 +131,10 @@ const {
 } = require('../controllers/couponController');
 
 // All coupon routes protected
-router.post('/coupons', protectAdmin, createCoupon);
-router.get('/coupons', protectAdmin, getCoupons);
-router.get('/coupons/:id', protectAdmin, getCoupon);
-router.put('/coupons/:id', protectAdmin, updateCoupon);
-router.delete('/coupons/:id', protectAdmin, deleteCoupon);
+router.post('/coupons', isAdmin, createCoupon);
+router.get('/coupons', isAdmin, getCoupons);
+router.get('/coupons/:id', isAdmin, getCoupon);
+router.put('/coupons/:id', isAdmin, updateCoupon);
+router.delete('/coupons/:id', isAdmin, deleteCoupon);
 
 module.exports = router;

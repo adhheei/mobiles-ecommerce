@@ -648,6 +648,24 @@
           </div>
           <h6 class="fw-bold fs-5" id="modalSubject"></h6>
           <div class="message-body-text mt-3" id="modalBody"></div>
+
+          <!-- Existing Reply Display -->
+          <div id="adminReplyDisplay" class="mt-4 p-3 bg-light border rounded d-none">
+            <h6 class="fw-bold text-success"><i class="fa-solid fa-check-circle"></i> Repled:</h6>
+            <p class="mb-0 text-muted" id="adminReplyText"></p>
+            <small class="text-muted" id="adminReplyDate"></small>
+          </div>
+
+          <!-- New Reply Input Section -->
+          <div id="replyInputSection" class="mt-4 d-none">
+            <label class="form-label fw-bold">Your Reply:</label>
+            <textarea class="form-control" id="replyMessage" rows="4" placeholder="Type your reply here..."></textarea>
+            <div class="mt-2 text-end">
+              <button class="btn btn-secondary btn-sm me-2" onclick="cancelReply()">Cancel</button>
+              <button class="btn btn-primary btn-sm" onclick="sendReply()">Send Reply <i
+                  class="fa-solid fa-paper-plane"></i></button>
+            </div>
+          </div>
         </div>
         <div class="modal-footer bg-light">
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
@@ -825,26 +843,11 @@
       messageModal = new bootstrap.Modal(modalEl);
 
       // Listen for hidden event for accessibility-safe redirect
+      // Listen for hidden event for accessibility-safe redirect
+      // (Removed old mailto logic)
       modalEl.addEventListener('hidden.bs.modal', async () => {
-        if (pendingReplyUrl) {
-          // Optimistic status update to "Replied"
-          if (currentMessageId) {
-            try {
-              await fetch(`/api/admin/messages/${currentMessageId}/replied`, { method: "PATCH", credentials: "include" });
-              // Update local state
-              const m = allMessages.find(msg => msg._id === currentMessageId);
-              if (m) m.status = 'replied';
-              filterMessages();
-            } catch (err) { console.error(err); }
-          }
-
-          // Trigger mailto after modal closes
-          setTimeout(() => {
-            window.location.href = pendingReplyUrl;
-            pendingReplyUrl = null;
-            currentMessageId = null;
-          }, 50);
-        }
+        // Cleanup if needed
+        currentMessageId = null;
       });
 
       fetchMessages();
@@ -855,19 +858,22 @@
       if (msg) {
         currentMessageId = id;
 
-        // Mark as Seen if currently Unread
+        // Reset UI state
+        document.getElementById('replyInputSection').classList.add('d-none');
+        document.getElementById('replyMessage').value = '';
+
+        // Mark as Seen logic (same as before)
         if (msg.status === 'unread' || (!msg.status && !msg.isRead)) {
-          // Optimistic update
           msg.status = 'seen';
           msg.isRead = true;
-          filterMessages();
+          filterMessages(); // Update list to show 'Seen'
           updateUnreadBadge();
-
           try {
             await fetch(`/api/admin/messages/${id}/seen`, { method: "PATCH", credentials: "include" });
-          } catch (err) { console.error("Error marking seen", err); }
+          } catch (err) { console.error(err); }
         }
 
+        // Populate Modal Details
         document.getElementById('modalAvatar').innerText = getInitials(msg.name);
         document.getElementById('modalSender').innerText = msg.name;
         document.getElementById('modalEmail').innerText = msg.email;
@@ -875,31 +881,101 @@
         document.getElementById('modalSubject').innerText = msg.subject;
         document.getElementById('modalBody').innerText = msg.message;
 
-        // Update Modal Status Badge
+        // Status Badge Logic
         const statusBadge = document.getElementById('modalStatusBadge');
         let statusLabel = '';
-        if (msg.status === 'unread' || (!msg.status && !msg.isRead)) {
-          statusLabel = '<span class="badge bg-primary rounded-pill">Unread</span>';
-        } else if (msg.status === 'replied') {
+        if (msg.status === 'replied') {
           statusLabel = '<span class="badge bg-success rounded-pill">Replied</span>';
-        } else { // msg.status === 'seen' or msg.isRead is true
-          statusLabel = '<span class="badge bg-secondary rounded-pill" style="opacity: 0.6;">Seen</span>';
+        } else {
+          statusLabel = '<span class="badge bg-secondary rounded-pill">Seen</span>';
         }
         statusBadge.innerHTML = statusLabel;
 
-
-        // Setup Reply Button
+        // Check for Existing Reply
+        const replyDisplay = document.getElementById('adminReplyDisplay');
         const replyBtn = document.getElementById('replyBtn');
-        replyBtn.removeAttribute('href');
-        replyBtn.onclick = (e) => {
-          e.preventDefault();
-          // Store intent
-          pendingReplyUrl = `mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.subject)}`;
-          // Close modal to trigger hidden.bs.modal event
-          messageModal.hide();
-        };
+
+        if (msg.isReplied || msg.status === 'replied') {
+          replyDisplay.classList.remove('d-none');
+          document.getElementById('adminReplyText').innerText = msg.adminReply || '(No content)';
+          document.getElementById('adminReplyDate').innerText = msg.repliedAt ? new Date(msg.repliedAt).toLocaleString() : '';
+
+          replyBtn.classList.add('d-none'); // Hide reply button if already replied
+        } else {
+          replyDisplay.classList.add('d-none');
+          replyBtn.classList.remove('d-none');
+          replyBtn.onclick = () => startReply(); // Use internal function
+          replyBtn.innerHTML = '<i class="fa-solid fa-reply"></i> Reply';
+        }
 
         messageModal.show();
+      }
+    }
+
+    function startReply() {
+      document.getElementById('replyInputSection').classList.remove('d-none');
+      document.getElementById('replyBtn').classList.add('d-none');
+      document.getElementById('replyMessage').focus();
+    }
+
+    function cancelReply() {
+      document.getElementById('replyInputSection').classList.add('d-none');
+      document.getElementById('replyBtn').classList.remove('d-none');
+    }
+
+    async function sendReply() {
+      const replyText = document.getElementById('replyMessage').value.trim();
+      if (!replyText) {
+        Swal.fire('Error', 'Reply cannot be empty', 'warning');
+        return;
+      }
+
+      // Confirmation
+      const result = await Swal.fire({
+        title: 'Send Reply?',
+        text: "This will send an email to the user.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Send',
+        confirmButtonColor: '#0d6efd'
+      });
+
+      if (result.isConfirmed) {
+        try {
+          // Show Loading
+          Swal.fire({ title: 'Sending...', didOpen: () => Swal.showLoading() });
+
+          const response = await fetch(`/api/admin/messages/${currentMessageId}/reply`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ reply: replyText })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            Swal.fire('Sent!', 'Reply sent successfully.', 'success');
+
+            // Update Local Data
+            const m = allMessages.find(msg => msg._id === currentMessageId);
+            if (m) {
+              m.status = 'replied';
+              m.isReplied = true;
+              m.adminReply = replyText;
+              m.repliedAt = new Date().toISOString();
+            }
+
+            // Refresh UI
+            filterMessages();
+            messageModal.hide(); // Close modal on success
+          } else {
+            Swal.fire('Error', data.error || 'Failed to send reply', 'error');
+          }
+        } catch (error) {
+          console.error(error);
+          Swal.fire('Error', 'Network error occurred', 'error');
+        }
       }
     }
   </script>
