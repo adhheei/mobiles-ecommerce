@@ -66,6 +66,78 @@ exports.markAsReplied = async (req, res) => {
     }
 };
 
+// Reply to Message
+exports.replyToMessage = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { reply } = req.body;
+
+        if (!reply) {
+            return res.status(400).json({ error: "Reply message cannot be empty" });
+        }
+
+        const message = await Message.findById(id);
+        if (!message) {
+            return res.status(404).json({ error: "Message not found" });
+        }
+
+        // Update Message
+        message.adminReply = reply;
+        message.repliedAt = Date.now();
+        message.isReplied = true;
+        message.status = "replied"; // Ensure status is synced
+        await message.save();
+
+        // Start Email Logic (using existing nodemailer setup if available, or create new)
+        // Note: Ideally import transporter from authController or shared config
+        // For now, I'll require nodemailer locally here if not available globally, 
+        // but since authController has it, let's copy the transporter setup or hope for shared file.
+        // Looking at structure, it's best to duplicate transporter init here for safety unless I move it to config.
+        const nodemailer = require("nodemailer");
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: message.email,
+            subject: "Reply from Jinsa Mobiles Support",
+            html: `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+                    <h2 style="color: #000;">Hello ${message.name},</h2>
+                    <p>Thank you for contacting us. Here is the response to your message.</p>
+                    
+                    <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #ccc; margin: 20px 0;">
+                        <p style="margin: 0; font-weight: bold;">Your Message:</p>
+                        <p style="margin-top: 5px;">"${message.message}"</p>
+                    </div>
+
+                    <div style="background: #e6f7ff; padding: 15px; border-left: 4px solid #007bff; margin: 20px 0;">
+                        <p style="margin: 0; font-weight: bold; color: #007bff;">Our Reply:</p>
+                        <p style="margin-top: 5px;">${reply}</p>
+                    </div>
+
+                    <p>If you have further questions, feel free to reply to this email.</p>
+                    <br>
+                    <p>Best Regards,<br><strong>Jinsa Mobiles Team</strong></p>
+                </div>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        res.json({ success: true, message: "Reply sent and saved successfully", data: message });
+
+    } catch (error) {
+        console.error("Error sending reply:", error);
+        res.status(500).json({ error: "Failed to send reply" });
+    }
+};
+
 // Get Unread Count
 exports.getUnreadCount = async (req, res) => {
     try {

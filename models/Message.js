@@ -34,6 +34,18 @@ const messageSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    // Reply fields
+    adminReply: {
+        type: String,
+        trim: true
+    },
+    repliedAt: {
+        type: Date
+    },
+    isReplied: {
+        type: Boolean,
+        default: false
+    }
 });
 
 module.exports = mongoose.model("Message", messageSchema);

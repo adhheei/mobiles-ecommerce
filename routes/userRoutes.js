@@ -9,7 +9,7 @@ const {
     removeFromWishlist,
     changePassword
 } = require("../controllers/userController");
-const { getAvailableCoupons } = require("../controllers/couponController");
+const { getAvailableCoupons, applyCoupon } = require("../controllers/couponController");
 const { protect } = require("../middleware/authMiddleware");
 const upload = require("../middleware/upload");
 
@@ -22,6 +22,7 @@ router.post("/wishlist", protect, addToWishlist);
 router.delete("/wishlist/:productId", protect, removeFromWishlist);
 
 router.get("/coupons", protect, getAvailableCoupons);
+router.post("/coupons/apply", protect, applyCoupon);
 
 router.post("/change-password", protect, changePassword);
 

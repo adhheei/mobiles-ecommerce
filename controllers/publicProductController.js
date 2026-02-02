@@ -209,3 +209,79 @@ exports.getSearchSuggestions = async (req, res) => {
     res.status(500).json({ success: false, error: 'Search failed' });
   }
 };
+
+exports.getSuggestions = async (req, res) => {
+  try {
+    const { cartProductIds } = req.body;
+    let excludeIds = [];
+    if (cartProductIds && Array.isArray(cartProductIds)) {
+      excludeIds = cartProductIds;
+    }
+
+    // 1. Fetch details of cart items to find their categories/brands (if any)
+    let categories = [];
+    let brands = [];
+
+    if (excludeIds.length > 0) {
+      const cartItems = await Product.find({ _id: { $in: excludeIds } }).select('category brand');
+      categories = cartItems.map(p => p.category);
+      brands = cartItems.map(p => p.brand).filter(b => b && b !== 'Generic');
+
+      // Remove duplicates
+      categories = [...new Set(categories.map(c => c.toString()))];
+      brands = [...new Set(brands)];
+    }
+
+    // 2. Build Query
+    let query = {
+      _id: { $nin: excludeIds },
+      status: 'active',
+      stock: { $gt: 0 }
+    };
+
+    if (categories.length > 0 || brands.length > 0) {
+      query.$or = [
+        { category: { $in: categories } },
+        { brand: { $in: brands } }
+      ];
+    }
+    // If cart empty, query stays simple (all active products)
+
+    // 3. Fetch Products
+    // Priority: Sort by newest or offerPrice? Let's random or newest.
+    // MongoDB $sample is good for random but let's stick to newest for consistency or sort by popularity if we had it.
+    let products = await Product.find(query)
+      .populate('category', 'name')
+      .limit(6)
+      .sort({ createdAt: -1 });
+
+    // Fallback if not enough recommendations (e.g. niche category)
+    if (products.length < 3) {
+      const moreProducts = await Product.find({
+        _id: { $nin: [...excludeIds, ...products.map(p => p._id)] },
+        status: 'active',
+        stock: { $gt: 0 }
+      })
+        .limit(6 - products.length)
+        .sort({ createdAt: -1 }); // Recently added
+
+      products = [...products, ...moreProducts];
+    }
+
+    // Format
+    const formatted = products.map(p => ({
+      id: p._id.toString(),
+      name: p.name,
+      offerPrice: p.offerPrice,
+      actualPrice: p.actualPrice,
+      image: p.mainImage ? `/uploads/products/${path.basename(p.mainImage)}` : '/images/logo.jpg',
+      category: p.category?.name
+    }));
+
+    res.json({ success: true, products: formatted });
+
+  } catch (err) {
+    console.error('Error fetching suggestions:', err);
+    res.status(500).json({ success: false, error: 'Failed' });
+  }
+};
