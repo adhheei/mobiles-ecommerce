@@ -483,37 +483,7 @@
 
       <div class="col-lg-5">
         <div class="order-summary">
-          <div class="summary-item">
-            <img src="https://placehold.co/100x100/eee/333?text=Case" class="summary-img" alt="Product" />
-            <div class="summary-details">
-              <h6>Pikkme iPhone 16 Pro Max</h6>
-              <p>Color: Black</p>
-              <p>Qty: 1</p>
-            </div>
-            <div class="summary-price">Rs. 1,497.00</div>
-          </div>
-
-          <div class="promo-row">
-            <span><i class="fa-solid fa-tag me-2"></i> Apply Voucher, Promo
-              Code</span>
-            <i class="fa-solid fa-chevron-right"></i>
-          </div>
-
-          <div class="summary-calc">
-            <div class="calc-row">
-              <span>Subtotal</span>
-              <span>Rs. 1,497.00</span>
-            </div>
-            <div class="calc-row">
-              <span>Shipping Method</span>
-              <span class="free-shipping">Free Shipping</span>
-            </div>
-
-            <div class="calc-row total">
-              <span>Total</span>
-              <span>Rs. 1,497.00</span>
-            </div>
-          </div>
+          <!-- Dynamic Content Loaded via checkoutSummary.js -->
         </div>
       </div>
     </div>
@@ -642,24 +612,39 @@
           title: "No Address Found",
           text: "Please add a new address to continue."
         });
-        // Show only 'New Address' option logic is handled by appending it below
       }
 
       addresses.forEach((addr, index) => {
         const isChecked = index === 0 ? "checked" : ""; // Default select first
         const cardClass = index === 0 ? "address-card selected" : "address-card";
 
+        // Store address data in DOM for easy access (optional, or use global array)
+        // Better: use the index to retrieve from the 'addresses' array which we can store globally or pass around.
+        // We will attach the full object to the window/scope or just lookup by ID if we keep the data.
+        // For simplicity, let's keep 'currentAddresses' global or just pass params.
+
+        window.currentAddresses = addresses; // Store for edit lookup
+
         const html = `
           <label class="${cardClass}" id="card-${addr._id}">
-            <input class="form-check-input" type="radio" name="address" value="${addr._id}" ${isChecked} onchange="selectAddress('${addr._id}')" />
-            <div class="address-details w-100 ms-3">
-               <div class="d-flex justify-content-between">
-                  <strong>${addr.fullName}</strong>
-                  <span class="badge bg-secondary">${addr.addressType}</span>
-               </div>
-               <div class="text-muted small">${addr.phone}</div>
-               <div class="mb-1">${addr.street}, ${addr.city}, ${addr.state} - ${addr.pincode}</div>
-               ${addr.country ? `<div class="text-muted small">${addr.country}</div>` : ''}
+            <div class="d-flex w-100 align-items-start">
+                <div class="me-2 mt-1">
+                    <input class="form-check-input" type="radio" name="address" value="${addr._id}" ${isChecked} onchange="selectAddress('${addr._id}')" />
+                </div>
+                <div class="address-details flex-grow-1">
+                   <div class="d-flex justify-content-between">
+                      <strong>${addr.fullName}</strong>
+                      <div>
+                          <span class="badge bg-secondary me-2">${addr.addressType}</span>
+                          <button type="button" class="btn btn-sm btn-outline-dark border-0 p-0" onclick="event.preventDefault(); editAddress('${index}')" title="Edit Address">
+                            <i class="fa-regular fa-pen-to-square"></i>
+                          </button>
+                      </div>
+                   </div>
+                   <div class="text-muted small">${addr.phone}</div>
+                   <div class="mb-1">${addr.street}, ${addr.city}, ${addr.state} - ${addr.pincode}</div>
+                   ${addr.country ? `<div class="text-muted small">${addr.country}</div>` : ''}
+                </div>
             </div>
           </label>
         `;
@@ -668,9 +653,11 @@
 
       // Append New Address Option
       const newAddressHtml = `
-          <label class="address-card">
-            <input class="form-check-input" type="radio" name="address" value="new" />
-            <span class="address-label fw-bold"> + Add New Address</span>
+          <label class="address-card" onclick="openAddressModal('add')">
+            <div class="d-flex align-items-center">
+                <input class="form-check-input me-2" type="radio" name="address" value="new" disabled />
+                <span class="address-label fw-bold"> + Add New Address</span>
+            </div>
           </label>
       `;
       addressContainer.innerHTML += newAddressHtml;
@@ -679,64 +666,74 @@
       attachRadioListeners();
     }
 
+    // New wrapper for Add
     function handleAddAddressClick() {
+      openAddressModal('add');
+    }
+
+    // Function to Edit
+    window.editAddress = function (index) {
+      const addr = window.currentAddresses[index];
+      if (addr) {
+        openAddressModal('edit', addr);
+      }
+    };
+
+    // Unified Modal Function
+    function openAddressModal(mode, address = null) {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       if (!token) {
-        Swal.fire({
-          icon: "warning",
-          title: "Login Required",
-          text: "Please login to add address",
-          timer: 2000,
-          showConfirmButton: false
-        }).then(() => {
-          window.location.href = "/User/userLogin.html";
-        });
+        window.location.href = "/User/userLogin.html";
         return;
       }
 
+      const isEdit = mode === 'edit';
+      const title = isEdit ? 'Edit Address' : 'Add New Address';
+      const confirmText = isEdit ? 'Update Address' : 'Save Address';
+
       Swal.fire({
-        title: 'Add New Address',
+        title: title,
         html: `
                 <div style="text-align: left; margin-bottom: 10px;">
-                    <input id="swal-fullname" class="form-control mb-2" placeholder="Full Name">
-                    <input id="swal-phone" class="form-control mb-2" placeholder="Phone Number (10 digits)">
-                    <input id="swal-street" class="form-control mb-2" placeholder="House / Building / Street">
+                    <input id="swal-fullname" class="form-control mb-2" placeholder="Full Name" value="${address ? address.fullName : ''}">
+                    <input id="swal-phone" class="form-control mb-2" placeholder="Phone Number (10 digits)" value="${address ? address.phone : ''}">
+                    <input id="swal-street" class="form-control mb-2" placeholder="House / Building / Street" value="${address ? address.street : ''}">
                     
                     <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                        <input id="swal-city" class="form-control" placeholder="City" style="flex: 1;">
-                        <input id="swal-state" class="form-control" placeholder="State" style="flex: 1;">
+                        <input id="swal-city" class="form-control" placeholder="City" style="flex: 1;" value="${address ? address.city : ''}">
+                        <input id="swal-state" class="form-control" placeholder="State" style="flex: 1;" value="${address ? address.state : ''}">
                     </div>
                     
                     <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                         <input id="swal-pincode" class="form-control" placeholder="Pincode (6 digits)" style="flex: 1;">
-                         <input id="swal-country" class="form-control" placeholder="Country" value="India" style="flex: 1;">
+                         <input id="swal-pincode" class="form-control" placeholder="Pincode (6 digits)" style="flex: 1;" value="${address ? address.pincode : ''}">
+                         <input id="swal-country" class="form-control" placeholder="Country" value="${address ? address.country || 'India' : 'India'}" style="flex: 1;">
                     </div>
                     
                     <label style="display: block; margin-bottom: 5px; font-weight: 500;">Address Type:</label>
                     <div style="display: flex; gap: 15px; margin-bottom: 15px;">
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="swal-type" value="Home" id="type-home" checked>
+                            <input class="form-check-input" type="radio" name="swal-type" value="Home" id="type-home" ${!address || address.addressType === 'Home' ? 'checked' : ''}>
                             <label class="form-check-label" for="type-home">Home</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="swal-type" value="Work" id="type-work">
+                            <input class="form-check-input" type="radio" name="swal-type" value="Work" id="type-work" ${address && address.addressType === 'Work' ? 'checked' : ''}>
                             <label class="form-check-label" for="type-work">Work</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="swal-type" value="Other" id="type-other">
+                            <input class="form-check-input" type="radio" name="swal-type" value="Other" id="type-other" ${address && address.addressType === 'Other' ? 'checked' : ''}>
                             <label class="form-check-label" for="type-other">Other</label>
                         </div>
                     </div>
                     
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="swal-default">
+                        <input class="form-check-input" type="checkbox" id="swal-default" ${address && address.isDefault ? 'checked' : ''}>
                         <label class="form-check-label" for="swal-default">Set as Default Address</label>
                     </div>
                 </div>
             `,
         width: '600px',
         showCancelButton: true,
-        confirmButtonText: 'Save Address',
+        confirmButtonText: confirmText,
         confirmButtonColor: '#1a1a1a',
         focusConfirm: false,
         preConfirm: () => {
@@ -768,8 +765,11 @@
       }).then(async (result) => {
         if (result.isConfirmed) {
           try {
-            const response = await fetch('/api/addresses', {
-              method: 'POST',
+            const url = isEdit ? `/api/addresses/${address._id}` : '/api/addresses';
+            const method = isEdit ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+              method: method,
               headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
@@ -782,14 +782,14 @@
             if (response.ok) {
               Swal.fire({
                 icon: 'success',
-                title: 'Address Added',
-                text: 'Your new address has been saved successfully!',
+                title: isEdit ? 'Address Updated' : 'Address Added',
+                text: isEdit ? 'Your address has been updated.' : 'Your new address has been saved.',
                 timer: 2000,
                 showConfirmButton: false
               });
               fetchAddresses(); // Refresh list
             } else {
-              throw new Error(data.message || 'Failed to add address');
+              throw new Error(data.message || 'Failed to save address');
             }
           } catch (error) {
             Swal.fire('Error', error.message, 'error');
@@ -809,8 +809,9 @@
           document.querySelectorAll(".address-card").forEach((card) => card.classList.remove("selected"));
 
           if (this.value === "new") {
-            handleAddAddressClick();
-            this.checked = false; // Add reset so it doesn't stay checked if back button used
+            // Handled by onclick on label, but if changed here:
+            openAddressModal('add');
+            this.checked = false;
             return;
           }
 
@@ -830,8 +831,17 @@
         return;
       }
 
-      localStorage.setItem("selectedAddressId", selected.value);
-      window.location.href = "/User/paymentPage.html";
+      // Find full address object
+      const selectedId = selected.value;
+      const addrObj = window.currentAddresses.find(a => a._id === selectedId);
+
+      if (addrObj) {
+        sessionStorage.setItem("deliveryAddress", JSON.stringify(addrObj));
+        localStorage.setItem("selectedAddressId", selectedId); // Keep for legacy/redundancy
+        window.location.href = "/User/paymentPage.html";
+      } else {
+        Swal.fire("Error", "Selected address not found in memory. Please refresh.", "error");
+      }
     });
 
     // Initialize
@@ -853,6 +863,7 @@
   </script>
 
   <script src="/js/navbar.js"></script>
+  <script src="/js/checkoutSummary.js"></script>
 </body>
 
 </html>

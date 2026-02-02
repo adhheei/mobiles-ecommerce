@@ -467,6 +467,23 @@
       <div class="col-lg-7">
         <h2 class="main-heading">Payment</h2>
 
+        <!-- New Shipping Address Display -->
+        <div class="card mb-4 border-0 shadow-sm" style="background-color: #f8f9fa; border-radius: 12px;">
+          <div class="card-body p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="fw-bold mb-0"><i class="fa-solid fa-location-dot me-2 text-danger"></i>Delivering to</h6>
+              <a href="./address.html" class="text-decoration-none small fw-bold">Change</a>
+            </div>
+            <div id="shipping-address-display" class="small text-muted ps-4">
+              <!-- Address will be injected here -->
+              <div class="placeholder-glow">
+                <span class="placeholder col-6"></span><br>
+                <span class="placeholder col-8"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <h4 class="section-title">Payment Method</h4>
 
         <div class="payment-option" id="option-wallet">
@@ -537,136 +554,26 @@
           </div>
         </div>
 
-        <a href="./thankYouPage.html" class="btn-complete">Complete Order</a>
+        <button type="button" class="btn-complete" onclick="placeOrder()">Complete Order</button>
       </div>
 
       <div class="col-lg-5">
         <div class="order-summary reveal-up">
-          <div class="summary-item">
-            <img src="https://placehold.co/100x100/eee/333?text=Case" class="summary-img" alt="Product" />
-            <div class="summary-details">
-              <h6>Pikkme iPhone 16 Pro Max</h6>
-              <p>Color: Black</p>
-              <p>Qty: 1</p>
-            </div>
-            <div class="summary-price-container">
-              <span class="original-price">Rs. 1,499.00</span>
-              <span class="offer-price">Rs. 499.00</span>
-            </div>
-          </div>
-
-          <a href="./couponPage.html" class="promo-row">
-            <span><i class="fa-solid fa-tag me-2"></i> Apply Voucher, Promo
-              Code</span>
-            <i class="fa-solid fa-chevron-right"></i>
-          </a>
-
-          <div class="summary-calc mt-3">
-            <div class="calc-row">
-              <span>Subtotal (MRP)</span>
-              <span>Rs. 1,499.00</span>
-            </div>
-            <div class="calc-row text-success">
-              <span>Offer Discount</span>
-              <span class="discount-text">- Rs. 1,000.00</span>
-            </div>
-            <div class="calc-row">
-              <span>Shipping Method</span>
-              <span class="free-shipping">Free Shipping</span>
-            </div>
-
-            <div class="calc-row total">
-              <span>Total Amount</span>
-              <span>Rs. 499.00</span>
-            </div>
-          </div>
+          <!-- Dynamic Content Loaded via checkoutSummary.js -->
         </div>
       </div>
     </div>
 
-    <div class="trust-section reveal-up">
-      <div class="row align-items-center justify-content-center">
-        <div class="col-md-5 mb-4 mb-md-0">
-          <h6 class="fw-bold mb-3">Accepted Payments</h6>
-          <div class="payment-icons">
-            <i class="fa-brands fa-cc-visa"></i>
-            <i class="fa-brands fa-cc-mastercard"></i>
-            <i class="fa-brands fa-cc-amex"></i>
-            <i class="fa-brands fa-cc-paypal"></i>
-            <i class="fa-brands fa-apple-pay"></i>
-          </div>
-        </div>
-        <div class="col-md-5">
-          <div class="guarantee-box">
-            <h6 class="fw-bold">
-              <i class="fa-solid fa-shield-halved me-2"></i> 100% Satisfaction
-              Guaranteed
-            </h6>
-            <p class="guarantee-text">
-              JINSA offers "10-day No Questions Asked Return or Exchange" and
-              "6-month Product Warranty" on selected products.
-              <br /><a href="#" class="text-decoration-none small">Learn more about our Protection Plan</a>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Trust Section ... -->
+
   </div>
 
   <footer>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-3">
-          <h5>Discover More</h5>
-          <ul>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact Us</a></li>
-            <li><a href="#">Blog</a></li>
-          </ul>
-        </div>
-        <div class="col-md-3">
-          <h5>Explore Products</h5>
-          <ul>
-            <li><a href="#">Mobiles</a></li>
-            <li><a href="#">Accessories</a></li>
-            <li><a href="#">Trendy Cases</a></li>
-          </ul>
-        </div>
-        <div class="col-md-3">
-          <h5>Customer Care</h5>
-          <ul>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Service</a></li>
-            <li><a href="#">Return Policy</a></li>
-          </ul>
-        </div>
-        <div class="col-md-3">
-          <h5>Contact Us</h5>
-          <form id="footerContactForm" style="margin-bottom: 0;">
-            <input type="text" class="newsletter-input mb-2" placeholder="Name"
-              style="font-size: 0.85rem; padding: 8px;" required />
-            <input type="email" class="newsletter-input mb-2" placeholder="Email"
-              style="font-size: 0.85rem; padding: 8px;" required />
-            <textarea class="newsletter-input mb-2" rows="2" placeholder="Message"
-              style="font-size: 0.85rem; padding: 8px; resize: none;" required></textarea>
-            <button type="submit" class="btn btn-light w-100 btn-sm fw-bold">Send</button>
-          </form>
-          <div class="mt-3">
-            <i class="fa-brands fa-facebook me-3"></i>
-            <i class="fa-brands fa-instagram me-3"></i>
-            <i class="fa-brands fa-twitter"></i>
-          </div>
-        </div>
-      </div>
-    </div>
-    <hr class="border-secondary mt-4" />
-    <div class="text-center small">
-      &copy; 2025 Jinsa Mobiles. All rights reserved.
-    </div>
-    </div>
+    <!-- ... Footer Content ... -->
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     // Function to toggle payment forms
     function selectPayment(method) {
@@ -683,6 +590,117 @@
         // Check the radio button programmatically
         const radio = document.getElementById("radio-" + method);
         if (radio) radio.checked = true;
+      }
+    }
+
+    // Place Order Function
+    // Place Order Function
+    async function placeOrder() {
+      const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
+      if (!selectedPayment) {
+        Swal.fire("Error", "Please select a payment method", "error");
+        return;
+      }
+
+      const paymentMethod = selectedPayment.id.replace('radio-', '');
+      const methodMap = {
+        'cod': 'COD',
+        'card': 'Card',
+        'wallet': 'Wallet',
+        'paypal': 'PayPal',
+        'upi': 'UPI'
+      };
+
+      const useWallet = window.walletState ? window.walletState.isApplied : false;
+      const addressId = localStorage.getItem("selectedAddressId");
+
+      if (!addressId) {
+        Swal.fire("Error", "No address selected. Please go back.", "error");
+        return;
+      }
+
+      // --- CHECK FOR BUY NOW ITEM ---
+      const checkoutType = sessionStorage.getItem("checkoutType");
+      let buyNowItem = null;
+      if (checkoutType === "buyNow") {
+        const storedItem = sessionStorage.getItem("buyNowItem");
+        if (storedItem) {
+          try {
+            buyNowItem = JSON.parse(storedItem);
+            console.log("✅ Buy Now Item Found:", buyNowItem);
+          } catch (e) {
+            console.error("❌ Error parsing buyNowItem:", e);
+          }
+        }
+      } else {
+        console.log("ℹ️ Standard Cart Checkout Mode");
+      }
+
+      const payload = {
+        paymentMethod: methodMap[paymentMethod] || paymentMethod,
+        useWallet: useWallet,
+        addressId: addressId,
+        buyNowItem: buyNowItem,
+        couponCode: sessionStorage.getItem("appliedCoupon") || null // Get coupon from session
+      };
+
+      console.log("📤 Sending Order Payload:", payload); // DEBUG LOG
+
+      try {
+        const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+
+        // Show processing
+        Swal.fire({
+          title: 'Processing Order',
+          text: 'Please wait...',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        const res = await fetch('/api/cart/checkout', {
+          method: 'POST',
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          // --- STORE ORDER DATA FOR SUCCESS PAGE ---
+          sessionStorage.setItem("lastOrderData", JSON.stringify({
+            orderId: data.orderId,
+            items: data.orderItems,
+            totals: data.totals,
+            appliedCoupon: data.appliedCoupon, // Store applied coupon code
+            address: JSON.parse(sessionStorage.getItem("deliveryAddress") || '{}')
+          }));
+
+          // Clear Session logic
+          sessionStorage.removeItem("buyNowItem");
+          sessionStorage.removeItem("checkoutType");
+          sessionStorage.removeItem("appliedCoupon"); // Clear used coupon
+          // Don't clear deliveryAddress yet, might need it, but actually lastOrderData has it.
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Order Placed!',
+            text: 'Redirecting to confirmation...',
+            timer: 2000,
+            showConfirmButton: false
+          }).then(() => {
+            window.location.href = './thankYouPage.html';
+          });
+        } else {
+          Swal.fire("Order Failed", data.message || "Something went wrong", "error");
+        }
+      } catch (error) {
+        console.error(error);
+        Swal.fire("Error", "Network error occurred", "error");
       }
     }
 
@@ -705,10 +723,35 @@
 
       const animatedElements = document.querySelectorAll(".reveal-up");
       animatedElements.forEach((el) => observer.observe(el));
+
+    });
+
+    // --- RENDER SHIPPING ADDRESS ---
+    document.addEventListener("DOMContentLoaded", () => {
+      const addrJson = sessionStorage.getItem("deliveryAddress");
+      const display = document.getElementById("shipping-address-display");
+
+      if (addrJson && display) {
+        try {
+          const addr = JSON.parse(addrJson);
+          display.innerHTML = `
+                    <div class="fw-bold text-dark">${addr.fullName} <span class="badge bg-light text-dark border ms-2">${addr.addressType}</span></div>
+                    <div>${addr.street}, ${addr.city}</div>
+                    <div>${addr.state} - ${addr.pincode}</div>
+                    <div>Phone: ${addr.phone}</div>
+                `;
+        } catch (e) {
+          console.error("Error parsing address", e);
+          display.innerHTML = '<span class="text-danger">Error loading address</span>';
+        }
+      } else if (display) {
+        display.innerHTML = '<span class="text-warning">No address selected</span>';
+      }
     });
   </script>
 
   <script src="/js/navbar.js"></script>
+  <script src="/js/checkoutSummary.js"></script>
 </body>
 
 </html>

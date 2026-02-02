@@ -7,7 +7,9 @@ const {
     getWishlist,
     addToWishlist,
     removeFromWishlist,
-    changePassword
+    changePassword,
+    getWallet,
+    applyWallet
 } = require("../controllers/userController");
 const { getAvailableCoupons, applyCoupon } = require("../controllers/couponController");
 const { protect } = require("../middleware/authMiddleware");
@@ -25,5 +27,9 @@ router.get("/coupons", protect, getAvailableCoupons);
 router.post("/coupons/apply", protect, applyCoupon);
 
 router.post("/change-password", protect, changePassword);
+
+// Wallet Routes
+router.get("/wallet", protect, getWallet);
+router.post("/wallet/apply", protect, applyWallet);
 
 module.exports = router;

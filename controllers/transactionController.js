@@ -1,26 +1,8 @@
 const Transaction = require('../models/Transaction');
 
-// Helper to seed data if empty
-const seedTransactions = async () => {
-    const count = await Transaction.countDocuments();
-    if (count === 0) {
-        const dummyData = [
-            { transactionId: 'TXN-1001', orderId: 'ORD-5001', user: { name: 'John Doe', email: 'john@example.com' }, paymentMethod: 'Card', amount: 120.50, status: 'Success', date: new Date('2023-10-25') },
-            { transactionId: 'TXN-1002', orderId: 'ORD-5002', user: { name: 'Jane Smith', email: 'jane@example.com' }, paymentMethod: 'UPI', amount: 45.00, status: 'Success', date: new Date('2023-10-24') },
-            { transactionId: 'TXN-1003', orderId: 'ORD-5003', user: { name: 'Mike Ross', email: 'mike@example.com' }, paymentMethod: 'COD', amount: 200.00, status: 'Pending', date: new Date('2023-10-23') },
-            { transactionId: 'TXN-1004', orderId: 'ORD-5004', user: { name: 'Rachel Green', email: 'rachel@example.com' }, paymentMethod: 'Wallet', amount: 15.00, status: 'Failed', date: new Date('2023-10-22') },
-            { transactionId: 'TXN-1005', orderId: 'ORD-5005', user: { name: 'Harvey Specter', email: 'harvey@example.com' }, paymentMethod: 'Card', amount: 500.00, status: 'Success', date: new Date() },
-            { transactionId: 'TXN-1006', orderId: 'ORD-5006', user: { name: 'Louis Litt', email: 'louis@example.com' }, paymentMethod: 'UPI', amount: 80.00, status: 'Pending', date: new Date() },
-            { transactionId: 'TXN-1007', orderId: 'ORD-5007', user: { name: 'Donna Paulsen', email: 'donna@example.com' }, paymentMethod: 'Card', amount: 320.00, status: 'Success', date: new Date() }
-        ];
-        await Transaction.insertMany(dummyData);
-        console.log("Seeded dummy transactions");
-    }
-};
-
 exports.getTransactions = async (req, res) => {
     try {
-        await seedTransactions(); // Ensure data exists
+        // seedTransactions removed
 
         const { page = 1, limit = 10, search, status, range, fromDate, toDate } = req.query;
         const query = {};

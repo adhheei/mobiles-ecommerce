@@ -348,6 +348,149 @@ const toggleBlockUser = async (req, res) => {
     }
 };
 
+// --- WALLET CONTROLLER LOGIC ---
+
+const Wallet = require("../models/Wallet");
+
+// @desc    Get User Wallet
+// @route   GET /api/wallet
+// @access  Private
+const getWallet = async (req, res) => {
+    try {
+        let wallet = await Wallet.findOne({ userId: req.user._id });
+        if (!wallet) {
+            wallet = await Wallet.create({ userId: req.user._id, balance: 0, transactions: [] });
+        }
+
+        // Ensure transactions array exists
+        if (!wallet.transactions) {
+            wallet.transactions = [];
+        }
+
+        // Sort transactions desc
+        wallet.transactions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // Return only last 20
+        const recentTransactions = wallet.transactions.slice(0, 20);
+
+        res.status(200).json({
+            success: true,
+            balance: wallet.balance,
+            transactions: recentTransactions
+        });
+    } catch (error) {
+        console.error("Get Wallet Error:", error);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
+// @desc    Apply Wallet for Checkout Calculation
+// @route   POST /api/wallet/apply
+// @access  Private
+const applyWallet = async (req, res) => {
+    try {
+        console.log("👉 Wallet Apply Called");
+        console.log("User ID:", req.user ? req.user._id : "No User");
+        console.log("Body:", req.body);
+
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const { totalAmount } = req.body;
+
+        if (totalAmount === undefined || totalAmount === null) {
+            return res.status(400).json({ message: "Total amount required" });
+        }
+
+        const wallet = await Wallet.findOne({ userId: req.user._id });
+        console.log("Wallet Found:", wallet ? wallet.balance : "No Wallet");
+
+        const balance = wallet ? wallet.balance : 0;
+        const walletUsable = Math.min(balance, totalAmount);
+        const payableAmount = totalAmount - walletUsable;
+
+        res.status(200).json({
+            success: true,
+            walletBalance: balance,
+            walletUsable: walletUsable,
+            payableAmount: payableAmount
+        });
+    } catch (error) {
+        console.error("❌ Apply Wallet Error:", error);
+        res.status(500).json({ message: "Server Error", error: error.message });
+    }
+};
+
+// @desc    Admin: Get User Wallet
+// @route   GET /api/admin/wallet/:userId
+// @access  Private/Admin
+const adminGetWallet = async (req, res) => {
+    try {
+        let wallet = await Wallet.findOne({ userId: req.params.userId });
+        if (!wallet) {
+            // Create if not exists to facilitate admin adding money
+            wallet = new Wallet({ userId: req.params.userId });
+            // Don't save yet unless needed, but returning 0 is fine
+        }
+        res.status(200).json({
+            success: true,
+            balance: wallet.balance,
+            transactions: wallet.transactions ? wallet.transactions.sort((a, b) => b.createdAt - a.createdAt) : []
+        });
+    } catch (error) {
+        console.error("Admin Get Wallet Error:", error);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
+// @desc    Admin: Update Wallet (Add/Deduct)
+// @route   POST /api/admin/wallet/update
+// @access  Private/Admin
+const adminUpdateWallet = async (req, res) => {
+    try {
+        const { userId, type, amount, reason } = req.body;
+        // type: 'CREDIT' or 'DEBIT'
+
+        if (amount <= 0) return res.status(400).json({ message: "Amount must be positive" });
+
+        let wallet = await Wallet.findOne({ userId });
+        if (!wallet) {
+            wallet = new Wallet({ userId });
+        }
+
+        if (type === 'DEBIT') {
+            if (wallet.balance < amount) {
+                return res.status(400).json({ message: "Insufficient wallet balance" });
+            }
+            wallet.balance -= amount;
+        } else {
+            wallet.balance += amount;
+        }
+
+        wallet.transactions.push({
+            userId,
+            amount,
+            type,
+            reason: reason || (type === 'CREDIT' ? 'ADMIN_ADD' : 'ADMIN_DEDUCT'),
+            createdAt: new Date()
+        });
+
+        await wallet.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Wallet updated successfully",
+            balance: wallet.balance
+        });
+
+    } catch (error) {
+        console.error("Admin Update Wallet Error:", error);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
+
 module.exports = {
     getProfile,
     updateProfile,
@@ -356,6 +499,10 @@ module.exports = {
     addToWishlist,
     removeFromWishlist,
     changePassword,
-    getAllUsers,     // Added
-    toggleBlockUser  // Added
+    getAllUsers,
+    toggleBlockUser,
+    getWallet,
+    applyWallet,
+    adminGetWallet,
+    adminUpdateWallet
 };

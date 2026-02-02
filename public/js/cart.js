@@ -603,8 +603,104 @@ function updateCouponUI(isApplied) {
     }
 }
 
-// Initial Load
+// Function to fetch and render suggestions
+async function fetchSuggestions(productIds) {
+    const container = document.querySelector(".scrolling-wrapper");
+    if (!container) return;
+
+    // Use current productIds if not passed (though renderCart passes them)
+    // If empty cart, maybe show popular items? The backend handles empty list logic.
+
+    try {
+        const res = await fetch("/api/admin/products/suggestions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ cartProductIds: productIds || [] })
+        });
+
+        const data = await res.json();
+        if (data.success && data.products.length > 0) {
+            container.innerHTML = ""; // Clear placeholders
+
+            data.products.forEach(p => {
+                const imgUrl = p.image || "https://placehold.co/100x100/f0f0f0/333?text=No+Image";
+
+                const html = `
+                <a href="/User/singleProductPage.html?id=${p.id}" class="rec-card-link">
+                  <div class="mini-rec-card">
+                    <img src="${imgUrl}" alt="${p.name}" onerror="this.src='https://placehold.co/100x100/f0f0f0/333?text=No+Image'" />
+                    <div>
+                      <div style="font-size: 0.8rem; font-weight: 600" class="text-truncate" style="max-width: 120px;">${p.name}</div>
+                      <div style="font-size: 0.75rem">Rs. ${p.offerPrice || p.actualPrice}</div>
+                    </div>
+                    <button class="btn-add-mini" onclick="event.preventDefault(); addToCart('${p.id}')">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                  </div>
+                </a>
+                `;
+                container.innerHTML += html;
+            });
+        } else {
+            // If no suggestions, maybe hide the section?
+            // container.closest('.mb-4').style.display = 'none';
+        }
+
+    } catch (e) {
+        console.error("Failed to load suggestions:", e);
+    }
+}
+
+// Quick Add from suggestions
+async function addToCart(productId) {
+    try {
+        const res = await fetch("/api/cart/add", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + (localStorage.getItem("token") || sessionStorage.getItem("token"))
+            },
+            body: JSON.stringify({ productId, quantity: 1 })
+        });
+
+        if (res.ok) {
+            // Refresh cart
+            fetchCart();
+            window.updateCartBadge();
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: true
+            });
+            Toast.fire({
+                icon: 'success',
+                title: 'Added to cart'
+            });
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     fetchCart();
     initCouponLogic();
 });
+
+// --- CHECKOUT LOGIC ---
+function proceedToCheckout(e) {
+    if (e) e.preventDefault();
+
+    // Set Checkout Type
+    sessionStorage.setItem("checkoutType", "cart");
+
+    // Remove old BuyNow data to prevent conflicts
+    sessionStorage.removeItem("buyNowItem");
+
+    // Redirect
+    window.location.href = "/User/address.html";
+}

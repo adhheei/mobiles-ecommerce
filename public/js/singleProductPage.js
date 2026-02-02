@@ -104,6 +104,7 @@ function renderProductDetails(product) {
     stockBadge.className = 'stock-badge';
     stockStatus.innerHTML = '<i class="fa-solid fa-check-circle me-1"></i> In stock, ready to ship';
     addToCartBtn.disabled = false;
+    // Existing Stock Logic...
     if (buyNowBtn) {
       buyNowBtn.classList.remove('disabled');
       buyNowBtn.style.pointerEvents = 'auto';
@@ -305,6 +306,9 @@ async function addToCart() {
         timer: 1500,
         timerProgressBar: true,
         showConfirmButton: false
+      }).then(() => {
+        // Refresh page as requested
+        window.location.reload();
       });
     } else {
       throw new Error(data.message || "Failed to add to cart");
@@ -614,6 +618,51 @@ document.addEventListener('DOMContentLoaded', (() => {
           }
         });
       }
+    });
+  }
+
+
+  // --- BUY NOW CLICK HANDLER ---
+  const buyNowBtn = document.getElementById('buyNowBtn');
+  if (buyNowBtn) {
+    buyNowBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      const user = localStorage.getItem('user');
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+      // Check Login
+      if (!user || !token) {
+        Swal.fire({
+          title: 'Login Required',
+          text: 'Please login to buy products.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Login Now',
+          cancelButtonText: 'Cancel'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = '/User/userLogin.html?redirect=' + encodeURIComponent(window.location.pathname);
+          }
+        });
+        return;
+      }
+
+      if (!currentProduct) return;
+
+      // Get Data
+      const productId = currentProduct.id || currentProduct._id;
+      const quantity = parseInt(document.getElementById('qtyInput').value) || 1;
+
+      // Store in SessionStorage
+      sessionStorage.setItem("checkoutType", "buyNow");
+      sessionStorage.setItem("buyNowItem", JSON.stringify({
+        productId: productId,
+        qty: quantity
+      }));
+
+      // Redirect
+      window.location.href = "/User/address.html";
     });
   }
 }));

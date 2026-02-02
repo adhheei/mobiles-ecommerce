@@ -218,44 +218,95 @@ exports.getSuggestions = async (req, res) => {
       excludeIds = cartProductIds;
     }
 
-    // 1. Fetch details of cart items to find their categories/brands (if any)
-    let categories = [];
-    let brands = [];
+    // 1. Analyze Cart Items
+    let cartBrands = [];
+    let cartCategories = []; // IDs
 
     if (excludeIds.length > 0) {
-      const cartItems = await Product.find({ _id: { $in: excludeIds } }).select('category brand');
-      categories = cartItems.map(p => p.category);
-      brands = cartItems.map(p => p.brand).filter(b => b && b !== 'Generic');
+      const cartItems = await Product.find({ _id: { $in: excludeIds } }).select('category brand name');
+      cartBrands = cartItems.map(p => p.brand).filter(b => b && b !== 'Generic');
+      cartCategories = cartItems.map(p => p.category);
 
       // Remove duplicates
-      categories = [...new Set(categories.map(c => c.toString()))];
-      brands = [...new Set(brands)];
+      cartBrands = [...new Set(cartBrands)];
+
+      // Filter out null categories if any
+      cartCategories = cartCategories.filter(c => c);
     }
 
-    // 2. Build Query
+    // 2. Find "Accessories" Category ID (heuristic)
+    // We look for categories with "Accessory" or "Accessories" in name
+    const accessoryCategories = await Category.find({
+      name: { $regex: /accessor/i },
+      isActive: true
+    }).select('_id');
+
+    const accessoryCategoryIds = accessoryCategories.map(c => c._id);
+
+    // 3. Build Accessory Query
+    // Strategy: 
+    // A. Properties: Brand match AND (Category is Accessory OR Name has keywords)
+    // B. Fallback: Same category as cart items (Cross-sell)
+
+    const keywords = ['Case', 'Cover', 'Glass', 'Screen Guard', 'Charger', 'Adapter', 'Headset', 'Cable'];
+    const keywordRegex = keywords.map(k => new RegExp(k, 'i'));
+
     let query = {
       _id: { $nin: excludeIds },
       status: 'active',
       stock: { $gt: 0 }
     };
 
-    if (categories.length > 0 || brands.length > 0) {
-      query.$or = [
-        { category: { $in: categories } },
-        { brand: { $in: brands } }
-      ];
-    }
-    // If cart empty, query stays simple (all active products)
+    // Primary goal: Find accessories for the brands in cart
+    let conditions = [];
 
-    // 3. Fetch Products
-    // Priority: Sort by newest or offerPrice? Let's random or newest.
-    // MongoDB $sample is good for random but let's stick to newest for consistency or sort by popularity if we had it.
+    if (cartBrands.length > 0) {
+      // Condition 1: Same Brand + Accessory Category
+      if (accessoryCategoryIds.length > 0) {
+        conditions.push({
+          brand: { $in: cartBrands },
+          category: { $in: accessoryCategoryIds }
+        });
+      }
+      // Condition 2: Same Brand + Keyword in Name
+      conditions.push({
+        brand: { $in: cartBrands },
+        name: { $in: keywordRegex }
+      });
+
+      // Condition 3: Just Accessory Category (allow other brands if general accessories)
+      if (accessoryCategoryIds.length > 0) {
+        conditions.push({
+          category: { $in: accessoryCategoryIds }
+        });
+      }
+    } else {
+      // No Brands? Just show Popular Accessories
+      if (accessoryCategoryIds.length > 0) {
+        conditions.push({
+          category: { $in: accessoryCategoryIds }
+        });
+      }
+    }
+
+    // Fallback: Same category as cart items
+    if (cartCategories.length > 0) {
+      conditions.push({
+        category: { $in: cartCategories }
+      });
+    }
+
+    if (conditions.length > 0) {
+      query.$or = conditions;
+    }
+
+    // 4. Fetch Products
     let products = await Product.find(query)
       .populate('category', 'name')
-      .limit(6)
-      .sort({ createdAt: -1 });
+      .limit(8)
+      .sort({ createdAt: -1 }); // Newest first
 
-    // Fallback if not enough recommendations (e.g. niche category)
+    // 5. Fallback if not enough
     if (products.length < 3) {
       const moreProducts = await Product.find({
         _id: { $nin: [...excludeIds, ...products.map(p => p._id)] },
@@ -263,10 +314,23 @@ exports.getSuggestions = async (req, res) => {
         stock: { $gt: 0 }
       })
         .limit(6 - products.length)
-        .sort({ createdAt: -1 }); // Recently added
+        .sort({ createdAt: -1 });
 
       products = [...products, ...moreProducts];
     }
+
+    // Deduplicate (just in case)
+    const uniqueProducts = [];
+    const seenMap = new Set();
+    products.forEach(p => {
+      if (!seenMap.has(p._id.toString())) {
+        seenMap.add(p._id.toString());
+        uniqueProducts.push(p);
+      }
+    });
+
+    // Limit to 6
+    products = uniqueProducts.slice(0, 6);
 
     // Format
     const formatted = products.map(p => ({

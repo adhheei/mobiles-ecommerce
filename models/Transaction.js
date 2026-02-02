@@ -18,8 +18,7 @@ const transactionSchema = new mongoose.Schema({
     },
     paymentMethod: {
         type: String,
-        required: true,
-        enum: ['UPI', 'Card', 'COD', 'Wallet']
+        required: true
     },
     amount: {
         type: Number,

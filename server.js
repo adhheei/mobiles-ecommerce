@@ -101,6 +101,15 @@ mongoose
     process.exit(1);
   });
 
+// 🌍 Global Error Handler
+app.use((err, req, res, next) => {
+  console.error("🔥 Global Error Handler:", err.stack);
+  res.status(500).json({
+    message: "Unexpected Server Error",
+    error: err.message
+  });
+});
+
 // 🚀 Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
