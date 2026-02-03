@@ -6,56 +6,22 @@
   <script src="/js/authGuard.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Thank You - Jinsa Mobiles</title>
+
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
     rel="stylesheet" />
 
   <style>
-    /* --- GLOBAL VARIABLES & FONTS --- */
-    :root {
-      --primary-black: #1a1a1a;
-      --primary-red: #d32f2f;
-      --bg-light: #f8f9fa;
-      --border-color: #e5e5e5;
-    }
-
     body {
       font-family: "Poppins", sans-serif;
       background-color: #fcfcfc;
-      padding-top: 0;
       color: #1a1a1a;
     }
 
-    /* --- ANIMATION CSS --- */
-
-    /* 1. Slide Up Fade In */
-    .reveal-up {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: all 0.8s ease-out;
-    }
-
-    .reveal-up.active {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* 2. Pop In (Bounce effect for icon) */
-    .pop-in {
-      opacity: 0;
-      transform: scale(0.5);
-      transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .pop-in.active {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    /* -------------------- */
-
-    /* --- THANK YOU PAGE STYLES --- */
     .thank-you-container {
       max-width: 800px;
       margin: 60px auto;
@@ -67,7 +33,6 @@
       width: 80px;
       height: 80px;
       background-color: #28a745;
-      /* Green */
       color: white;
       border-radius: 50%;
       display: flex;
@@ -75,47 +40,19 @@
       justify-content: center;
       font-size: 2.5rem;
       margin: 0 auto 25px;
-      box-shadow: 0 10px 20px rgba(40, 167, 69, 0.2);
     }
 
-    .thank-you-heading {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    .order-number-text {
-      color: #666;
-      font-size: 0.95rem;
-      margin-bottom: 40px;
-    }
-
-    /* Order Summary Card */
     .order-card {
       background: white;
-      border: 1px solid #eee;
       border-radius: 12px;
-      padding: 0;
-      text-align: left;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.03);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
       overflow: hidden;
+      text-align: left;
     }
 
     .order-card-header {
       padding: 20px 30px;
       border-bottom: 1px solid #eee;
-    }
-
-    .order-card-header h5 {
-      margin: 0;
-      font-weight: 700;
-      font-size: 1.1rem;
-    }
-
-    .order-card-header p {
-      margin: 5px 0 0;
-      font-size: 0.85rem;
-      color: #666;
     }
 
     .order-item-row {
@@ -130,20 +67,7 @@
       height: 70px;
       border-radius: 8px;
       object-fit: cover;
-      background: #f8f9fa;
       margin-right: 20px;
-    }
-
-    .item-info h6 {
-      margin: 0 0 5px;
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-
-    .item-info p {
-      margin: 0;
-      font-size: 0.8rem;
-      color: #666;
     }
 
     .item-total {
@@ -156,41 +80,22 @@
       display: flex;
       justify-content: space-between;
       font-size: 0.9rem;
-      color: #555;
     }
 
     .order-totals-row.final {
-      border-top: 1px solid #eee;
-      padding-top: 20px;
       font-size: 1.1rem;
       font-weight: 700;
-      color: #1a1a1a;
-      margin-bottom: 10px;
+      border-top: 1px solid #eee;
     }
 
     .shipping-info-row {
       padding: 20px 30px;
-      background-color: #fcfcfc;
-      border-top: 1px solid #eee;
+      background: #f9f9f9;
       display: flex;
-      flex-wrap: wrap;
+      justify-content: space-between;
       gap: 30px;
     }
 
-    .info-column h6 {
-      font-size: 0.9rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .info-column p {
-      font-size: 0.85rem;
-      color: #555;
-      margin: 0;
-      line-height: 1.5;
-    }
-
-    /* Buttons */
     .action-buttons {
       margin-top: 40px;
       display: flex;
@@ -203,236 +108,153 @@
       color: white;
       padding: 12px 30px;
       border-radius: 6px;
-      font-weight: 600;
       text-decoration: none;
-      transition: background 0.2s;
-      border: 1px solid #1a1a1a;
-    }
-
-    .btn-black:hover {
-      background: #333;
-      color: white;
+      font-weight: 600;
     }
 
     .btn-outline {
-      background: transparent;
-      color: #1a1a1a;
+      background: #e9ecef;
       padding: 12px 30px;
       border-radius: 6px;
-      font-weight: 600;
       text-decoration: none;
-      border: 1px solid #e5e5e5;
-      transition: all 0.2s;
-      background-color: #e9ecef;
-    }
-
-    .btn-outline:hover {
-      background: #dde0e3;
+      font-weight: 600;
       color: #1a1a1a;
     }
   </style>
-
-  <link href="/css/navbar.css" rel="stylesheet" />
 </head>
 
 <body>
+
   <div class="thank-you-container">
-    <div class="success-icon pop-in">
+    <div class="success-icon">
       <i class="fa-solid fa-check"></i>
     </div>
 
-    <h1 class="thank-you-heading reveal-up">Thank You for Your Order!</h1>
-    <p class="order-number-text reveal-up">
-      Your order #123456 has been successfully placed.
-    </p>
+    <h1>Thank You for Your Order!</h1>
+    <p class="order-number-text text-muted mb-4"></p>
 
-    <div class="order-card reveal-up">
+    <div class="order-card">
       <div class="order-card-header">
         <h5>Order Summary</h5>
-        <p>A confirmation email has been sent to your email address.</p>
+        <p class="text-muted">A confirmation email has been sent.</p>
       </div>
 
-      <div class="order-item-row">
-        <img src="https://placehold.co/100x100/eee/333?text=Case" class="item-thumb" alt="Product" />
-        <div class="item-info text-start">
-          <h6>Pikkme iPhone 16 Pro Max</h6>
-          <p>Color: Black | Qty: 1</p>
-        </div>
-        <div class="item-total">Rs. 499.00</div>
-      </div>
+      <!-- Items inserted dynamically -->
 
-      <div class="order-totals-row">
-        <span>Subtotal</span>
-        <span>Rs. 499.00</span>
-      </div>
-      <div class="order-totals-row">
-        <span>Shipping</span>
-        <span class="text-success">Free</span>
-      </div>
-      <div class="order-totals-row">
-        <span>Tax</span>
-        <span>Rs. 0.00</span>
-      </div>
-      <div class="order-totals-row final">
-        <span>Total</span>
-        <span>Rs. 499.00</span>
-      </div>
+      <!-- Totals inserted dynamically -->
 
       <div class="shipping-info-row">
-        <div class="info-column text-start">
+        <div class="info-column">
           <h6>Shipping Address</h6>
-          <p>John Doe<br />123 Main Street<br />Kerala, India 673001</p>
+          <p></p>
         </div>
-        <div class="info-column text-start ms-auto">
+        <div class="info-column text-end">
           <h6>Estimated Delivery</h6>
-          <p>October 26, 2025</p>
+          <p></p>
         </div>
       </div>
     </div>
 
-    <div class="action-buttons px-4 reveal-up">
+    <div class="action-buttons">
       <a href="./userOrderDetails.html" class="btn-black">View Order History</a>
       <a href="./index.html" class="btn-outline">Continue Shopping</a>
     </div>
   </div>
 
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+  <!-- ✅ FINAL FIXED SCRIPT -->
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      // --- ANIMATION SETUP ---
-      const observerOptions = {
-        root: null,
-        rootMargin: "0px",
-        threshold: 0.1,
-      };
+    document.addEventListener("DOMContentLoaded", () => {
 
-      const observer = new IntersectionObserver((entries, observer) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("active");
-            observer.unobserve(entry.target);
-          }
-        });
-      }, observerOptions);
+      const summaryJSON = sessionStorage.getItem("checkoutSummary");
 
-      const animatedElements = document.querySelectorAll(".reveal-up, .pop-in");
-      animatedElements.forEach((el) => observer.observe(el));
-
-      // --- DYNAMIC DATA RENDERING ---
-      const orderDataJson = sessionStorage.getItem("lastOrderData");
-      if (!orderDataJson) {
-        // No order data? Redirect or show empty (User might have refreshed)
-        // For now, just leave static or redirect
-        console.warn("No order data found in session.");
+      if (!summaryJSON) {
+        alert("No order found");
+        window.location.href = "/index.html";
         return;
       }
 
-      const orderData = JSON.parse(orderDataJson);
+      const order = JSON.parse(summaryJSON);
 
-      // 1. Order ID
-      const orderNumEl = document.querySelector('.order-number-text');
-      if (orderNumEl) orderNumEl.innerText = `Your order #${orderData.orderId} has been successfully placed.`;
+      /* Order ID */
+      document.querySelector(".order-number-text").innerText =
+        `Your order #${order.orderId} has been successfully placed.`;
 
-      // 2. Render Items
-      const container = document.querySelector('.order-card');
-      // Create separate container or find existing structure. 
-      // Strategy: Clear existing rows and append new ones.
+      /* Render Items */
+      const card = document.querySelector(".order-card");
+      const header = document.querySelector(".order-card-header");
 
-      // Find rows to replace (all .order-item-row)
-      const existingRows = document.querySelectorAll('.order-item-row');
-      existingRows.forEach(row => row.remove());
+      order.items.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "order-item-row";
 
-      // Insert after header
-      const header = document.querySelector('.order-card-header');
+        row.innerHTML = `
+          <img src="${item.image}" class="item-thumb"
+               onerror="this.src='https://placehold.co/100x100?text=No+Image'">
+          <div>
+            <strong>${item.name}</strong><br>
+            Qty: ${item.quantity}<br>
+            <del class="text-muted">Rs. ${item.mrp}</del>
+            <span class="text-success ms-2">Rs. ${item.price}</span>
+          </div>
+          <div class="item-total">Rs. ${item.price * item.quantity}</div>
+        `;
 
-      if (orderData.items && orderData.items.length > 0) {
-        orderData.items.forEach(item => {
-          const row = document.createElement('div');
-          row.className = 'order-item-row';
+        header.after(row);
+      });
 
-          // Format Image (Already formatted by backend, but handle relative check just in case)
-          let imgUrl = item.image || "https://placehold.co/100x100?text=No+Img";
+      /* Totals */
+      const shippingRow = document.querySelector(".shipping-info-row");
 
-          row.innerHTML = `
-                <img src="${imgUrl}" class="item-thumb" alt="${item.name}" onerror="this.onerror=null;this.src='https://placehold.co/100x100?text=No+Img';" />
-                <div class="item-info text-start">
-                  <h6>${item.name}</h6>
-                  <p>Qty: ${item.quantity} | Price: Rs. ${item.price.toLocaleString()}</p>
-                </div>
-                <div class="item-total">Rs. ${item.lineTotal.toLocaleString()}</div>
-              `;
-
-          // Insert after header (or last row)
-          header.parentNode.insertBefore(row, document.querySelector('.order-totals-row')); // Insert before totals
-        });
-      }
-
-      // 3. Update Totals
-      const totals = orderData.totals || {};
-
-      // We need to rebuild the totals section dynamically to handle optional rows
-      const totalsContainer = document.querySelector('.order-card');
-      const startNode = document.querySelector('.order-totals-row'); // The first one usually
-
-      // Remove all existing total rows to rebuild clean
-      document.querySelectorAll('.order-totals-row').forEach(el => el.remove());
-
-      const createTotalRow = (label, value, isGreen = false, isBold = false) => {
-        const div = document.createElement('div');
-        div.className = `order-totals-row ${isBold ? 'final' : ''}`;
-        div.innerHTML = `
-            <span>${label}</span>
-            <span class="${isGreen ? 'text-success' : ''}">Rs. ${value.toLocaleString()}</span>
-          `;
-        return div;
+      const addTotal = (label, value, green = false, bold = false) => {
+        const row = document.createElement("div");
+        row.className = `order-totals-row ${bold ? "final" : ""}`;
+        row.innerHTML = `
+          <span>${label}</span>
+          <span class="${green ? "text-success" : ""}">
+            ${typeof value === "number" ? `Rs. ${value}` : value}
+          </span>`;
+        card.insertBefore(row, shippingRow);
       };
 
-      // Subtotal
-      totalsContainer.insertBefore(createTotalRow('Subtotal', totals.subtotal || 0), totalsContainer.lastElementChild); // Insert before info row? No, append logic needed.
+      addTotal("Total MRP", order.pricing.mrpTotal);
+      addTotal("Product Discount", `- Rs. ${order.pricing.discount}`, true);
 
-      // Let's just append to container before shipping info
-      const shippingInfo = document.querySelector('.shipping-info-row');
-
-      const insertRow = (element) => totalsContainer.insertBefore(element, shippingInfo);
-
-      insertRow(createTotalRow('Subtotal', totals.subtotal || 0));
-
-      // Coupon
-      if (totals.couponDiscount > 0) {
-        insertRow(createTotalRow(`Coupon Discount (${orderData.appliedCoupon || 'Applied'})`, -totals.couponDiscount, true));
+      if (order.pricing.couponDiscount > 0) {
+        addTotal("Coupon Discount", `- Rs. ${order.pricing.couponDiscount}`, true);
       }
 
-      // Shipping
-      const shippingRow = document.createElement('div');
-      shippingRow.className = 'order-totals-row';
-      shippingRow.innerHTML = `<span>Shipping</span><span class="text-success">Free</span>`;
-      insertRow(shippingRow);
+      addTotal("Shipping", "FREE", true);
+      addTotal("Total Payable", order.pricing.finalAmount, false, true);
 
-      // Wallet
-      if (totals.walletDeducted > 0) {
-        insertRow(createTotalRow('Wallet Used', -totals.walletDeducted, true));
-      }
+      /* Delivery Date (6–7 days) */
+      const start = new Date();
+      start.setDate(start.getDate() + 6);
+      const end = new Date();
+      end.setDate(end.getDate() + 7);
 
-      // Total
-      insertRow(createTotalRow('Total Payable', totals.totalAmount || 0, false, true));
+      const format = d =>
+        d.toLocaleDateString("en-IN", { day: "numeric", month: "long" });
 
-      // 4. Update Shipping Address
-      const address = orderData.address;
-      if (address) {
-        const addressP = document.querySelector('.shipping-info-row .info-column p');
-        if (addressP) {
-          addressP.innerHTML = `
-                <strong>${address.fullName}</strong> (${address.addressType})<br>
-                ${address.street}<br>
-                ${address.city}, ${address.state} - ${address.pincode}<br>
-                Phone: ${address.phone}
-              `;
-        }
-      }
+      document.querySelector(".shipping-info-row .info-column:last-child p")
+        .innerText = `${format(start)} – ${format(end)}`;
 
+      /* Address */
+      const a = order.address;
+      document.querySelector(".shipping-info-row .info-column p").innerHTML = `
+        <strong>${a.fullName}</strong><br>
+        ${a.street}<br>
+        ${a.city}, ${a.state} - ${a.pincode}<br>
+        Phone: ${a.phone}
+      `;
+
+      // Optional cleanup
+      sessionStorage.removeItem("checkoutSummary");
     });
   </script>
+
 </body>
 
 </html>

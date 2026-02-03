@@ -76,23 +76,86 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ message: "Passwords do not match" });
     }
 
-    const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
-    if (existingUser) {
-      return res.status(409).json({ message: "User already exists" });
+    let user = await User.findOne({ email });
+
+    if (user) {
+      if (user.isVerified) {
+        return res.status(409).json({ message: "User already exists" });
+      }
+
+      // User exists but not verified -> Resend OTP
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const salt = await bcrypt.genSalt(10);
+      user.otp = await bcrypt.hash(otp, salt);
+      user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 mins
+
+      // Update details in case they changed during re-attempt (optional, but good UX)
+      user.firstName = firstName;
+      user.lastName = lastName;
+      user.phone = phone;
+      user.password = password; // Will be hashed by pre-save
+
+      await user.save();
+
+      // Send Email
+      const message = `Your Verification OTP is: ${otp}\n\nIt expires in 10 minutes.`;
+      if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        console.log(`⚠️ [MOCK EMAIL] OTP for ${user.email}: ${otp}`);
+      } else {
+        try {
+          await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: user.email,
+            subject: "Verify Your Account - Jinsa Mobiles",
+            text: message,
+          });
+        } catch (emailErr) {
+          console.error("Email send failed:", emailErr);
+          // Continue to allow manual OTP entry if in dev
+        }
+      }
+
+      return res.status(200).json({ message: "OTP sent to your email" });
     }
 
-    const user = await User.create({
+    // New User
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const salt = await bcrypt.genSalt(10);
+    const hashedOtp = await bcrypt.hash(otp, salt);
+
+    user = await User.create({
       firstName,
       lastName,
       email,
       phone,
-      password, // Pre-save hook will hash this
+      password,
+      isVerified: false,
+      otp: hashedOtp,
+      otpExpires: Date.now() + 10 * 60 * 1000, // 10 mins
     });
 
-    sendTokenResponse(user, 201, res);
+    // Send Email
+    const message = `Your Verification OTP is: ${otp}\n\nIt expires in 10 minutes.`;
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      console.log(`⚠️ [MOCK EMAIL] OTP for ${user.email}: ${otp}`);
+    } else {
+      try {
+        await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: user.email,
+          subject: "Verify Your Account - Jinsa Mobiles",
+          text: message,
+        });
+      } catch (emailErr) {
+        console.error("Email send failed:", emailErr);
+      }
+    }
+
+    res.status(200).json({ message: "OTP sent to your email" });
+
   } catch (error) {
     console.error("Signup Error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error during signup" });
   }
 };
 
@@ -107,6 +170,10 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
+    if (!user.isVerified) {
+      return res.status(401).json({ message: "Please verify your email first" });
+    }
+
     if (user.isBlocked) {
       return res.status(403).json({ message: "Your account is blocked by admin" });
     }
@@ -117,7 +184,7 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    sendTokenResponse(user, 200, res); // Use helper function
+    sendTokenResponse(user, 200, res);
 
   } catch (err) {
     console.log("Login Error:", err);
@@ -206,10 +273,11 @@ exports.sendOtp = async (req, res) => {
 // 5. VERIFY OTP
 exports.verifyOtp = async (req, res) => {
   try {
-    const { emailOrPhone, otp } = req.body;
+    const { email, emailOrPhone, otp } = req.body;
+    const target = email || emailOrPhone;
 
     const user = await User.findOne({
-      $or: [{ email: emailOrPhone }, { phone: emailOrPhone }],
+      $or: [{ email: target }, { phone: target }],
     });
 
     if (!user) {
@@ -240,7 +308,21 @@ exports.verifyOtp = async (req, res) => {
       return res.status(400).json({ message: "Invalid OTP" });
     }
 
-    // Success - Do NOT clear OTP yet (needed for reset step)
+    // If user is NOT verified, this is a Signup Verification
+    if (!user.isVerified) {
+      user.isVerified = true;
+      user.otp = undefined;
+      user.otpExpires = undefined;
+      user.otpAttempts = 0;
+      user.lockUntil = undefined;
+      await user.save();
+
+      // Issue Token for Signup (Auto-Login)
+      return sendTokenResponse(user, 200, res);
+    }
+
+    // If user IS verified, this is likely a Password Reset flow
+    // Do NOT clear OTP yet (needed for resetPassword step)
     res.status(200).json({ success: true, message: "OTP Verified" });
   } catch (err) {
     console.error("verifyOtp Error:", err);
@@ -306,31 +388,31 @@ exports.resetPassword = async (req, res) => {
 };
 
 // 7. GOOGLE AUTH
-exports.googleSignup = async (req, res) => {
-  try {
-    const { credential } = req.body;
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    const { email, given_name, family_name } = ticket.getPayload();
+// exports.googleSignup = async (req, res) => {
+//   try {
+//     const { credential } = req.body;
+//     const ticket = await client.verifyIdToken({
+//       idToken: credential,
+//       audience: process.env.GOOGLE_CLIENT_ID,
+//     });
+//     const { email, given_name, family_name } = ticket.getPayload();
 
-    let user = await User.findOne({ email });
-    if (!user) {
-      user = await User.create({
-        firstName: given_name,
-        lastName: family_name || "",
-        email,
-        phone: "google-" + Date.now(),
-        password: email + process.env.JWT_SECRET,
-        isGoogleUser: true,
-      });
-    }
-    sendTokenResponse(user, 200, res);
-  } catch (error) {
-    res.status(401).json({ success: false, message: "Invalid Google token" });
-  }
-};
+//     let user = await User.findOne({ email });
+//     if (!user) {
+//       user = await User.create({
+//         firstName: given_name,
+//         lastName: family_name || "",
+//         email,
+//         phone: "google-" + Date.now(),
+//         password: email + process.env.JWT_SECRET,
+//         isGoogleUser: true,
+//       });
+//     }
+//     sendTokenResponse(user, 200, res);
+//   } catch (error) {
+//     res.status(401).json({ success: false, message: "Invalid Google token" });
+//   }
+// };
 
 // 8. ADMIN LOGIN
 const loginAttempts = new Map();

@@ -2,614 +2,331 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <script src="/js/authGuard.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Order #12345678 - Jinsa Mobiles</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet" />
-
-  <style>
-    :root {
-      --primary-black: #1a1a1a;
-      --bg-light: #f8f9fa;
-      --border-color: #eee;
-    }
-
-    body {
-      font-family: "Poppins", sans-serif;
-      background-color: #fff;
-      color: var(--primary-black);
-      padding-top: 80px;
-      overflow-x: hidden;
-    }
-
-    /* --- ANIMATION STYLES (Content Only) --- */
-    @keyframes slideInFromBottom {
-      0% {
-        transform: translateY(30px);
-        opacity: 0;
-      }
-
-      100% {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    /* Apply this class only to the right side content */
-    .content-animate {
-      animation: slideInFromBottom 0.6s ease-out forwards;
-    }
-
-    /* --- END ANIMATION --- */
-
-
-
-
-
-    /* --- LAYOUT --- */
-    .profile-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px 20px;
-    }
-
-    /* Sidebar (Desktop Default) */
-    .sidebar {
-      background-color: #fff;
-      border-right: 1px solid var(--border-color);
-      min-height: 600px;
-      padding-right: 20px;
-    }
-
-    .sidebar-menu {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .sidebar-item {
-      margin-bottom: 5px;
-    }
-
-    .sidebar-link {
-      display: flex;
-      align-items: center;
-      padding: 12px 20px;
-      color: #555;
-      text-decoration: none;
-      font-weight: 500;
-      border-radius: 8px;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-
-    .sidebar-link i {
-      margin-right: 15px;
-      width: 20px;
-      text-align: center;
-    }
-
-    .sidebar-link:hover {
-      background-color: #f8f9fa;
-      color: #000;
-    }
-
-    .sidebar-link.active {
-      background-color: #000;
-      color: #fff;
-    }
-
-    .logout-btn {
-      color: #dc3545;
-    }
-
-    .logout-btn:hover {
-      color: #b02a37;
-      background-color: #f8f9fa;
-    }
-
-    /* --- MOBILE SIDEBAR (SCROLLING BAR) --- */
-    @media (max-width: 991px) {
-      .profile-container {
-        padding: 0 15px 40px 15px;
-      }
-
-      .sidebar {
-        border-right: none;
-        min-height: auto;
-        padding: 10px 0;
-        border-bottom: 1px solid #eee;
-        position: sticky;
-        top: 85px;
-        /* Adjust based on navbar height */
-        z-index: 99;
-        background: #fff;
-
-        /* Horizontal Scrolling */
-        overflow-x: auto;
-        white-space: nowrap;
-        width: 100vw;
-        margin-left: -15px;
-        /* Counteract container padding */
-        padding-left: 15px;
-
-        /* Hide Scrollbar */
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-
-      .sidebar::-webkit-scrollbar {
-        display: none;
-      }
-
-      .sidebar-menu {
-        display: flex;
-        flex-direction: row;
-        gap: 10px;
-        padding-right: 20px;
-      }
-
-      .sidebar-item {
-        margin-bottom: 0;
-        display: inline-block;
-      }
-
-      .sidebar-link {
-        border: 1px solid #eee;
-        padding: 8px 16px;
-        font-size: 0.9rem;
-        background: #fff;
-      }
-
-      .sidebar-link:hover {
-        transform: none;
-      }
-
-      .sidebar-link.active {
-        border-color: #000;
-      }
-
-      .main-content {
-        padding-left: 0;
-        margin-top: 20px;
-      }
-    }
-
-    /* --- ORDER DETAILS CONTENT --- */
-    .main-content {
-      padding-left: 40px;
-    }
-
-    @media (max-width: 991px) {
-      .main-content {
-        padding-left: 0;
-      }
-    }
-
-    .page-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 30px;
-    }
-
-    /* Order Header */
-    .order-header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      flex-wrap: wrap;
-      margin-bottom: 25px;
-    }
-
-    .order-id {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 5px;
-    }
-
-    .order-meta {
-      color: #666;
-      font-size: 0.95rem;
-    }
-
-    .btn-action {
-      border: 1px solid #ddd;
-      background: white;
-      color: #333;
-      padding: 8px 15px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-left: 10px;
-      transition: all 0.2s;
-      margin-bottom: 5px;
-      /* Added spacing for mobile wrapping */
-    }
-
-    .btn-action:hover {
-      background: #f8f9fa;
-      border-color: #ccc;
-    }
-
-    /* Product Table */
-    .table-custom {
-      width: 100%;
-      margin-bottom: 30px;
-    }
-
-    .table-custom thead th {
-      background-color: #f8f9fa;
-      color: #888;
-      font-weight: 600;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      padding: 15px;
-      border-bottom: 1px solid #eee;
-    }
-
-    .table-custom tbody td {
-      padding: 20px 15px;
-      vertical-align: middle;
-      border-bottom: 1px solid #eee;
-      color: #333;
-    }
-
-    .product-cell {
-      display: flex;
-      align-items: center;
-    }
-
-    .product-img {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 6px;
-      background: #eee;
-      margin-right: 15px;
-    }
-
-    .product-name {
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-
-    .btn-cancel {
-      border: 1px solid #ddd;
-      background: white;
-      color: #555;
-      padding: 5px 12px;
-      border-radius: 4px;
-      font-size: 0.8rem;
-    }
-
-    .btn-cancel:hover {
-      background: #f1f1f1;
-    }
-
-    /* Return Banner */
-    .return-banner {
-      background-color: #f8f9fa;
-      border-radius: 8px;
-      padding: 20px 25px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-
-    .return-text h6 {
-      font-weight: 700;
-      margin-bottom: 5px;
-    }
-
-    .return-text p {
-      margin: 0;
-      font-size: 0.9rem;
-      color: #666;
-    }
-
-    .btn-return {
-      background: white;
-      border: 1px solid #ddd;
-      padding: 8px 20px;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-
-    /* Info Cards (Bottom) */
-    .info-card {
-      background: #fcfcfc;
-      border: 1px solid #eee;
-      border-radius: 12px;
-      padding: 25px;
-      height: 100%;
-    }
-
-    .info-card h6 {
-      font-weight: 700;
-      margin-bottom: 15px;
-      font-size: 1rem;
-    }
-
-    .info-text {
-      font-size: 0.9rem;
-      color: #555;
-      line-height: 1.6;
-      margin-bottom: 2px;
-    }
-
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      font-size: 0.9rem;
-      color: #555;
-    }
-
-    .summary-row.total {
-      border-top: 1px solid #ddd;
-      padding-top: 15px;
-      margin-top: 10px;
-      font-weight: 700;
-      color: #000;
-      font-size: 1.1rem;
-    }
-
-    /* Footer */
-    footer {
-      background-color: #111;
-      color: #aaa;
-      padding: 60px 0 20px;
-      margin-top: 60px;
-    }
-
-    footer h5 {
-      color: white;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
-
-    footer ul {
-      padding-left: 0;
-      list-style: none;
-    }
-
-    footer ul li {
-      margin-bottom: 10px;
-    }
-
-    footer a {
-      color: #aaa;
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      color: white;
-    }
-
-    .newsletter-input {
-      background: #333;
-      border: none;
-      color: white;
-      padding: 10px;
-      width: 100%;
-      margin-bottom: 10px;
-    }
-  </style>
-
-  <link href="/css/navbar.css" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - Jinsa Mobiles</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-black: #1a1a1a;
+            --primary-red: #d32f2f;
+            --border-color: #eee;
+        }
+
+        body {
+            font-family: "Poppins", sans-serif;
+            background-color: #fff;
+            color: #1a1a1a;
+            padding-top: 80px;
+        }
+
+        /* --- PAGE LAYOUT (Copied from Profile) --- */
+        .profile-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 20px;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background-color: #fff;
+            border-right: 1px solid var(--border-color);
+            min-height: 600px;
+            padding-right: 20px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-item {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #555;
+            text-decoration: none;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar-link i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-link:hover {
+            background-color: #f8f9fa;
+            color: #000;
+            transform: translateX(5px);
+        }
+
+        .sidebar-link.active {
+            background-color: #000;
+            color: #fff;
+        }
+
+        .sidebar-link.active:hover {
+            transform: none;
+        }
+
+        .logout-btn {
+            color: #dc3545;
+        }
+
+        .logout-btn:hover {
+            color: #b02a37;
+            background-color: #f8f9fa;
+        }
+
+        /* --- RESPONSIVE SIDEBAR (MOBILE) --- */
+        @media (max-width: 991px) {
+            .profile-container {
+                padding: 0 15px 40px 15px;
+            }
+
+            .sidebar {
+                border-right: none;
+                min-height: auto;
+                padding: 10px 0;
+                border-bottom: 1px solid #eee;
+                position: sticky;
+                top: 85px;
+                z-index: 99;
+                background: #fff;
+                overflow-x: auto;
+                white-space: nowrap;
+                width: 100vw;
+                margin-left: -15px;
+                padding-left: 15px;
+                -ms-overflow-style: none;
+                /* IE/Edge */
+                scrollbar-width: none;
+                /* Firefox */
+            }
+
+            .sidebar::-webkit-scrollbar {
+                display: none;
+            }
+
+            .sidebar-menu {
+                display: flex;
+                flex-direction: row;
+                gap: 10px;
+                padding-right: 20px;
+            }
+
+            .sidebar-item {
+                margin-bottom: 0;
+                display: inline-block;
+            }
+
+            .sidebar-link {
+                border: 1px solid #eee;
+                padding: 8px 16px;
+                font-size: 0.9rem;
+                background: #fff;
+            }
+
+            .sidebar-link:hover {
+                transform: none;
+            }
+
+            .sidebar-link.active {
+                border-color: #000;
+            }
+
+            .main-content {
+                padding-left: 0;
+                margin-top: 20px;
+            }
+        }
+
+        /* --- ANIMATIONS (Copied from Profile) --- */
+        @keyframes slideInFromBottom {
+            0% {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .content-animate {
+            animation: slideInFromBottom 0.8s ease-out forwards;
+        }
+
+        /* --- CONTENT STYLES --- */
+        .main-content {
+            padding-left: 40px;
+        }
+
+        @media (max-width: 991px) {
+            .main-content {
+                padding-left: 0;
+            }
+        }
+
+        .section-box {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            border: 1px solid #f0f0f0;
+        }
+
+        .section-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+    </style>
+    <link href="/css/navbar.css" rel="stylesheet" />
 </head>
 
 <body>
 
-  <div id="navbar-placeholder"></div>
+    <div id="navbar-placeholder"></div>
 
-  <div class="profile-container">
-    <div class="row">
-
-      <div class="col-lg-3 sidebar">
-        <ul class="sidebar-menu">
-          <li class="sidebar-item"><a href="./userProfilePage.html" class="sidebar-link"><i
-                class="fa-regular fa-user"></i> Profile</a></li>
-          <li class="sidebar-item"><a href="./userOrdersPage.html" class="sidebar-link active"><i
-                class="fa-solid fa-bag-shopping"></i> Orders</a></li>
-          <li class="sidebar-item"><a href="./userWalletPage.html" class="sidebar-link"><i
-                class="fa-solid fa-wallet"></i> Wallet</a></li>
-          <li class="sidebar-item"><a href="./userWishListPage.html" class="sidebar-link"><i
-                class="fa-regular fa-heart"></i> Wishlist</a></li>
-          <li class="sidebar-item"><a href="./userAddressPage.html" class="sidebar-link"><i
-                class="fa-solid fa-location-dot"></i> Address</a></li>
-          <li class="sidebar-item"><a href="./changePassword.html" class="sidebar-link"><i class="fa-solid fa-lock"></i>
-              Password</a></li>
-          <li class="sidebar-item"><a href="./userCoupon.html" class="sidebar-link"><i class="fa-solid fa-ticket"></i>
-              Coupon</a></li>
-          <li class="sidebar-item"><a href="./userLogin.html" class="sidebar-link logout-btn"><i
-                class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a></li>
-        </ul>
-      </div>
-
-      <div class="col-lg-9 main-content content-animate">
-
-        <div class="mb-2">
-          <h2 class="page-title text-center text-lg-start py-1">My Orders</h2>
-        </div>
-
-        <div class="order-header-row">
-          <div>
-            <h2 class="order-id">Order #12345678</h2>
-            <p class="order-meta">
-              Order Placed: <span class="text-dark fw-medium">October 26, 2023</span> | Status: <span
-                class="fw-bold">Processing</span>
-            </p>
-          </div>
-          <div>
-            <button class="btn-action"><i class="fa-solid fa-print me-2"></i> Print Receipt</button>
-            <button class="btn-action">
-              <a href="./userOrdersPage.html" style="text-decoration: none; color: inherit;">Return to Orders</a>
-            </button>
-          </div>
-        </div>
-
-        <div class="table-responsive">
-          <table class="table-custom">
-            <thead>
-              <tr>
-                <th style="width: 40%;">Product</th>
-                <th style="width: 15%;">Quantity</th>
-                <th style="width: 15%;">Price</th>
-                <th style="width: 15%;">Total</th>
-                <th style="width: 15%; text-align: right;">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <div class="product-cell">
-                    <img src="https://placehold.co/100x100/333/fff?text=T" alt="T-Shirt" class="product-img">
-                    <span class="product-name">Classic Black T-Shirt</span>
-                  </div>
-                </td>
-                <td>1</td>
-                <td>$25.00</td>
-                <td>$25.00</td>
-                <td style="text-align: right;">
-                  <button class="btn-cancel">Cancel</button>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="product-cell">
-                    <img src="https://placehold.co/100x100/333/fff?text=J" alt="Jeans" class="product-img">
-                    <span class="product-name">Denim Jeans</span>
-                  </div>
-                </td>
-                <td>1</td>
-                <td>$75.00</td>
-                <td>$75.00</td>
-                <td style="text-align: right;">
-                  <button class="btn-cancel">Cancel</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="return-banner">
-          <div class="return-text">
-            <h6>Need to return an item?</h6>
-            <p>You can start a return for eligible items.</p>
-          </div>
-          <button class="btn-return"><i class="fa-solid fa-arrow-left me-2"></i><a href="./orderReturnPage.html"
-              style="text-decoration: none; color: inherit;"> Return Order</a></button>
-        </div>
-
-        <div class="row g-4">
-
-          <div class="col-md-4">
-            <div class="info-card">
-              <h6>Shipping Address</h6>
-              <p class="info-text fw-bold">John Doe</p>
-              <p class="info-text">123 Main St</p>
-              <p class="info-text">Anytown, USA 12345</p>
+    <div class="profile-container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 sidebar">
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item">
+                        <a href="./userProfilePage.html" class="sidebar-link">
+                            <i class="fa-regular fa-user"></i> Profile
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="./userOrdersPage.html" class="sidebar-link active">
+                            <!-- Active here too as it's order related -->
+                            <i class="fa-solid fa-bag-shopping"></i> Orders
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="userWalletPage.html" class="sidebar-link">
+                            <i class="fa-solid fa-wallet"></i> Wallet
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="userWishListPage.html" class="sidebar-link">
+                            <i class="fa-regular fa-heart"></i> Wishlist
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="userAddressPage.html" class="sidebar-link">
+                            <i class="fa-solid fa-location-dot"></i> Address
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="./changePassword.html" class="sidebar-link">
+                            <i class="fa-solid fa-lock"></i> Password
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="./userCoupon.html" class="sidebar-link">
+                            <i class="fa-solid fa-ticket"></i> Coupon
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="./userLogin.html" class="sidebar-link logout-btn">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                        </a>
+                    </li>
+                </ul>
             </div>
-          </div>
 
-          <div class="col-md-4">
-            <div class="info-card">
-              <h6>Payment Method</h6>
-              <p class="info-text">Visa ending in 1234</p>
+            <div class="col-lg-9 main-content content-animate">
+                <div class="d-flex flex-column align-items-start" style="margin-bottom: 40px;">
+                    <a href="userOrdersPage.html" class="text-decoration-none text-muted mb-2 hover-black"><i
+                            class="fa-solid fa-arrow-left"></i> Back to Orders</a>
+                    <h3 class="fw-bold mb-0">Order Details</h3>
+                </div>
+
+                <div class="row" id="order-details-container">
+                    <!-- Left Column: Items (Within Main Content) -->
+                    <div class="col-lg-8">
+                        <div class="section-box">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h5 class="fw-bold mb-1" id="order-id-display">Loading...</h5>
+                                    <p class="text-muted small mb-0">Placed on <span id="order-date-display">-</span>
+                                    </p>
+                                </div>
+                                <span id="order-status-badge" class="badge bg-secondary rounded-pill">Loading</span>
+                            </div>
+
+                            <div id="order-items-list" class="mt-4">
+                                <!-- Items injected here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Summary & Info (Within Main Content) -->
+                    <div class="col-lg-4">
+                        <div class="section-box">
+                            <h6 class="section-title">Shipping Address</h6>
+                            <div id="shipping-address" class="small text-muted">
+                                <!-- Address -->
+                            </div>
+                        </div>
+
+                        <div class="section-box">
+                            <h6 class="section-title">Order Summary</h6>
+                            <div class="d-flex justify-content-between mb-2 small">
+                                <span>Subtotal</span>
+                                <span id="summary-subtotal">-</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2 small">
+                                <span>Shipping</span>
+                                <span id="summary-shipping">-</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2 small text-success">
+                                <span>Discount</span>
+                                <span id="summary-discount">-</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-3 fw-bold fs-5">
+                                <span>Total</span>
+                                <span id="summary-total">-</span>
+                            </div>
+
+                            <div class="bg-light p-2 rounded small mb-3">
+                                <strong>Payment Method:</strong> <span id="payment-method">-</span>
+                            </div>
+
+                            <div id="main-action-btn">
+                                <!-- Cancel Button if applicable -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-
-          <div class="col-md-4">
-            <div class="info-card">
-              <h6>Order Summary</h6>
-              <div class="summary-row">
-                <span>Subtotal</span>
-                <span>$100.00</span>
-              </div>
-              <div class="summary-row">
-                <span>Shipping</span>
-                <span>$10.00</span>
-              </div>
-              <div class="summary-row">
-                <span>Taxes</span>
-                <span>$8.25</span>
-              </div>
-              <div class="summary-row total">
-                <span>Grand Total</span>
-                <span>$118.25</span>
-              </div>
-            </div>
-          </div>
-
         </div>
-
-      </div>
     </div>
-  </div>
 
-  <footer>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-3">
-          <h5>Discover More</h5>
-          <ul>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact Us</a></li>
-            <li><a href="#">Blog</a></li>
-          </ul>
-        </div>
-        <div class="col-md-3">
-          <h5>Explore Products</h5>
-          <ul>
-            <li><a href="#">Mobiles</a></li>
-            <li><a href="#">Accessories</a></li>
-            <li><a href="#">Trendy Cases</a></li>
-          </ul>
-        </div>
-        <div class="col-md-3">
-          <h5>Customer Care</h5>
-          <ul>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Service</a></li>
-            <li><a href="#">Return Policy</a></li>
-          </ul>
-        </div>
-        <div class="col-md-3">
-          <h5>Contact Us</h5>
-          <form id="footerContactForm" style="margin-bottom: 0;">
-            <input type="text" class="newsletter-input mb-2" placeholder="Name"
-              style="font-size: 0.85rem; padding: 8px;" required />
-            <input type="email" class="newsletter-input mb-2" placeholder="Email"
-              style="font-size: 0.85rem; padding: 8px;" required />
-            <textarea class="newsletter-input mb-2" rows="2" placeholder="Message"
-              style="font-size: 0.85rem; padding: 8px; resize: none;" required></textarea>
-            <button type="submit" class="btn btn-light w-100 btn-sm fw-bold">Send</button>
-          </form>
-          <div class="mt-3">
-            <i class="fa-brands fa-facebook me-3"></i>
-            <i class="fa-brands fa-instagram me-3"></i>
-            <i class="fa-brands fa-twitter"></i>
-          </div>
-        </div>
-      </div>
-    </div>
-    <hr class="border-secondary mt-4" />
-    <div class="text-center small">
-      &copy; 2025 Jinsa Mobiles. All rights reserved.
-    </div>
-    </div>
-  </footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script src="/js/navbar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/navbar.js"></script>
+    <script src="/js/userOrderDetails.js"></script>
 </body>
 
 </html>

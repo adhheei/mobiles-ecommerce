@@ -2,8 +2,6 @@ const Transaction = require('../models/Transaction');
 
 exports.getTransactions = async (req, res) => {
     try {
-        // seedTransactions removed
-
         const { page = 1, limit = 10, search, status, range, fromDate, toDate } = req.query;
         const query = {};
 
@@ -54,15 +52,15 @@ exports.getTransactions = async (req, res) => {
         const total = await Transaction.countDocuments(query);
 
         res.json({
-            transactions,
-            totalPages: Math.ceil(total / limit),
+            transactions: transactions || [],
+            totalPages: Math.ceil(total / limit) || 0,
             currentPage: parseInt(page),
             total
         });
 
     } catch (error) {
         console.error("Error fetching transactions:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({ error: "Internal Server Error", transactions: [] });
     }
 };
 

@@ -411,9 +411,19 @@ async function checkUserLogin() {
         }
     };
 
-    // Verify with backend (Cookie Check)
+    // Verify with backend (Cookie/Token Check)
     try {
-        const res = await fetch('/api/user/profile');
+        const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+        console.log("Navbar: Token present?", !!token, token ? token.substring(0, 10) + "..." : "");
+
+        const headers = {};
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const res = await fetch('/api/user/profile', { headers });
+        console.log("Navbar: Profile Fetch Status:", res.status);
+
         if (res.ok) {
             const data = await res.json();
             if (data.success && data.user) {
@@ -422,10 +432,14 @@ async function checkUserLogin() {
                 renderLoggedInParams(userData);
             }
         } else if (res.status === 401) {
-            // Cookie invalid or expired
+            // Cookie and Token invalid
             // Ensure no dropdown is shown
             const userDropdown = document.querySelector('.dropdown.ms-4');
             if (userDropdown) userDropdown.remove();
+
+            // Clear invalid token
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
         }
     } catch (err) {
         console.error("Auth check failed", err);
