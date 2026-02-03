@@ -6,16 +6,13 @@ const path = require('path');
 const { isAdmin } = require('../middleware/authMiddleware');
 
 // ────────────────
-// CATEGORY ROUTES
+// CONTROLLER IMPORTS
 // ────────────────
 
-// Import category controller and middleware
-const {
-  getCategoriesWithCounts
-} = require('../controllers/productController');
+// 1. IMPORT AUTH
+const { loginAdmin } = require('../controllers/authController');
 
-const publicProductController = require('../controllers/publicProductController');
-
+// 2. IMPORT CATEGORY
 const {
   getAllCategories,
   getCategoryById,
@@ -24,144 +21,98 @@ const {
   deleteCategory
 } = require('../controllers/categoryController');
 
-const { loginAdmin } = require('../controllers/authController');
-
-const { single: uploadCategory } = require('../middleware/upload');
-
-// ADMIN LOGIN
-router.post('/login', loginAdmin);
-
-// GET all categories
-router.get('/categories', getAllCategories);
-
-// GET single category by ID
-router.get('/categories/:id', getCategoryById);
-
-// POST new category
-router.post('/categories', isAdmin, uploadCategory, createCategory);
-
-// PUT update category
-router.put('/categories/:id', isAdmin, uploadCategory, updateCategory);
-
-// DELETE category permanently
-router.delete('/categories/:id', isAdmin, deleteCategory);
-
-// GET categories with product counts
-router.get('/products/categories-with-counts', getCategoriesWithCounts);
-
-// ────────────────
-// PRODUCT ROUTES
-// ────────────────
-
-// Import product controller and middleware
+// 3. IMPORT PRODUCT (The main fix is here)
+// We assign the entire object to 'productController' so your calls below work
+const productController = require('../controllers/productController');
 const {
   getAllProducts,
   addProduct,
   getCategoriesForDropdown,
   getProductById,
   updateProduct,
-  deleteProduct
-} = require('../controllers/productController'); // 👈 Fixed: use productController
+  deleteProduct,
+  getUniqueBrands, // You can still destructure these for direct use
+  getPublicProducts,
+  getCategoriesWithCounts
+} = productController;
 
-const { product: uploadProduct } = require('../middleware/upload');
+// 4. IMPORT PUBLIC & OTHERS
+const publicProductController = require('../controllers/publicProductController');
+const { single: uploadCategory, product: uploadProduct } = require('../middleware/upload');
 
-// Public product route
-// Uses the controller to ensure 'draft' status filtering is applied
+// ────────────────
+// ADMIN LOGIN
+// ────────────────
+router.post('/login', loginAdmin);
+
+// ────────────────
+// CATEGORY ROUTES
+// ────────────────
+router.get('/categories', getAllCategories);
+router.get('/categories/:id', getCategoryById);
+router.post('/categories', isAdmin, uploadCategory, createCategory);
+router.put('/categories/:id', isAdmin, uploadCategory, updateCategory);
+router.delete('/categories/:id', isAdmin, deleteCategory);
+
+// Note: Ensure this exists in productController
+router.get('/products/categories-with-counts', getCategoriesWithCounts);
+
+// ────────────────
+// PRODUCT ROUTES
+// ────────────────
+
+// Public product routes (Using publicProductController)
 router.get('/products/public', publicProductController.getPublicProducts);
-
-// Search suggestions route
 router.get('/search/suggestions', publicProductController.getSearchSuggestions);
-
-// Get brands with counts
 router.get('/products/brands-with-counts', publicProductController.getBrandsWithCounts);
-
-// Get suggestions based on cart
 router.post('/products/suggestions', publicProductController.getSuggestions);
 
-// GET categories for product dropdown
+// Admin/Internal Product Routes
 router.get('/products/categories', getCategoriesForDropdown);
-
-// GET all products (protected admin route)
 router.get('/products', getAllProducts);
-
-// POST new product
 router.post('/products', isAdmin, uploadProduct, addProduct);
 
-// GET single product by ID
-router.get('/products/:id', getProductById); // Public allowed to view ID? usually public route handles this, but admin checks ID too. Let's keep public for now or isAdmin if strictly admin edit page.
+// FIXED: These were calling 'productController' which wasn't defined properly before
+router.get('/brands', getUniqueBrands);
+router.get('/public', getPublicProducts);
 
-// PUT update product
+router.get('/products/:id', getProductById);
 router.put('/products/:id', isAdmin, uploadProduct, updateProduct);
-
-// DELETE product permanently
 router.delete('/products/:id', isAdmin, deleteProduct);
 
-// Signup routes have been moved to authRoutes.js
 // ────────────────
 // MESSAGE ROUTES
 // ────────────────
-
-// Import middleware
-// const { isAdmin } = require('../middleware/authMiddleware'); // Already imported at top
-const {
-  getMessages,
-  markAsRead,
-  getUnreadCount
-} = require('../controllers/messageController');
-
-// All message routes are protected
-router.get('/messages', isAdmin, getMessages);
-router.patch('/messages/:id/seen', isAdmin, require('../controllers/messageController').markAsSeen);
-router.patch('/messages/:id/replied', isAdmin, require('../controllers/messageController').markAsReplied);
-router.get('/messages/unread-count', isAdmin, getUnreadCount);
-// router.post('/messages/:id/reply', isAdmin, require('../controllers/messageController').replyToMessage);
-router.post('/messages/:id/reply', isAdmin, require('../controllers/messageController').replyToMessage);
-router.delete('/messages/:id', isAdmin, require('../controllers/messageController').deleteMessage);
+const messageController = require('../controllers/messageController');
+router.get('/messages', isAdmin, messageController.getMessages);
+router.patch('/messages/:id/seen', isAdmin, messageController.markAsSeen);
+router.patch('/messages/:id/replied', isAdmin, messageController.markAsReplied);
+router.get('/messages/unread-count', isAdmin, messageController.getUnreadCount);
+router.post('/messages/:id/reply', isAdmin, messageController.replyToMessage);
+router.delete('/messages/:id', isAdmin, messageController.deleteMessage);
 
 // ────────────────
 // COUPON ROUTES
 // ────────────────
-
-const {
-  createCoupon,
-  getCoupons,
-  deleteCoupon,
-  getCoupon,
-  updateCoupon
-} = require('../controllers/couponController');
-
-// All coupon routes protected
-router.post('/coupons', isAdmin, createCoupon);
-router.get('/coupons', isAdmin, getCoupons);
-router.get('/coupons/:id', isAdmin, getCoupon);
-router.put('/coupons/:id', isAdmin, updateCoupon);
-router.delete('/coupons/:id', isAdmin, deleteCoupon);
-
-router.delete('/coupons/:id', isAdmin, deleteCoupon);
+const couponController = require('../controllers/couponController');
+router.post('/coupons', isAdmin, couponController.createCoupon);
+router.get('/coupons', isAdmin, couponController.getCoupons);
+router.get('/coupons/:id', isAdmin, couponController.getCoupon);
+router.put('/coupons/:id', isAdmin, couponController.updateCoupon);
+router.delete('/coupons/:id', isAdmin, couponController.deleteCoupon);
 
 // ────────────────
-// TRANSACTION ROUTES
+// TRANSACTION & USER & ORDERS
 // ────────────────
 const { getTransactions, downloadTransactions } = require('../controllers/transactionController');
+const { getAllUsers, toggleBlockUser, adminGetWallet } = require('../controllers/userController');
+const { getAdminOrderDetails, updateOrderStatus } = require('../controllers/orderController');
 
 router.get('/transactions', isAdmin, getTransactions);
 router.get('/transactions/download', isAdmin, downloadTransactions);
-
-// ────────────────
-// USER ROUTES
-// ────────────────
-const { getAllUsers, toggleBlockUser, adminGetWallet, adminUpdateWallet } = require('../controllers/userController');
-
 router.get('/users', isAdmin, getAllUsers);
 router.patch('/users/:id/block', isAdmin, toggleBlockUser);
-
-// Admin Wallet Routes
 router.get('/wallet/:userId', isAdmin, adminGetWallet);
-// ────────────────
-// ORDER ROUTES (ADMIN)
-// ────────────────
-const { getAdminOrderDetails, updateOrderStatus } = require('../controllers/orderController');
-
 router.get('/orders/:id', isAdmin, getAdminOrderDetails);
 router.put('/orders/:id/status', isAdmin, updateOrderStatus);
 

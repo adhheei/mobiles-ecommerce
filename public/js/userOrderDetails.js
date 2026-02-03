@@ -1,3 +1,6 @@
+// Global variable for current order ID to use in HTML onclick attributes
+let currentOrderId = null;
+
 document.addEventListener("DOMContentLoaded", async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('id');
@@ -15,7 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    const container = document.getElementById("order-details-container");
+    currentOrderId = orderId; // Set global
 
     try {
         const res = await fetch(`/api/orders/${orderId}`, {
@@ -24,73 +27,100 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const data = await res.json();
         const order = data.order;
+        currentOrderId = order._id; // Ensure we have the DB ID
 
         if (res.ok && data.success) {
-            // Render Order Data
+            // --- HEADER ---
             document.getElementById("order-id-display").innerText = `Order #${order.orderId}`;
 
-            const date = new Date(order.createdAt).toLocaleDateString("en-US", {
-                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            const orderDate = new Date(order.createdAt);
+            document.getElementById("order-date-display").innerText = orderDate.toLocaleDateString("en-US", {
+                year: 'numeric', month: 'long', day: 'numeric'
             });
-            document.getElementById("order-date-display").innerText = date;
 
             // Status Badge
             const statusEl = document.getElementById("order-status-badge");
             statusEl.innerText = order.orderStatus;
-            statusEl.className = `badge rounded-pill ${getStatusColor(order.orderStatus)}`;
+            statusEl.className = `badge ${getStatusColor(order.orderStatus)}`;
 
-            // Shipping Address
-            const addr = order.shippingAddress;
-            document.getElementById("shipping-address").innerHTML = `
-                <strong>${addr.fullName}</strong><br>
-                ${addr.street}, ${addr.city}<br>
-                ${addr.state} - ${addr.pincode}<br>
-                Phone: ${addr.phone}
-            `;
+            // Expected Delivery (Order + 6 to 7 days)
+            const deliveryStart = new Date(orderDate);
+            deliveryStart.setDate(deliveryStart.getDate() + 6);
+            const deliveryEnd = new Date(orderDate);
+            deliveryEnd.setDate(deliveryEnd.getDate() + 7);
 
-            // Payment
-            document.getElementById("payment-method").innerText = order.paymentMethod;
+            const deliveryText = order.orderStatus === 'Delivered'
+                ? `Delivered on ${new Date(order.updatedAt).toLocaleDateString()}`
+                : `Est. Delivery: ${deliveryStart.toLocaleDateString()} - ${deliveryEnd.toLocaleDateString()}`;
 
-            // Items
+            document.getElementById("estimated-delivery").innerText = deliveryText;
+
+
+            // --- ITEMS TABLE ---
             const itemsList = document.getElementById("order-items-list");
             itemsList.innerHTML = order.items.map(item => `
-                <div class="d-flex gap-3 mb-4 border-bottom pb-4">
-                    <img src="${item.image}" alt="${item.name}" style="width: 80px; height: 80px; object-fit: contain; border-radius: 8px; background: #f8f9fa;">
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between">
-                            <h6 class="fw-bold mb-1">${item.name}</h6>
-                            <span class="fw-bold">₹${(item.price * item.quantity).toLocaleString()}</span>
+                <tr>
+                    <td class="ps-4 py-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="${item.image}" alt="${item.name}" 
+                                 style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;">
+                            <div>
+                                <h6 class="mb-0 fw-bold small text-truncate" style="max-width: 200px;">${item.name}</h6>
+                                <span class="badge border text-dark fw-normal" style="font-size: 0.7rem;">${item.status}</span>
+                            </div>
                         </div>
-                        <div class="text-muted small mb-2">
-                             Qty: ${item.quantity} | Price: ₹${item.price.toLocaleString()}
-                        </div>
-                         
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="badge bg-light text-dark border">${item.status}</span>
-                            
-                            ${(item.status !== 'Cancelled' && item.status !== 'Delivered' && item.status !== 'Returned' && order.orderStatus !== 'Cancelled') ?
-                    `<button class="btn btn-sm btn-outline-danger" onclick="cancelOrder('${order._id}', '${item._id}')">Cancel Item</button>` : ''}
-                            ${(item.status === 'Delivered') ?
-                    `<button class="btn btn-sm btn-outline-warning" onclick="returnOrder('${order._id}', '${item._id}')">Return Item</button>` : ''}
-                        </div>
-                    </div>
-                </div>
+                    </td>
+                    <td class="py-3 text-muted">${item.quantity}</td>
+                    <td class="py-3 text-muted">₹${item.price.toLocaleString()}</td>
+                    <td class="py-3 fw-bold">₹${(item.price * item.quantity).toLocaleString()}</td>
+                    <td class="pe-4 py-3 text-end">
+                        ${getActionButton(order, item)}
+                    </td>
+                </tr>
             `).join('');
 
-            // Summary
+
+            // --- RETURN BANNER VISIBILITY ---
+            const returnSection = document.getElementById("return-section");
+            if (order.orderStatus === 'Delivered') {
+                returnSection.style.display = 'block';
+            } else {
+                returnSection.style.display = 'none';
+            }
+
+
+            // --- SHIPPING ADDRESS ---
+            const addr = order.shippingAddress;
+            document.getElementById("shipping-address").innerHTML = `
+                <p class="mb-1 fw-bold text-dark">${addr.fullName}</p>
+                <p class="mb-0">${addr.street}</p>
+                <p class="mb-0">${addr.city}, ${addr.state} ${addr.pincode}</p>
+                <p class="mb-0 mt-2"><i class="fa-solid fa-phone me-1 text-muted"></i> ${addr.phone}</p>
+            `;
+
+            // --- PAYMENT INFO ---
+            document.getElementById("payment-method").innerText = order.paymentMethod;
+
+            const payStatusEl = document.getElementById("payment-status");
+            payStatusEl.innerText = `Status: ${order.paymentStatus}`;
+            payStatusEl.className = order.paymentStatus === 'Paid' ? 'text-success fw-bold' : 'text-warning fw-bold';
+
+
+            // --- ORDER SUMMARY ---
             document.getElementById("summary-subtotal").innerText = `₹${order.totals.subtotal.toLocaleString()}`;
             document.getElementById("summary-shipping").innerText = order.totals.shipping === 0 ? "Free" : `₹${order.totals.shipping}`;
             document.getElementById("summary-discount").innerText = `- ₹${(order.totals.couponDiscount || 0).toLocaleString()}`;
             document.getElementById("summary-total").innerText = `₹${order.totals.totalAmount.toLocaleString()}`;
 
-            // Main Action Button
-            const mainActionBtn = document.getElementById("main-action-btn");
+            // --- BOTTOM CANCEL BUTTON ---
+            const actionContainer = document.getElementById("main-action-btn-container");
             if (order.orderStatus === 'Processing' || order.orderStatus === 'Shipped') {
-                mainActionBtn.innerHTML = `<button class="btn btn-danger w-100" onclick="cancelOrder('${order._id}', null)">Cancel Entire Order</button>`;
-            } else if (order.orderStatus === 'Delivered') {
-                mainActionBtn.innerHTML = `<button class="btn btn-warning w-100" onclick="returnOrder('${order._id}', null)">Return Filter Order</button>`;
+                actionContainer.innerHTML = `
+                    <button class="btn btn-outline-danger w-100" onclick="cancelOrder('${order._id}', null)">
+                        Cancel Entire Order
+                    </button>`;
             } else {
-                mainActionBtn.innerHTML = '';
+                actionContainer.innerHTML = '';
             }
 
         } else {
@@ -101,6 +131,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         Swal.fire("Error", "Network Error", "error");
     }
 });
+
+function getActionButton(order, item) {
+    if (order.orderStatus === 'Cancelled') return '<span class="text-muted small">Order Cancelled</span>';
+
+    if (item.status === 'Cancelled') return '<span class="text-danger small">Item Cancelled</span>';
+    if (item.status === 'Returned') return '<span class="text-warning small fw-bold">Returned</span>';
+
+    if (item.status === 'Delivered') {
+        return `<button class="btn btn-sm btn-outline-warning" onclick="returnOrder('${order._id}', '${item._id}')">Return</button>`;
+    }
+
+    if (order.orderStatus === 'Processing' || order.orderStatus === 'Shipped') {
+        return `<button class="btn btn-sm btn-outline-danger" onclick="cancelOrder('${order._id}', '${item._id}')">Cancel</button>`;
+    }
+
+    return '-';
+}
 
 function getStatusColor(status) {
     switch (status) {

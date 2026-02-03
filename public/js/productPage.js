@@ -17,27 +17,17 @@ const priceRange = document.getElementById('priceRange');
 document.addEventListener('DOMContentLoaded', () => {
   // Load categories for filter (and then load products)
   loadCategoriesForFilter();
-
+  loadBrandsForFilter();
   // Setup event listeners
   setupEventListeners();
 });
 
 // Setup all event listeners
 function setupEventListeners() {
-  // Filter toggle button
-  if (filterToggleBtn) {
-    filterToggleBtn.addEventListener('click', openFilterSidebar);
-  }
+  if (filterToggleBtn) filterToggleBtn.addEventListener('click', openFilterSidebar);
+  if (filterBackdrop) filterBackdrop.addEventListener('click', closeFilterSidebar);
+  if (closeFiltersBtn) closeFiltersBtn.addEventListener('click', closeFilterSidebar);
 
-  // Close filter sidebar (backdrop and close button)
-  if (filterBackdrop) {
-    filterBackdrop.addEventListener('click', closeFilterSidebar);
-  }
-  if (closeFiltersBtn) {
-    closeFiltersBtn.addEventListener('click', closeFilterSidebar);
-  }
-
-  // Sort selection
   if (sortSelect) {
     sortSelect.addEventListener('change', () => {
       currentPage = 1;
@@ -45,7 +35,6 @@ function setupEventListeners() {
     });
   }
 
-  // In stock only toggle
   if (inStockOnly) {
     inStockOnly.addEventListener('change', () => {
       currentPage = 1;
@@ -53,7 +42,6 @@ function setupEventListeners() {
     });
   }
 
-  // Price range
   if (priceRange) {
     priceRange.addEventListener('input', () => {
       currentPage = 1;
@@ -61,15 +49,11 @@ function setupEventListeners() {
     });
   }
 
-  // Navbar search (debounced)
   const navbarSearch = document.getElementById('navbarSearch');
   if (navbarSearch) {
-    // Initialize value from URL param
     const urlParams = new URLSearchParams(window.location.search);
     const searchParam = urlParams.get('search');
-    if (searchParam) {
-      navbarSearch.value = searchParam;
-    }
+    if (searchParam) navbarSearch.value = searchParam;
 
     navbarSearch.addEventListener('input', debounce(() => {
       currentPage = 1;
@@ -77,7 +61,6 @@ function setupEventListeners() {
     }, 300));
   }
 
-  // EVENT DELEGATION for Products Container (Wishlist & Cart)
   const container = document.getElementById('productsContainer');
   if (container) {
     container.addEventListener('click', handleProductClicks);
@@ -180,59 +163,43 @@ function debounce(func, wait) {
   };
 }
 
-// Load products from backend
+// Main function to load products with all filters
 async function loadProducts() {
   const container = document.getElementById('productsContainer');
   const loading = document.getElementById('loading');
   const emptyState = document.getElementById('emptyState');
 
-  // Show loading state
   loading.style.display = 'block';
   emptyState.style.display = 'none';
   if (container) container.innerHTML = '';
 
   try {
-    // Build query parameters
     const params = new URLSearchParams();
     params.append('page', currentPage);
     params.append('limit', limit);
 
-    // Add sort parameter
-    if (sortSelect && sortSelect.value) {
-      params.append('sort', sortSelect.value);
-    }
+    if (sortSelect?.value) params.append('sort', sortSelect.value);
 
-    // Add category filter (from checkboxes)
+    // Categories
     const selectedCategories = [];
-    const categoryCheckboxes = document.querySelectorAll('#categoryList input[type="checkbox"]:checked');
-
-    categoryCheckboxes.forEach(checkbox => {
-      if (checkbox.value !== 'all') {
-        selectedCategories.push(checkbox.value);
-      }
+    document.querySelectorAll('#categoryList input[type="checkbox"]:checked').forEach(cb => {
+      if (cb.value !== 'all') selectedCategories.push(cb.value);
     });
+    if (selectedCategories.length > 0) params.append('category', selectedCategories.join(','));
 
-    if (selectedCategories.length > 0) {
-      params.append('category', selectedCategories.join(','));
-    }
+    // Brands
+    const selectedBrands = [];
+    document.querySelectorAll('.brand-checkbox:checked').forEach(cb => {
+      selectedBrands.push(cb.value);
+    });
+    if (selectedBrands.length > 0) params.append('brand', selectedBrands.join(','));
 
-    // Add in-stock filter
-    if (inStockOnly && inStockOnly.checked) {
-      params.append('inStock', 'true');
-    }
+    if (inStockOnly?.checked) params.append('inStock', 'true');
+    if (priceRange) params.append('maxPrice', priceRange.value);
 
-    // Add price range
-    if (priceRange) {
-      params.append('maxPrice', priceRange.value);
-    }
-
-    // Add search query from navbar
     const navbarSearch = document.getElementById('navbarSearch');
-    if (navbarSearch && navbarSearch.value.trim() !== '') {
-      params.append('search', navbarSearch.value.trim());
-    }
+    if (navbarSearch?.value.trim() !== '') params.append('search', navbarSearch.value.trim());
 
-    // Fetch products and wishlist in parallel
     const [productsRes, _] = await Promise.all([
       fetch(`/api/admin/products/public?${params}`),
       loadUserWishlist()
@@ -240,74 +207,13 @@ async function loadProducts() {
 
     const data = await productsRes.json();
 
-    if (data.success && data.products && data.products.length > 0) {
+    if (data.success && data.products?.length > 0) {
       loading.style.display = 'none';
-
-      const html = data.products.map(product => {
-        // Use _id preferably, fallback to id
-        const pId = product._id || product.id;
-        const isOutOfStock = product.stock === 0 || product.status === 'outofstock';
-        // If out of stock, disable the link (void(0)) and add styling
-        const linkHref = isOutOfStock ? 'javascript:void(0)' : `./singleProductPage.html?id=${pId}`;
-        const cursorStyle = isOutOfStock ? 'cursor: not-allowed;' : '';
-
-        const isInWishlist = userWishlistIds.has(pId);
-
-        return `
-        <div class="col-6 col-md-4 col-xl-20-percent">
-          <a href="${linkHref}" class="product-card-link" style="${cursorStyle}">
-            <div class="product-card ${isOutOfStock ? 'sold-out' : ''}">
-              <div class="card-img-wrapper">
-                ${isOutOfStock ?
-            '<div class="badge-overlay"><span class="sold-out-badge">Sold Out</span></div>' :
-            ''
-          }
-                <!-- Wishlist Icon (Event Delegated) -->
-                <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" data-id="${pId}">
-                    <i class="${isInWishlist ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
-                </button>
-
-                <!-- Add To Cart Banner (Event Delegated) -->
-                ${!isOutOfStock ?
-            `<div class="add-to-cart-banner" data-id="${pId}">
-                    Add to Cart
-                </div>` : ''}
-
-                <img 
-                  src="${product.mainImage}" 
-                  alt="${product.name}" 
-                  onerror="this.src='/images/logo.jpg'"
-                />
-              </div>
-              <div class="product-info">
-                <div class="product-vendor">${product.brand}</div>
-                <div class="d-flex justify-content-between align-items-start">
-                   <div class="product-title mb-0" style="padding-right: 10px;" title="${product.name}">${product.name}</div>
-                   <div class="text-end flex-shrink-0">
-                      ${product.offerPrice < product.actualPrice ?
-            `<div class="current-price sale-price" style="font-size: 0.95rem;">Rs. ${product.offerPrice}</div>
-                         <div class="old-price" style="font-size: 0.75rem;">Rs. ${product.actualPrice}</div>` :
-            `<div class="current-price" style="font-size: 0.95rem;">Rs. ${product.offerPrice}</div>`
-          }
-                   </div>
-                </div>
-              </div>
-            </div>
-          </a>
-        </div>
-      `;
-      }).join('');
-
-      if (container) container.innerHTML = html;
-
-      // Render pagination
-      if (data.pagination) {
-        renderPagination(data.pagination);
-      }
+      container.innerHTML = data.products.map(product => renderProductCard(product)).join('');
+      if (data.pagination) renderPagination(data.pagination);
     } else {
       loading.style.display = 'none';
       emptyState.style.display = 'block';
-      // Clear pagination if no products
       const pContainer = document.getElementById('paginationContainer');
       if (pContainer) pContainer.innerHTML = '';
     }
@@ -370,56 +276,35 @@ async function loadCategoriesForFilter() {
   try {
     const res = await fetch('/api/admin/products/categories-with-counts');
     const data = await res.json();
-
     if (data.success && data.categories) {
       const categoryList = document.getElementById('categoryList');
       if (!categoryList) return;
-
-      // Clear existing options
-      categoryList.innerHTML = '';
-
-      // Add "All Categories" option
-      const allOption = document.createElement('li');
-      allOption.innerHTML = `
-        <input type="checkbox" class="form-check-input" id="category-all" value="all" />
-        <label for="category-all" class="form-check-label">All Categories</label>
-      `;
-      categoryList.appendChild(allOption);
-
-      // Add categories with counts
+      categoryList.innerHTML = '<li><input type="checkbox" class="form-check-input" id="category-all" value="all" /><label for="category-all" class="form-check-label">All Categories</label></li>';
       data.categories.forEach(cat => {
         const li = document.createElement('li');
-        li.innerHTML = `
-          <input type="checkbox" class="form-check-input" id="category-${cat._id}" value="${cat._id}" />
-          <label for="category-${cat._id}" class="form-check-label">${cat.name} (${cat.productCount})</label>
-        `;
+        li.innerHTML = `<input type="checkbox" class="form-check-input" id="category-${cat._id}" value="${cat._id}" /><label for="category-${cat._id}" class="form-check-label">${cat.name} (${cat.productCount})</label>`;
         categoryList.appendChild(li);
       });
-
-      // CHECK URL AND PRE-SELECT CATEGORY
-      const urlParams = new URLSearchParams(window.location.search);
-      const categoryId = urlParams.get('category');
-
-      if (categoryId) {
-        const checkbox = document.getElementById(`category-${categoryId}`);
-        if (checkbox) {
-          checkbox.checked = true;
-        }
-      }
-
-      // Setup event listeners for category checkboxes
       setupCategoryFilterListeners();
-
-      // NOW load products (after filters are set)
       loadProducts();
-
-
-
     }
-  } catch (err) {
-    console.error('Error loading categories:', err);
-  }
+  } catch (err) { console.error('Error loading categories:', err); }
 }
+
+function setupCategoryFilterListeners() {
+  document.querySelectorAll('#categoryList input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', () => { currentPage = 1; loadProducts(); });
+  });
+}
+
+function openFilterSidebar() { filterSidebar.classList.add('open'); filterBackdrop.classList.add('show'); }
+function closeFilterSidebar() { filterSidebar.classList.remove('open'); filterBackdrop.classList.remove('show'); }
+function debounce(func, wait) {
+  let timeout;
+  return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func(...args), wait); };
+}
+
+// ... (Include your toggleWishlist, loadUserWishlist, and addToCart functions here) ...
 
 // Setup event listeners for category checkboxes
 function setupCategoryFilterListeners() {
@@ -603,3 +488,73 @@ async function addToCart(productId) {
   }
 }
 
+// Load brands from backend and inject into the sidebar
+async function loadBrandsForFilter() {
+  try {
+    const res = await fetch('/api/admin/products/brands-with-counts');
+    const data = await res.json();
+
+    if (data.success && data.brands) {
+      const brandList = document.getElementById('brandList');
+      if (!brandList) return;
+
+      brandList.innerHTML = data.brands.map(brand => `
+        <li>
+          <input type="checkbox" class="form-check-input brand-checkbox" 
+                 id="brand-${brand.id}" value="${brand.name}" />
+          <label for="brand-${brand.id}" class="form-check-label">
+            ${brand.name} <span class="text-muted">(${brand.count})</span>
+          </label>
+        </li>
+      `).join('');
+
+      // Setup listeners for newly created checkboxes
+      document.querySelectorAll('.brand-checkbox').forEach(cb => {
+        cb.addEventListener('change', () => {
+          currentPage = 1;
+          loadProducts();
+        });
+      });
+    }
+  } catch (err) {
+    console.error('Error loading brands:', err);
+  }
+}
+
+// Helper to render a single card (to keep code clean)
+function renderProductCard(product) {
+  const pId = product._id || product.id;
+  const isOutOfStock = product.stock === 0 || product.status === 'outofstock';
+  const linkHref = isOutOfStock ? 'javascript:void(0)' : `./singleProductPage.html?id=${pId}`;
+  const isInWishlist = userWishlistIds.has(pId);
+
+  return `
+    <div class="col-6 col-md-4 col-xl-20-percent">
+      <a href="${linkHref}" class="product-card-link" style="${isOutOfStock ? 'cursor: not-allowed;' : ''}">
+        <div class="product-card ${isOutOfStock ? 'sold-out' : ''}">
+          <div class="card-img-wrapper">
+            ${isOutOfStock ? '<div class="badge-overlay"><span class="sold-out-badge">Sold Out</span></div>' : ''}
+            <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" data-id="${pId}">
+              <i class="${isInWishlist ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+            </button>
+            ${!isOutOfStock ? `<div class="add-to-cart-banner" data-id="${pId}">Add to Cart</div>` : ''}
+            <img src="${product.mainImage}" alt="${product.name}" onerror="this.src='/images/logo.jpg'" />
+          </div>
+          <div class="product-info">
+            <div class="product-vendor">${product.brand}</div>
+            <div class="d-flex justify-content-between align-items-start">
+               <div class="product-title mb-0" title="${product.name}">${product.name}</div>
+               <div class="text-end flex-shrink-0">
+                  ${product.offerPrice < product.actualPrice ?
+      `<div class="current-price sale-price">Rs. ${product.offerPrice}</div><div class="old-price">Rs. ${product.actualPrice}</div>` :
+      `<div class="current-price">Rs. ${product.offerPrice}</div>`}
+               </div>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>`;
+}
+
+// --- REST OF YOUR FUNCTIONS (Wishlist, Cart, Pagination, etc. stay exactly the same) ---
+// (Ensure loadCategoriesForFilter, setupCategoryFilterListeners, toggleWishlist, addToCart are below this)

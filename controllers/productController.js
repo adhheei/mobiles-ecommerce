@@ -136,6 +136,7 @@ exports.getProductById = async (req, res) => {
         tags: product.tags,
         mainImage: mainImageUrl,
         gallery: galleryUrls,
+        brand: product.brand
       },
     });
   } catch (err) {
@@ -363,5 +364,79 @@ exports.deleteProduct = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, error: "Failed to delete product" });
+  }
+};
+
+exports.getUniqueBrands = async (req, res) => {
+  try {
+    // Gets unique brand strings from products that aren't deleted
+    const brands = await Product.distinct('brand', { isDeleted: false });
+
+    res.status(200).json({
+      success: true,
+      brands: brands.filter(b => b) // Removes any null/undefined values
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.getPublicProducts = async (req, res) => {
+  try {
+    const { page = 1, limit = 12, sort, category, brand, inStock, maxPrice, search } = req.query;
+
+    // Build Query Object
+    let query = { isDeleted: false };
+
+    // Brand Filter: Handles comma-separated values from frontend
+    if (brand) {
+      const brandArray = brand.split(',');
+      query.brand = { $in: brandArray.map(b => new RegExp(`^${b}$`, 'i')) };
+    }
+
+    // Category Filter
+    if (category) {
+      query.category = { $in: category.split(',') };
+    }
+
+    // Price Filter
+    if (maxPrice) {
+      query.offerPrice = { $lte: Number(maxPrice) };
+    }
+
+    // Stock Filter
+    if (inStock === 'true') {
+      query.stock = { $gt: 0 };
+    }
+
+    // Search Filter
+    if (search) {
+      query.name = { $regex: search, $options: 'i' };
+    }
+
+    // Sorting Logic
+    let sortOptions = { createdAt: -1 }; // Default: Newest
+    if (sort === 'price-low-high') sortOptions = { offerPrice: 1 };
+    if (sort === 'price-high-low') sortOptions = { offerPrice: -1 };
+
+    const skip = (page - 1) * limit;
+    const products = await Product.find(query)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(Number(limit));
+
+    const total = await Product.countDocuments(query);
+
+    res.json({
+      success: true,
+      products,
+      pagination: {
+        total,
+        page: Number(page),
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
