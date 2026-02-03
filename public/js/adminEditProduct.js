@@ -218,8 +218,12 @@ document.addEventListener('DOMContentLoaded', () => {
         didOpen: () => Swal.showLoading()
       });
 
+      const token = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
       const res = await fetch(`/api/admin/products/${productId}`, {
         method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
         body: formData
       });
 
@@ -251,8 +255,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (result.isConfirmed) {
       try {
+        const token = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
         const res = await fetch(`/api/admin/products/${productId}`, {
-          method: 'DELETE'
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
         const data = await res.json();
         if (data.success) {

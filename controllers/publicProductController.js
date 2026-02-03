@@ -61,13 +61,21 @@ exports.getPublicProducts = async (req, res) => {
       const brandArray = brand.split(',');
       // Create case-insensitive regex for each brand
       const brandRegexArray = brandArray.map(b => new RegExp(`^${b}$`, 'i'));
+      console.log('Brand Filter:', brand, 'Regex:', brandRegexArray);
       query.brand = { $in: brandRegexArray };
     }
+    console.log('Final Query:', JSON.stringify(query));
 
     // In-stock only filter
-    if (inStock === 'true') {
+    if (inStock === 'true' || inStock === true) {
+      console.log('Applying In-Stock Filter: stock > 0 AND status = active');
       query.stock = { $gt: 0 };
+      query.status = 'active'; // Force active status just in case
+    } else {
+      // Ensure we show outofstock items if filter is OFF (which is default behavior of query init)
+      // query.status is already { $in: ['active', 'outofstock'] }
     }
+    console.log('Query after stock filter:', JSON.stringify(query));
 
     // Price range filter
     if (maxPrice) {

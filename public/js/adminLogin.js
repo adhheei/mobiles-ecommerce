@@ -30,6 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
 
       if (res.ok && data.success) {
+        // Save token for API requests
+        localStorage.setItem('adminToken', data.token);
+
         Swal.fire({
           icon: "success",
           title: "Login Successful",
