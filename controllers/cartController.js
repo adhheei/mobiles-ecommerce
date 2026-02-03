@@ -224,21 +224,35 @@ const formatImageUrl = (filePath) => {
 const placeOrder = async (req, res) => {
     try {
         console.log("👉 Place Order Called");
-        console.log("User:", req.user ? req.user.id : "Unauth");
-        console.log("Body:", JSON.stringify(req.body, null, 2));
 
         const userId = req.user.id;
         const { paymentMethod, useWallet, addressId, buyNowItem, couponCode } = req.body;
 
-        let orderItems = [];
-        let subtotal = 0;
+        const Address = require("../models/Address");
+        const addressDoc = await Address.findById(addressId);
+        if (!addressDoc) {
+            return res.status(400).json({ message: "Invalid Address" });
+        }
 
         // --- 1. IDENTIFY ITEMS (Cart vs BuyNow) ---
-        if (buyNowItem && buyNowItem.productId) {
-            // Buy Now Flow
-            console.log("✅ Processing BuyNow Item:", buyNowItem);
-            const product = await Product.findById(buyNowItem.productId || buyNowItem._id);
+        // Ensure buyNowItem is an object if passed as string
+        if (typeof buyNowItem === 'string') {
+            try {
+                buyNowItem = JSON.parse(buyNowItem);
+            } catch (e) {
+                console.error("Error parsing buyNowItem:", e);
+                buyNowItem = null;
+            }
+        }
 
+        console.log("👉 Buy Now Item Received:", buyNowItem);
+
+        if (buyNowItem && (buyNowItem.productId || buyNowItem._id)) {
+            // Buy Now Flow
+            const pId = buyNowItem.productId || buyNowItem._id;
+            console.log("🔹 Processing Buy Now for Product ID:", pId);
+
+            const product = await Product.findById(pId);
             if (!product) {
                 return res.status(404).json({ message: "Product not found" });
             }
@@ -256,13 +270,15 @@ const placeOrder = async (req, res) => {
                 lineTotal: subtotal
             }];
         } else {
+            console.log("🛒 Processing Cart Checkout");
             // Cart Flow
-            console.log("🛒 Processing Cart Flow");
             const cart = await Cart.findOne({ userId }).populate("items.productId");
-
             if (!cart || cart.items.length === 0) {
                 return res.status(400).json({ message: "Cart is empty" });
             }
+
+            // Filter invalid items
+            cart.items = cart.items.filter(item => item.productId);
 
             cart.items.forEach(item => {
                 const product = item.productId;
@@ -292,20 +308,16 @@ const placeOrder = async (req, res) => {
             const Coupon = require("../models/Coupon");
             const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
 
-            // Validate Coupon (Strict Re-check)
             if (coupon && coupon.isActive) {
                 const now = new Date();
                 const start = new Date(coupon.startDate);
                 const end = new Date(coupon.endDate);
-
-                // Usability Checks
                 const userUsage = (coupon.userUsage && coupon.userUsage.get(userId.toString())) || 0;
                 const isLimitReached = (coupon.perUserLimit !== null && userUsage >= coupon.perUserLimit);
                 const isExpired = now < start || now > end;
                 const isMinPurchase = subtotal >= coupon.minPurchase;
 
                 if (!isLimitReached && !isExpired && isMinPurchase) {
-                    // Valid! Calculate
                     if (coupon.discountType === 'fixed') {
                         couponDiscount = coupon.value;
                     } else if (coupon.discountType === 'percentage') {
@@ -314,18 +326,10 @@ const placeOrder = async (req, res) => {
                             couponDiscount = Math.min(couponDiscount, coupon.maxDiscount);
                         }
                     }
-
-                    // Cap discount at subtotal
                     couponDiscount = Math.min(couponDiscount, subtotal);
-
                     appliedCouponCode = coupon.code;
                     couponIdToUpdate = coupon._id;
-                    console.log(`✅ Coupon ${coupon.code} applied. Discount: ${couponDiscount}`);
-                } else {
-                    console.warn(`⚠️ Coupon ${couponCode} invalid at checkout: Expired/Limit/MinPurchase`);
                 }
-            } else {
-                console.warn(`⚠️ Coupon ${couponCode} not found or inactive`);
             }
         }
 
@@ -336,97 +340,113 @@ const placeOrder = async (req, res) => {
         let walletDeducted = 0;
         const Wallet = require("../models/Wallet");
         const Transaction = require("../models/Transaction");
+        const Order = require("../models/Order"); // Import Order Model
 
         if (useWallet) {
             const wallet = await Wallet.findOne({ userId });
             if (wallet && wallet.balance > 0) {
                 const deduction = Math.min(wallet.balance, totalAmount);
                 wallet.balance -= deduction;
+                walletDeducted = deduction;
+                totalAmount -= deduction;
+
                 wallet.transactions.push({
                     userId,
                     amount: deduction,
                     type: "DEBIT",
                     reason: "ORDER_PAYMENT",
-                    orderId: "PENDING"
                 });
                 await wallet.save();
-                walletDeducted = deduction;
-                totalAmount -= deduction;
             }
         }
 
-        // --- 4. CREATE TRANSACTION ---
+        // Shipping Charges
+        const shipping = totalAmount > 499 ? 0 : 40;
+        totalAmount += shipping;
+
+        // --- 4. CREATE ORDER DOCUMENT (NEW) ---
         const orderId = "ORD-" + Date.now();
         const txnId = "TXN-" + Date.now();
-        const pMethod = walletDeducted > 0 ? (totalAmount === 0 ? "Wallet" : `Wallet + ${paymentMethod}`) : paymentMethod;
 
-        const userName = (req.user.firstName && req.user.lastName)
-            ? `${req.user.firstName} ${req.user.lastName}`
-            : (req.user.name || "User");
+        const newOrder = await Order.create({
+            userId,
+            orderId,
+            items: orderItems.map(i => ({
+                productId: i.productId,
+                name: i.name,
+                image: i.image,
+                price: i.price,
+                quantity: i.quantity,
+                status: 'Processing'
+            })),
+            shippingAddress: {
+                fullName: addressDoc.fullName,
+                phone: addressDoc.phone,
+                street: addressDoc.street,
+                city: addressDoc.city,
+                state: addressDoc.state,
+                pincode: addressDoc.pincode,
+                country: addressDoc.country
+            },
+            paymentMethod: paymentMethod === 'cod' ? 'COD' : paymentMethod,
+            paymentStatus: (paymentMethod === 'cod') ? 'Pending' : 'Paid', // Simplified
+            totals: {
+                subtotal,
+                couponDiscount,
+                walletDeducted,
+                shipping,
+                totalAmount
+            },
+            orderStatus: 'Processing',
+            appliedCoupon: appliedCouponCode
+        });
+
+        // --- 5. CREATE TRANSACTION (Legacy/History) ---
+        const pMethod = walletDeducted > 0 ? (totalAmount === 0 ? "Wallet" : `Wallet + ${paymentMethod}`) : paymentMethod;
 
         await Transaction.create({
             transactionId: txnId,
             orderId: orderId,
-            user: { name: userName, email: req.user.email },
+            user: { name: addressDoc.fullName, email: req.user.email },
             paymentMethod: pMethod,
-            amount: totalAfterCoupon, // Store amount AFTER coupon, before wallet splits
+            amount: totalAmount,
             status: "Success"
         });
 
-        // --- 5. UPDATE COUPON USAGE ---
+        // --- 6. UPDATE COUPON USAGE ---
         if (couponIdToUpdate) {
             const Coupon = require("../models/Coupon");
-            // Map keys must be strings
             const updateKey = `userUsage.${userId}`;
             await Coupon.findByIdAndUpdate(couponIdToUpdate, {
-                $inc: { [updateKey]: 1 } // Increment specific user usage
+                $inc: { [updateKey]: 1 }
             });
         }
 
-        // --- 6. CLEAR CART ---
+        // --- 7. CLEAR CART ---
         if (!buyNowItem) {
             await Cart.findOneAndUpdate({ userId }, { $set: { items: [] } });
         }
 
-        // --- 7. SEND EMAIL ---
+        // --- 8. SEND EMAIL ---
         try {
             const itemsHtml = orderItems.map(item => `
                 <tr>
-                    <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.quantity}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #eee;">Rs. ${item.price}</td>
+                    <td style="padding: 10px;">${item.name}</td>
+                    <td style="padding: 10px;">${item.quantity}</td>
+                    <td style="padding: 10px;">Rs. ${item.price}</td>
                 </tr>
             `).join('');
 
             const emailHtml = `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: #1a1a1a;">Thank you for your order!</h2>
-                    <p>Hi ${userName},</p>
-                    <p>Your order <strong>${orderId}</strong> has been placed successfully.</p>
-                    
-                    <h3 style="border-bottom: 1px solid #ccc; padding-bottom: 10px;">Order Summary</h3>
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="background: #f8f9fa;">
-                                <th style="padding: 10px; text-align: left;">Product</th>
-                                <th style="padding: 10px; text-align: left;">Qty</th>
-                                <th style="padding: 10px; text-align: left;">Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>${itemsHtml}</tbody>
-                    </table>
-
-                    <div style="margin-top: 20px; text-align: right;">
-                        <p>Subtotal: Rs. ${subtotal}</p>
-                        ${couponDiscount > 0 ? `<p style="color: green;">Coupon (${appliedCouponCode}): - Rs. ${couponDiscount}</p>` : ''}
-                        ${walletDeducted > 0 ? `<p style="color: green;">Wallet: - Rs. ${walletDeducted}</p>` : ''}
-                        <h3 style="color: #d32f2f;">Total Paid: Rs. ${totalAmount}</h3>
-                    </div>
-
-                    <p style="margin-top: 30px; font-size: 12px; color: #777;">
-                        Shipping to selected address.<br>Jinsa Mobiles Team
-                    </p>
-                </div>
+                <h2>Order Confirmation: ${orderId}</h2>
+                <p>Hi ${addressDoc.fullName},</p>
+                <p>Your order has been placed successfully.</p>
+                <table border="1" cellpadding="5" cellspacing="0">
+                   <thead><tr><th>Item</th><th>Qty</th><th>Price</th></tr></thead>
+                   <tbody>${itemsHtml}</tbody>
+                </table>
+                <p><strong>Total Paid: Rs. ${totalAmount}</strong></p>
+                <p>Status: <a href="http://localhost:5000/User/userOrderDetails.html?id=${newOrder._id}">View Order</a></p>
             `;
 
             await transporter.sendMail({
@@ -435,10 +455,8 @@ const placeOrder = async (req, res) => {
                 subject: `Order Confirmation - ${orderId}`,
                 html: emailHtml
             });
-            console.log("✅ Email sent to " + req.user.email);
         } catch (emailErr) {
             console.error("⚠️ Email failed:", emailErr);
-            // Don't fail the order just because email failed
         }
 
         res.status(200).json({
@@ -446,13 +464,9 @@ const placeOrder = async (req, res) => {
             message: "Order placed successfully",
             orderId: orderId,
             orderItems: orderItems,
-            totals: {
-                subtotal,
-                couponDiscount,
-                walletDeducted,
-                totalAmount: totalAmount // This is valid payable amount
-            },
-            appliedCoupon: appliedCouponCode
+            totals: newOrder.totals,
+            appliedCoupon: appliedCouponCode,
+            dbOrderId: newOrder._id // Send DB ID for frontend redirection
         });
 
     } catch (error) {

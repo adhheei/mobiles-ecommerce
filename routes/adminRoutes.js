@@ -157,6 +157,12 @@ router.patch('/users/:id/block', isAdmin, toggleBlockUser);
 
 // Admin Wallet Routes
 router.get('/wallet/:userId', isAdmin, adminGetWallet);
-router.post('/wallet/update', isAdmin, adminUpdateWallet);
+// ────────────────
+// ORDER ROUTES (ADMIN)
+// ────────────────
+const { getAdminOrderDetails, updateOrderStatus } = require('../controllers/orderController');
+
+router.get('/orders/:id', isAdmin, getAdminOrderDetails);
+router.put('/orders/:id/status', isAdmin, updateOrderStatus);
 
 module.exports = router;

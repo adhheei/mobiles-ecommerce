@@ -141,15 +141,18 @@ window.verifyOTP = async function () {
     const res = await fetch("/api/auth/verify-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, otp }),
+      body: JSON.stringify({ emailOrPhone: email, otp }),
     });
 
     const result = await res.json();
 
     if (res.ok) {
+      console.log("Signup: Verification Success. Token:", result.token ? "YES" : "NO");
+
       // Save Token Logic (Login immediately on verification)
       localStorage.setItem('user', JSON.stringify(result.user));
       if (result.token) localStorage.setItem('token', result.token);
+      else console.error("Signup: Token missing in response!");
 
       Swal.fire({
         icon: 'success',
@@ -161,6 +164,7 @@ window.verifyOTP = async function () {
         window.location.href = "index.html";
       });
     } else {
+      console.error("Signup: Verification Failed", result);
       Swal.fire('Verification Failed', result.message, 'error');
     }
   } catch (error) {
@@ -176,7 +180,7 @@ window.resendOTP = async function () {
     const res = await fetch("/api/auth/resend-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ emailOrPhone: email }),
     });
 
     if (res.ok) {

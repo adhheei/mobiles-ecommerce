@@ -1,298 +1,312 @@
-// public/js/checkoutSummary.js
+document.addEventListener('DOMContentLoaded', async () => {
+    const summaryContainer = document.querySelector('.order-summary');
+    if (!summaryContainer) return;
 
-// Function to fetch cart and render summary
-// Function to fetch cart and render summary
-async function fetchOrderSummary() {
-  const summaryContainer = document.querySelector('.order-summary');
-  if (!summaryContainer) return;
+    // Show loading state
+    summaryContainer.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-dark" role="status"><span class="visually-hidden">Loading...</span></div></div>';
 
-  // Show Loader
-  summaryContainer.innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Loading Summary...</div>';
+    try {
+        const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+        if (!token) {
+            summaryContainer.innerHTML = '<div class="alert alert-warning">Please login to view order summary</div>';
+            return;
+        }
 
-  try {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+        // --- 1. GATHER DATA ---
+        let items = [];
+        let subtotal = 0;
+        let totalMrp = 0;
+        let discount = 0;
 
-    // --- DETERMINE CHECKOUT FLOW ---
-    // --- DETERMINE CHECKOUT FLOW ---
-    const checkoutType = sessionStorage.getItem("checkoutType");
-    const buyNowData = sessionStorage.getItem("buyNowItem");
+        const checkoutType = sessionStorage.getItem("checkoutType");
 
-    if (checkoutType === "cart") {
-      // --- CART FLOW (Explicit) ---
-      await fetchCartAndRender(token);
-    }
-    else if (checkoutType === "buyNow" && buyNowData) {
-      // --- BUY IT NOW FLOW ---
-      const { productId, qty } = JSON.parse(buyNowData);
+        if (checkoutType === 'buyNow') {
+            const buyNowItemStr = sessionStorage.getItem("buyNowItem");
+            if (buyNowItemStr) {
+                const buyNowItem = JSON.parse(buyNowItemStr);
+                const res = await fetch(`/api/admin/products/${buyNowItem.productId || buyNowItem._id}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    const p = data.product;
+                    const qty = parseInt(buyNowItem.qty) || 1;
+                    const price = p.offerPrice || p.price || 0;
+                    const mrp = p.actualPrice || p.price || 0;
 
-      // Fetch Single Product Details
-      const res = await fetch(`/api/admin/products/${productId}`);
-      const data = await res.json();
+                    items.push({
+                        name: p.name,
+                        image: formatImage(p.mainImage || (p.productImages && p.productImages[0])),
+                        price: price,
+                        mrp: mrp,
+                        qty: qty
+                    });
 
-      if (!data.success || !data.product) throw new Error("Product not found");
+                    subtotal = price * qty;
+                    totalMrp = mrp * qty; // Total MRP
+                    discount = (mrp - price) * qty; // Product level discount
+                }
+            }
+        } else {
+            const res = await fetch('/api/cart', {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const cartData = await res.json();
+                items = (cartData.items || []).map(item => ({
+                    name: item.name,
+                    image: item.image,
+                    price: item.price,
+                    mrp: item.mrp || item.price, // Ensure mrp is passed from cart controller or defaults to price
+                    qty: item.quantity
+                }));
+                subtotal = cartData.subtotal || 0;
+                totalMrp = cartData.totalMrp || subtotal;
+                discount = cartData.discount || (totalMrp - subtotal);
+            }
+        }
 
-      const product = data.product;
-      const price = product.offerPrice || product.price || 0;
-      const total = price * qty;
+        if (items.length === 0) {
+            console.warn("⚠️ Checkout Summary: No items found to display.");
+            console.log("Current Checkout Type:", checkoutType);
+            if (checkoutType === 'buyNow') {
+                console.log("Buy Now Item (Raw):", sessionStorage.getItem("buyNowItem"));
+            }
+            summaryContainer.innerHTML = `
+                <div class="text-center text-muted py-3">
+                    <i class="fa-solid fa-cart-shopping mb-2" style="font-size: 1.5rem;"></i>
+                    <p>No items in summary</p>
+                    <button class="btn btn-sm btn-outline-dark" onclick="window.location.reload()">Refresh</button>
+                </div>`;
+            return;
+        }
 
-      // Mock Cart Structure for Renderer
-      const mockCart = {
-        items: [{
-          productId: product._id, // Keep consistent
-          name: product.name,
-          price: price,
-          quantity: qty,
-          image: product.mainImage,
-          stock: product.stock
-        }],
-        subtotal: total,
-        totalMrp: (product.actualPrice || price) * qty,
-        totalAmount: total
-      };
+        // --- 2. COUPON & TOTAL CALC ---
+        const appliedCoupon = sessionStorage.getItem("appliedCoupon");
+        let couponDiscount = 0;
 
-      // Render
-      renderOrderSummary(mockCart);
-    }
-    else {
-      // --- FALLBACK TO CART FLOW ---
-      await fetchCartAndRender(token);
-    }
+        if (appliedCoupon) {
+            // Re-validate coupon to get exact discount amount if needed, 
+            // OR store the discount amount in session.
+            // For now, let's try to Apply it again to get the fresh numbers
+            try {
+                const cRes = await fetch('/api/user/coupons/apply', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ couponCode: appliedCoupon, cartTotal: subtotal })
+                });
+                const cData = await cRes.json();
+                if (cData.success) {
+                    couponDiscount = cData.discountAmount;
+                } else {
+                    // Coupon became invalid? Remove it.
+                    sessionStorage.removeItem("appliedCoupon");
+                }
+            } catch (e) {
+                console.error("Coupon re-check failed", e);
+            }
+        }
 
-  } catch (error) {
-    console.error("Summary error:", error);
-    summaryContainer.innerHTML = '<div class="alert alert-danger">Failed to load order summary.</div>';
-  }
-}
+        const deliveryCharge = (subtotal - couponDiscount) > 499 ? 0 : 40;
+        const finalAmount = subtotal - couponDiscount + deliveryCharge;
 
-// Helper to fetch cart
-async function fetchCartAndRender(token) {
-  const res = await fetch('/api/cart', {
-    headers: { "Authorization": "Bearer " + token }
-  });
+        // --- 3. RENDER UI ---
 
-  if (!res.ok) throw new Error("Failed to fetch cart");
-  const data = await res.json();
-  renderOrderSummary(data);
-}
-
-
-
-function formatMoney(amount) {
-  return "Rs. " + Number(amount).toLocaleString("en-IN") + ".00";
-}
-
-function renderOrderSummary(cartData) {
-  const summaryContainer = document.querySelector('.order-summary');
-  if (!summaryContainer) return;
-
-  if (!cartData || !cartData.items || cartData.items.length === 0) {
-    summaryContainer.innerHTML = '<div class="alert alert-warning">Your cart is empty. <a href="/index.html">Shop Now</a></div>';
-    return;
-  }
-
-  // Calculations
-  const subtotal = cartData.subtotal || 0;
-  const totalMrp = cartData.totalMrp || subtotal;
-  const discount = totalMrp - subtotal;
-  const finalTotal = cartData.totalAmount || subtotal;
-
-  // 1. Render Items List
-  let itemsHtml = '<div class="checkout-items mb-3" style="max-height: 300px; overflow-y: auto;">';
-  cartData.items.forEach(item => {
-    // Image Handling
-    let imgSrc = "https://placehold.co/100x120/f0f0f0/333?text=No+Image";
-    if (item.image) {
-      if (item.image.startsWith("http")) {
-        imgSrc = item.image;
-      } else {
-        imgSrc = item.image.startsWith("/") ? item.image : "/" + item.image;
-        imgSrc = imgSrc.replace(/\\/g, "/");
-        if (!imgSrc.includes("/")) imgSrc = "/uploads/products/" + imgSrc;
-      }
-    }
-
-    itemsHtml += `
-          <div class="summary-item d-flex gap-3 mb-3 pb-3 border-bottom">
-            <img src="${imgSrc}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; background: #f1f1f1;" alt="${item.name}" onerror="this.src='https://placehold.co/100x100/f0f0f0/333?text=No+Image'"/>
-            <div class="summary-details flex-grow-1">
-              <h6 class="mb-1 text-truncate" style="max-width: 150px; font-size: 0.9rem; font-weight: 600;" title="${item.name}">${item.name}</h6>
-              <div class="d-flex justify-content-between align-items-center">
-                  <small class="text-muted">Qty: ${item.quantity}</small>
-                  <span class="fw-bold" style="font-size: 0.9rem;">${formatMoney(item.price * item.quantity)}</span>
-              </div>
+        // Items HTML
+        const itemsHtml = items.map(item => `
+            <div class="d-flex gap-3 mb-3 border-bottom pb-3">
+                <div style="width: 60px; height: 60px; flex-shrink: 0; background: #f9f9f9; border-radius: 8px; overflow: hidden;">
+                    <img src="${item.image}" alt="${item.name}" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="mb-1" style="font-size: 0.9rem; font-weight: 600;">${item.name}</h6>
+                    <div class="small text-muted">Qty: ${item.qty}</div>
+                    <div class="d-flex align-items-center gap-2 mt-1">
+                        <span class="fw-bold">₹${(item.price * item.qty).toLocaleString()}</span>
+                        ${item.mrp > item.price ? `<span class="text-decoration-line-through text-muted small">₹${(item.mrp * item.qty).toLocaleString()}</span>` : ''}
+                        ${item.mrp > item.price ? `<span class="text-success small fw-bold">${Math.round(((item.mrp - item.price) / item.mrp) * 100)}% Off</span>` : ''}
+                    </div>
+                </div>
             </div>
-          </div>
+        `).join('');
+
+        // Coupon HTML (The Card Design)
+        const couponHtml = appliedCoupon ? `
+            <div class="d-flex justify-content-between align-items-center p-3 mb-3 bg-light border border-success rounded">
+                <div class="text-success">
+                    <i class="fa-solid fa-tag me-2"></i>
+                    <span class="fw-bold">Code: ${appliedCoupon}</span>
+                </div>
+                <button class="btn btn-sm btn-outline-danger border-0" onclick="removeCoupon()">Remove</button>
+            </div>
+        ` : `
+            <div class="coupon-card mb-3 p-3 bg-white border rounded d-flex justify-content-between align-items-center" 
+                 style="cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.02);" 
+                 onclick="openCouponModal(${subtotal})">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-tag text-dark"></i>
+                    <span class="fw-bold" style="font-size: 0.95rem;">Apply Coupon</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-muted"></i>
+            </div>
         `;
-  });
-  itemsHtml += '</div>';
 
-  // 2. Render Totals (Cart Bill Style)
-  const summaryHtml = `
-          <h5 class="mb-3">Order Summary</h5>
-          
-          ${itemsHtml}
-          
-          <a href="./couponPage.html" class="promo-row text-decoration-none text-dark d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
-            <span><i class="fa-solid fa-tag me-2"></i> Apply Voucher</span>
-            <i class="fa-solid fa-chevron-right small"></i>
-          </a>
+        // Render Full Container
+        summaryContainer.innerHTML = `
+            <h5 class="mb-4 fw-bold">Order Details</h5>
+            
+            <div class="summary-items mb-4" style="max-height: 300px; overflow-y: auto;">
+                ${itemsHtml}
+            </div>
 
-          <div class="summary-row d-flex justify-content-between mb-2">
-            <span>Total MRP</span>
-            <span class="text-muted text-decoration-line-through">${formatMoney(totalMrp)}</span>
-          </div>
+            ${couponHtml}
 
-          <div class="summary-row d-flex justify-content-between mb-2 text-success">
-            <span>Discount on MRP</span>
-            <span>-${formatMoney(discount)}</span>
-          </div>
+            <div class="summary-calc pt-3 border-top">
+                 <div class="d-flex justify-content-between mb-2 small text-muted">
+                    <span>Price (${items.length} items)</span>
+                    <span>₹${totalMrp.toLocaleString()}</span>
+                </div>
+                
+                ${discount > 0 ? `
+                <div class="d-flex justify-content-between mb-2 small text-success">
+                    <span>Discount</span>
+                    <span>- ₹${discount.toLocaleString()}</span>
+                </div>` : ''}
 
-          <div class="summary-row d-flex justify-content-between mb-2">
-            <span>Subtotal</span>
-            <span>${formatMoney(subtotal)}</span>
-          </div>
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span>Subtotal</span>
+                    <span>₹${subtotal.toLocaleString()}</span>
+                </div>
 
-          <div class="summary-row d-flex justify-content-between mb-2">
-            <span>Shipping</span>
-            <span class="text-success fw-bold">Free</span>
-          </div>
+                ${couponDiscount > 0 ? `
+                <div class="d-flex justify-content-between mb-2 small text-success fw-bold">
+                    <span>Coupon Discount</span>
+                    <span>- ₹${couponDiscount.toLocaleString()}</span>
+                </div>` : ''}
 
+                <div class="d-flex justify-content-between mb-3 small">
+                    <span>Delivery Charges</span>
+                    <span class="${deliveryCharge === 0 ? 'text-success fw-bold' : ''}">
+                        ${deliveryCharge === 0 ? 'Free Shipping' : '₹' + deliveryCharge}
+                    </span>
+                </div>
 
-          <hr>
+                <div class="d-flex justify-content-between py-3 border-top border-bottom mb-3">
+                    <span class="fw-bold" style="font-size: 1.1rem;">Total Amount</span>
+                    <span class="fw-bold" style="font-size: 1.1rem;">₹${finalAmount.toLocaleString()}</span>
+                </div>
+                
+                <p class="text-success small mb-0"><i class="fa-solid fa-check-circle me-1"></i> You will save ₹${(discount + couponDiscount).toLocaleString()} on this order</p>
+            </div>
+        `;
 
-          <!-- Wallet Section -->
-          <div class="wallet-section mb-3 p-2 border rounded bg-light" id="wallet-section" style="display:none;">
-             <div class="form-check d-flex justify-content-between align-items-center mb-0">
-               <div>
-                 <input class="form-check-input" type="checkbox" id="useWalletCheckbox">
-                 <label class="form-check-label small fw-bold" for="useWalletCheckbox">
-                   Use Wallet Balance
-                 </label>
-                 <div class="text-muted small" style="font-size: 0.75rem;">
-                   Available: <span id="wallet-balance-display">Rs. 0.00</span>
-                 </div>
-               </div>
-               <span class="text-success small fw-bold" id="wallet-applied-text" style="display:none;">-Rs. 0.00</span>
-             </div>
-          </div>
-
-          <div class="summary-total d-flex justify-content-between fw-bold fs-5 mt-2">
-            <span>Total Amount</span>
-            <span id="final-total-display">${formatMoney(finalTotal)}</span>
-          </div>
-    `;
-
-  summaryContainer.innerHTML = summaryHtml;
-
-  // Initialize Wallet Logic
-  initWallet(finalTotal);
-}
-
-// Global variable to store wallet state
-window.walletState = {
-  balance: 0,
-  isApplied: false,
-  appliedAmount: 0,
-  originalTotal: 0
-};
-
-async function initWallet(totalAmount) {
-  window.walletState.originalTotal = totalAmount;
-  const walletSection = document.getElementById('wallet-section');
-  const balanceDisplay = document.getElementById('wallet-balance-display');
-  const checkbox = document.getElementById('useWalletCheckbox');
-
-  // Fetch Wallet Balance
-  try {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-    const res = await fetch('/api/user/wallet', {
-      headers: { "Authorization": "Bearer " + token }
-    });
-    const data = await res.json();
-
-    if (data.success && data.balance > 0) {
-      window.walletState.balance = data.balance;
-      balanceDisplay.innerText = formatMoney(data.balance);
-      walletSection.style.display = 'block';
-
-      // Add Event Listener
-      checkbox.addEventListener('change', function () {
-        toggleWalletUsage(this.checked);
-      });
+    } catch (error) {
+        console.error("Summary Render Error:", error);
+        summaryContainer.innerHTML = '<div class="alert alert-danger">Error loading summary</div>';
     }
-  } catch (err) {
-    console.error("Wallet fetch error", err);
-  }
+});
+
+// --- HELPER FUNCTIONS ---
+
+function formatImage(path) {
+    if (!path) return 'https://placehold.co/60x60?text=No+Img';
+    if (path.startsWith('http')) return path;
+    return '/' + path.replace(/^public/, '').replace(/\\/g, '/').replace(/^\//, '');
 }
 
-async function toggleWalletUsage(isChecked) {
-  const appliedText = document.getElementById('wallet-applied-text');
-  const finalTotalDisplay = document.getElementById('final-total-display');
-  const checkbox = document.getElementById('useWalletCheckbox');
-
-  if (!isChecked) {
-    // Reset
-    window.walletState.isApplied = false;
-    window.walletState.appliedAmount = 0;
-    appliedText.style.display = 'none';
-    finalTotalDisplay.innerText = formatMoney(window.walletState.originalTotal);
-    // Important: Update payment method selection logic if needed (e.g. re-enable other methods if disabled)
-    return;
-  }
-
-  // Apply Wallet
-  try {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-    const res = await fetch('/api/user/wallet/apply', {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
-      },
-      body: JSON.stringify({ totalAmount: window.walletState.originalTotal })
-    });
-    const data = await res.json();
-
-    if (data.success) {
-      window.walletState.isApplied = true;
-      window.walletState.appliedAmount = data.walletUsable;
-
-      // UI Updates
-      appliedText.innerText = `-${formatMoney(data.walletUsable)}`;
-      appliedText.style.display = 'block';
-      finalTotalDisplay.innerText = formatMoney(data.payableAmount);
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Wallet Applied',
-        text: `${formatMoney(data.walletUsable)} deducted from your wallet balance.`,
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000
-      });
-
-      // If full amount covered
-      if (data.payableAmount === 0) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Full Payment via Wallet',
-          text: 'Your entire order amount is covered by your wallet balance.',
-          confirmButtonText: 'Great!'
+async function openCouponModal(cartTotal) {
+    // 1. Fetch available coupons first
+    let coupons = [];
+    try {
+        const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+        const res = await fetch('/api/user/coupons', {
+            headers: { "Authorization": `Bearer ${token}` }
         });
-        // Logic to auto-select Wallet payment method can be added here if access to paymentPage DOM exists
-        // For now, simpler to leave it to the user or handle at checkout submission
-      }
+        if (res.ok) {
+            const data = await res.json();
+            coupons = data.data || [];
+        }
+    } catch (e) { console.error(e); }
 
-    } else {
-      checkbox.checked = false;
-      Swal.fire("Error", "Could not apply wallet", "error");
-    }
-  } catch (err) {
-    console.error("Wallet apply error", err);
-    checkbox.checked = false;
-  }
+    // 2. Build HTML for sweetalert
+    // Show available coupons as clickable info cards
+    const couponsHtml = coupons.length > 0 ? coupons.map(c => `
+        <div class="text-start border rounded p-2 mb-2 ${c.isExpired || c.isUsed ? 'bg-light text-muted' : 'border-success'}" 
+             style="cursor: ${c.isExpired || c.isUsed ? 'not-allowed' : 'pointer'}"
+             onclick="${!c.isExpired && !c.isUsed ? `selectCoupon('${c.code}')` : ''}">
+            <div class="d-flex justify-content-between">
+                <strong>${c.code}</strong>
+                <small>${c.discountType === 'percentage' ? c.value + '% OFF' : '₹' + c.value + ' OFF'}</small>
+            </div>
+            <div style="font-size: 0.75rem;">Min Order: ₹${c.minPurchase}</div>
+            ${c.isExpired ? '<div class="text-danger small">Expired</div>' : ''}
+        </div>
+    `).join('') : '<div class="text-muted small">No coupons available</div>';
+
+    Swal.fire({
+        title: 'Apply Coupon',
+        html: `
+            <input type="text" id="swal-coupon-code" class="form-control mb-3" placeholder="Enter Coupon Code">
+            <div class="text-start mb-2 fw-bold small">Available Coupons:</div>
+            <div style="max-height: 150px; overflow-y: auto;">
+                ${couponsHtml}
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Apply',
+        confirmButtonColor: '#1a1a1a',
+        preConfirm: () => {
+            const code = document.getElementById('swal-coupon-code').value;
+            if (!code) Swal.showValidationMessage('Please enter a code');
+            return code;
+        }
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            applyCoupon(result.value, cartTotal);
+        }
+    });
 }
 
-// Auto init
-document.addEventListener("DOMContentLoaded", fetchOrderSummary);
+function selectCoupon(code) {
+    document.getElementById('swal-coupon-code').value = code;
+}
+
+async function applyCoupon(code, cartTotal) {
+    try {
+        const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+        const res = await fetch('/api/user/coupons/apply', {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ couponCode: code, cartTotal: cartTotal })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+            sessionStorage.setItem("appliedCoupon", data.code);
+            Swal.fire({
+                icon: 'success',
+                title: 'Coupon Applied!',
+                text: `You saved ₹${data.discountAmount}`,
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                location.reload(); // Reload to update summary
+            });
+        } else {
+            Swal.fire("Invalid Coupon", data.message, "error");
+        }
+    } catch (e) {
+        console.error(e);
+        Swal.fire("Error", "Failed to apply coupon", "error");
+    }
+}
+
+function removeCoupon() {
+    sessionStorage.removeItem("appliedCoupon");
+    location.reload();
+}

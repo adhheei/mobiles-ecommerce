@@ -632,6 +632,20 @@
             console.error("❌ Error parsing buyNowItem:", e);
           }
         }
+
+        // --- VALIDATION: Prevent Fallback to Cart ---
+        if (!buyNowItem || !buyNowItem.productId) {
+          Swal.fire({
+            title: 'Session Error',
+            text: 'Buy Now item not found. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'Go to Products'
+          }).then(() => {
+            window.location.href = '/User/index.html';
+          });
+          return; // STOP execution
+        }
+
       } else {
         console.log("ℹ️ Standard Cart Checkout Mode");
       }
@@ -751,7 +765,7 @@
   </script>
 
   <script src="/js/navbar.js"></script>
-  <script src="/js/checkoutSummary.js"></script>
+  <script src="/js/checkoutSummary.js?v=2"></script>
 </body>
 
 </html>

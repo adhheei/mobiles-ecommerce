@@ -635,34 +635,29 @@
     });
 
     async function fetchOrders(search = "") {
+      const tableBody = document.getElementById("ordersTableBody");
       try {
-        const tableBody = document.getElementById("ordersTableBody");
         tableBody.innerHTML = '<tr><td colspan="7" class="text-center">Loading...</td></tr>';
 
-        const token = localStorage.getItem('token') || sessionStorage.getItem('token'); // Admin might use different token storage
-
-        // Assuming admin token is generic for now or handled via cookie
-        // If strictly needed, add Authorization header. 
-        // In typical admin panels here, probably cookie or localStorage 'adminToken'
-
+        // Use the transactions endpoint as the source of truth for orders
         let url = `/api/admin/transactions?limit=20`;
         if (search) url += `&search=${encodeURIComponent(search)}`;
 
-        const res = await fetch(url, {
-          // headers: { "Authorization": "Bearer " + token } // Uncomment if using bearer
-        });
+        const res = await fetch(url);
+
+        if (!res.ok) throw new Error("Failed to fetch data");
 
         const data = await res.json();
 
-        if (data.transactions) {
+        if (data.transactions && data.transactions.length > 0) {
           renderTable(data.transactions, search);
         } else {
-          tableBody.innerHTML = '<tr><td colspan="7" class="text-center">No orders found</td></tr>';
+          tableBody.innerHTML = '<tr><td colspan="7" class="text-center p-4 text-muted">No orders found</td></tr>';
         }
 
       } catch (error) {
         console.error("Error loading orders:", error);
-        document.getElementById("ordersTableBody").innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error loading data</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger p-4">Error loading data. Please try again.</td></tr>';
       }
     }
 
@@ -670,8 +665,8 @@
       const tableBody = document.getElementById("ordersTableBody");
       tableBody.innerHTML = "";
 
-      if (orders.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="7" class="text-center">No orders found</td></tr>';
+      if (!orders || orders.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="7" class="text-center p-4 text-muted">No orders found</td></tr>';
         return;
       }
 
@@ -680,8 +675,8 @@
 
         // Highlight logic
         const isMatch = highlightTerm && (
-          order.orderId.toLowerCase() === highlightTerm.toLowerCase() ||
-          order.transactionId.toLowerCase() === highlightTerm.toLowerCase()
+          (order.orderId && order.orderId.toLowerCase() === highlightTerm.toLowerCase()) ||
+          (order.transactionId && order.transactionId.toLowerCase() === highlightTerm.toLowerCase())
         );
 
         if (isMatch) {
@@ -690,24 +685,26 @@
 
         // Status Badge Logic
         let statusClass = "status-pending";
-        const status = order.status.toLowerCase();
+        const status = (order.status || 'Pending').toLowerCase();
         if (status === 'success' || status === 'delivered') statusClass = "status-delivered";
         else if (status === 'shipped') statusClass = "status-shipped";
         else if (status === 'cancelled' || status === 'failed') statusClass = "status-cancelled";
         else if (status === 'processing') statusClass = "status-processing";
 
         // Date Formatting
-        const dateStr = new Date(order.date).toLocaleDateString();
+        const dateStr = order.date ? new Date(order.date).toLocaleDateString() : 'N/A';
+        const userName = order.user && order.user.name ? order.user.name : 'Unknown';
+        const userEmail = order.user && order.user.email ? order.user.email : '';
 
         row.innerHTML = `
-              <td><span class="order-id">${order.orderId}</span></td>
+              <td><span class="order-id">${order.orderId || order.transactionId}</span></td>
               <td>${dateStr}</td>
-              <td>${order.user.name}<br><small class="text-muted">${order.user.email}</small></td>
-              <td><span class="text-muted small fw-bold">${order.paymentMethod}</span></td>
-              <td><span class="badge-custom ${statusClass}">${order.status}</span></td>
-              <td class="price">Rs. ${order.amount.toLocaleString()}</td>
+              <td>${userName}<br><small class="text-muted">${userEmail}</small></td>
+              <td><span class="text-muted small fw-bold">${order.paymentMethod || 'N/A'}</span></td>
+              <td><span class="badge-custom ${statusClass}">${order.status || 'Pending'}</span></td>
+              <td class="price">Rs. ${(order.amount || 0).toLocaleString()}</td>
               <td class="text-end">
-                <a href="./adminOrderDetails.html?id=${order.orderId}" class="btn-view-details">View Details</a>
+                <a href="./adminOrderDetails.html?id=${order.orderId || order.transactionId}" class="btn-view-details">View Details</a>
               </td>
             `;
         tableBody.appendChild(row);
