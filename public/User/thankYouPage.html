@@ -144,7 +144,7 @@
 
 <body>
 
-  <div class="thank-you-container">
+  <div class="thank-you-container reveal-up">
     <div class="success-icon">
       <i class="fa-solid fa-check"></i>
     </div>
@@ -197,8 +197,16 @@
       }
 
       const order = JSON.parse(summaryJSON);
+
+      // Fix: Add ID to View Order button
+      const detailsBtn = document.querySelector(".action-buttons .btn-black");
+      if (detailsBtn && order.dbOrderId) {
+        detailsBtn.href = `./userOrderDetails.html?id=${order.dbOrderId}`;
+        detailsBtn.innerText = "View Order Details";
+      }
+
       const container = document.querySelector(".thank-you-container");
-      container.classList.add("reveal-up"); // Trigger animation
+      // container.classList.add("reveal-up"); // Class already in HTML for smooth start
 
       /* Order ID */
       document.querySelector(".order-number-text").innerText =
