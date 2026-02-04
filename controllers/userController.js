@@ -256,43 +256,42 @@ const removeFromWishlist = async (req, res) => {
 
 const changePassword = async (req, res) => {
     try {
-        console.log("Change Password Request Body:", req.body); // Log for debugging
         const { oldPassword, newPassword, confirmPassword } = req.body;
-        const userId = req.user.id; // from JWT middleware
+        const userId = req.user._id; // Provided by protect middleware
 
+        // 1. Validation
         if (!oldPassword || !newPassword || !confirmPassword) {
             return res.status(400).json({ message: "All fields are required" });
         }
 
         if (newPassword !== confirmPassword) {
-            return res.status(400).json({ message: "New password and confirm password do not match" });
+            return res.status(400).json({ message: "New passwords do not match" });
         }
 
+        // 2. Find User
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Check current password
-        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        // 3. Verify Old Password
+        // We use the matchPassword method defined in your User model
+        const isMatch = await user.matchPassword(oldPassword);
         if (!isMatch) {
             return res.status(400).json({ message: "Incorrect old password" });
         }
 
-        // Hash new password
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(newPassword, salt);
+        // 4. Update Password
+        // Your User model has a pre('save') hook that will automatically 
+        // hash this new password before saving it to MongoDB.
+        user.password = newPassword;
         await user.save();
 
-        // Logout user after password change
-        res.clearCookie("token");
+        res.status(200).json({ message: "Password updated successfully. Please login again." });
 
-        res.status(200).json({
-            message: "Password changed successfully. Please login again.",
-        });
     } catch (error) {
-        console.error("Change password error:", error);
-        res.status(500).json({ message: "Server error" });
+        console.error("Change Password Error:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
 };
 
