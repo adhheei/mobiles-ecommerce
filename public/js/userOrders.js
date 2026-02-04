@@ -2,17 +2,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const ordersContainer = document.getElementById("orders-container");
     const token = localStorage.getItem("token");
 
-    if (!token) {
-        window.location.href = "userLogin.html";
-        return;
-    }
+    // Cookie fallback
+    // if (!token) { window.location.href = "userLogin.html"; return; }
 
     try {
-        const res = await fetch("/api/orders", {
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
+        const headers = {};
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const res = await fetch("/api/orders", { headers });
 
         const data = await res.json();
 
@@ -33,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const date = new Date(order.date).toLocaleDateString("en-US", {
                     year: 'numeric', month: 'short', day: 'numeric'
                 });
-                
+
                 // Status Badge Color
                 let badgeClass = "bg-secondary";
                 if (order.status === 'Delivered') badgeClass = "bg-success";

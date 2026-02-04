@@ -29,6 +29,20 @@
       padding: 0 15px;
     }
 
+    /* Added Animation */
+    .reveal-up {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: revealUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    @keyframes revealUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .success-icon {
       width: 80px;
       height: 80px;
@@ -86,6 +100,11 @@
       font-size: 1.1rem;
       font-weight: 700;
       border-top: 1px solid #eee;
+    }
+
+    .size-lg {
+      font-size: 1.2rem;
+      font-weight: 800;
     }
 
     .shipping-info-row {
@@ -157,7 +176,7 @@
 
     <div class="action-buttons">
       <a href="./userOrderDetails.html" class="btn-black">View Order History</a>
-      <a href="./index.html" class="btn-outline">Continue Shopping</a>
+      <a href="/User/index.html" class="btn-outline">Continue Shopping</a>
     </div>
   </div>
 
@@ -168,15 +187,18 @@
   <script>
     document.addEventListener("DOMContentLoaded", () => {
 
-      const summaryJSON = sessionStorage.getItem("checkoutSummary");
+      const summaryJSON = sessionStorage.getItem("lastOrderData");
 
       if (!summaryJSON) {
-        alert("No order found");
-        window.location.href = "/index.html";
+        // Fallback for demo or refreshing without order
+        // alert("No order found"); 
+        // window.location.href = "/User/index.html"; 
         return;
       }
 
       const order = JSON.parse(summaryJSON);
+      const container = document.querySelector(".thank-you-container");
+      container.classList.add("reveal-up"); // Trigger animation
 
       /* Order ID */
       document.querySelector(".order-number-text").innerText =
@@ -186,20 +208,36 @@
       const card = document.querySelector(".order-card");
       const header = document.querySelector(".order-card-header");
 
+      // Clear existing items if any (sanity check)
+      document.querySelectorAll(".order-item-row").forEach(e => e.remove());
+
       order.items.forEach(item => {
         const row = document.createElement("div");
         row.className = "order-item-row";
 
+        // Handle price display
+        let priceHtml = "";
+        const mrp = item.mrp || item.price; // Fallback to price if MRP missing
+        const price = item.price;
+
+        if (mrp > price) {
+          priceHtml = `
+                <del class="text-muted small me-2">Rs. ${mrp}</del>
+                <span class="text-success fw-bold">Rs. ${price}</span>
+             `;
+        } else {
+          priceHtml = `<span class="fw-bold">Rs. ${price}</span>`;
+        }
+
         row.innerHTML = `
           <img src="${item.image}" class="item-thumb"
                onerror="this.src='https://placehold.co/100x100?text=No+Image'">
-          <div>
-            <strong>${item.name}</strong><br>
-            Qty: ${item.quantity}<br>
-            <del class="text-muted">Rs. ${item.mrp}</del>
-            <span class="text-success ms-2">Rs. ${item.price}</span>
+          <div style="flex-grow: 1;">
+            <div class="fw-bold mb-1">${item.name}</div>
+            <div class="text-muted small">Qty: ${item.quantity}</div>
+            <div class="mt-1">${priceHtml}</div>
           </div>
-          <div class="item-total">Rs. ${item.price * item.quantity}</div>
+          <div class="item-total fw-bold">Rs. ${item.price * item.quantity}</div>
         `;
 
         header.after(row);
@@ -207,51 +245,79 @@
 
       /* Totals */
       const shippingRow = document.querySelector(".shipping-info-row");
+      // Remove existing totals to prevent duplicates if any
+      document.querySelectorAll(".order-totals-row").forEach(e => e.remove());
 
-      const addTotal = (label, value, green = false, bold = false) => {
+      const addTotal = (label, value, colorClass = "", bold = false) => {
         const row = document.createElement("div");
         row.className = `order-totals-row ${bold ? "final" : ""}`;
         row.innerHTML = `
-          <span>${label}</span>
-          <span class="${green ? "text-success" : ""}">
+          <span class="${bold ? "" : "text-muted"}">${label}</span>
+          <span class="${colorClass} ${bold ? "fw-bold" : ""}">
             ${typeof value === "number" ? `Rs. ${value}` : value}
           </span>`;
-        card.insertBefore(row, shippingRow);
+        card.insertBefore(row, shippingRow); // Insert *before* shipping info
       };
 
-      addTotal("Total MRP", order.pricing.mrpTotal);
-      addTotal("Product Discount", `- Rs. ${order.pricing.discount}`, true);
-
-      if (order.pricing.couponDiscount > 0) {
-        addTotal("Coupon Discount", `- Rs. ${order.pricing.couponDiscount}`, true);
+      // 1. Total MRP
+      if (order.totals.totalMrp && order.totals.totalMrp > order.totals.subtotal) {
+        addTotal("Total MRP", order.totals.totalMrp);
       }
 
-      addTotal("Shipping", "FREE", true);
-      addTotal("Total Payable", order.pricing.finalAmount, false, true);
+      // 2. Product Discount
+      if (order.totals.productDiscount && order.totals.productDiscount > 0) {
+        addTotal("Product Discount", `- Rs. ${order.totals.productDiscount}`, "text-success");
+      }
 
-      /* Delivery Date (6–7 days) */
+      // 3. Subtotal (Deal Price)
+      // addTotal("Subtotal", order.totals.subtotal); // Optional, maybe redundant if breakdown is clear
+
+      // 4. Coupon Discount
+      if (order.totals.couponDiscount && order.totals.couponDiscount > 0) {
+        addTotal("Coupon Discount", `- Rs. ${order.totals.couponDiscount}`, "text-success");
+      }
+
+      // 5. Wallet
+      if (order.totals.walletDeducted && order.totals.walletDeducted > 0) {
+        addTotal("Wallet Paid", `- Rs. ${order.totals.walletDeducted}`, "text-success");
+      }
+
+      // 6. Shipping
+      const shippingCost = order.totals.shipping === 0 ? "FREE" : order.totals.shipping;
+      const shippingColor = order.totals.shipping === 0 ? "text-success fw-bold" : "";
+      addTotal("Shipping", shippingCost, shippingColor);
+
+      // 7. Total Payable
+      addTotal("Total Payable", order.totals.totalAmount, "size-lg", true);
+
+
+      /* Date Calculation */
       const start = new Date();
       start.setDate(start.getDate() + 6);
       const end = new Date();
       end.setDate(end.getDate() + 7);
 
       const format = d =>
-        d.toLocaleDateString("en-IN", { day: "numeric", month: "long" });
+        d.toLocaleDateString("en-IN", { weekday: 'short', day: "numeric", month: "short" });
 
       document.querySelector(".shipping-info-row .info-column:last-child p")
-        .innerText = `${format(start)} – ${format(end)}`;
+        .innerHTML = `<span class="fw-bold text-success">${format(start)} – ${format(end)}</span>`;
 
       /* Address */
       const a = order.address;
-      document.querySelector(".shipping-info-row .info-column p").innerHTML = `
-        <strong>${a.fullName}</strong><br>
-        ${a.street}<br>
-        ${a.city}, ${a.state} - ${a.pincode}<br>
-        Phone: ${a.phone}
-      `;
+      if (a) {
+        document.querySelector(".shipping-info-row .info-column p").innerHTML = `
+            <div class="fw-bold text-dark">${a.fullName}</div>
+            <div class="text-muted small">
+                ${a.street}<br>
+                ${a.city}, ${a.state} - ${a.pincode}<br>
+                Phone: ${a.phone}
+            </div>
+        `;
+      }
 
       // Optional cleanup
-      sessionStorage.removeItem("checkoutSummary");
+      sessionStorage.removeItem("lastOrderData");
     });
   </script>
 

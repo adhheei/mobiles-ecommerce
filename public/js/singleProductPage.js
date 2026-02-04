@@ -5,7 +5,8 @@ let currentProduct = null;
 // Get product ID from URL
 function getProductId() {
   const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get('id');
+  const id = urlParams.get('id');
+  return id;
 }
 
 // Fetch product details from backend
@@ -642,7 +643,7 @@ document.addEventListener('DOMContentLoaded', (() => {
           cancelButtonText: 'Cancel'
         }).then((result) => {
           if (result.isConfirmed) {
-            window.location.href = '/User/userLogin.html?redirect=' + encodeURIComponent(window.location.pathname);
+            window.location.href = '/User/userLogin.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
           }
         });
         return;

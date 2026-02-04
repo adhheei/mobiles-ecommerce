@@ -7,10 +7,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-        if (!token) {
-            summaryContainer.innerHTML = '<div class="alert alert-warning">Please login to view order summary</div>';
-            return;
-        }
+        const headers = { "Content-Type": "application/json" };
+        if (token) headers["Authorization"] = `Bearer ${token}`;
 
         // --- 1. GATHER DATA ---
         let items = [];

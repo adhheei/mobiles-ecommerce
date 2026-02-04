@@ -241,6 +241,14 @@
                 const data = await res.json();
 
                 if (data.success) {
+                    // Save Token & User to LocalStorage
+                    if (data.token) {
+                        localStorage.setItem('token', data.token);
+                    }
+                    if (data.user) {
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                    }
+
                     Swal.fire({
                         icon: 'success',
                         title: 'Login Successful',
@@ -289,6 +297,10 @@
                 const data = await res.json();
 
                 if (data.success) {
+                    // Save Token & User (Google)
+                    if (data.token) localStorage.setItem('token', data.token);
+                    if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+
                     Swal.fire({
                         icon: 'success',
                         title: 'Login Successful',

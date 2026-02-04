@@ -237,7 +237,7 @@ exports.sendOtp = async (req, res) => {
 
     // Update User
     user.otp = hashedOtp;
-    user.otpExpires = Date.now() + 5 * 60 * 1000; // 5 mins
+    user.otpExpires = Date.now() + 15 * 60 * 1000; // 15 mins
     user.otpAttempts = 0;
     await user.save();
 
@@ -281,6 +281,7 @@ exports.verifyOtp = async (req, res) => {
     });
 
     if (!user) {
+      console.log("VerifyOtp: User not found for", target);
       return res.status(400).json({ message: "User not found" });
     }
 
@@ -291,6 +292,7 @@ exports.verifyOtp = async (req, res) => {
 
     // Check Expiry
     if (!user.otpExpires || user.otpExpires < Date.now()) {
+      console.log("VerifyOtp: OTP Expired", user.otpExpires);
       return res.status(400).json({ message: "OTP has expired" });
     }
 
@@ -298,6 +300,7 @@ exports.verifyOtp = async (req, res) => {
     const isMatch = await bcrypt.compare(String(otp), user.otp);
 
     if (!isMatch) {
+      console.log("VerifyOtp: OTP Mismatch", otp);
       user.otpAttempts += 1;
       if (user.otpAttempts >= 5) {
         user.lockUntil = Date.now() + 15 * 60 * 1000; // 15 min lock
@@ -322,7 +325,10 @@ exports.verifyOtp = async (req, res) => {
     }
 
     // If user IS verified, this is likely a Password Reset flow
-    // Do NOT clear OTP yet (needed for resetPassword step)
+    // Extend OTP expiry to give time for the actual password reset step
+    user.otpExpires = Date.now() + 15 * 60 * 1000; // Add 15 mins grace period
+    await user.save();
+
     res.status(200).json({ success: true, message: "OTP Verified" });
   } catch (err) {
     console.error("verifyOtp Error:", err);
@@ -333,18 +339,21 @@ exports.verifyOtp = async (req, res) => {
 // 6. RESET PASSWORD
 exports.resetPassword = async (req, res) => {
   try {
-    // Expect: email, otp, newPassword
+    // Expect: email (which could be phone), otp, newPassword
     const { email, otp, newPassword } = req.body;
 
     if (!email || !otp || !newPassword) {
-      return res.status(400).json({ message: "Missing required fields (email, otp, newPassword)" });
+      return res.status(400).json({ message: "Missing required fields" });
     }
 
     if (newPassword.length < 6) {
       return res.status(400).json({ message: "Password must be at least 6 chars" });
     }
 
-    const user = await User.findOne({ email });
+    // Support both Email and Phone for lookup
+    const user = await User.findOne({
+      $or: [{ email: email }, { phone: email }]
+    });
 
     if (!user) {
       return res.status(400).json({ message: "User not found" });
