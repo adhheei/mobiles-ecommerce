@@ -440,6 +440,9 @@ async function checkUserLogin() {
             // Clear invalid token
             localStorage.removeItem("token");
             localStorage.removeItem("user");
+
+            // Force clear server-side cookie
+            await fetch('/api/auth/logout', { method: 'POST' });
         }
     } catch (err) {
         console.error("Auth check failed", err);

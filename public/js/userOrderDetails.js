@@ -6,10 +6,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const orderId = urlParams.get('id');
     const token = localStorage.getItem("token");
 
-    if (!token) {
-        window.location.href = "userLogin.html";
-        return;
-    }
+    // Cookie auth fallback
+    // if (!token) { window.location.href = "userLogin.html"; return; } 
 
     if (!orderId) {
         Swal.fire("Error", "Invalid Order ID", "error").then(() => {
@@ -21,9 +19,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     currentOrderId = orderId; // Set global
 
     try {
-        const res = await fetch(`/api/orders/${orderId}`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
+        const headers = {};
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+
+        const res = await fetch(`/api/orders/${orderId}`, { headers });
 
         const data = await res.json();
         const order = data.order;

@@ -180,9 +180,12 @@ const updateOrderStatus = async (req, res) => {
         // Validate status transition if needed (optional for now)
         order.orderStatus = status;
 
-        // If delivered, update payment status if COD
-        if (status === 'Delivered' && order.paymentMethod === 'COD') {
-            order.paymentStatus = 'Paid';
+        // If delivered, update payment status if COD, and set deliveredAt
+        if (status === 'Delivered') {
+            if (order.paymentMethod === 'COD') {
+                order.paymentStatus = 'Paid';
+            }
+            order.deliveredAt = Date.now();
         }
 
         // Update item statuses as well if needed, or keep them separate?

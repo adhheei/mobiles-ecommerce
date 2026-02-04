@@ -234,6 +234,11 @@ const placeOrder = async (req, res) => {
             return res.status(400).json({ message: "Invalid Address" });
         }
 
+        // Initialize totals
+        let subtotal = 0;
+        let totalMrp = 0;
+        let orderItems = [];
+
         // --- 1. IDENTIFY ITEMS (Cart vs BuyNow) ---
         // Ensure buyNowItem is an object if passed as string
         if (typeof buyNowItem === 'string') {
@@ -258,14 +263,18 @@ const placeOrder = async (req, res) => {
             }
 
             const price = product.offerPrice || product.price || 0;
+            const mrp = product.actualPrice || product.price || 0;
             const qty = parseInt(buyNowItem.qty) || parseInt(buyNowItem.quantity) || 1;
 
             subtotal = price * qty;
+            totalMrp = mrp * qty;
+
             orderItems = [{
                 productId: product._id,
                 name: product.productName || product.name,
                 image: formatImageUrl(product.mainImage || (product.productImages && product.productImages[0])),
                 price: price,
+                mrp: mrp,
                 quantity: qty,
                 lineTotal: subtotal
             }];
@@ -284,20 +293,26 @@ const placeOrder = async (req, res) => {
                 const product = item.productId;
                 if (product) {
                     const price = product.offerPrice || product.price || 0;
+                    const mrp = product.actualPrice || product.price || 0;
                     const lineTotal = price * item.quantity;
+
                     subtotal += lineTotal;
+                    totalMrp += (mrp * item.quantity);
 
                     orderItems.push({
                         productId: product._id,
                         name: product.productName || product.name,
                         image: formatImageUrl(product.mainImage || (product.productImages && product.productImages[0])),
                         price: price,
+                        mrp: mrp,
                         quantity: item.quantity,
                         lineTotal: lineTotal
                     });
                 }
             });
         }
+
+        const productDiscount = totalMrp - subtotal;
 
         // --- 2. APPLY COUPON ---
         let couponDiscount = 0;
@@ -376,6 +391,7 @@ const placeOrder = async (req, res) => {
                 name: i.name,
                 image: i.image,
                 price: i.price,
+                mrp: i.mrp,
                 quantity: i.quantity,
                 status: 'Processing'
             })),
@@ -392,6 +408,8 @@ const placeOrder = async (req, res) => {
             paymentStatus: (paymentMethod === 'cod') ? 'Pending' : 'Paid', // Simplified
             totals: {
                 subtotal,
+                totalMrp,
+                productDiscount,
                 couponDiscount,
                 walletDeducted,
                 shipping,

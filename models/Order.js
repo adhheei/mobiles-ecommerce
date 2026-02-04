@@ -19,7 +19,8 @@ const orderSchema = new mongoose.Schema({
         },
         name: { type: String, required: true },
         image: { type: String },
-        price: { type: Number, required: true }, // Price at time of purchase
+        price: { type: Number, required: true }, // Selling Price
+        mrp: { type: Number }, // Original MRP
         quantity: { type: Number, required: true },
         status: {
             type: String,
@@ -46,7 +47,9 @@ const orderSchema = new mongoose.Schema({
         default: 'Pending'
     },
     totals: {
-        subtotal: Number,
+        subtotal: Number, // Total Selling Price
+        totalMrp: Number, // Total MRP
+        productDiscount: Number, // MRP - Selling Price
         couponDiscount: Number,
         walletDeducted: Number,
         shipping: Number,
@@ -61,6 +64,9 @@ const orderSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    deliveredAt: {
+        type: Date
     }
 });
 

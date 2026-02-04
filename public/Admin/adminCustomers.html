@@ -821,24 +821,19 @@
     // --- FETCH DATA ---
     async function fetchUsers() {
       try {
-        const response = await fetch('/api/admin/users', {
-          credentials: 'include'
-        });
+        const response = await fetch('/api/admin/users');
+        const data = await response.json();
 
-        if (response.status === 401) {
-          window.location.href = '/Admin/adminLogin.html';
-          return;
+        // DEBUG: Look at this log in your browser console (F12)
+        console.log("Users from API:", data.users);
+
+        if (data.success) {
+          allCustomers = data.users;
+          currentCustomers = [...allCustomers];
+          applyLogic(); // Use standard flow with pagination
         }
-
-        if (!response.ok) throw new Error('Failed to fetch users');
-
-        allCustomers = await response.json();
-        currentCustomers = [...allCustomers];
-        applyLogic();
-      } catch (error) {
-        console.error(error);
-        document.getElementById("customerTableBody").innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Failed to load customers.</td></tr>';
-        Swal.fire({ icon: 'error', title: 'Error', text: 'Could not load customers' });
+      } catch (err) {
+        console.error("Fetch error:", err);
       }
     }
 
@@ -878,80 +873,53 @@
     function handleFilter() { applyLogic(); }
     function handleSort() { applyLogic(); }
 
-    // --- RENDER TABLE ---
+    // --- RENDER TABLE (Pagination Wrapper) ---
     function renderTable() {
-      const tbody = document.getElementById("customerTableBody");
-      tbody.innerHTML = "";
-
       const start = (currentPage - 1) * rowsPerPage;
       const end = start + rowsPerPage;
       const paginated = currentCustomers.slice(start, end);
 
-      if (paginated.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">No customers found.</td></tr>';
-        updatePagination(0, 0, 0);
-        return;
-      }
-
-      paginated.forEach(c => {
-        // Normalize status
-        let isBlocked = c.isBlocked;
-        let displayStatus = isBlocked ? 'Suspended' : 'Active';
-        let statusClass = isBlocked ? 'status-suspended' : 'status-active';
-
-        // Determine Block/Unblock Button State
-        let blockBtnClass = isBlocked ? 'btn-unblock' : 'btn-block';
-        let blockIcon = isBlocked ? 'fa-lock-open' : 'fa-ban';
-        let blockTitle = isBlocked ? 'Unblock Customer' : 'Block Customer';
-
-        // Name Initials or Image
-        let avatarHtml;
-        if (c.profileImage) {
-          avatarHtml = `<img src="${c.profileImage}" class="customer-avatar" alt="${c.firstName}">`;
-        } else {
-          const initials = (c.firstName.charAt(0) + c.lastName.charAt(0)).toUpperCase();
-          avatarHtml = `<div class="customer-avatar bg-light text-secondary border">${initials}</div>`;
-        }
-
-        const fullName = `${c.firstName} ${c.lastName}`;
-        const date = new Date(c.createdAt).toLocaleDateString();
-
-        const row = `
-                <tr>
-                    <td data-label="Customer">
-                        <div class="customer-cell">
-                            ${avatarHtml}
-                            <div class="customer-info">
-                                <h6>${fullName}</h6>
-                                <span>Registered: ${date}</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td data-label="Contact">
-                        <div class="contact-info">
-                            <div class="contact-email text-break" style="max-width: 200px;">${c.email}</div>
-                            <div class="contact-phone">${c.phone || 'N/A'}</div>
-                        </div>
-                    </td>
-                    <td data-label="Stats">${c.ordersCount || 0} Orders</td>
-                    <td data-label="Status"><span class="badge-custom ${statusClass}">${displayStatus}</span></td>
-                    <td data-label="Actions" class="text-end">
-
-                        <button class="action-btn btn-view" title="View Details" onclick='viewDetails(${JSON.stringify(c).replace(/'/g, "&apos;")})'>
-                            <i class="fa-solid fa-eye"></i>
-                        </button>
-                        <button class="action-btn ${blockBtnClass}" title="${blockTitle}" onclick="toggleBlockCustomer('${c._id}', ${c.isBlocked}, '${fullName.replace(/'/g, "\\'")}')">
-                            <i class="fa-solid ${blockIcon}"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
-        tbody.innerHTML += row;
-      });
-
+      renderUserTable(paginated);
       updatePagination(start + 1, Math.min(end, currentCustomers.length), currentCustomers.length);
     }
 
+    // --- RENDER ROWS ---
+    function renderUserTable(users) {
+      const tableBody = document.getElementById('customerTableBody'); // Fixed ID
+
+      if (users.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">No customers found.</td></tr>';
+        return;
+      }
+
+      tableBody.innerHTML = users.map(user => `
+    <tr>
+      <td>
+        <div class="d-flex align-items-center">
+          <img src="${user.profileImage || '/images/default-avatar.png'}" class="rounded-circle me-2" width="40">
+          <div>
+            <div class="fw-bold">${user.firstName} ${user.lastName}</div>
+            <small class="text-muted">Registered: ${new Date(user.createdAt).toLocaleDateString()}</small>
+          </div>
+        </div>
+      </td>
+      <td>
+        <div>${user.email}</div>
+        <small class="text-muted">${user.phone || 'N/A'}</small>
+      </td>
+      
+      <td>${user.orderCount || 0} Orders</td> 
+      
+      <td><span class="badge bg-success-light text-success">${user.status || (user.isBlocked ? 'Suspended' : 'Active')}</span></td>
+      <td>
+        <button class="btn btn-sm btn-light" onclick='viewDetails(${JSON.stringify(user).replace(/'/g, "&apos;")})'><i class="fa-regular fa-eye"></i></button>
+        <button class="btn btn-sm btn-light" onclick="toggleBlockCustomer('${user._id}', ${user.isBlocked}, '${(user.firstName + ' ' + user.lastName).replace(/'/g, "\\'")}')">
+            <i class="fa-solid fa-ban"></i>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+    }
     // --- PAGINATION LOGIC ---
     function updatePagination(start, end, total) {
       document.getElementById("pageInfoText").innerText = `Showing ${start} to ${end} of ${total} customers`;
