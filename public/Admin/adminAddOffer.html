@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -469,16 +469,58 @@
       </a>
 
       <ul class="sidebar-menu">
-        <li class="menu-item"><a href="../Admin/adminDashboard.html" class="menu-link"><i class="fa-solid fa-border-all"></i> &nbsp;Dashboard</a></li>
-        <li class="menu-item"><a href="../Admin/adminOrders.html" class="menu-link"><i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a></li>
-      <li class="menu-item"><a href="../Admin/adminTransactions.html" class="menu-link"><i class="fa-solid fa-money-bill-transfer"></i> &nbsp;Transactions</a></li>
-        <li class="menu-item"><a href="../Admin/adminProducts.html" class="menu-link"><i class="fa-solid fa-box-open"></i> &nbsp;Products</a></li>
-        <li class="menu-item"><a href="../Admin/adminCustomers.html" class="menu-link"><i class="fa-solid fa-users"></i> &nbsp;Customers</a></li>
-        <li class="menu-item"><a href="../Admin/adminMessages.html" class="menu-link"><i class="fa-regular fa-envelope"></i> &nbsp;Messages</a></li>
-        <li class="menu-item"><a href="../Admin/adminAnalytics.html" class="menu-link"><i class="fa-solid fa-chart-simple"></i> &nbsp;Analytics</a></li>
-        <li class="menu-item"><a href="../Admin/adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i> &nbsp;Coupon Management</a></li>
-        <li class="menu-item"><a href="../Admin/adminCategories.html" class="menu-link"><i class="fa-solid fa-layer-group"></i> &nbsp;Category Management</a></li>
-        <li class="menu-item"><a href="../Admin/adminOffers.html" class="menu-link active"><i class="fa-solid fa-gift"></i> &nbsp;Offer</a></li>
+        <li class="menu-item">
+          <a href="../Admin/adminDashboard.html" class="menu-link"
+            ><i class="fa-solid fa-border-all"></i> &nbsp;Dashboard</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminOrders.html" class="menu-link"
+            ><i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminTransactions.html" class="menu-link"
+            ><i class="fa-solid fa-money-bill-transfer"></i>
+            &nbsp;Transactions</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminProducts.html" class="menu-link"
+            ><i class="fa-solid fa-box-open"></i> &nbsp;Products</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminCustomers.html" class="menu-link"
+            ><i class="fa-solid fa-users"></i> &nbsp;Customers</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminMessages.html" class="menu-link"
+            ><i class="fa-regular fa-envelope"></i> &nbsp;Messages</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminAnalytics.html" class="menu-link"
+            ><i class="fa-solid fa-chart-simple"></i> &nbsp;Analytics</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminCoupons.html" class="menu-link"
+            ><i class="fa-solid fa-tag"></i> &nbsp;Coupon Management</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminCategories.html" class="menu-link"
+            ><i class="fa-solid fa-layer-group"></i> &nbsp;Category
+            Management</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminOffers.html" class="menu-link active"
+            ><i class="fa-solid fa-gift"></i> &nbsp;Offer</a
+          >
+        </li>
       </ul>
 
       <div class="admin-profile">
@@ -603,17 +645,12 @@
           </div>
 
           <div class="form-group">
-            <label for="applicableProducts" class="form-label"
-              >Applicable Products / Categories</label
-            >
-            <input
-              type="text"
-              id="applicableProducts"
-              class="form-control"
-              placeholder="Start typing to search products or categories..."
-            />
+            <label for="targetId" class="form-label">Applicable Category</label>
+            <select id="targetId" class="form-select">
+              <option value="" disabled selected>Loading categories...</option>
+            </select>
             <span class="form-help-text"
-              >Leave blank to apply to all products.</span
+              >Choose the category where this discount will apply.</span
             >
           </div>
 
@@ -621,7 +658,7 @@
             <button
               type="button"
               class="btn btn-cancel"
-              onclick="location.href='./adminOffers.html'"
+              onclick="location.href = './adminOffers.html'"
             >
               Cancel
             </button>
@@ -644,31 +681,108 @@
         document.getElementById("sidebarOverlay").classList.toggle("active");
       }
 
-      function createOffer() {
-        const name = document.getElementById("offerName").value;
-        const type = document.getElementById("offerType").value;
+      async function createOffer() {
+        const token = localStorage.getItem("token");
 
-        if (!name || !type) {
-          Swal.fire({
+        // Extract form data
+        const offerData = {
+          name: document.getElementById("offerName").value,
+          // Ensure this matches your logic: percentage usually implies Category-wide
+          offerType:
+            document.getElementById("offerType").value === "percentage"
+              ? "Category"
+              : "Product",
+          discountPercentage: parseFloat(
+            document.getElementById("discountValue").value,
+          ),
+          startDate: document.getElementById("startDate").value,
+          endDate: document.getElementById("endDate").value,
+          status:
+            document.querySelector('input[name="status"]:checked').value ===
+            "active"
+              ? "Active"
+              : "Inactive",
+          // FIX: Read from the dropdown select element
+          targetId: document.getElementById("targetId").value,
+        };
+
+        // Validation
+        if (
+          !offerData.name ||
+          isNaN(offerData.discountPercentage) ||
+          !offerData.targetId
+        ) {
+          return Swal.fire({
             icon: "error",
-            title: "Missing Info",
-            text: "Please provide an Offer Name and select an Offer Type.",
-            confirmButtonColor: "#1a1a1a",
+            title: "Wait!",
+            text: "Please fill in all required fields and select a category.",
           });
-          return;
         }
 
-        Swal.fire({
-          title: "Success!",
-          text: "New offer has been created.",
-          icon: "success",
-          confirmButtonColor: "#1a1a1a",
-          confirmButtonText: "Go to Offers",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            window.location.href = "./adminOffers.html";
+        try {
+          const res = await fetch("/api/admin/offers", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(offerData),
+          });
+
+          const data = await res.json();
+
+          if (data.success) {
+            Swal.fire({
+              title: "Success!",
+              text: "Offer created and applied to products.",
+              icon: "success",
+              confirmButtonColor: "#1a1a1a",
+            }).then(() => (window.location.href = "./adminOffers.html"));
+          } else {
+            throw new Error(data.message);
           }
-        });
+        } catch (error) {
+          Swal.fire({ icon: "error", title: "Error", text: error.message });
+        }
+      }
+
+      // Function to fetch categories from the backend and populate the select menu
+      async function loadCategories() {
+        const targetSelect = document.getElementById("targetId");
+        if (!targetSelect) return;
+
+        try {
+          // This calls your controller's GET /api/admin/categories route
+          const res = await fetch("/api/admin/categories");
+          const result = await res.json();
+
+          // Debugging: This will show you the 'data' array in your console
+          console.log("Category API Response:", result);
+
+          // FIX: Your controller sends the array inside result.data
+          const categoriesArray = result.data || [];
+
+          targetSelect.innerHTML =
+            '<option value="" disabled selected>Select a category</option>';
+
+          if (categoriesArray.length === 0) {
+            targetSelect.innerHTML =
+              '<option value="">No categories found in database</option>';
+            return;
+          }
+
+          categoriesArray.forEach((cat) => {
+            const option = document.createElement("option");
+            // Use cat.id because your controller's .map() renames _id to id
+            option.value = cat.id;
+            option.textContent = cat.name;
+            targetSelect.appendChild(option);
+          });
+        } catch (error) {
+          console.error("Fetch error:", error);
+          targetSelect.innerHTML =
+            '<option value="">Error connecting to server</option>';
+        }
       }
 
       // Close sidebar when clicking outside on mobile
@@ -688,6 +802,9 @@
 
       // Set default dates
       document.addEventListener("DOMContentLoaded", function () {
+        loadCategories();
+
+        // 2. Your existing date logic
         const today = new Date().toISOString().split("T")[0];
         const nextMonth = new Date();
         nextMonth.setMonth(nextMonth.getMonth() + 1);
@@ -699,4 +816,3 @@
     </script>
   </body>
 </html>
-

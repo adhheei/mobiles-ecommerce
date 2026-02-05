@@ -117,4 +117,18 @@ router.get('/orders', isAdmin, getAdminOrderDetails);
 router.get('/orders/:id', isAdmin, getAdminOrderDetails);
 router.put('/orders/:id/status', isAdmin, updateOrderStatus);
 
+
+// ────────────────
+// Offer
+// ────────────────
+
+const offerController = require('../controllers/offerController');
+
+// Offer Management Routes
+router.get('/offers', isAdmin, offerController.getAllOffers);
+router.post('/offers', isAdmin, offerController.addOffer);
+router.get('/offers/:id', isAdmin, offerController.getOfferById);
+router.put('/offers/:id', isAdmin, offerController.updateOffer);
+router.delete('/offers/:id', isAdmin, offerController.deleteOffer);
+
 module.exports = router;

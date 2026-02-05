@@ -1,467 +1,483 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Edit Offer - Jinsa Mobiles Admin</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        :root {
-            --primary-black: #1a1a1a;
-            --bg-light: #f8f9fa;
-            --border-color: #eee;
-            --sidebar-width: 260px;
-            --active-bg: #e9ecef;
-            --text-muted: #6c757d;
-        }
+      :root {
+        --primary-black: #1a1a1a;
+        --bg-light: #f8f9fa;
+        --border-color: #eee;
+        --sidebar-width: 260px;
+        --active-bg: #e9ecef;
+        --text-muted: #6c757d;
+      }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-light);
-            color: var(--primary-black);
-            overflow-x: hidden;
-        }
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: var(--bg-light);
+        color: var(--primary-black);
+        overflow-x: hidden;
+      }
 
-        /* --- ANIMATIONS --- */
-        @keyframes slideInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+      /* --- ANIMATIONS --- */
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
         }
-        .content-animate { animation: slideInUp 0.6s ease-out forwards; }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .content-animate {
+        animation: slideInUp 0.6s ease-out forwards;
+      }
 
-        /* --- SIDEBAR --- */
+      /* --- SIDEBAR --- */
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        background-color: #fff;
+        border-right: 1px solid var(--border-color);
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        z-index: 1000;
+        transition: transform 0.3s ease;
+      }
+      .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 40px;
+        text-decoration: none;
+        color: var(--primary-black);
+      }
+      .brand-logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .brand-text-container {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+      }
+      .brand-title {
+        font-weight: 800;
+        font-size: 1rem;
+        color: #000;
+      }
+      .brand-subtitle {
+        font-size: 0.55rem;
+        letter-spacing: 2px;
+        color: #777;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-grow: 1;
+        overflow-y: auto;
+      }
+      .menu-item {
+        margin-bottom: 5px;
+      }
+      .menu-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        color: #555;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        transition: all 0.2s;
+      }
+      .menu-link i {
+        width: 25px;
+        font-size: 1.1rem;
+        color: #777;
+      }
+      .menu-link:hover {
+        background-color: var(--bg-light);
+        color: #000;
+      }
+      .menu-link.active {
+        background-color: var(--active-bg);
+        color: #000;
+        font-weight: 600;
+      }
+      .menu-link.active i {
+        color: #000;
+      }
+
+      .admin-profile {
+        margin-top: auto;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+      }
+      .profile-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        text-decoration: none;
+        color: inherit;
+      }
+      .admin-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: #ccc;
+      }
+      .admin-details h6 {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+      .admin-details span {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+      .logout-btn {
+        width: 100%;
+        background-color: var(--bg-light);
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: 0.2s;
+        text-decoration: none;
+      }
+      .logout-btn:hover {
+        background-color: #e2e6ea;
+        color: #000;
+      }
+
+      /* --- MAIN CONTENT --- */
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 30px;
+        transition: margin-left 0.3s ease;
+      }
+
+      /* Mobile Nav */
+      .mobile-nav {
+        display: none;
+        background: #fff;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 999;
+      }
+      .mobile-nav .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 0;
+        text-decoration: none;
+        color: var(--primary-black);
+      }
+      .brand-text-mobile {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+        text-align: left;
+      }
+      .brand-title-mobile {
+        font-weight: 800;
+        font-size: 1rem;
+        color: #000;
+        display: block;
+      }
+      .brand-subtitle-mobile {
+        font-size: 0.6rem;
+        letter-spacing: 1px;
+        color: #777;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: block;
+      }
+
+      /* Header */
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+      .header-left {
+        display: flex;
+        flex-direction: column;
+      }
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+        color: var(--text-muted);
+        font-weight: 500;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+        transition: color 0.2s;
+      }
+      .back-link:hover {
+        color: var(--primary-black);
+      }
+      .back-link i {
+        margin-right: 8px;
+      }
+      .page-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin: 0 0 5px 0;
+        color: #000;
+      }
+      .page-description {
+        color: var(--text-muted);
+        margin: 0;
+        font-size: 0.95rem;
+      }
+
+      /* Delete Button */
+      .btn-delete-offer {
+        background-color: #ffe5e5;
+        color: #dc3545;
+        border: 1px solid #f5c2c7;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+      }
+      .btn-delete-offer:hover {
+        background-color: #dc3545;
+        color: #fff;
+        border-color: #dc3545;
+      }
+
+      /* Form Container - FULL WIDTH */
+      .form-card {
+        background-color: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+      }
+      .form-group {
+        margin-bottom: 25px;
+      }
+      .form-label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        color: #333;
+      }
+      .form-control,
+      .form-select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        color: var(--primary-black);
+        font-family: "Poppins", sans-serif;
+      }
+      .form-control:focus,
+      .form-select:focus {
+        box-shadow: none;
+        border-color: #000;
+        outline: none;
+      }
+
+      .input-group {
+        display: flex;
+        align-items: center;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .input-group .form-control {
+        border: none;
+        border-radius: 0;
+        flex-grow: 1;
+      }
+      .input-group-text {
+        padding: 12px 15px;
+        background-color: #fcfcfc;
+        color: #666;
+        font-size: 0.95rem;
+        border-left: 1px solid #eee;
+        font-weight: 500;
+        min-width: 50px;
+        text-align: center;
+      }
+
+      /* Section Headings inside form */
+      .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 30px 0 5px 0;
+        color: #000;
+      }
+      .section-desc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+      }
+      .form-help-text {
+        display: block;
+        margin-top: 5px;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+
+      /* Status Radio */
+      .status-group {
+        display: flex;
+        gap: 25px;
+        align-items: center;
+      }
+      .status-option {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-size: 0.95rem;
+        color: #333;
+      }
+      .status-option input[type="radio"] {
+        margin-right: 8px;
+        accent-color: #000;
+        transform: scale(1.2);
+        cursor: pointer;
+      }
+
+      /* Footer Buttons */
+      .form-footer {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 30px;
+        gap: 15px;
+      }
+      .btn-cancel {
+        background-color: var(--active-bg);
+        color: #333;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: 0.2s;
+      }
+      .btn-cancel:hover {
+        background-color: #dcdcdc;
+      }
+      .btn-create {
+        background-color: var(--primary-black);
+        color: #fff;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: 0.2s;
+      }
+      .btn-create:hover {
+        background-color: #333;
+      }
+
+      @media (max-width: 991px) {
         .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            background-color: #fff;
-            border-right: 1px solid var(--border-color);
-            position: fixed;
-            top: 0;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            z-index: 1000;
-            transition: transform 0.3s ease;
+          transform: translateX(-100%);
         }
-        .brand-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 40px;
-            text-decoration: none;
-            color: var(--primary-black);
+        .sidebar.active {
+          transform: translateX(0);
+          box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
         }
-        .brand-logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        .brand-text-container {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.1;
-        }
-        .brand-title {
-            font-weight: 800;
-            font-size: 1rem;
-            color: #000;
-        }
-        .brand-subtitle {
-            font-size: 0.55rem;
-            letter-spacing: 2px;
-            color: #777;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-        .menu-item {
-            margin-bottom: 5px;
-        }
-        .menu-link {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            color: #555;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9rem;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-        .menu-link i {
-            width: 25px;
-            font-size: 1.1rem;
-            color: #777;
-        }
-        .menu-link:hover {
-            background-color: var(--bg-light);
-            color: #000;
-        }
-        .menu-link.active {
-            background-color: var(--active-bg);
-            color: #000;
-            font-weight: 600;
-        }
-        .menu-link.active i {
-            color: #000;
-        }
-
-        .admin-profile {
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
-        }
-        .profile-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            text-decoration: none;
-            color: inherit;
-        }
-        .admin-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: #ccc;
-        }
-        .admin-details h6 {
-            margin: 0;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-        .admin-details span {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-        .logout-btn {
-            width: 100%;
-            background-color: var(--bg-light);
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: 0.2s;
-            text-decoration: none;
-        }
-        .logout-btn:hover {
-            background-color: #e2e6ea;
-            color: #000;
-        }
-
-        /* --- MAIN CONTENT --- */
         .main-content {
-            margin-left: var(--sidebar-width);
-            padding: 30px;
-            transition: margin-left 0.3s ease;
+          margin-left: 0;
+          padding: 20px;
         }
-
-        /* Mobile Nav */
         .mobile-nav {
-            display: none;
-            background: #fff;
-            padding: 15px 20px;
-            border-bottom: 1px solid #eee;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 999;
+          display: flex;
         }
-        .mobile-nav .brand-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 0;
-            text-decoration: none;
-            color: var(--primary-black);
+        .sidebar-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 998;
         }
-        .brand-text-mobile {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.1;
-            text-align: left;
+        .sidebar-overlay.active {
+          display: block;
         }
-        .brand-title-mobile {
-            font-weight: 800;
-            font-size: 1rem;
-            color: #000;
-            display: block;
-        }
-        .brand-subtitle-mobile {
-            font-size: 0.6rem;
-            letter-spacing: 1px;
-            color: #777;
-            font-weight: 600;
-            text-transform: uppercase;
-            display: block;
-        }
-
-        /* Header */
         .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 15px;
+          flex-direction: column;
+          align-items: flex-start;
         }
-        .header-left {
-            display: flex;
-            flex-direction: column;
-        }
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            text-decoration: none;
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-            transition: color 0.2s;
-        }
-        .back-link:hover {
-            color: var(--primary-black);
-        }
-        .back-link i {
-            margin-right: 8px;
-        }
-        .page-title {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin: 0 0 5px 0;
-            color: #000;
-        }
-        .page-description {
-            color: var(--text-muted);
-            margin: 0;
-            font-size: 0.95rem;
-        }
-
-        /* Delete Button */
-        .btn-delete-offer {
-            background-color: #ffe5e5;
-            color: #dc3545;
-            border: 1px solid #f5c2c7;
-            font-weight: 600;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-        .btn-delete-offer:hover {
-            background-color: #dc3545;
-            color: #fff;
-            border-color: #dc3545;
-        }
-
-        /* Form Container - FULL WIDTH */
         .form-card {
-            background-color: #fff;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+          padding: 20px;
         }
-        .form-group {
-            margin-bottom: 25px;
-        }
-        .form-label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            color: #333;
-        }
-        .form-control,
-        .form-select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            color: var(--primary-black);
-            font-family: "Poppins", sans-serif;
-        }
-        .form-control:focus,
-        .form-select:focus {
-            box-shadow: none;
-            border-color: #000;
-            outline: none;
-        }
-        
         .input-group {
-            display: flex;
-            align-items: center;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        .input-group .form-control {
-            border: none;
-            border-radius: 0;
-            flex-grow: 1;
+          flex-wrap: wrap;
         }
         .input-group-text {
-            padding: 12px 15px;
-            background-color: #fcfcfc;
-            color: #666;
-            font-size: 0.95rem;
-            border-left: 1px solid #eee;
-            font-weight: 500;
-            min-width: 50px;
-            text-align: center;
+          width: 100%;
+          border-left: none;
+          border-top: 1px solid #eee;
+          text-align: left;
+          padding: 8px 15px;
         }
-
-        /* Section Headings inside form */
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin: 30px 0 5px 0;
-            color: #000;
+        .btn-delete-offer {
+          width: 100%;
+          justify-content: center;
         }
-        .section-desc {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-        .form-help-text {
-            display: block;
-            margin-top: 5px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        /* Status Radio */
-        .status-group {
-            display: flex;
-            gap: 25px;
-            align-items: center;
-        }
-        .status-option {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            font-size: 0.95rem;
-            color: #333;
-        }
-        .status-option input[type="radio"] {
-            margin-right: 8px;
-            accent-color: #000;
-            transform: scale(1.2);
-            cursor: pointer;
-        }
-
-        /* Footer Buttons */
-        .form-footer {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 30px;
-            gap: 15px;
-        }
-        .btn-cancel {
-            background-color: var(--active-bg);
-            color: #333;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 30px;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-        .btn-cancel:hover {
-            background-color: #dcdcdc;
-        }
-        .btn-create {
-            background-color: var(--primary-black);
-            color: #fff;
-            border: none;
-            padding: 10px 30px;
-            border-radius: 30px;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-        .btn-create:hover {
-            background-color: #333;
-        }
-
-        @media (max-width: 991px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.active {
-                transform: translateX(0);
-                box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
-            }
-            .main-content {
-                margin-left: 0;
-                padding: 20px;
-            }
-            .mobile-nav {
-                display: flex;
-            }
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 998;
-            }
-            .sidebar-overlay.active {
-                display: block;
-            }
-            .page-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .form-card {
-                padding: 20px;
-            }
-            .input-group {
-                flex-wrap: wrap;
-            }
-            .input-group-text {
-                width: 100%;
-                border-left: none;
-                border-top: 1px solid #eee;
-                text-align: left;
-                padding: 8px 15px;
-            }
-            .btn-delete-offer {
-                width: 100%;
-                justify-content: center;
-            }
-        }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div class="mobile-nav">
       <a href="#" class="brand-section">
         <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
@@ -475,7 +491,11 @@
       </button>
     </div>
 
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div
+      class="sidebar-overlay"
+      id="sidebarOverlay"
+      onclick="toggleSidebar()"
+    ></div>
 
     <nav class="sidebar" id="sidebar">
       <a href="./adminDashboard.html" class="brand-section">
@@ -487,21 +507,70 @@
       </a>
 
       <ul class="sidebar-menu">
-        <li class="menu-item"><a href="../Admin/adminDashboard.html" class="menu-link"><i class="fa-solid fa-border-all"></i> &nbsp;Dashboard</a></li>
-        <li class="menu-item"><a href="../Admin/adminOrders.html" class="menu-link"><i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a></li>
-      <li class="menu-item"><a href="../Admin/adminTransactions.html" class="menu-link"><i class="fa-solid fa-money-bill-transfer"></i> &nbsp;Transactions</a></li>
-        <li class="menu-item"><a href="../Admin/adminProducts.html" class="menu-link"><i class="fa-solid fa-box-open"></i> &nbsp;Products</a></li>
-        <li class="menu-item"><a href="../Admin/adminCustomers.html" class="menu-link"><i class="fa-solid fa-users"></i> &nbsp;Customers</a></li>
-        <li class="menu-item"><a href="../Admin/adminMessages.html" class="menu-link"><i class="fa-regular fa-envelope"></i> &nbsp;Messages</a></li>
-        <li class="menu-item"><a href="../Admin/adminAnalytics.html" class="menu-link"><i class="fa-solid fa-chart-simple"></i> &nbsp;Analytics</a></li>
-        <li class="menu-item"><a href="../Admin/adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i> &nbsp;Coupon Management</a></li>
-        <li class="menu-item"><a href="../Admin/adminCategories.html" class="menu-link"><i class="fa-solid fa-layer-group"></i> &nbsp;Category Management</a></li>
-        <li class="menu-item"><a href="../Admin/adminOffers.html" class="menu-link active"><i class="fa-solid fa-gift"></i> &nbsp;Offer</a></li>
+        <li class="menu-item">
+          <a href="../Admin/adminDashboard.html" class="menu-link"
+            ><i class="fa-solid fa-border-all"></i> &nbsp;Dashboard</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminOrders.html" class="menu-link"
+            ><i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminTransactions.html" class="menu-link"
+            ><i class="fa-solid fa-money-bill-transfer"></i>
+            &nbsp;Transactions</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminProducts.html" class="menu-link"
+            ><i class="fa-solid fa-box-open"></i> &nbsp;Products</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminCustomers.html" class="menu-link"
+            ><i class="fa-solid fa-users"></i> &nbsp;Customers</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminMessages.html" class="menu-link"
+            ><i class="fa-regular fa-envelope"></i> &nbsp;Messages</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminAnalytics.html" class="menu-link"
+            ><i class="fa-solid fa-chart-simple"></i> &nbsp;Analytics</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminCoupons.html" class="menu-link"
+            ><i class="fa-solid fa-tag"></i> &nbsp;Coupon Management</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminCategories.html" class="menu-link"
+            ><i class="fa-solid fa-layer-group"></i> &nbsp;Category
+            Management</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminOffers.html" class="menu-link active"
+            ><i class="fa-solid fa-gift"></i> &nbsp;Offer</a
+          >
+        </li>
       </ul>
 
       <div class="admin-profile">
-        <a href="../Admin/adminProfile.html" class="profile-info text-decoration-none text-reset">
-          <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
+        <a
+          href="../Admin/adminProfile.html"
+          class="profile-info text-decoration-none text-reset"
+        >
+          <img
+            src="https://placehold.co/100x100/ccc/fff?text=A"
+            alt="Admin"
+            class="admin-avatar"
+          />
           <div class="admin-details">
             <h6 id="sidebarName" class="m-0">Admin</h6>
             <span class="small text-muted">admin@example.com</span>
@@ -514,170 +583,307 @@
     </nav>
 
     <div class="main-content content-animate">
-        <div class="page-header">
-            <div class="header-left">
-                <a href="./adminOffers.html" class="back-link">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    Back to Offer Management
-                </a>
-                <h1 class="page-title">Edit Offer</h1>
-                <p class="page-description">Modify existing offer details.</p>
+      <div class="page-header">
+        <div class="header-left">
+          <a href="./adminOffers.html" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Offer Management
+          </a>
+          <h1 class="page-title">Edit Offer</h1>
+          <p class="page-description">Modify existing offer details.</p>
+        </div>
+
+        <a
+          href="#"
+          class="btn-delete-offer"
+          onclick="
+            deleteOffer();
+            return false;
+          "
+        >
+          <i class="fa-solid fa-trash-can"></i> Delete Offer
+        </a>
+      </div>
+
+      <div class="form-card">
+        <form id="editOfferForm">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="offerName" class="form-label">Offer Name</label>
+                <input
+                  type="text"
+                  id="offerName"
+                  class="form-control"
+                  value="Summer BOGO Sale"
+                  required
+                />
+              </div>
             </div>
-            
-            <a href="#" class="btn-delete-offer" onclick="deleteOffer(); return false;">
-                <i class="fa-solid fa-trash-can"></i> Delete Offer
-            </a>
-        </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="offerType" class="form-label">Offer Type</label>
+                <select id="offerType" class="form-select">
+                  <option value="percentage">Percentage Discount</option>
+                  <option value="fixed">Fixed Amount Discount</option>
+                  <option value="bogo" selected>Buy One Get One</option>
+                </select>
+              </div>
+            </div>
+          </div>
 
-        <div class="form-card">
-            <form id="editOfferForm">
-                
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="offerName" class="form-label">Offer Name</label>
-                            <input type="text" id="offerName" class="form-control" value="Summer BOGO Sale" required>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="offerType" class="form-label">Offer Type</label>
-                            <select id="offerType" class="form-select">
-                                <option value="percentage">Percentage Discount</option>
-                                <option value="fixed">Fixed Amount Discount</option>
-                                <option value="bogo" selected>Buy One Get One</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+          <div class="form-group">
+            <label for="discountValue" class="form-label">Discount Value</label>
+            <div class="input-group">
+              <input
+                type="number"
+                step="0.01"
+                id="discountValue"
+                class="form-control"
+                value="50"
+              />
+              <span class="input-group-text">%</span>
+            </div>
+          </div>
 
-                <div class="form-group">
-                    <label for="discountValue" class="form-label">Discount Value</label>
-                    <div class="input-group">
-                        <input type="number" step="0.01" id="discountValue" class="form-control" value="50">
-                        <span class="input-group-text">%</span>
-                    </div>
-                </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="startDate" class="form-label">Start Date</label>
+                <input
+                  type="date"
+                  id="startDate"
+                  class="form-control"
+                  value="2024-06-01"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="endDate" class="form-label">End Date</label>
+                <input
+                  type="date"
+                  id="endDate"
+                  class="form-control"
+                  value="2024-08-31"
+                />
+              </div>
+            </div>
+          </div>
 
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="startDate" class="form-label">Start Date</label>
-                            <input type="date" id="startDate" class="form-control" value="2024-06-01">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="endDate" class="form-label">End Date</label>
-                            <input type="date" id="endDate" class="form-control" value="2024-08-31">
-                        </div>
-                    </div>
-                </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <div class="status-group">
+              <label class="status-option">
+                <input type="radio" name="status" value="active" checked />
+                <span>Active</span>
+              </label>
+              <label class="status-option">
+                <input type="radio" name="status" value="inactive" />
+                <span>Inactive</span>
+              </label>
+            </div>
+          </div>
 
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <div class="status-group">
-                        <label class="status-option">
-                            <input type="radio" name="status" value="active" checked>
-                            <span>Active</span>
-                        </label>
-                        <label class="status-option">
-                            <input type="radio" name="status" value="inactive">
-                            <span>Inactive</span>
-                        </label>
-                    </div>
-                </div>
+          <h2 class="section-title">Conditions & Applicability</h2>
+          <p class="section-desc">Define specific rules for this offer.</p>
 
-                <h2 class="section-title">Conditions & Applicability</h2>
-                <p class="section-desc">Define specific rules for this offer.</p>
+          <div class="form-group">
+            <label for="minPurchase" class="form-label"
+              >Minimum Purchase ($)</label
+            >
+            <input
+              type="number"
+              step="0.01"
+              id="minPurchase"
+              class="form-control"
+              value="50"
+            />
+          </div>
 
-                <div class="form-group">
-                    <label for="minPurchase" class="form-label">Minimum Purchase ($)</label>
-                    <input type="number" step="0.01" id="minPurchase" class="form-control" value="50">
-                </div>
+          <div class="form-group">
+            <label for="targetId" class="form-label">Applicable Category</label>
+            <select id="targetId" class="form-select">
+              <option value="" disabled selected>Loading categories...</option>
+            </select>
+            <span class="form-help-text"
+              >Choose the category for this discount.</span
+            >
+          </div>
 
-                <div class="form-group">
-                    <label for="applicableProducts" class="form-label">Applicable Products / Categories</label>
-                    <input type="text" id="applicableProducts" class="form-control" value="iPhone 15, Samsung S24">
-                    <span class="form-help-text">Leave blank to apply to all products.</span>
-                </div>
-
-                <div class="form-footer">
-                    <button type="button" class="btn btn-cancel" onclick="location.href='./adminOffers.html'">Cancel</button>
-                    <button type="button" class="btn btn-create" onclick="updateOffer()">Update Offer</button>
-                </div>
-
-            </form>
-        </div>
+          <div class="form-footer">
+            <button
+              type="button"
+              class="btn btn-cancel"
+              onclick="location.href = './adminOffers.html'"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-create"
+              onclick="updateOffer()"
+            >
+              Update Offer
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function toggleSidebar() {
-            document.getElementById("sidebar").classList.toggle("active");
-            document.getElementById("sidebarOverlay").classList.toggle("active");
-        }
+      const urlParams = new URLSearchParams(window.location.search);
+      const offerId = urlParams.get("id");
+      const token = localStorage.getItem("token");
 
-        // Update Action
-        function updateOffer() {
-            const name = document.getElementById('offerName').value;
-            
-            if (!name) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Missing Info',
-                    text: 'Please provide an Offer Name.',
-                    confirmButtonColor: '#1a1a1a'
-                });
-                return;
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+        document.getElementById("sidebarOverlay").classList.toggle("active");
+      }
+
+      // 1. Fetch Existing Offer Data
+      async function loadOfferData() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const offerId = urlParams.get("id");
+        const token = localStorage.getItem("token");
+
+        if (!offerId) return;
+
+        try {
+          // 1. Wait for categories to load so the dropdown is ready
+          await loadCategories();
+
+          // 2. Fetch the specific offer details
+          const res = await fetch(`/api/admin/offers/${offerId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const result = await res.json();
+
+          if (result.success) {
+            const offer = result.offer;
+            document.getElementById("offerName").value = offer.name;
+            document.getElementById("discountValue").value =
+              offer.discountPercentage;
+            document.getElementById("startDate").value =
+              offer.startDate.split("T")[0];
+            document.getElementById("endDate").value =
+              offer.endDate.split("T")[0];
+
+            // Set the dropdown to the correct category ID
+            const targetIdSelect = document.getElementById("targetId");
+            if (targetIdSelect) {
+              targetIdSelect.value = offer.targetId._id || offer.targetId;
             }
 
-            Swal.fire({
-                title: 'Updated!',
-                text: 'Offer details have been updated.',
-                icon: 'success',
-                confirmButtonColor: '#1a1a1a',
-                confirmButtonText: 'Go to Offers'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = './adminOffers.html';
-                }
-            });
-        }
-
-        // Delete Action
-        function deleteOffer() {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#1a1a1a',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire(
-                        'Deleted!',
-                        'Offer has been deleted.',
-                        'success'
-                    ).then(() => {
-                        window.location.href = './adminOffers.html';
-                    });
-                }
-            });
-        }
-
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function(e) {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (window.innerWidth <= 991 && sidebar.classList.contains('active') && 
-                !e.target.closest('.sidebar') && !e.target.closest('.mobile-nav button')) {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
+            if (offer.status === "Inactive") {
+              document.querySelector(
+                'input[name="status"][value="inactive"]',
+              ).checked = true;
             }
+          }
+        } catch (error) {
+          console.error("Load Error:", error);
+          Swal.fire("Error", "Failed to load offer data", "error");
+        }
+      }
+
+      async function loadCategories() {
+        const targetSelect = document.getElementById("targetId");
+        if (!targetSelect)
+          throw new Error("Dropdown 'targetId' not found in HTML");
+
+        try {
+          const res = await fetch("/api/admin/categories");
+          const result = await res.json();
+          const categoriesArray = result.data || []; // Your controller uses the 'data' key
+
+          targetSelect.innerHTML =
+            '<option value="" disabled>Select a category</option>';
+          categoriesArray.forEach((cat) => {
+            const option = document.createElement("option");
+            option.value = cat.id; // Using 'id' from your controller's map function
+            option.textContent = cat.name;
+            targetSelect.appendChild(option);
+          });
+        } catch (error) {
+          console.error("Category Load Error:", error);
+        }
+      }
+
+      // 3. Update Function
+      async function updateOffer() {
+        const offerData = {
+          name: document.getElementById("offerName").value,
+          offerType:
+            document.getElementById("offerType").value === "percentage"
+              ? "Category"
+              : "Product",
+          discountPercentage: parseFloat(
+            document.getElementById("discountValue").value,
+          ),
+          targetId: document.getElementById("targetId").value,
+          startDate: document.getElementById("startDate").value,
+          endDate: document.getElementById("endDate").value,
+          status:
+            document.querySelector('input[name="status"]:checked').value ===
+            "active"
+              ? "Active"
+              : "Inactive",
+        };
+
+        try {
+          const res = await fetch(`/api/admin/offers/${offerId}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(offerData),
+          });
+
+          const data = await res.json();
+          if (data.success) {
+            Swal.fire("Success", "Offer updated successfully!", "success").then(
+              () => (window.location.href = "./adminOffers.html"),
+            );
+          } else {
+            throw new Error(data.message);
+          }
+        } catch (error) {
+          Swal.fire("Error", error.message, "error");
+        }
+      }
+
+      // 4. Delete Function
+      async function deleteOffer() {
+        const confirm = await Swal.fire({
+          title: "Are you sure?",
+          text: "This action cannot be undone!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#dc3545",
+          confirmButtonText: "Yes, delete it!",
         });
+
+        if (confirm.isConfirmed) {
+          try {
+            const res = await fetch(`/api/admin/offers/${offerId}`, {
+              method: "DELETE",
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            if ((await res.json()).success) {
+              Swal.fire("Deleted!", "Offer removed.", "success").then(
+                () => (window.location.href = "./adminOffers.html"),
+              );
+            }
+          } catch (err) {
+            Swal.fire("Error", "Delete failed", "error");
+          }
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", loadOfferData);
     </script>
-</body>
+  </body>
 </html>

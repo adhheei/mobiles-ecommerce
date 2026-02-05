@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -38,10 +38,18 @@
 
       /* --- ANIMATIONS --- */
       @keyframes slideInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
-      .content-animate { animation: slideInUp 0.6s ease-out forwards; }
+      .content-animate {
+        animation: slideInUp 0.6s ease-out forwards;
+      }
 
       /* --- SIDEBAR --- */
       .sidebar {
@@ -89,7 +97,7 @@
         font-weight: 600;
         text-transform: uppercase;
       }
-      
+
       .sidebar-menu {
         list-style: none;
         padding: 0;
@@ -239,7 +247,7 @@
         margin: 0;
         color: #000;
       }
-      
+
       .btn-add-new {
         background-color: #000;
         color: #fff;
@@ -304,7 +312,9 @@
         font-weight: 500;
         height: 46px;
         appearance: none;
-        background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") no-repeat right 0.75rem center/16px 12px;
+        background: #fff
+          url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e")
+          no-repeat right 0.75rem center/16px 12px;
         font-family: "Poppins", sans-serif;
         min-width: 160px;
       }
@@ -457,7 +467,11 @@
       </button>
     </div>
 
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div
+      class="sidebar-overlay"
+      id="sidebarOverlay"
+      onclick="toggleSidebar()"
+    ></div>
 
     <nav class="sidebar" id="sidebar">
       <a href="./adminDashboard.html" class="brand-section">
@@ -469,21 +483,70 @@
       </a>
 
       <ul class="sidebar-menu">
-        <li class="menu-item"><a href="../Admin/adminDashboard.html" class="menu-link"><i class="fa-solid fa-border-all"></i> &nbsp;Dashboard</a></li>
-        <li class="menu-item"><a href="../Admin/adminOrders.html" class="menu-link"><i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a></li>
-      <li class="menu-item"><a href="../Admin/adminTransactions.html" class="menu-link"><i class="fa-solid fa-money-bill-transfer"></i> &nbsp;Transactions</a></li>
-        <li class="menu-item"><a href="../Admin/adminProducts.html" class="menu-link"><i class="fa-solid fa-box-open"></i> &nbsp;Products</a></li>
-        <li class="menu-item"><a href="../Admin/adminCustomers.html" class="menu-link"><i class="fa-solid fa-users"></i> &nbsp;Customers</a></li>
-        <li class="menu-item"><a href="../Admin/adminMessages.html" class="menu-link"><i class="fa-regular fa-envelope"></i> &nbsp;Messages</a></li>
-        <li class="menu-item"><a href="../Admin/adminAnalytics.html" class="menu-link"><i class="fa-solid fa-chart-simple"></i> &nbsp;Analytics</a></li>
-        <li class="menu-item"><a href="../Admin/adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i> &nbsp;Coupon Management</a></li>
-        <li class="menu-item"><a href="../Admin/adminCategories.html" class="menu-link"><i class="fa-solid fa-layer-group"></i> &nbsp;Category Management</a></li>
-        <li class="menu-item"><a href="../Admin/adminOffers.html" class="menu-link active"><i class="fa-solid fa-gift"></i> &nbsp;Offer</a></li>
+        <li class="menu-item">
+          <a href="../Admin/adminDashboard.html" class="menu-link"
+            ><i class="fa-solid fa-border-all"></i> &nbsp;Dashboard</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminOrders.html" class="menu-link"
+            ><i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminTransactions.html" class="menu-link"
+            ><i class="fa-solid fa-money-bill-transfer"></i>
+            &nbsp;Transactions</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminProducts.html" class="menu-link"
+            ><i class="fa-solid fa-box-open"></i> &nbsp;Products</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminCustomers.html" class="menu-link"
+            ><i class="fa-solid fa-users"></i> &nbsp;Customers</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminMessages.html" class="menu-link"
+            ><i class="fa-regular fa-envelope"></i> &nbsp;Messages</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminAnalytics.html" class="menu-link"
+            ><i class="fa-solid fa-chart-simple"></i> &nbsp;Analytics</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminCoupons.html" class="menu-link"
+            ><i class="fa-solid fa-tag"></i> &nbsp;Coupon Management</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminCategories.html" class="menu-link"
+            ><i class="fa-solid fa-layer-group"></i> &nbsp;Category
+            Management</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminOffers.html" class="menu-link active"
+            ><i class="fa-solid fa-gift"></i> &nbsp;Offer</a
+          >
+        </li>
       </ul>
 
       <div class="admin-profile">
-        <a href="../Admin/adminProfile.html" class="profile-info text-decoration-none text-reset">
-          <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
+        <a
+          href="../Admin/adminProfile.html"
+          class="profile-info text-decoration-none text-reset"
+        >
+          <img
+            src="https://placehold.co/100x100/ccc/fff?text=A"
+            alt="Admin"
+            class="admin-avatar"
+          />
           <div class="admin-details">
             <h6 id="sidebarName" class="m-0">Admin</h6>
             <span class="small text-muted">admin@example.com</span>
@@ -506,20 +569,37 @@
       <div class="table-toolbar">
         <div class="search-box">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="searchInput" placeholder="Search offers..." onkeyup="applyFilters()" />
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search offers..."
+            onkeyup="applyFilters()"
+          />
         </div>
         <div class="filter-group">
-          <select class="custom-select" id="filterStatus" onchange="applyFilters()">
+          <select
+            class="custom-select"
+            id="filterStatus"
+            onchange="applyFilters()"
+          >
             <option value="all">All Status</option>
             <option value="Active">Active</option>
             <option value="Expired">Expired</option>
           </select>
-          <select class="custom-select" id="filterType" onchange="applyFilters()">
+          <select
+            class="custom-select"
+            id="filterType"
+            onchange="applyFilters()"
+          >
             <option value="all">All Types</option>
             <option value="Product">Product Offer</option>
             <option value="Referral">Referral Offer</option>
           </select>
-          <select class="custom-select" id="sortOption" onchange="applyFilters()">
+          <select
+            class="custom-select"
+            id="sortOption"
+            onchange="applyFilters()"
+          >
             <option value="newest">Newest First</option>
             <option value="oldest">Oldest First</option>
             <option value="value-high">Discount: High to Low</option>
@@ -539,112 +619,156 @@
               <th class="text-end">Actions</th>
             </tr>
           </thead>
-          <tbody id="offerTableBody">
-          </tbody>
+          <tbody id="offerTableBody"></tbody>
         </table>
       </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+      let offers = []; // Global state for live data
+
       function toggleSidebar() {
         document.getElementById("sidebar").classList.toggle("active");
         document.getElementById("sidebarOverlay").classList.toggle("active");
       }
 
-      // --- Dummy Data ---
-      let offers = [
-        { id: 1, title: "Summer Sale 2024", type: "Product", value: 15, expiry: "2024-08-30", status: "Active", desc: "Flat 15% off on all accessories." },
-        { id: 2, title: "Refer & Earn", type: "Referral", value: 20, expiry: "2024-12-31", status: "Active", desc: "Get 20% off when you refer a friend." },
-        { id: 3, title: "Winter Clearance", type: "Product", value: 30, expiry: "2023-01-15", status: "Expired", desc: "End of season sale." },
-        { id: 4, title: "Welcome Bonus", type: "Referral", value: 10, expiry: "2023-05-10", status: "Expired", desc: "Welcome discount for new users." },
-      ];
+      // 1. FETCH LIVE OFFERS FROM SERVER
+      async function fetchOffers() {
+        const token = localStorage.getItem("token");
+        const tbody = document.getElementById("offerTableBody");
 
-      // --- Main Filter & Sort Logic ---
+        try {
+          tbody.innerHTML =
+            '<tr><td colspan="6" class="text-center py-4">Loading offers...</td></tr>';
+
+          const res = await fetch("/api/admin/offers", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const result = await res.json();
+
+          if (result.success) {
+            offers = result.offers; // Store live data
+            applyFilters(); // Initial render
+          } else {
+            throw new Error(result.message);
+          }
+        } catch (error) {
+          console.error("Fetch error:", error);
+          tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">Error: ${error.message}</td></tr>`;
+        }
+      }
+
+      // 2. LIVE FILTER & SORT LOGIC
       function applyFilters() {
-        const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+        const searchTerm = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
         const statusFilter = document.getElementById("filterStatus").value;
         const typeFilter = document.getElementById("filterType").value;
         const sortOption = document.getElementById("sortOption").value;
 
-        // 1. Filter
-        let filtered = offers.filter(offer => {
-            const matchesSearch = offer.title.toLowerCase().includes(searchTerm);
-            const matchesStatus = statusFilter === 'all' || offer.status === statusFilter;
-            const matchesType = typeFilter === 'all' || offer.type === typeFilter;
-            return matchesSearch && matchesStatus && matchesType;
+        let filtered = offers.filter((offer) => {
+          // Check for name or targetId name if populated
+          const matchesSearch = offer.name.toLowerCase().includes(searchTerm);
+          const matchesStatus =
+            statusFilter === "all" || offer.status === statusFilter;
+          const matchesType =
+            typeFilter === "all" || offer.offerType === typeFilter;
+          return matchesSearch && matchesStatus && matchesType;
         });
 
-        // 2. Sort
+        // Sort Logic
         filtered.sort((a, b) => {
-            if (sortOption === 'newest') return b.id - a.id; 
-            if (sortOption === 'oldest') return a.id - b.id;
-            if (sortOption === 'value-high') return b.value - a.value;
-            return 0;
+          if (sortOption === "newest")
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          if (sortOption === "oldest")
+            return new Date(a.createdAt) - new Date(b.createdAt);
+          if (sortOption === "value-high")
+            return b.discountPercentage - a.discountPercentage;
+          return 0;
         });
 
         renderTable(filtered);
       }
 
-      // --- Render Table ---
+      // 3. RENDER TABLE WITH SCHEMA MAPPING
       function renderTable(data) {
         const tbody = document.getElementById("offerTableBody");
         tbody.innerHTML = "";
 
         if (data.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No offers found.</td></tr>';
+          tbody.innerHTML =
+            '<tr><td colspan="6" class="text-center py-4 text-muted">No offers found.</td></tr>';
           return;
         }
 
-        data.forEach(offer => {
-          let badgeClass = offer.type === "Product" ? "offer-product" : "offer-referral";
-          let statusClass = offer.status === "Active" ? "status-active" : "status-expired";
+        data.forEach((offer) => {
+          // Mapping Schema: offerType ('Category'/'Product') and status ('Active'/'Inactive')
+          let badgeClass =
+            offer.offerType === "Product" ? "offer-product" : "offer-referral";
+          let statusClass =
+            offer.status === "Active" ? "status-active" : "status-expired";
+
+          // Formatting date from ISO string
+          const expiryDate = new Date(offer.endDate).toLocaleDateString();
 
           const row = `
-            <tr>
-              <td class="fw-bold">${offer.title}</td>
-              <td><span class="badge-custom ${badgeClass}">${offer.type}</span></td>
-              <td>${offer.value}%</td>
-              <td>${offer.expiry}</td>
-              <td><span class="badge-custom ${statusClass}">${offer.status}</span></td>
-              <td class="text-end">
-                <a href="./adminEditOffer.html?id=${offer.id}" class="action-btn" title="Edit">
-                    <i class="fa-solid fa-pen"></i>
-                </a>
-                <button class="action-btn btn-delete" title="Delete" onclick="deleteOffer(${offer.id})">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
-              </td>
-            </tr>
-          `;
+        <tr>
+          <td class="fw-bold">${offer.name}</td>
+          <td><span class="badge-custom ${badgeClass}">${offer.offerType}</span></td>
+          <td>${offer.discountPercentage}%</td>
+          <td>${expiryDate}</td>
+          <td><span class="badge-custom ${statusClass}">${offer.status}</span></td>
+          <td class="text-end">
+            <a href="./adminEditOffer.html?id=${offer._id}" class="action-btn" title="Edit">
+                <i class="fa-solid fa-pen"></i>
+            </a>
+            <button class="action-btn btn-delete" title="Delete" onclick="deleteOffer('${offer._id}')">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `;
           tbody.innerHTML += row;
         });
       }
 
-      // --- Delete Offer ---
-      function deleteOffer(id) {
-        Swal.fire({
-          title: 'Are you sure?',
-          text: "You won't be able to revert this!",
-          icon: 'warning',
+      // 4. LIVE DELETE OFFER
+      async function deleteOffer(id) {
+        const result = await Swal.fire({
+          title: "Are you sure?",
+          text: "Product prices associated with this offer will remain modified!",
+          icon: "warning",
           showCancelButton: true,
-          confirmButtonColor: '#dc3545',
-          cancelButtonColor: '#1a1a1a',
-          confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            const index = offers.findIndex(o => o.id === id);
-            if(index > -1) {
-              offers.splice(index, 1);
-              applyFilters();
-              Swal.fire('Deleted!', 'Offer has been removed.', 'success');
-            }
-          }
+          confirmButtonColor: "#dc3545",
+          cancelButtonColor: "#1a1a1a",
+          confirmButtonText: "Yes, delete it!",
         });
+
+        if (result.isConfirmed) {
+          try {
+            const token = localStorage.getItem("token");
+            const res = await fetch(`/api/admin/offers/${id}`, {
+              method: "DELETE",
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            const data = await res.json();
+
+            if (data.success) {
+              Swal.fire("Deleted!", "Offer removed successfully.", "success");
+              fetchOffers(); // Refresh the list
+            } else {
+              throw new Error(data.message);
+            }
+          } catch (error) {
+            Swal.fire("Error", error.message, "error");
+          }
+        }
       }
 
-      // Init
-      document.addEventListener("DOMContentLoaded", () => applyFilters());
+      // Init - Fetch real data on load
+      document.addEventListener("DOMContentLoaded", () => fetchOffers());
     </script>
   </body>
 </html>
