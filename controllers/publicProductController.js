@@ -1,10 +1,7 @@
 // controllers/publicProductController.js
-const Product = require('../models/Product');
-const Category = require('../models/Category');
-const path = require('path');
-
-
-
+const Product = require("../models/Product");
+const Category = require("../models/Category");
+const path = require("path");
 
 // Get categories with product counts for filtering
 exports.getCategoriesWithCounts = async (req, res) => {
@@ -18,64 +15,74 @@ exports.getCategoriesWithCounts = async (req, res) => {
         const productCount = await Product.countDocuments({
           category: cat._id,
           stock: { $gt: 0 },
-          status: 'active'
+          status: "active",
         });
         return {
           _id: cat._id.toString(),
           name: cat.name,
-          productCount: productCount
+          productCount: productCount,
         };
-      })
+      }),
     );
 
     res.json({ success: true, categories: categoriesWithCounts });
   } catch (err) {
-    console.error('Error fetching categories with counts:', err);
-    res.status(500).json({ success: false, error: 'Failed to load categories' });
+    console.error("Error fetching categories with counts:", err);
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to load categories" });
   }
 };
 
 exports.getPublicProducts = async (req, res) => {
   try {
-    const { page = 1, limit = 12, category, brand, search, sort, inStock, maxPrice } = req.query;
+    const {
+      page = 1,
+      limit = 12,
+      category,
+      brand,
+      search,
+      sort,
+      inStock,
+      maxPrice,
+    } = req.query;
 
     // Build query
-    // Build query
     let query = {
-      status: { $in: ['active', 'outofstock'] }
+      status: { $in: ["active", "outofstock"] },
     };
 
     // Search by name
-    if (search) {
-      query.name = { $regex: search, $options: 'i' };
+    if (search && search.trim() !== "") {
+      query.name = { $regex: search, $options: "i" }; // 'i' makes it case-insensitive
     }
 
     // Filter by category (multiple categories supported)
-    if (category && category !== 'all') {
-      const categoryArray = category.split(',');
+    if (category && category !== "all") {
+      const categoryArray = category.split(",");
       query.category = { $in: categoryArray };
     }
 
     // Filter by brand (multiple brands supported)
-    if (brand && brand !== 'all') {
-      const brandArray = brand.split(',');
+    if (brand && brand !== "all") {
+      const brandArray = brand.split(",");
       // Create case-insensitive regex for each brand
-      const brandRegexArray = brandArray.map(b => new RegExp(`^${b}$`, 'i'));
-      console.log('Brand Filter:', brand, 'Regex:', brandRegexArray);
+      const brandRegexArray = brandArray.map((b) => new RegExp(`^${b}$`, "i"));
+      console.log("Brand Filter:", brand, "Regex:", brandRegexArray);
       query.brand = { $in: brandRegexArray };
     }
-    console.log('Final Query:', JSON.stringify(query));
+    console.log("Final Query:", JSON.stringify(query));
 
     // In-stock only filter
-    if (inStock === 'true' || inStock === true) {
-      console.log('Applying In-Stock Filter: stock > 0 AND status = active');
+    if (inStock === "true" || inStock === true) {
+      console.log("Applying In-Stock Filter: stock > 0 AND status = active");
       query.stock = { $gt: 0 };
-      query.status = 'active'; // Force active status just in case
+      query.status = "active"; // Force active status just in case
     } else {
       // Ensure we show outofstock items if filter is OFF (which is default behavior of query init)
       // query.status is already { $in: ['active', 'outofstock'] }
     }
-    console.log('Query after stock filter:', JSON.stringify(query));
+    console.log("Query after stock filter:", JSON.stringify(query));
 
     // Price range filter
     if (maxPrice) {
@@ -85,17 +92,17 @@ exports.getPublicProducts = async (req, res) => {
     // Build sort object
     let sortObj = {};
     switch (sort) {
-      case 'price-low-high':
+      case "price-low-high":
         sortObj = { offerPrice: 1 };
         break;
-      case 'price-high-low':
+      case "price-high-low":
         sortObj = { offerPrice: -1 };
         break;
-      case 'newest':
+      case "newest":
         sortObj = { createdAt: -1 };
         break;
-      case 'best-selling':
-      case 'featured':
+      case "best-selling":
+      case "featured":
       default:
         sortObj = { createdAt: -1 };
     }
@@ -103,13 +110,13 @@ exports.getPublicProducts = async (req, res) => {
     const skip = (page - 1) * limit;
     const total = await Product.countDocuments(query);
     const products = await Product.find(query)
-      .populate('category', 'name')
+      .populate("category", "name")
       .sort(sortObj)
       .skip(skip)
       .limit(limit);
 
     // Format response
-    const formatted = products.map(p => ({
+    const formatted = products.map((p) => ({
       id: p._id.toString(),
       name: p.name,
       description: p.description,
@@ -119,9 +126,11 @@ exports.getPublicProducts = async (req, res) => {
       stock: p.stock,
       stock: p.stock,
       status: p.status,
-      brand: p.brand || 'Generic',
-      categoryName: p.category?.name || 'Uncategorized',
-      mainImage: p.mainImage ? `/uploads/products/${path.basename(p.mainImage)}` : '/images/logo.jpg'
+      brand: p.brand || "Generic",
+      categoryName: p.category?.name || "Uncategorized",
+      mainImage: p.mainImage
+        ? `/uploads/products/${path.basename(p.mainImage)}`
+        : "/images/logo.jpg",
     }));
 
     res.json({
@@ -130,40 +139,40 @@ exports.getPublicProducts = async (req, res) => {
       pagination: {
         total,
         page: parseInt(page),
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (err) {
-    console.error('Error in getPublicProducts:', err);
-    res.status(500).json({ success: false, error: 'Failed to fetch products' });
+    console.error("Error in getPublicProducts:", err);
+    res.status(500).json({ success: false, error: "Failed to fetch products" });
   }
 };
 
 exports.getBrandsWithCounts = async (req, res) => {
   try {
     const brands = await Product.aggregate([
-      { $match: { status: { $in: ['active', 'outofstock'] } } },
+      { $match: { status: { $in: ["active", "outofstock"] } } },
       {
         $group: {
           _id: { $toLower: "$brand" }, // Group by lowercase brand to normalize
           originalName: { $first: "$brand" }, // Keep one original casing
-          count: { $sum: 1 }
-        }
+          count: { $sum: 1 },
+        },
       },
-      { $sort: { originalName: 1 } }
+      { $sort: { originalName: 1 } },
     ]);
 
     // Map to cleaner format, handle Generic/null
-    const formattedBrands = brands.map(b => ({
-      name: b.originalName || 'Generic',
+    const formattedBrands = brands.map((b) => ({
+      name: b.originalName || "Generic",
       count: b.count,
-      id: b.originalName // Use name as ID for simplicity in frontend
+      id: b.originalName, // Use name as ID for simplicity in frontend
     }));
 
     res.json({ success: true, brands: formattedBrands });
   } catch (err) {
-    console.error('Error fetching brands:', err);
-    res.status(500).json({ success: false, error: 'Failed to fetch brands' });
+    console.error("Error fetching brands:", err);
+    res.status(500).json({ success: false, error: "Failed to fetch brands" });
   }
 };
 
@@ -174,47 +183,51 @@ exports.getSearchSuggestions = async (req, res) => {
       return res.json({ success: true, suggestions: [] });
     }
 
-    const regex = new RegExp(q, 'i');
+    const regex = new RegExp(q, "i");
 
     // Search active products
     const products = await Product.find({
       $or: [{ name: regex }, { description: regex }],
-      status: { $in: ['active', 'outofstock'] } // Exclude drafts
+      status: { $in: ["active", "outofstock"] }, // Exclude drafts
     })
-      .select('name _id mainImage category brand')
-      .populate('category', 'name')
+      .select("name _id mainImage category brand")
+      .populate("category", "name")
       .limit(5);
 
     // Search categories
     const categories = await Category.find({
-      name: regex
-    }).select('name _id').limit(3);
+      name: regex,
+    })
+      .select("name _id")
+      .limit(3);
 
     const suggestions = [];
 
-    categories.forEach(cat => {
+    categories.forEach((cat) => {
       suggestions.push({
-        type: 'category',
+        type: "category",
         label: cat.name,
         id: cat._id,
-        url: `./productPage.html?category=${cat._id}`
+        url: `./productPage.html?category=${cat._id}`,
       });
     });
 
-    products.forEach(prod => {
+    products.forEach((prod) => {
       suggestions.push({
-        type: 'product',
+        type: "product",
         label: prod.name,
-        image: prod.mainImage ? `/uploads/products/${path.basename(prod.mainImage)}` : '/images/logo.jpg',
+        image: prod.mainImage
+          ? `/uploads/products/${path.basename(prod.mainImage)}`
+          : "/images/logo.jpg",
         id: prod._id,
-        url: `./singleProductPage.html?id=${prod._id}`
+        url: `./singleProductPage.html?id=${prod._id}`,
       });
     });
 
     res.json({ success: true, suggestions });
   } catch (err) {
-    console.error('Error in getSearchSuggestions:', err);
-    res.status(500).json({ success: false, error: 'Search failed' });
+    console.error("Error in getSearchSuggestions:", err);
+    res.status(500).json({ success: false, error: "Search failed" });
   }
 };
 
@@ -231,38 +244,51 @@ exports.getSuggestions = async (req, res) => {
     let cartCategories = []; // IDs
 
     if (excludeIds.length > 0) {
-      const cartItems = await Product.find({ _id: { $in: excludeIds } }).select('category brand name');
-      cartBrands = cartItems.map(p => p.brand).filter(b => b && b !== 'Generic');
-      cartCategories = cartItems.map(p => p.category);
+      const cartItems = await Product.find({ _id: { $in: excludeIds } }).select(
+        "category brand name",
+      );
+      cartBrands = cartItems
+        .map((p) => p.brand)
+        .filter((b) => b && b !== "Generic");
+      cartCategories = cartItems.map((p) => p.category);
 
       // Remove duplicates
       cartBrands = [...new Set(cartBrands)];
 
       // Filter out null categories if any
-      cartCategories = cartCategories.filter(c => c);
+      cartCategories = cartCategories.filter((c) => c);
     }
 
     // 2. Find "Accessories" Category ID (heuristic)
     // We look for categories with "Accessory" or "Accessories" in name
     const accessoryCategories = await Category.find({
       name: { $regex: /accessor/i },
-      isActive: true
-    }).select('_id');
+      isActive: true,
+    }).select("_id");
 
-    const accessoryCategoryIds = accessoryCategories.map(c => c._id);
+    const accessoryCategoryIds = accessoryCategories.map((c) => c._id);
 
     // 3. Build Accessory Query
-    // Strategy: 
+    // Strategy:
     // A. Properties: Brand match AND (Category is Accessory OR Name has keywords)
     // B. Fallback: Same category as cart items (Cross-sell)
 
-    const keywords = ['Case', 'Cover', 'Glass', 'Screen Guard', 'Charger', 'Adapter', 'Headset', 'Cable'];
-    const keywordRegex = keywords.map(k => new RegExp(k, 'i'));
+    const keywords = [
+      "Case",
+      "Cover",
+      "Glass",
+      "Screen Guard",
+      "Charger",
+      "Adapter",
+      "Headset",
+      "Cable",
+    ];
+    const keywordRegex = keywords.map((k) => new RegExp(k, "i"));
 
     let query = {
       _id: { $nin: excludeIds },
-      status: 'active',
-      stock: { $gt: 0 }
+      status: "active",
+      stock: { $gt: 0 },
     };
 
     // Primary goal: Find accessories for the brands in cart
@@ -273,26 +299,26 @@ exports.getSuggestions = async (req, res) => {
       if (accessoryCategoryIds.length > 0) {
         conditions.push({
           brand: { $in: cartBrands },
-          category: { $in: accessoryCategoryIds }
+          category: { $in: accessoryCategoryIds },
         });
       }
       // Condition 2: Same Brand + Keyword in Name
       conditions.push({
         brand: { $in: cartBrands },
-        name: { $in: keywordRegex }
+        name: { $in: keywordRegex },
       });
 
       // Condition 3: Just Accessory Category (allow other brands if general accessories)
       if (accessoryCategoryIds.length > 0) {
         conditions.push({
-          category: { $in: accessoryCategoryIds }
+          category: { $in: accessoryCategoryIds },
         });
       }
     } else {
       // No Brands? Just show Popular Accessories
       if (accessoryCategoryIds.length > 0) {
         conditions.push({
-          category: { $in: accessoryCategoryIds }
+          category: { $in: accessoryCategoryIds },
         });
       }
     }
@@ -300,7 +326,7 @@ exports.getSuggestions = async (req, res) => {
     // Fallback: Same category as cart items
     if (cartCategories.length > 0) {
       conditions.push({
-        category: { $in: cartCategories }
+        category: { $in: cartCategories },
       });
     }
 
@@ -310,16 +336,16 @@ exports.getSuggestions = async (req, res) => {
 
     // 4. Fetch Products
     let products = await Product.find(query)
-      .populate('category', 'name')
+      .populate("category", "name")
       .limit(8)
       .sort({ createdAt: -1 }); // Newest first
 
     // 5. Fallback if not enough
     if (products.length < 3) {
       const moreProducts = await Product.find({
-        _id: { $nin: [...excludeIds, ...products.map(p => p._id)] },
-        status: 'active',
-        stock: { $gt: 0 }
+        _id: { $nin: [...excludeIds, ...products.map((p) => p._id)] },
+        status: "active",
+        stock: { $gt: 0 },
       })
         .limit(6 - products.length)
         .sort({ createdAt: -1 });
@@ -330,7 +356,7 @@ exports.getSuggestions = async (req, res) => {
     // Deduplicate (just in case)
     const uniqueProducts = [];
     const seenMap = new Set();
-    products.forEach(p => {
+    products.forEach((p) => {
       if (!seenMap.has(p._id.toString())) {
         seenMap.add(p._id.toString());
         uniqueProducts.push(p);
@@ -341,19 +367,20 @@ exports.getSuggestions = async (req, res) => {
     products = uniqueProducts.slice(0, 6);
 
     // Format
-    const formatted = products.map(p => ({
+    const formatted = products.map((p) => ({
       id: p._id.toString(),
       name: p.name,
       offerPrice: p.offerPrice,
       actualPrice: p.actualPrice,
-      image: p.mainImage ? `/uploads/products/${path.basename(p.mainImage)}` : '/images/logo.jpg',
-      category: p.category?.name
+      image: p.mainImage
+        ? `/uploads/products/${path.basename(p.mainImage)}`
+        : "/images/logo.jpg",
+      category: p.category?.name,
     }));
 
     res.json({ success: true, products: formatted });
-
   } catch (err) {
-    console.error('Error fetching suggestions:', err);
-    res.status(500).json({ success: false, error: 'Failed' });
+    console.error("Error fetching suggestions:", err);
+    res.status(500).json({ success: false, error: "Failed" });
   }
 };

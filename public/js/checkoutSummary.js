@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        const deliveryCharge = (subtotal - couponDiscount) > 499 ? 0 : 40;
+        const deliveryCharge = 0;
         const finalAmount = subtotal - couponDiscount + deliveryCharge;
 
         // --- 3. RENDER UI ---
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         summaryContainer.innerHTML = `
             <h5 class="mb-4 fw-bold">Order Details</h5>
             
-            <div class="summary-items mb-4" style="max-height: 300px; overflow-y: auto;">
+            <div class="summary-items" style="max-height: 300px; overflow-y: auto;">
                 ${itemsHtml}
             </div>
 
