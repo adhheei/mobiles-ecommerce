@@ -113,6 +113,7 @@ router.get('/transactions/download', isAdmin, downloadTransactions);
 router.get('/users', isAdmin, getAllUsers);
 router.patch('/users/:id/block', isAdmin, toggleBlockUser);
 router.get('/wallet/:userId', isAdmin, adminGetWallet);
+router.get('/orders', isAdmin, getAdminOrderDetails);
 router.get('/orders/:id', isAdmin, getAdminOrderDetails);
 router.put('/orders/:id/status', isAdmin, updateOrderStatus);
 
