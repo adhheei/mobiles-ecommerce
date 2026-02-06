@@ -626,7 +626,6 @@
                 <select id="offerType" class="form-select">
                   <option value="percentage">Percentage Discount</option>
                   <option value="fixed">Fixed Amount Discount</option>
-                  <option value="bogo" selected>Buy One Get One</option>
                 </select>
               </div>
             </div>
@@ -751,10 +750,9 @@
         if (!offerId) return;
 
         try {
-          // 1. Wait for categories to load so the dropdown is ready
+          // Wait for categories to load so the dropdown is ready
           await loadCategories();
 
-          // 2. Fetch the specific offer details
           const res = await fetch(`/api/admin/offers/${offerId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
@@ -762,9 +760,29 @@
 
           if (result.success) {
             const offer = result.offer;
+
+            // Basic Fields
             document.getElementById("offerName").value = offer.name;
             document.getElementById("discountValue").value =
               offer.discountPercentage;
+
+            // --- FIX: Fetching Minimum Purchase ---
+            // Ensure your backend controller sends 'minPurchaseAmount' or similar
+            if (document.getElementById("minPurchase")) {
+              document.getElementById("minPurchase").value =
+                offer.minPurchaseAmount || 0;
+            }
+
+            // --- FIX: Fetching Offer Type ---
+            // Map backend 'Category'/'Product' back to frontend 'percentage'/'fixed'
+            const typeSelect = document.getElementById("offerType");
+            if (offer.offerType === "Category") {
+              typeSelect.value = "percentage";
+            } else if (offer.offerType === "Product") {
+              typeSelect.value = "fixed";
+            }
+
+            // Dates
             document.getElementById("startDate").value =
               offer.startDate.split("T")[0];
             document.getElementById("endDate").value =
@@ -776,9 +794,14 @@
               targetIdSelect.value = offer.targetId._id || offer.targetId;
             }
 
-            if (offer.status === "Inactive") {
+            // Status
+            if (offer.status === "Inactive" || offer.status === "inactive") {
               document.querySelector(
                 'input[name="status"][value="inactive"]',
+              ).checked = true;
+            } else {
+              document.querySelector(
+                'input[name="status"][value="active"]',
               ).checked = true;
             }
           }
@@ -825,6 +848,8 @@
           targetId: document.getElementById("targetId").value,
           startDate: document.getElementById("startDate").value,
           endDate: document.getElementById("endDate").value,
+          minPurchaseAmount:
+            parseFloat(document.getElementById("minPurchase").value) || 0,
           status:
             document.querySelector('input[name="status"]:checked').value ===
             "active"

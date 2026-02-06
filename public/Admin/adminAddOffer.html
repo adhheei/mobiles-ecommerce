@@ -579,7 +579,6 @@
                   </option>
                   <option value="percentage">Percentage Discount</option>
                   <option value="fixed">Fixed Amount Discount</option>
-                  <option value="bogo">Buy One Get One</option>
                 </select>
               </div>
             </div>
@@ -748,41 +747,21 @@
 
       // Function to fetch categories from the backend and populate the select menu
       async function loadCategories() {
+        const res = await fetch("/api/admin/categories");
+        const result = await res.json();
+        const categoriesArray = result.data || [];
+
         const targetSelect = document.getElementById("targetId");
-        if (!targetSelect) return;
+        targetSelect.innerHTML =
+          '<option value="" disabled selected>Select a category</option>';
 
-        try {
-          // This calls your controller's GET /api/admin/categories route
-          const res = await fetch("/api/admin/categories");
-          const result = await res.json();
-
-          // Debugging: This will show you the 'data' array in your console
-          console.log("Category API Response:", result);
-
-          // FIX: Your controller sends the array inside result.data
-          const categoriesArray = result.data || [];
-
-          targetSelect.innerHTML =
-            '<option value="" disabled selected>Select a category</option>';
-
-          if (categoriesArray.length === 0) {
-            targetSelect.innerHTML =
-              '<option value="">No categories found in database</option>';
-            return;
-          }
-
-          categoriesArray.forEach((cat) => {
-            const option = document.createElement("option");
-            // Use cat.id because your controller's .map() renames _id to id
-            option.value = cat.id;
-            option.textContent = cat.name;
-            targetSelect.appendChild(option);
-          });
-        } catch (error) {
-          console.error("Fetch error:", error);
-          targetSelect.innerHTML =
-            '<option value="">Error connecting to server</option>';
-        }
+        categoriesArray.forEach((cat) => {
+          const option = document.createElement("option");
+          // 'cat.id' must match your Product model's 'category' field
+          option.value = cat.id;
+          option.textContent = cat.name;
+          targetSelect.appendChild(option);
+        });
       }
 
       // Close sidebar when clicking outside on mobile

@@ -146,25 +146,25 @@ const cancelOrder = async (req, res) => {
 // @route   GET /api/admin/orders/:id
 // @access  Private/Admin
 const getAdminOrderDetails = async (req, res) => {
-    try {
-        const orderId = req.params.id;
+  try {
+    const orderId = req.params.id;
 
-        if (orderId) {
-            // Populate userId to get actual customer name and email
-            const order = await Order.findById(orderId).populate('userId', 'name email');
-            if (!order) return res.status(404).json({ success: false, message: "Order not found" });
-            return res.status(200).json({ success: true, order });
-        }
-
-        // For the general list, populate userId for all orders
-        const orders = await Order.find()
-            .populate('userId', 'firstName lastName email') 
-            .sort({ createdAt: -1 });
-
-        res.status(200).json({ success: true, orders });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+    if (orderId) {
+      // Populate userId to get actual customer name and email
+      const order = await Order.findById(orderId).populate('userId', 'firstName lastName email mobile createdAt isBlocked');
+      if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+      return res.status(200).json({ success: true, order });
     }
+
+    // For the general list, populate userId for all orders
+    const orders = await Order.find()
+      .populate('userId', 'firstName lastName email')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ success: true, orders });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 // @desc    Update order status (Admin)

@@ -264,6 +264,41 @@
       font-weight: 700;
     }
 
+    /* Wishlist Icon Styling */
+.wishlist-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.wishlist-btn i {
+    color: #888;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+
+.wishlist-btn:hover {
+    transform: scale(1.1);
+    background: #fff;
+}
+
+.wishlist-btn.active i {
+    color: #d32f2f; /* Primary Red */
+    font-weight: 900; /* Makes it a solid heart if using FontAwesome 6 */
+}
+
     .original-price {
       text-decoration: line-through;
       color: #999;
@@ -316,6 +351,33 @@
       font-size: 3rem;
       font-weight: 700;
     }
+
+    /* Red Small Banner Style */
+.discount-tag {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #d32f2f; /* Using Jinsa Mobiles Primary Red */
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-bottom-right-radius: 15px;
+    z-index: 10;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+    text-transform: uppercase;
+}
+
+/* Reference for the absolute badge */
+.card-img-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.current-price {
+    color: #d32f2f;
+    font-weight: 700;
+}
 
     .marquee-container {
       width: 100%;
@@ -450,7 +512,7 @@
       margin-bottom: 10px;
     }
   </style>
-
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link href="/css/navbar.css" rel="stylesheet" />
 </head>
 
@@ -628,182 +690,26 @@
   </script>
 
   <section id="hot-deals-section" class="container py-5 reveal-up">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="section-header fw-bold">Hot Deals</h2>
-      <div>
-        <button class="btn btn-outline-dark rounded-circle me-2" onclick="scrollSection('hotDealsSlider', 'left')">
-          <i class="fa-solid fa-chevron-left"></i>
-        </button>
-        <button class="btn btn-outline-dark rounded-circle" onclick="scrollSection('hotDealsSlider', 'right')">
-          <i class="fa-solid fa-chevron-right"></i>
-        </button>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="section-header fw-bold">Hot Deals</h2>
+    <div>
+      <button class="btn btn-outline-dark rounded-circle me-2" onclick="scrollSection('hotDealsSlider', 'left')">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <button class="btn btn-outline-dark rounded-circle" onclick="scrollSection('hotDealsSlider', 'right')">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="row scrolling-wrapper g-2" id="hotDealsSlider">
+    <div class="text-center w-100 py-5">
+      <div class="spinner-border text-danger" role="status">
+        <span class="visually-hidden">Loading Deals...</span>
       </div>
     </div>
-
-    <div class="row scrolling-wrapper g-2" id="hotDealsSlider">
-      <div class="col-lg-3 col-md-3">
-        <a href="./productDetails.html" class="text-decoration-none text-dark">
-          <div class="card product-card mb-2 border-0">
-            <div class="card-img-wrapper">
-              <span class="hot-deal-badge">Save 50%</span>
-              <img src="../images/boatpower.jpeg" alt="Powerbank" />
-            </div>
-          </div>
-          <div class="px-1">
-            <p class="brand-name mb-1">boat</p>
-            <h6 class="fw-bold text-truncate mb-1">
-              Boat powerbank 30000mah
-            </h6>
-            <div class="price-container">
-              <span class="current-price">Rs. 899.00</span>
-              <span class="original-price">Rs. 1499.00</span>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <div class="col-lg-3 col-md-3">
-        <a href="./productDetails.html" class="text-decoration-none text-dark">
-          <div class="card product-card mb-2 border-0">
-            <div class="card-img-wrapper">
-              <span class="hot-deal-badge">Save 70%</span>
-              <img src="../images/15 backcover.jpeg" alt="Case" />
-            </div>
-          </div>
-          <div class="px-1">
-            <p class="brand-name mb-1">KARWAN</p>
-            <h6 class="fw-bold text-truncate mb-1">
-              Apple iPhone 15 Plus Back Cover
-            </h6>
-            <div class="price-container">
-              <span class="current-price">Rs. 299.00</span>
-              <span class="original-price">Rs. 999.00</span>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <div class="col-lg-3 col-md-3">
-        <a href="./productDetails.html" class="text-decoration-none text-dark">
-          <div class="card product-card mb-2 border-0">
-            <div class="card-img-wrapper">
-              <span class="hot-deal-badge">Save 50%</span>
-              <img src="../images/portronicsM2.jpeg" alt="Headphone" />
-            </div>
-          </div>
-          <div class="px-1">
-            <p class="brand-name mb-1">PORTRONICS</p>
-            <h6 class="fw-bold text-truncate mb-1">
-              Portronics Muffs M2 Bluetooth
-            </h6>
-            <div class="price-container">
-              <span class="current-price">Rs. 999.00</span>
-              <span class="original-price">Rs. 1999.00</span>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <div class="col-lg-3 col-md-3">
-        <a href="./productDetails.html" class="text-decoration-none text-dark">
-          <div class="card product-card mb-2 border-0">
-            <div class="card-img-wrapper">
-              <span class="hot-deal-badge">Save 70%</span>
-              <img src="../images/16backcover.jpeg" alt="Blue Case" />
-            </div>
-          </div>
-          <div class="px-1">
-            <p class="brand-name mb-1">Enflamo</p>
-            <h6 class="fw-bold text-truncate mb-1">
-              Apple iPhone 16 Back Cover
-            </h6>
-            <div class="price-container">
-              <span class="current-price">Rs. 299.00</span>
-              <span class="original-price">Rs. 899.00</span>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <div class="col-lg-3 col-md-3">
-        <a href="./productDetails.html" class="text-decoration-none text-dark">
-          <div class="card product-card mb-2 border-0">
-            <div class="card-img-wrapper">
-              <span class="hot-deal-badge">Save 40%</span>
-              <img src="https://placehold.co/300x300?text=Charger" alt="Charger" />
-            </div>
-          </div>
-          <div class="px-1">
-            <p class="brand-name mb-1">SAMSUNG</p>
-            <h6 class="fw-bold text-truncate mb-1">25W Type-C Adapter</h6>
-            <div class="price-container">
-              <span class="current-price">Rs. 999.00</span>
-              <span class="original-price">Rs. 1699.00</span>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <div class="col-lg-3 col-md-3">
-        <a href="./productDetails.html" class="text-decoration-none text-dark">
-          <div class="card product-card mb-2 border-0">
-            <div class="card-img-wrapper">
-              <span class="hot-deal-badge">Save 60%</span>
-              <img src="https://placehold.co/300x300?text=Cable" alt="Cable" />
-            </div>
-          </div>
-          <div class="px-1">
-            <p class="brand-name mb-1">BOAT</p>
-            <h6 class="fw-bold text-truncate mb-1">Rugged Type-C Cable 1M</h6>
-            <div class="price-container">
-              <span class="current-price">Rs. 199.00</span>
-              <span class="original-price">Rs. 499.00</span>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <div class="col-lg-3 col-md-3">
-        <a href="./productDetails.html" class="text-decoration-none text-dark">
-          <div class="card product-card mb-2 border-0">
-            <div class="card-img-wrapper">
-              <span class="hot-deal-badge">Save 30%</span>
-              <img src="https://placehold.co/300x300?text=Earbuds" alt="Earbuds" />
-            </div>
-          </div>
-          <div class="px-1">
-            <p class="brand-name mb-1">REALME</p>
-            <h6 class="fw-bold text-truncate mb-1">Buds Air 5 Pro</h6>
-            <div class="price-container">
-              <span class="current-price">Rs. 4,999.00</span>
-              <span class="original-price">Rs. 7,999.00</span>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <div class="col-lg-3 col-md-3">
-        <a href="./productDetails.html" class="text-decoration-none text-dark">
-          <div class="card product-card mb-2 border-0">
-            <div class="card-img-wrapper">
-              <span class="hot-deal-badge">Save 80%</span>
-              <img src="https://placehold.co/300x300?text=Screen+Guard" alt="Screen Guard" />
-            </div>
-          </div>
-          <div class="px-1">
-            <p class="brand-name mb-1">SPIGEN</p>
-            <h6 class="fw-bold text-truncate mb-1">
-              Tempered Glass S24 Ultra
-            </h6>
-            <div class="price-container">
-              <span class="current-price">Rs. 499.00</span>
-              <span class="original-price">Rs. 2499.00</span>
-            </div>
-          </div>
-        </a>
-      </div>
-    </div>
-  </section>
+  </div>
+</section>
 
   <script>
     function scrollSection(sliderId, direction) {
@@ -1213,6 +1119,150 @@
         behavior: "smooth"
       });
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+    loadHotDeals();
+});
+
+async function loadHotDeals() {
+    const slider = document.getElementById('hotDealsSlider');
+    try {
+        // 1. Fetch active offers
+        const offerRes = await fetch('/api/admin/offers'); 
+        const offerData = await offerRes.json();
+        
+        const activeCategoryIds = offerData.offers
+            .filter(o => o.offerType === 'Category' && o.status === 'Active' && o.targetId)
+            .map(o => (o.targetId._id || o.targetId).toString());
+
+        console.log("Active Offer Categories:", activeCategoryIds); // DEBUG LOG
+
+        // 2. Fetch products
+        const res = await fetch('/api/admin/products/public?limit=20');
+        const data = await res.json();
+
+        // 3. Match using robust string comparison
+        const activeDeals = data.products.filter(product => {
+            // Get the ID regardless of whether it's an object or string
+            const pCatId = (product.category?._id || product.category || "").toString();
+            
+            console.log(`Checking Product: ${product.name} | CategoryID: ${pCatId}`); // DEBUG LOG
+            
+            const isInCategory = activeCategoryIds.includes(pCatId);
+            const hasDiscount = product.offerPrice < product.actualPrice;
+            
+            return isInCategory && hasDiscount;
+        });
+
+        if (data.success && activeDeals.length > 0) {
+            slider.innerHTML = activeDeals.map(product => {
+                const discount = Math.round(((product.actualPrice - product.offerPrice) / product.actualPrice) * 100);
+                return `
+                <div class="col-lg-3 col-md-3 col-10">
+                    <div class="card product-card mb-2 border-0">
+                        <div class="card-img-wrapper">
+                            <span class="discount-tag">-${discount}% OFF</span>
+                            <a href="./singleProductPage.html?id=${product._id}">
+                                <img src="${product.mainImage}" alt="${product.name}" onerror="this.src='/images/logo.jpg'" />
+                            </a>
+                        </div>
+                    </div>
+                    <div class="px-1 text-center">
+                        <h6 class="fw-bold text-truncate mb-1">${product.name}</h6>
+                        <div class="price-container">
+                            <span class="current-price">Rs. ${product.offerPrice.toLocaleString('en-IN')}</span>
+                            <span class="original-price">Rs. ${product.actualPrice.toLocaleString('en-IN')}</span>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        } else {
+            slider.innerHTML = '<div class="col-12 text-center text-muted py-5">No products found for the active Admin offers.</div>';
+        }
+    } catch (err) {
+        console.error('Fetch Error:', err);
+    }
+}
+async function toggleWishlist(event, productId) {
+    event.preventDefault(); 
+    event.stopPropagation();
+    
+    const token = localStorage.getItem("token");
+    
+    if (!token) {
+        return Swal.fire({
+            title: "Login Required",
+            text: "Please login to manage your wishlist.",
+            icon: "warning",
+            confirmButtonColor: "#d32f2f"
+        });
+    }
+
+    const btn = event.currentTarget;
+    const icon = btn.querySelector('i');
+    const isAdding = !btn.classList.contains('active');
+
+    // UI Update immediately
+    btn.classList.toggle('active');
+    isAdding ? icon.classList.replace('fa-regular', 'fa-solid') : icon.classList.replace('fa-solid', 'fa-regular');
+
+    try {
+        const method = isAdding ? 'POST' : 'DELETE';
+        const url = isAdding ? '/api/user/wishlist' : `/api/user/wishlist/${productId}`;
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+            body: isAdding ? JSON.stringify({ productId }) : null
+        });
+
+        const data = await response.json();
+        if (!data.success) throw new Error(data.message);
+
+        // --- THE TOAST FIRE ALERT ---
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 1500,
+            timerProgressBar: true
+        });
+
+        Toast.fire({
+            icon: 'success',
+            title: isAdding ? 'Product added to wishlist ❤️' : 'Removed from Wishlist'
+        });
+
+    } catch (error) {
+        console.error("Wishlist error:", error);
+        // Revert UI if server fails
+        btn.classList.toggle('active');
+        isAdding ? icon.classList.replace('fa-solid', 'fa-regular') : icon.classList.replace('fa-regular', 'fa-solid');
+        Swal.fire("Error", error.message || "Failed to update wishlist", "error");
+    }
+}
+
+async function loadUserWishlist() {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+        const res = await fetch("/api/user/wishlist", {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+            // Store IDs in a Set for fast lookup
+            userWishlistIds = new Set(data.wishlist.map(item => item._id || item));
+        }
+    } catch (err) {
+        console.error("Error loading wishlist:", err);
+    }
+}
+
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/navbar.js"></script>

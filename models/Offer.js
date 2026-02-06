@@ -19,6 +19,10 @@ const offerSchema = new mongoose.Schema(
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
+    minPurchaseAmount: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true },
 );
