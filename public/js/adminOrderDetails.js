@@ -99,10 +99,35 @@ function renderOrderDetails(order) {
 
     // 5. Customer Info
     const customerCard = document.querySelectorAll('.col-lg-4 .card-custom')[0];
-    customerCard.querySelector('.admin-avatar').textContent = order.userId.firstName.charAt(0);
-    customerCard.querySelector('h6').textContent = `${order.userId.firstName} ${order.userId.lastName}`;
-    customerCard.querySelector('.info-group .info-value:nth-child(2)').textContent = order.userId.email;
-    customerCard.querySelector('.info-group .info-value:nth-child(3)').textContent = order.userId.mobile || 'N/A';
+    const viewProfileLink = customerCard.querySelector('a'); // Select the View Profile link
+
+    // Reset defaults
+    viewProfileLink.href = 'javascript:void(0)';
+    viewProfileLink.onclick = null;
+
+    if (order.userId) {
+        const c_firstName = order.userId.firstName || '';
+        const c_lastName = order.userId.lastName || '';
+        const c_name = `${c_firstName} ${c_lastName}`.trim() || 'Guest';
+        const c_email = order.userId.email || 'N/A';
+        const c_mobile = order.userId.mobile || 'N/A';
+
+        customerCard.querySelector('.admin-avatar').textContent = (c_firstName.charAt(0) || '?').toUpperCase();
+        customerCard.querySelector('h6').textContent = c_name;
+        customerCard.querySelector('.info-group .info-value:nth-child(2)').textContent = c_email;
+        customerCard.querySelector('.info-group .info-value:nth-child(3)').textContent = c_mobile;
+
+        // Attach Click Event for Modal
+        viewProfileLink.onclick = () => showUserProfileModal(order.userId);
+    } else {
+        customerCard.querySelector('.admin-avatar').textContent = '?';
+        customerCard.querySelector('h6').textContent = 'Guest / Unknown';
+        customerCard.querySelector('.info-group .info-value:nth-child(2)').textContent = 'N/A';
+        customerCard.querySelector('.info-group .info-value:nth-child(3)').textContent = 'N/A';
+
+        // Show empty modal or alert
+        viewProfileLink.onclick = () => Swal.fire('Info', 'No user profile data available (Guest Checkout)', 'info');
+    }
 
     // 6. Shipping Address
     const shippingCard = document.querySelectorAll('.col-lg-4 .card-custom')[1];
@@ -161,4 +186,47 @@ async function updateStatus() {
             }
         }
     });
+}
+
+function showUserProfileModal(user) {
+    // 1. Basic Info
+    const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Guest';
+    document.getElementById('modalUserName').textContent = fullName;
+    document.getElementById('modalUserId').textContent = user._id || 'N/A';
+    document.getElementById('modalUserEmail').textContent = user.email || 'N/A';
+    document.getElementById('modalUserMobile').textContent = user.mobile || 'N/A';
+
+    // 2. Status Badge
+    const statusEl = document.getElementById('modalUserStatus');
+    const isBlocked = user.isBlocked; // true/false
+    if (isBlocked) {
+        statusEl.textContent = 'Blocked';
+        statusEl.className = 'badge bg-danger bg-opacity-10 text-danger rounded-pill px-3';
+    } else {
+        statusEl.textContent = 'Active';
+        statusEl.className = 'badge bg-success bg-opacity-10 text-success rounded-pill px-3';
+    }
+
+    // 3. Registered Date
+    if (user.createdAt) {
+        const date = new Date(user.createdAt);
+        // Format: 1/27/2026
+        document.getElementById('modalUserJoined').textContent = date.toLocaleDateString('en-US');
+    } else {
+        document.getElementById('modalUserJoined').textContent = 'N/A';
+    }
+
+    // 4. Orders Count (Optional: If we don't have it, keep 0 or N/A)
+    // We didn't populate ordersCount, so leaving as 0 or static for now as per design
+    document.getElementById('modalUserOrders').textContent = '0';
+
+    // 5. Image
+    const imgEl = document.getElementById('modalUserImage');
+    // If backend sends profileImage, use it, else placeholder
+    // imgEl.src = user.profileImage ? `/uploads/profiles/${user.profileImage}` : 'https://placehold.co/150/6610f2/ffffff?text=' + fullName.charAt(0).toUpperCase();
+    // Using placeholder for now as seen in requirements
+    imgEl.src = 'https://placehold.co/150/6610f2/ffffff?text=' + (fullName.charAt(0).toUpperCase() || 'U');
+
+    const myModal = new bootstrap.Modal(document.getElementById('userProfileModal'));
+    myModal.show();
 }

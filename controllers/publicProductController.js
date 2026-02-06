@@ -39,95 +39,89 @@ exports.getPublicProducts = async (req, res) => {
     const {
       page = 1,
       limit = 12,
+      sort,
       category,
       brand,
-      search,
-      sort,
       inStock,
       maxPrice,
+      search,
     } = req.query;
 
-    // Build query
-    let query = {
-      status: { $in: ["active", "outofstock"] },
-    };
+    let query = { status: "active", visibility: "public" }; // Fixed base query
 
-    // Search by name
-    if (search && search.trim() !== "") {
-      query.name = { $regex: search, $options: "i" }; // 'i' makes it case-insensitive
-    }
-
-    // Filter by category (multiple categories supported)
+    // Filtering Logic
     if (category && category !== "all") {
-      const categoryArray = category.split(",");
-      query.category = { $in: categoryArray };
+      query.category = category;
     }
 
-    // Filter by brand (multiple brands supported)
-    if (brand && brand !== "all") {
-      const brandArray = brand.split(",");
-      // Create case-insensitive regex for each brand
-      const brandRegexArray = brandArray.map((b) => new RegExp(`^${b}$`, "i"));
-      console.log("Brand Filter:", brand, "Regex:", brandRegexArray);
-      query.brand = { $in: brandRegexArray };
+    if (brand) {
+      // Split by comma if multiple brands are selected
+      const brands = brand.split(",");
+      if (brands.length > 0) {
+        // Case-insensitive match for brands
+        query.brand = { $in: brands.map((b) => new RegExp(`^${b}$`, "i")) };
+      }
     }
-    console.log("Final Query:", JSON.stringify(query));
 
-    // In-stock only filter
-    if (inStock === "true" || inStock === true) {
-      console.log("Applying In-Stock Filter: stock > 0 AND status = active");
-      query.stock = { $gt: 0 };
-      query.status = "active"; // Force active status just in case
-    } else {
-      // Ensure we show outofstock items if filter is OFF (which is default behavior of query init)
-      // query.status is already { $in: ['active', 'outofstock'] }
-    }
-    console.log("Query after stock filter:", JSON.stringify(query));
-
-    // Price range filter
     if (maxPrice) {
-      query.offerPrice = { $lte: parseInt(maxPrice) };
+      query.offerPrice = { $lte: Number(maxPrice) };
     }
 
-    // Build sort object
-    let sortObj = {};
+    if (inStock === "true") {
+      query.stock = { $gt: 0 };
+    }
+
+    if (search) {
+      const searchRegex = new RegExp(search, "i");
+      query.$or = [
+        { name: searchRegex },
+        { description: searchRegex },
+        { brand: searchRegex }, // Also search via brand
+      ];
+    }
+
+    // Sorting Logic
+    let sortOptions = {}; // Default: No specific sort (natural order)
     switch (sort) {
-      case "price-low-high":
-        sortObj = { offerPrice: 1 };
-        break;
-      case "price-high-low":
-        sortObj = { offerPrice: -1 };
-        break;
       case "newest":
-        sortObj = { createdAt: -1 };
+        sortOptions = { createdAt: -1 };
         break;
-      case "best-selling":
-      case "featured":
+      case "price_low":
+        sortOptions = { offerPrice: 1 };
+        break;
+      case "price_high":
+        sortOptions = { offerPrice: -1 };
+        break;
+      case "a_z":
+        sortOptions = { name: 1 };
+        break;
+      case "z_a":
+        sortOptions = { name: -1 };
+        break;
       default:
-        sortObj = { createdAt: -1 };
+        sortOptions = { createdAt: -1 }; // Default to newest if not specified
     }
 
     const skip = (page - 1) * limit;
-    const total = await Product.countDocuments(query);
-    const products = await Product.find(query)
-      .populate("category", "name")
-      .sort(sortObj)
-      .skip(skip)
-      .limit(limit);
 
-    // Format response
+    const products = await Product.find(query)
+      .populate("category", "_id name")
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(Number(limit));
+
+    const total = await Product.countDocuments(query);
+
+    // Format for frontend
     const formatted = products.map((p) => ({
       id: p._id.toString(),
       name: p.name,
-      description: p.description,
-      sku: p.sku,
       actualPrice: p.actualPrice,
       offerPrice: p.offerPrice,
       stock: p.stock,
-      stock: p.stock,
-      status: p.status,
       brand: p.brand || "Generic",
       categoryName: p.category?.name || "Uncategorized",
+      category: p.category?._id.toString() || "",
       mainImage: p.mainImage
         ? `/uploads/products/${path.basename(p.mainImage)}`
         : "/images/logo.jpg",
@@ -142,9 +136,9 @@ exports.getPublicProducts = async (req, res) => {
         pages: Math.ceil(total / limit),
       },
     });
-  } catch (err) {
-    console.error("Error in getPublicProducts:", err);
-    res.status(500).json({ success: false, error: "Failed to fetch products" });
+  } catch (error) {
+    console.error("Error in getPublicProducts:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 

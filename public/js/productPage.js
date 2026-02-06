@@ -18,6 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Load categories for filter (and then load products)
   loadCategoriesForFilter();
   loadBrandsForFilter();
+  // Load user wishlist
+  loadUserWishlist();
   // Setup event listeners
   setupEventListeners();
 });
@@ -63,7 +65,7 @@ function setupEventListeners() {
     );
   }
 
-  const container = document.getElementById("productsContainer");
+  const container = document.getElementById("productContainer");
   if (container) {
     container.addEventListener("click", handleProductClicks);
   }
@@ -137,7 +139,6 @@ async function handleProductClicks(event) {
     const productId = cartBanner.dataset.id;
     if (productId) {
       console.log("Added to cart:", productId);
-      // alert('Product added to cart! (Demo)');
       addToCart(productId);
     }
     return;
@@ -169,73 +170,23 @@ function debounce(func, wait) {
   };
 }
 
-// Main function to load products with all filters
 async function loadProducts() {
-  const container = document.getElementById("productsContainer");
-  const loading = document.getElementById("loading");
-  const emptyState = document.getElementById("emptyState");
-
-  loading.style.display = "block";
-  emptyState.style.display = "none";
-  if (container) container.innerHTML = "";
+  const container = document.getElementById("productContainer");
+  if (!container) return;
 
   try {
-    const params = new URLSearchParams();
-    params.append("page", currentPage);
-    params.append("limit", limit);
+    const res = await fetch("/api/admin/products/public?limit=100");
+    const data = await res.json();
 
-    if (sortSelect?.value) params.append("sort", sortSelect.value);
-
-    // Categories
-    const selectedCategories = [];
-    document
-      .querySelectorAll('#categoryList input[type="checkbox"]:checked')
-      .forEach((cb) => {
-        if (cb.value !== "all") selectedCategories.push(cb.value);
-      });
-    if (selectedCategories.length > 0)
-      params.append("category", selectedCategories.join(","));
-
-    // Brands
-    const selectedBrands = [];
-    document.querySelectorAll(".brand-checkbox:checked").forEach((cb) => {
-      selectedBrands.push(cb.value);
-    });
-    if (selectedBrands.length > 0)
-      params.append("brand", selectedBrands.join(","));
-
-    if (inStockOnly?.checked) params.append("inStock", "true");
-    if (priceRange) params.append("maxPrice", priceRange.value);
-
-    // CAPTURE SEARCH VALUE
-    const navbarSearch = document.getElementById("navbarSearch");
-    if (navbarSearch && navbarSearch.value.trim() !== "") {
-      params.append("search", navbarSearch.value.trim());
-    }
-
-    const [productsRes, _] = await Promise.all([
-      fetch(`/api/admin/products/public?${params}`),
-      loadUserWishlist(),
-    ]);
-
-    const data = await productsRes.json();
-
-    if (data.success && data.products?.length > 0) {
-      loading.style.display = "none";
+    if (data.success && data.products.length > 0) {
       container.innerHTML = data.products
-        .map((product) => renderProductCard(product))
+        .map((p) => renderProductCard(p))
         .join("");
-      if (data.pagination) renderPagination(data.pagination);
     } else {
-      loading.style.display = "none";
-      emptyState.style.display = "block";
-      const pContainer = document.getElementById("paginationContainer");
-      if (pContainer) pContainer.innerHTML = "";
+      document.getElementById("emptyState").style.display = "block";
     }
   } catch (err) {
-    console.error("Error loading products:", err);
-    loading.style.display = "none";
-    emptyState.style.display = "block";
+    console.error("Fetch failed:", err);
   }
 }
 
@@ -280,7 +231,7 @@ window.changePage = function (newPage) {
   loadProducts();
 
   // Smooth scroll to top of product grid
-  const grid = document.getElementById("productsContainer");
+  const grid = document.getElementById("productContainer");
   if (grid) {
     grid.scrollIntoView({ behavior: "smooth" });
   }
@@ -320,40 +271,45 @@ function setupCategoryFilterListeners() {
     });
 }
 
-function openFilterSidebar() {
-  filterSidebar.classList.add("open");
-  filterBackdrop.classList.add("show");
-}
-function closeFilterSidebar() {
-  filterSidebar.classList.remove("open");
-  filterBackdrop.classList.remove("show");
-}
-function debounce(func, wait) {
-  let timeout;
-  return (...args) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
+// Load brands from backend and inject into the sidebar
+async function loadBrandsForFilter() {
+  try {
+    const res = await fetch("/api/admin/products/brands-with-counts");
+    const data = await res.json();
+
+    if (data.success && data.brands) {
+      const brandList = document.getElementById("brandList");
+      if (!brandList) return;
+
+      brandList.innerHTML = data.brands
+        .map(
+          (brand) => `
+        <li>
+          <input type="checkbox" class="form-check-input brand-checkbox" 
+                 id="brand-${brand.id}" value="${brand.name}" />
+          <label for="brand-${brand.id}" class="form-check-label">
+            ${brand.name} <span class="text-muted">(${brand.count})</span>
+          </label>
+        </li>
+      `,
+        )
+        .join("");
+
+      // Setup listeners for newly created checkboxes
+      document.querySelectorAll(".brand-checkbox").forEach((cb) => {
+        cb.addEventListener("change", () => {
+          currentPage = 1;
+          loadProducts();
+        });
+      });
+    }
+  } catch (err) {
+    console.error("Error loading brands:", err);
+  }
 }
 
-// ... (Include your toggleWishlist, loadUserWishlist, and addToCart functions here) ...
+// --- RESTORED VARIABLES AND FUNCTIONS ---
 
-// Setup event listeners for category checkboxes
-function setupCategoryFilterListeners() {
-  const categoryCheckboxes = document.querySelectorAll(
-    '#categoryList input[type="checkbox"]',
-  );
-
-  categoryCheckboxes.forEach((checkbox) => {
-    checkbox.addEventListener("change", () => {
-      currentPage = 1;
-      loadProducts();
-    });
-  });
-}
-
-// --- Card Interactions ---
-// --- Wishlist Logic ---
 let userWishlistIds = new Set();
 let isUserLoggedIn = false;
 
@@ -455,8 +411,6 @@ async function toggleWishlist(btn, productId) {
       icon.classList.add("fa-solid");
     }
 
-    // Show warning for known errors like OOS (which we send as 400)
-    // Or just generic error
     Swal.fire({
       icon: "warning",
       title: "Action Failed",
@@ -510,9 +464,6 @@ async function addToCart(productId) {
         timerProgressBar: true,
         showConfirmButton: false,
       });
-
-      // Optional: Update cart count in navbar if exists
-      // updateCartCount();
     } else {
       throw new Error(data.message || "Failed to add to cart");
     }
@@ -527,43 +478,6 @@ async function addToCart(productId) {
   }
 }
 
-// Load brands from backend and inject into the sidebar
-async function loadBrandsForFilter() {
-  try {
-    const res = await fetch("/api/admin/products/brands-with-counts");
-    const data = await res.json();
-
-    if (data.success && data.brands) {
-      const brandList = document.getElementById("brandList");
-      if (!brandList) return;
-
-      brandList.innerHTML = data.brands
-        .map(
-          (brand) => `
-        <li>
-          <input type="checkbox" class="form-check-input brand-checkbox" 
-                 id="brand-${brand.id}" value="${brand.name}" />
-          <label for="brand-${brand.id}" class="form-check-label">
-            ${brand.name} <span class="text-muted">(${brand.count})</span>
-          </label>
-        </li>
-      `,
-        )
-        .join("");
-
-      // Setup listeners for newly created checkboxes
-      document.querySelectorAll(".brand-checkbox").forEach((cb) => {
-        cb.addEventListener("change", () => {
-          currentPage = 1;
-          loadProducts();
-        });
-      });
-    }
-  } catch (err) {
-    console.error("Error loading brands:", err);
-  }
-}
-
 // Helper to render a single card (to keep code clean)
 function renderProductCard(product) {
   const pId = product._id || product.id;
@@ -574,7 +488,7 @@ function renderProductCard(product) {
   const isInWishlist = userWishlistIds.has(pId);
 
   return `
-    <div class="col-6 col-md-4 col-xl-20-percent">
+    <div class="col-6 col-md-4 col-lg-3 col-xl-20-percent mb-4">
       <a href="${linkHref}" class="product-card-link" style="${isOutOfStock ? "cursor: not-allowed;" : ""}">
         <div class="product-card ${isOutOfStock ? "sold-out" : ""}">
           <div class="card-img-wrapper">
@@ -585,16 +499,13 @@ function renderProductCard(product) {
             ${!isOutOfStock ? `<div class="add-to-cart-banner" data-id="${pId}">Add to Cart</div>` : ""}
             <img src="${product.mainImage}" alt="${product.name}" onerror="this.src='/images/logo.jpg'" />
           </div>
-          <div class="product-info">
-            <div class="product-vendor">${product.brand}</div>
-            <div class="d-flex justify-content-between align-items-start">
-               <div class="product-title mb-0" title="${product.name}">${product.name}</div>
+          <div class="product-info px-2">
+            <div class="product-vendor">${product.brand || 'Generic'}</div>
+            <div class="d-flex justify-content-between align-items-start gap-2">
+               <h6 class="product-title" title="${product.name}">${product.name}</h6>
                <div class="text-end flex-shrink-0">
-                  ${
-                    product.offerPrice < product.actualPrice
-                      ? `<div class="current-price sale-price">Rs. ${product.offerPrice}</div><div class="old-price">Rs. ${product.actualPrice}</div>`
-                      : `<div class="current-price">Rs. ${product.offerPrice}</div>`
-                  }
+                  <div class="current-price">₹${product.offerPrice.toLocaleString("en-IN")}</div>
+                  ${product.offerPrice < product.actualPrice ? `<div class="old-price">₹${product.actualPrice.toLocaleString("en-IN")}</div>` : ''}
                </div>
             </div>
           </div>
@@ -602,6 +513,3 @@ function renderProductCard(product) {
       </a>
     </div>`;
 }
-
-// --- REST OF YOUR FUNCTIONS (Wishlist, Cart, Pagination, etc. stay exactly the same) ---
-// (Ensure loadCategoriesForFilter, setupCategoryFilterListeners, toggleWishlist, addToCart are below this)

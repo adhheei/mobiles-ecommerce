@@ -586,15 +586,7 @@
             <option value="Active">Active</option>
             <option value="Expired">Expired</option>
           </select>
-          <select
-            class="custom-select"
-            id="filterType"
-            onchange="applyFilters()"
-          >
-            <option value="all">All Types</option>
-            <option value="Product">Product Offer</option>
-            <option value="Referral">Referral Offer</option>
-          </select>
+
           <select
             class="custom-select"
             id="sortOption"
@@ -626,14 +618,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      let offers = []; // Global state for live data
+      let offers = [];
 
       function toggleSidebar() {
         document.getElementById("sidebar").classList.toggle("active");
         document.getElementById("sidebarOverlay").classList.toggle("active");
       }
 
-      // 1. FETCH LIVE OFFERS FROM SERVER
       async function fetchOffers() {
         const token = localStorage.getItem("token");
         const tbody = document.getElementById("offerTableBody");
@@ -648,8 +639,8 @@
           const result = await res.json();
 
           if (result.success) {
-            offers = result.offers; // Store live data
-            applyFilters(); // Initial render
+            offers = result.offers;
+            applyFilters();
           } else {
             throw new Error(result.message);
           }
@@ -659,23 +650,20 @@
         }
       }
 
-      // 2. LIVE FILTER & SORT LOGIC
       function applyFilters() {
         const searchTerm = document
           .getElementById("searchInput")
           .value.toLowerCase();
         const statusFilter = document.getElementById("filterStatus").value;
-        const typeFilter = document.getElementById("filterType").value;
         const sortOption = document.getElementById("sortOption").value;
 
         let filtered = offers.filter((offer) => {
-          // Check for name or targetId name if populated
           const matchesSearch = offer.name.toLowerCase().includes(searchTerm);
           const matchesStatus =
             statusFilter === "all" || offer.status === statusFilter;
-          const matchesType =
-            typeFilter === "all" || offer.offerType === typeFilter;
-          return matchesSearch && matchesStatus && matchesType;
+
+          // Removed the typeFilter dependency here
+          return matchesSearch && matchesStatus;
         });
 
         // Sort Logic
@@ -738,11 +726,10 @@
       async function deleteOffer(id) {
         const result = await Swal.fire({
           title: "Are you sure?",
-          text: "Product prices associated with this offer will remain modified!",
+          text: "This will restore original prices for all affected products.",
           icon: "warning",
           showCancelButton: true,
           confirmButtonColor: "#dc3545",
-          cancelButtonColor: "#1a1a1a",
           confirmButtonText: "Yes, delete it!",
         });
 
@@ -756,8 +743,8 @@
             const data = await res.json();
 
             if (data.success) {
-              Swal.fire("Deleted!", "Offer removed successfully.", "success");
-              fetchOffers(); // Refresh the list
+              Swal.fire("Deleted!", "The offer has been removed.", "success");
+              fetchOffers(); // Refresh the table
             } else {
               throw new Error(data.message);
             }

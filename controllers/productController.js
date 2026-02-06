@@ -100,6 +100,91 @@ exports.getAllProducts = async (req, res) => {
   }
 };
 
+exports.getPublicProducts = async (req, res) => {
+    try {
+        const {
+            page = 1,
+            limit = 12,
+            category,
+            brand,
+            search,
+            sort,
+            inStock,
+            maxPrice,
+        } = req.query;
+
+        // 1. Build a clean query object
+        let query = { isDeleted: false }; // Ensure your model uses this flag
+
+        if (search && search.trim() !== "") {
+            query.name = { $regex: search.trim(), $options: "i" };
+        }
+
+        if (category && category !== "all" && category !== "") {
+            const categoryArray = category.split(",");
+            query.category = { $in: categoryArray };
+        }
+
+        if (brand && brand !== "all" && brand !== "") {
+            const brandArray = brand.split(",");
+            const brandRegexArray = brandArray.map((b) => new RegExp(`^${b}$`, "i"));
+            query.brand = { $in: brandRegexArray };
+        }
+
+        if (inStock === "true") {
+            query.stock = { $gt: 0 };
+        }
+
+        if (maxPrice) {
+            query.offerPrice = { $lte: parseInt(maxPrice) };
+        }
+
+        // 2. Build Sort Object
+        let sortObj = { createdAt: -1 };
+        if (sort === "price-low-high") sortObj = { offerPrice: 1 };
+        if (sort === "price-high-low") sortObj = { offerPrice: -1 };
+
+        const skip = (page - 1) * limit;
+
+        // 3. CRITICAL: Fetch with Population to fix the "Blank CategoryID" error
+        const products = await Product.find(query)
+            .populate("category", "name") // Join category data
+            .sort(sortObj)
+            .skip(skip)
+            .limit(Number(limit));
+
+        const total = await Product.countDocuments(query);
+
+        // 4. Format the response for your Jinsa Mobiles frontend
+        const formatted = products.map((p) => ({
+            _id: p._id.toString(),
+            name: p.name,
+            actualPrice: p.actualPrice,
+            offerPrice: p.offerPrice,
+            stock: p.stock,
+            brand: p.brand || "Generic",
+            categoryName: p.category?.name || "Uncategorized",
+            // This ensures images load correctly regardless of path format
+            mainImage: p.mainImage 
+                ? (p.mainImage.startsWith('/') ? p.mainImage : `/uploads/products/${path.basename(p.mainImage)}`)
+                : "/images/logo.jpg",
+        }));
+
+        res.json({
+            success: true,
+            products: formatted,
+            pagination: {
+                total,
+                page: parseInt(page),
+                pages: Math.ceil(total / limit),
+            },
+        });
+    } catch (err) {
+        console.error("Critical Error in getPublicProducts:", err);
+        res.status(500).json({ success: false, error: "Internal Server Error: Failed to fetch products" });
+    }
+};
+
 // getProductById function
 exports.getProductById = async (req, res) => {
   try {

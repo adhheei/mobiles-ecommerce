@@ -507,6 +507,40 @@
         width: 100%;
       }
     }
+
+    /* Modal Styling */
+    .user-profile-img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border: 3px solid #fff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-user-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .modal-user-info:last-child {
+      border-bottom: none;
+    }
+
+    .modal-label {
+      color: #777;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .modal-value {
+      color: #000;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-align: right;
+    }
   </style>
 </head>
 
@@ -692,6 +726,57 @@
           <div class="info-group mb-0">
             <div class="info-sub">Same as shipping address</div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Profile Modal -->
+  <div class="modal fade" id="userProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold">Customer Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body pt-0">
+          <div class="text-center mt-3 mb-4">
+            <img src="https://placehold.co/150" id="modalUserImage" class="rounded-circle user-profile-img mb-3">
+            <h5 id="modalUserName" class="fw-bold mb-1">User Name</h5>
+            <p class="text-muted small mb-0">Customer ID: <span id="modalUserId">...</span></p>
+          </div>
+
+          <div class="px-3">
+            <div class="modal-user-info">
+              <span class="modal-label">Status</span>
+              <span id="modalUserStatus"
+                class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Active</span>
+            </div>
+
+            <div class="modal-user-info">
+              <span class="modal-label">Email</span>
+              <span id="modalUserEmail" class="modal-value">user@example.com</span>
+            </div>
+
+            <div class="modal-user-info">
+              <span class="modal-label">Phone</span>
+              <span id="modalUserMobile" class="modal-value">N/A</span>
+            </div>
+
+            <div class="modal-user-info">
+              <span class="modal-label">Registered On</span>
+              <span id="modalUserJoined" class="modal-value">N/A</span>
+            </div>
+
+            <div class="modal-user-info">
+              <span class="modal-label">Total Orders</span>
+              <span id="modalUserOrders" class="modal-value">0</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-0 justify-content-end pb-4 pe-4">
+          <button type="button" class="btn btn-secondary px-4 rounded-pill" data-bs-dismiss="modal"
+            style="background-color: #6c757d;">Close</button>
         </div>
       </div>
     </div>
