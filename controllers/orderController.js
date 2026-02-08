@@ -199,12 +199,20 @@ const updateOrderStatus = async (req, res) => {
       order.deliveredAt = Date.now();
     }
 
-    // Update item statuses as well if needed, or keep them separate?
-    // Usually, if the main order moves to Shipped, all items move to Shipped unless individually cancelled.
-    // For simplicity, sync active items with order status
-    if (["Shipped", "Delivered"].includes(status)) {
+    // Update item statuses
+    // If the main order status changes, we generally want to update the items too.
+    const terminalStatuses = ["Cancelled", "Returned"];
+
+    if (terminalStatuses.includes(status)) {
+      // If the entire order is Cancelled or Returned, marks all items as such
       order.items.forEach((item) => {
-        if (item.status !== "Cancelled" && item.status !== "Returned") {
+        item.status = status;
+      });
+    } else {
+      // For forward progress (Pending -> Processing -> Shipped -> Delivered)
+      // Only update items that are NOT already in a terminal state (Cancelled/Returned)
+      order.items.forEach((item) => {
+        if (!terminalStatuses.includes(item.status)) {
           item.status = status;
         }
       });

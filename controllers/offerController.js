@@ -1,13 +1,16 @@
 const Offer = require("../models/Offer");
 const Product = require("../models/Product");
 const Category = require("../models/Category");
+const path = require("path");
 
 // GET all offers for the admin table
 exports.getAllOffers = async (req, res) => {
   try {
-    const offers = await Offer.find()
-      .populate("targetId") // This will show Product/Category names
+    // populate('targetId') is critical to provide the ID for filtering
+    const offers = await Offer.find({ status: "Active" })
+      .populate("targetId")
       .sort({ createdAt: -1 });
+
     res.status(200).json({ success: true, offers });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -70,17 +73,24 @@ exports.addOffer = async (req, res) => {
 // DELETE an offer
 exports.deleteOffer = async (req, res) => {
   try {
-    const offer = await Offer.findByIdAndDelete(req.params.id);
+    const offer = await Offer.findById(req.params.id);
     if (!offer)
       return res
         .status(404)
         .json({ success: false, message: "Offer not found" });
 
-    // Optional: Reset product prices to actualPrice here if needed
+    // RESET PRICES: Set offerPrice back to actualPrice before deleting
+    const query =
+      offer.offerType === "Category"
+        ? { category: offer.targetId }
+        : { _id: offer.targetId };
+    await Product.updateMany(query, [{ $set: { offerPrice: "$actualPrice" } }]);
+
+    await Offer.findByIdAndDelete(req.params.id);
 
     res
       .status(200)
-      .json({ success: true, message: "Offer deleted successfully" });
+      .json({ success: true, message: "Offer deleted and prices restored" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

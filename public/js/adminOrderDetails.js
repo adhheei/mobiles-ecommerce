@@ -7,11 +7,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/Admin/adminLogin.html';
+        return;
+    }
+
     try {
-        const res = await fetch(`/api/admin/orders/${orderId}`);
+        const res = await fetch(`/api/admin/orders/${orderId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
         const data = await res.json();
 
         if (!data.success) {
+            if (res.status === 401 || res.status === 403) {
+                window.location.href = '/Admin/adminLogin.html';
+                return;
+            }
             throw new Error(data.message || 'Failed to fetch order');
         }
 
@@ -36,7 +48,8 @@ function renderOrderDetails(order) {
 
     // Set Select Dropdown
     const statusSelect = document.getElementById('statusSelect');
-    statusSelect.value = order.orderStatus.toLowerCase(); // match with options value
+    // Ensure lowercase value matches options
+    statusSelect.value = order.orderStatus.toLowerCase();
 
     // 2. Items
     const itemsContainer = document.querySelector('.card-custom .item-row').parentNode;
@@ -157,6 +170,12 @@ async function updateStatus() {
     };
 
     const statusEnum = statusMap[newStatus];
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        window.location.href = '/Admin/adminLogin.html';
+        return;
+    }
 
     Swal.fire({
         title: "Update Status?",
@@ -170,7 +189,10 @@ async function updateStatus() {
             try {
                 const res = await fetch(`/api/admin/orders/${window.currentOrderId}/status`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: JSON.stringify({ status: statusEnum })
                 });
                 const data = await res.json();
@@ -178,6 +200,10 @@ async function updateStatus() {
                     Swal.fire("Updated!", "Order status updated.", "success")
                         .then(() => location.reload());
                 } else {
+                    if (res.status === 401 || res.status === 403) {
+                        window.location.href = '/Admin/adminLogin.html';
+                        return;
+                    }
                     throw new Error(data.message);
                 }
             } catch (e) {

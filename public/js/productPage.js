@@ -20,6 +20,17 @@ document.addEventListener("DOMContentLoaded", () => {
   loadBrandsForFilter();
   // Load user wishlist
   loadUserWishlist();
+
+  // Initialize Search from URL
+  const navbarSearch = document.getElementById("navbarSearch");
+  if (navbarSearch) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchParam = urlParams.get("search");
+    if (searchParam) {
+      navbarSearch.value = searchParam;
+    }
+  }
+
   // Setup event listeners
   setupEventListeners();
 });
@@ -48,7 +59,17 @@ function setupEventListeners() {
   }
 
   if (priceRange) {
-    priceRange.addEventListener("input", () => {
+    const priceValue = document.getElementById("priceValue");
+
+    // Update text on slide
+    priceRange.addEventListener("input", (e) => {
+      if (priceValue) {
+        priceValue.textContent = `Rs. ${parseInt(e.target.value).toLocaleString("en-IN")}`;
+      }
+    });
+
+    // Trigger load on release
+    priceRange.addEventListener("change", () => {
       currentPage = 1;
       loadProducts();
     });
@@ -59,9 +80,9 @@ function setupEventListeners() {
     navbarSearch.addEventListener(
       "input",
       debounce(() => {
-        currentPage = 1; // Reset to page 1 for new results
-        loadProducts(); // This function now includes the search param
-      }, 400),
+        currentPage = 1;
+        loadProducts();
+      }, 500),
     );
   }
 
@@ -174,19 +195,64 @@ async function loadProducts() {
   const container = document.getElementById("productContainer");
   if (!container) return;
 
+  // Show loading
+  document.getElementById("loading").style.display = "block";
+  container.innerHTML = "";
+  document.getElementById("emptyState").style.display = "none";
+
+  // Gather Filter Values
+  const sort = document.getElementById("sortSelect")?.value || "best-selling";
+  const inStock = document.getElementById("inStockOnly")?.checked || false;
+  const maxPrice = document.getElementById("priceRange")?.value || 1000000;
+
+  // Categories
+  const selectedCats = Array.from(document.querySelectorAll('#categoryList input:checked'))
+    .map(cb => cb.value)
+    .filter(val => val !== 'all');
+  const categoryParam = selectedCats.length > 0 ? selectedCats.join(",") : "";
+
+  // Brands
+  const selectedBrands = Array.from(document.querySelectorAll('#brandList input:checked'))
+    .map(cb => cb.value);
+  const brandParam = selectedBrands.length > 0 ? selectedBrands.join(",") : "";
+
+  // Search
+  const search = document.getElementById("navbarSearch")?.value || "";
+
+  // Build Query
+  const queryParams = new URLSearchParams({
+    page: currentPage,
+    limit: limit,
+    sort: sort,
+    inStock: inStock,
+    maxPrice: maxPrice,
+    search: search
+  });
+
+  if (categoryParam) queryParams.append("category", categoryParam);
+  if (brandParam) queryParams.append("brand", brandParam);
+
   try {
-    const res = await fetch("/api/admin/products/public?limit=100");
+    const res = await fetch(`/api/admin/products/public?${queryParams.toString()}`);
     const data = await res.json();
+
+    document.getElementById("loading").style.display = "none";
 
     if (data.success && data.products.length > 0) {
       container.innerHTML = data.products
         .map((p) => renderProductCard(p))
         .join("");
+
+      if (data.pagination) {
+        renderPagination(data.pagination);
+      }
     } else {
       document.getElementById("emptyState").style.display = "block";
+      document.getElementById("paginationContainer").innerHTML = "";
     }
   } catch (err) {
     console.error("Fetch failed:", err);
+    document.getElementById("loading").style.display = "none";
   }
 }
 
@@ -245,11 +311,21 @@ async function loadCategoriesForFilter() {
     if (data.success && data.categories) {
       const categoryList = document.getElementById("categoryList");
       if (!categoryList) return;
+
+      // check URL for existing category
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlCategory = urlParams.get("category");
+      const selectedCategories = urlCategory ? urlCategory.split(",") : [];
+
+      let allChecked = selectedCategories.length === 0;
+
       categoryList.innerHTML =
-        '<li><input type="checkbox" class="form-check-input" id="category-all" value="all" /><label for="category-all" class="form-check-label">All Categories</label></li>';
+        `<li><input type="checkbox" class="form-check-input" id="category-all" value="all" ${allChecked ? "checked" : ""} /><label for="category-all" class="form-check-label">All Categories</label></li>`;
+
       data.categories.forEach((cat) => {
+        const isChecked = selectedCategories.includes(cat._id);
         const li = document.createElement("li");
-        li.innerHTML = `<input type="checkbox" class="form-check-input" id="category-${cat._id}" value="${cat._id}" /><label for="category-${cat._id}" class="form-check-label">${cat.name} (${cat.productCount})</label>`;
+        li.innerHTML = `<input type="checkbox" class="form-check-input" id="category-${cat._id}" value="${cat._id}" ${isChecked ? "checked" : ""} /><label for="category-${cat._id}" class="form-check-label">${cat.name} (${cat.productCount})</label>`;
         categoryList.appendChild(li);
       });
       setupCategoryFilterListeners();
@@ -261,14 +337,37 @@ async function loadCategoriesForFilter() {
 }
 
 function setupCategoryFilterListeners() {
-  document
-    .querySelectorAll('#categoryList input[type="checkbox"]')
-    .forEach((cb) => {
-      cb.addEventListener("change", () => {
-        currentPage = 1;
-        loadProducts();
-      });
+  const allCheckbox = document.getElementById("category-all");
+  const otherCheckboxes = document.querySelectorAll('#categoryList input[type="checkbox"]:not(#category-all)');
+
+  // "All" checkbox listener
+  if (allCheckbox) {
+    allCheckbox.addEventListener("change", (e) => {
+      if (e.target.checked) {
+        // Uncheck all others
+        otherCheckboxes.forEach(cb => cb.checked = false);
+      }
+      currentPage = 1;
+      loadProducts();
     });
+  }
+
+  // Other checkboxes listeners
+  otherCheckboxes.forEach((cb) => {
+    cb.addEventListener("change", (e) => {
+      if (e.target.checked && allCheckbox) {
+        allCheckbox.checked = false;
+      }
+      // If all deselected, maybe select "All"? Optional.
+      const anyChecked = Array.from(otherCheckboxes).some(c => c.checked);
+      if (!anyChecked && allCheckbox) {
+        allCheckbox.checked = true;
+      }
+
+      currentPage = 1;
+      loadProducts();
+    });
+  });
 }
 
 // Load brands from backend and inject into the sidebar
