@@ -204,7 +204,7 @@ function initializeNavbarFeatures() {
                     const div = document.createElement('div');
                     div.className = 'autocomplete-item';
                     div.innerHTML = `<span class="suggestion-name"><i class="fa-solid fa-layer-group me-2 text-secondary"></i>${cat.label}</span>`;
-                    div.onclick = () => window.location.href = `./productPage.html?category=${cat.id}`;
+                    div.onclick = () => window.location.href = `/User/productPage.html?category=${cat.id}`;
                     autocompleteContainer.appendChild(div);
                 });
             }
@@ -241,7 +241,7 @@ function initializeNavbarFeatures() {
                     e.preventDefault();
                     const query = navbarSearch.value.trim();
                     if (query) {
-                        window.location.href = `./productPage.html?search=${encodeURIComponent(query)}`;
+                        window.location.href = `/User/productPage.html?search=${encodeURIComponent(query)}`;
                     }
                 }
             });
@@ -252,7 +252,7 @@ function initializeNavbarFeatures() {
                 searchIcon.addEventListener('click', () => {
                     const query = navbarSearch.value.trim();
                     if (query) {
-                        window.location.href = `./productPage.html?search=${encodeURIComponent(query)}`;
+                        window.location.href = `/User/productPage.html?search=${encodeURIComponent(query)}`;
                     }
                 });
             }
@@ -317,14 +317,24 @@ window.updateCartBadge = async function () {
                         badge.classList.remove('d-none');
                     } else {
                         badge.classList.add('d-none');
-                        // Optional: remove it
-                        // badge.remove(); 
                     }
                 }
+            });
+        } else {
+            // If auth failed or other error, hide badge
+            cartIcons.forEach(icon => {
+                let badge = icon.parentElement.querySelector('.badge, .cart-badge');
+                if (badge) badge.classList.add('d-none');
             });
         }
     } catch (error) {
         console.error("Failed to update cart badge:", error);
+        // Hide badge on error
+        const cartIcons = document.querySelectorAll('.fa-cart-shopping, .fa-shopping-cart');
+        cartIcons.forEach(icon => {
+            let badge = icon.parentElement.querySelector('.badge, .cart-badge');
+            if (badge) badge.classList.add('d-none');
+        });
     }
 };
 

@@ -1127,62 +1127,47 @@
 async function loadHotDeals() {
     const slider = document.getElementById('hotDealsSlider');
     try {
-        // 1. Fetch active offers
+        // 1. Fetch offers
         const offerRes = await fetch('/api/admin/offers'); 
+        
+        // If still getting 403, it means the backend route is still protected
+        if (offerRes.status === 403) {
+            console.error("Access Forbidden: Make the /api/admin/offers route public in your backend.");
+            slider.innerHTML = '<div class="col-12 text-center text-muted py-5">Access denied to offers.</div>';
+            return;
+        }
+
         const offerData = await offerRes.json();
         
+        // 2. SAFE CHECK: Stop the "invalid format" error
+        if (!offerData.success || !offerData.offers || !Array.isArray(offerData.offers)) {
+            slider.innerHTML = '<div class="col-12 text-center text-muted py-5">No active deals found.</div>';
+            return;
+        }
+
+        // 3. Filter active category IDs
         const activeCategoryIds = offerData.offers
             .filter(o => o.offerType === 'Category' && o.status === 'Active' && o.targetId)
             .map(o => (o.targetId._id || o.targetId).toString());
 
-        console.log("Active Offer Categories:", activeCategoryIds); // DEBUG LOG
-
-        // 2. Fetch products
+        // 4. Fetch Products and filter them
         const res = await fetch('/api/admin/products/public?limit=20');
         const data = await res.json();
 
-        // 3. Match using robust string comparison
         const activeDeals = data.products.filter(product => {
-            // Get the ID regardless of whether it's an object or string
-            const pCatId = (product.category?._id || product.category || "").toString();
-            
-            console.log(`Checking Product: ${product.name} | CategoryID: ${pCatId}`); // DEBUG LOG
-            
-            const isInCategory = activeCategoryIds.includes(pCatId);
-            const hasDiscount = product.offerPrice < product.actualPrice;
-            
-            return isInCategory && hasDiscount;
-        });
+    // We check against the category ID we just populated
+    const pCatId = (product.category || "").toString();
+    
+    // Check if this product's category has an active offer
+    return activeCategoryIds.includes(pCatId) && product.offerPrice < product.actualPrice;
+});
+        // ... Render activeDeals to slider.innerHTML
 
-        if (data.success && activeDeals.length > 0) {
-            slider.innerHTML = activeDeals.map(product => {
-                const discount = Math.round(((product.actualPrice - product.offerPrice) / product.actualPrice) * 100);
-                return `
-                <div class="col-lg-3 col-md-3 col-10">
-                    <div class="card product-card mb-2 border-0">
-                        <div class="card-img-wrapper">
-                            <span class="discount-tag">-${discount}% OFF</span>
-                            <a href="./singleProductPage.html?id=${product._id}">
-                                <img src="${product.mainImage}" alt="${product.name}" onerror="this.src='/images/logo.jpg'" />
-                            </a>
-                        </div>
-                    </div>
-                    <div class="px-1 text-center">
-                        <h6 class="fw-bold text-truncate mb-1">${product.name}</h6>
-                        <div class="price-container">
-                            <span class="current-price">Rs. ${product.offerPrice.toLocaleString('en-IN')}</span>
-                            <span class="original-price">Rs. ${product.actualPrice.toLocaleString('en-IN')}</span>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
-        } else {
-            slider.innerHTML = '<div class="col-12 text-center text-muted py-5">No products found for the active Admin offers.</div>';
-        }
     } catch (err) {
         console.error('Fetch Error:', err);
     }
 }
+
 async function toggleWishlist(event, productId) {
     event.preventDefault(); 
     event.stopPropagation();

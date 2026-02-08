@@ -51,7 +51,10 @@ exports.getPublicProducts = async (req, res) => {
 
     // Filtering Logic
     if (category && category !== "all") {
-      query.category = category;
+      const categories = category.split(",");
+      if (categories.length > 0) {
+        query.category = { $in: categories };
+      }
     }
 
     if (brand) {

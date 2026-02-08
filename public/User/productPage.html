@@ -760,22 +760,11 @@
       </div>
 
       <div class="filter-group">
-        <div class="filter-header">Color</div>
-        <div class="d-flex flex-wrap gap-2">
-          <span class="sidebar-swatch active" style="background: #000"></span>
-          <span class="sidebar-swatch" style="background: #fff"></span>
-          <span class="sidebar-swatch" style="background: #d32f2f"></span>
-          <span class="sidebar-swatch" style="background: #0d6efd"></span>
-          <span class="sidebar-swatch" style="background: #198754"></span>
-        </div>
-      </div>
-
-      <div class="filter-group">
         <div class="filter-header">Price</div>
-        <input type="range" class="form-range" min="0" max="1000000" value="1000000" id="priceRange" />
+        <input type="range" class="form-range" min="0" max="200000" value="200000" id="priceRange" />
         <div class="d-flex justify-content-between small text-muted">
           <span>Rs. 0</span>
-          <span>Rs. 10,00,000+</span>
+          <span id="priceValue">Rs. 2,00,000</span>
         </div>
       </div>
     </div>

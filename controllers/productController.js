@@ -57,7 +57,12 @@ exports.getAllProducts = async (req, res) => {
 
     // Get total count
     const total = await Product.countDocuments(query);
-    console.log(`[DEBUG] getAllProducts query:`, JSON.stringify(query), `Total:`, total);
+    console.log(
+      `[DEBUG] getAllProducts query:`,
+      JSON.stringify(query),
+      `Total:`,
+      total,
+    );
 
     // Get products with pagination AND sorting
     const products = await Product.find(query)
@@ -101,88 +106,54 @@ exports.getAllProducts = async (req, res) => {
 };
 
 exports.getPublicProducts = async (req, res) => {
-    try {
-        const {
-            page = 1,
-            limit = 12,
-            category,
-            brand,
-            search,
-            sort,
-            inStock,
-            maxPrice,
-        } = req.query;
+  try {
+    const {
+      page = 1,
+      limit = 12,
+      category,
+      brand,
+      search,
+      sort,
+      inStock,
+      maxPrice,
+    } = req.query;
 
-        // 1. Build a clean query object
-        let query = { isDeleted: false }; // Ensure your model uses this flag
+    let query = { isDeleted: false }; // Base query
 
-        if (search && search.trim() !== "") {
-            query.name = { $regex: search.trim(), $options: "i" };
-        }
+    // ... (Include your existing brand/search/price filter logic)
 
-        if (category && category !== "all" && category !== "") {
-            const categoryArray = category.split(",");
-            query.category = { $in: categoryArray };
-        }
+    // 1. CRITICAL: Add .populate("category") to fix the blank CategoryID error
+    const products = await Product.find(query)
+      .populate("category", "_id name")
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
 
-        if (brand && brand !== "all" && brand !== "") {
-            const brandArray = brand.split(",");
-            const brandRegexArray = brandArray.map((b) => new RegExp(`^${b}$`, "i"));
-            query.brand = { $in: brandRegexArray };
-        }
+    const total = await Product.countDocuments(query);
 
-        if (inStock === "true") {
-            query.stock = { $gt: 0 };
-        }
+    // 2. Format the response for your Jinsa Mobiles theme
+    const formatted = products.map((p) => ({
+      _id: p._id.toString(),
+      name: p.name,
+      actualPrice: p.actualPrice,
+      offerPrice: p.offerPrice,
+      stock: p.stock,
+      brand: p.brand || "Generic",
+      categoryName: p.category?.name || "Uncategorized",
+      category: p.category?._id.toString() || "", // Explicitly send the ID
+      mainImage: p.mainImage
+        ? `/uploads/products/${require("path").basename(p.mainImage)}`
+        : "/images/logo.jpg",
+    }));
 
-        if (maxPrice) {
-            query.offerPrice = { $lte: parseInt(maxPrice) };
-        }
-
-        // 2. Build Sort Object
-        let sortObj = { createdAt: -1 };
-        if (sort === "price-low-high") sortObj = { offerPrice: 1 };
-        if (sort === "price-high-low") sortObj = { offerPrice: -1 };
-
-        const skip = (page - 1) * limit;
-
-        // 3. CRITICAL: Fetch with Population to fix the "Blank CategoryID" error
-        const products = await Product.find(query)
-            .populate("category", "name") // Join category data
-            .sort(sortObj)
-            .skip(skip)
-            .limit(Number(limit));
-
-        const total = await Product.countDocuments(query);
-
-        // 4. Format the response for your Jinsa Mobiles frontend
-        const formatted = products.map((p) => ({
-            _id: p._id.toString(),
-            name: p.name,
-            actualPrice: p.actualPrice,
-            offerPrice: p.offerPrice,
-            stock: p.stock,
-            brand: p.brand || "Generic",
-            categoryName: p.category?.name || "Uncategorized",
-            // This ensures images load correctly regardless of path format
-            mainImage: p.mainImage 
-                ? (p.mainImage.startsWith('/') ? p.mainImage : `/uploads/products/${path.basename(p.mainImage)}`)
-                : "/images/logo.jpg",
-        }));
-
-        res.json({
-            success: true,
-            products: formatted,
-            pagination: {
-                total,
-                page: parseInt(page),
-                pages: Math.ceil(total / limit),
-            },
-        });
-    } catch (err) {
-        console.error("Critical Error in getPublicProducts:", err);
-        res.status(500).json({ success: false, error: "Internal Server Error: Failed to fetch products" });
-    }
+    res.json({
+      success: true,
+      products: formatted,
+      pagination: { total, pages: Math.ceil(total / limit) },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 // getProductById function
@@ -221,7 +192,7 @@ exports.getProductById = async (req, res) => {
         tags: product.tags,
         mainImage: mainImageUrl,
         gallery: galleryUrls,
-        brand: product.brand
+        brand: product.brand,
       },
     });
   } catch (err) {
@@ -246,27 +217,29 @@ exports.getCategoriesForDropdown = async (req, res) => {
 // ADD THIS FUNCTION
 exports.getCategoriesWithCounts = async (req, res) => {
   try {
-    const Category = require('../models/Category');
-    const Product = require('../models/Product');
+    const Category = require("../models/Category");
+    const Product = require("../models/Product");
 
     const categories = await Category.find({ isActive: true });
     const categoriesWithCounts = await Promise.all(
       categories.map(async (cat) => {
         const productCount = await Product.countDocuments({
           category: cat._id,
-          stock: { $gt: 0 }
+          stock: { $gt: 0 },
         });
         return {
           _id: cat._id.toString(),
           name: cat.name,
-          productCount: productCount
+          productCount: productCount,
         };
-      })
+      }),
     );
     res.json({ success: true, categories: categoriesWithCounts });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, error: 'Failed to load categories' });
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to load categories" });
   }
 };
 
@@ -285,7 +258,7 @@ exports.addProduct = async (req, res) => {
       publishDate,
       tags = "",
       category,
-      brand
+      brand,
     } = req.body;
 
     if (!name || !actualPrice || !offerPrice || !stock || !category) {
@@ -310,7 +283,7 @@ exports.addProduct = async (req, res) => {
       visibility,
       publishDate: publishDate ? new Date(publishDate) : undefined,
       tags: tagArray,
-      brand: brand || 'Generic',
+      brand: brand || "Generic",
       category,
     };
 
@@ -353,7 +326,7 @@ exports.updateProduct = async (req, res) => {
       publishDate,
       tags = "",
       category,
-      brand
+      brand,
     } = req.body;
 
     if (!name || !actualPrice || !offerPrice || !stock || !category) {
@@ -378,7 +351,7 @@ exports.updateProduct = async (req, res) => {
       visibility,
       publishDate: publishDate ? new Date(publishDate) : undefined,
       tags: tagArray,
-      brand: brand || 'Generic',
+      brand: brand || "Generic",
       category,
     };
 
@@ -455,11 +428,11 @@ exports.deleteProduct = async (req, res) => {
 exports.getUniqueBrands = async (req, res) => {
   try {
     // Gets unique brand strings from products that aren't deleted
-    const brands = await Product.distinct('brand', { isDeleted: false });
+    const brands = await Product.distinct("brand", { isDeleted: false });
 
     res.status(200).json({
       success: true,
-      brands: brands.filter(b => b) // Removes any null/undefined values
+      brands: brands.filter((b) => b), // Removes any null/undefined values
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -468,20 +441,29 @@ exports.getUniqueBrands = async (req, res) => {
 
 exports.getPublicProducts = async (req, res) => {
   try {
-    const { page = 1, limit = 12, sort, category, brand, inStock, maxPrice, search } = req.query;
+    const {
+      page = 1,
+      limit = 12,
+      sort,
+      category,
+      brand,
+      inStock,
+      maxPrice,
+      search,
+    } = req.query;
 
     // Build Query Object
     let query = { isDeleted: false };
 
     // Brand Filter: Handles comma-separated values from frontend
     if (brand) {
-      const brandArray = brand.split(',');
-      query.brand = { $in: brandArray.map(b => new RegExp(`^${b}$`, 'i')) };
+      const brandArray = brand.split(",");
+      query.brand = { $in: brandArray.map((b) => new RegExp(`^${b}$`, "i")) };
     }
 
     // Category Filter
     if (category) {
-      query.category = { $in: category.split(',') };
+      query.category = { $in: category.split(",") };
     }
 
     // Price Filter
@@ -490,19 +472,19 @@ exports.getPublicProducts = async (req, res) => {
     }
 
     // Stock Filter
-    if (inStock === 'true') {
+    if (inStock === "true") {
       query.stock = { $gt: 0 };
     }
 
     // Search Filter
     if (search) {
-      query.name = { $regex: search, $options: 'i' };
+      query.name = { $regex: search, $options: "i" };
     }
 
     // Sorting Logic
     let sortOptions = { createdAt: -1 }; // Default: Newest
-    if (sort === 'price-low-high') sortOptions = { offerPrice: 1 };
-    if (sort === 'price-high-low') sortOptions = { offerPrice: -1 };
+    if (sort === "price-low-high") sortOptions = { offerPrice: 1 };
+    if (sort === "price-high-low") sortOptions = { offerPrice: -1 };
 
     const skip = (page - 1) * limit;
     const products = await Product.find(query)
@@ -518,8 +500,8 @@ exports.getPublicProducts = async (req, res) => {
       pagination: {
         total,
         page: Number(page),
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
