@@ -563,6 +563,10 @@ async function addToCart(productId) {
         timerProgressBar: true,
         showConfirmButton: false,
       });
+      // Update cart badge immediately
+      if (window.updateCartBadge) {
+        window.updateCartBadge();
+      }
     } else {
       throw new Error(data.message || "Failed to add to cart");
     }
