@@ -278,8 +278,8 @@
         addTotal("Product Discount", `- Rs. ${order.totals.productDiscount}`, "text-success");
       }
 
-      // 3. Subtotal (Deal Price)
-      // addTotal("Subtotal", order.totals.subtotal); // Optional, maybe redundant if breakdown is clear
+      // 3. Subtotal (Offer Price)
+      addTotal("Subtotal (Offer Price)", order.totals.subtotal);
 
       // 4. Coupon Discount
       if (order.totals.couponDiscount && order.totals.couponDiscount > 0) {

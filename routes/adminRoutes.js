@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const Product = require("../models/Product");
 const path = require("path");
-const { isAdmin } = require("../middleware/authMiddleware");
+const { protect, isAdmin } = require('../middleware/authMiddleware');
 
 // ────────────────
 // CONTROLLER IMPORTS
@@ -153,3 +153,13 @@ router.put("/offers/:id", isAdmin, updateOffer);
 router.delete("/offers/:id", isAdmin, deleteOffer);
 
 module.exports = router;
+
+
+// ────────────────
+// Dashboard
+// ────────────────
+
+const adminController = require('../controllers/adminController');
+
+
+router.get('/dashboard-stats', protect, isAdmin, adminController.getDashboardStats);
