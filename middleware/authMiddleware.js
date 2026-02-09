@@ -64,7 +64,6 @@ const protect = async (req, res, next) => {
   }
 };
 
-module.exports = { protect };
 
 const isAdmin = async (req, res, next) => {
   let token;

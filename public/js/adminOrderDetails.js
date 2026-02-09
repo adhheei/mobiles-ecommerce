@@ -123,7 +123,7 @@ function renderOrderDetails(order) {
         const c_lastName = order.userId.lastName || '';
         const c_name = `${c_firstName} ${c_lastName}`.trim() || 'Guest';
         const c_email = order.userId.email || 'N/A';
-        const c_mobile = order.userId.mobile || 'N/A';
+        const c_mobile = order.userId.phone || 'N/A';
 
         customerCard.querySelector('.admin-avatar').textContent = (c_firstName.charAt(0) || '?').toUpperCase();
         customerCard.querySelector('h6').textContent = c_name;
@@ -147,7 +147,7 @@ function renderOrderDetails(order) {
     const addr = order.shippingAddress;
     shippingCard.querySelector('.info-group').innerHTML = `
         <div class="info-value">${addr.fullName}</div>
-        <div class="info-sub">${addr.streetAddress}, ${addr.city}</div>
+        <div class="info-sub">${addr.street }, ${addr.city}</div>
         <div class="info-sub">${addr.state}, ${addr.pincode}</div>
         <div class="info-sub">${addr.country}</div>
         <div class="info-sub">Phone: ${addr.phone}</div>
