@@ -78,19 +78,18 @@ const updateCart = async (req, res) => {
         const { productId, quantity } = req.body;
         const qty = parseInt(quantity);
 
-        if (qty < 1) {
-            return res.status(400).json({ message: "Quantity must be at least 1" });
-        }
+        if (qty < 1) return res.status(400).json({ message: "Quantity must be at least 1" });
 
         const cart = await Cart.findOne({ userId });
         if (!cart) return res.status(404).json({ message: "Cart not found" });
 
         const itemIndex = cart.items.findIndex(p => p.productId.toString() === productId);
         if (itemIndex > -1) {
-            // Check Stock
+            // Fetch the actual product to check live stock
             const product = await Product.findById(productId);
-            if (!product) return res.status(404).json({ message: "Product not found" });
+            if (!product) return res.status(404).json({ message: "Product no longer exists" });
 
+            // VALIDATION: Check if requested qty exceeds available stock
             if (product.stock < qty) {
                 return res.status(400).json({
                     message: `Insufficient stock. Only ${product.stock} units available.`
@@ -100,14 +99,13 @@ const updateCart = async (req, res) => {
             cart.items[itemIndex].quantity = qty;
             await cart.save();
 
-            // Re-fetch to populate for response
             const updatedCart = await Cart.findOne({ userId }).populate("items.productId");
             res.status(200).json({ cart: formatCart(updatedCart) });
         } else {
             res.status(404).json({ message: "Item not found in cart" });
         }
     } catch (error) {
-        console.error(error);
+        console.error("Update Cart Error:", error);
         res.status(500).json({ message: "Server error" });
     }
 };
