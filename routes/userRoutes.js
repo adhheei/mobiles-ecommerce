@@ -4,6 +4,7 @@ const {
     getProfile,
     updateProfile,
     updateAvatar,
+    removeAvatar,
     getWishlist,
     addToWishlist,
     removeFromWishlist,
@@ -18,6 +19,7 @@ const upload = require("../middleware/upload");
 router.get("/profile", protect, getProfile);
 router.put("/profile", protect, updateProfile);
 router.put("/avatar", protect, upload.single, updateAvatar);
+router.delete("/avatar", protect, removeAvatar);
 
 router.get("/wishlist", protect, getWishlist);
 router.post("/wishlist", protect, addToWishlist);

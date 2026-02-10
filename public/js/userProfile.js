@@ -261,4 +261,63 @@ document.addEventListener("DOMContentLoaded", async () => {
       ); // 80% quality JPEG
     });
   }
+  // 5. Handle "Remove Avatar"
+  const removeAvatarBtn = document.getElementById("removeAvatarBtn");
+  if (removeAvatarBtn) {
+    removeAvatarBtn.addEventListener("click", async () => {
+      // Use SweetAlert2 for confirmation
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "Do you really want to remove your profile picture?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Yes, remove it!",
+      });
+
+      if (!result.isConfirmed) return;
+
+      try {
+        const response = await fetch("/api/user/avatar", {
+          method: "DELETE",
+          credentials: "include",
+        });
+
+        if (response.status === 401) {
+          window.location.href = "/User/userLogin.html";
+          return;
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Reset to default placeholder
+          profileImage.src = "https://placehold.co/150x150/ccc/333?text=User";
+
+          Swal.fire({
+            title: "Removed!",
+            text: "Your profile picture has been removed.",
+            icon: "success",
+            confirmButtonColor: "#1a1a1a"
+          });
+        } else {
+          Swal.fire({
+            title: "Error!",
+            text: data.message || "Failed to remove profile picture",
+            icon: "error",
+            confirmButtonColor: "#1a1a1a"
+          });
+        }
+      } catch (error) {
+        console.error("Remove avatar error:", error);
+        Swal.fire({
+          title: "Error!",
+          text: "An error occurred while removing the picture.",
+          icon: "error",
+          confirmButtonColor: "#1a1a1a"
+        });
+      }
+    });
+  }
 });

@@ -757,64 +757,85 @@
     <script>
       async function loadDashboardData() {
         try {
+          const token = localStorage.getItem("token"); // Retrieve the admin token
           const response = await fetch("/api/admin/dashboard-stats", {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ${token}`, // Must match your 'protect' middleware
+              "Content-Type": "application/json",
             },
           });
+
           const data = await response.json();
 
-          if (data.success) {
+          if (data.success && data.stats) {
             const { stats } = data;
 
-            // Update UI Cards
-            document.getElementById("totalRevenue").innerText =
-              `Rs. ${stats.totalRevenue.toLocaleString("en-IN")}`;
-            document.getElementById("totalOrders").innerText =
-              stats.totalOrders.toLocaleString();
-            document.getElementById("totalCustomers").innerText =
-              stats.totalCustomers.toLocaleString();
-            document.getElementById("productsInStock").innerText =
-              stats.productsInStock.toLocaleString();
-            document.getElementById("outOfStockText").innerText =
-              `${stats.outOfStock} out of stock`;
+            // Helper to update text safely
+            const updateEl = (id, value) => {
+              const el = document.getElementById(id);
+              if (el) el.innerText = value;
+            };
+
+            // Update Cards
+            updateEl(
+              "totalRevenue",
+              `Rs. ${(stats.totalRevenue || 0).toLocaleString("en-IN")}`,
+            );
+            updateEl("totalOrders", (stats.totalOrders || 0).toLocaleString());
+            updateEl(
+              "totalCustomers",
+              (stats.totalCustomers || 0).toLocaleString(),
+            );
+            updateEl(
+              "productsInStock",
+              (stats.productsInStock || 0).toLocaleString(),
+            );
+            updateEl("outOfStockText", `${stats.outOfStock || 0} out of stock`);
+
+            if (stats.graphData) initSalesChart(stats.graphData);
           }
         } catch (err) {
           console.error("Dashboard Fetch Error:", err);
         }
       }
 
-      // Ensure data loads when the page opens
-      document.addEventListener("DOMContentLoaded", loadDashboardData);
+      function initSalesChart(graphData) {
+        const ctx = document.getElementById("salesChart")?.getContext("2d");
+        if (!ctx) return;
 
-      function toggleSidebar() {
-        document.getElementById("sidebar").classList.toggle("active");
-        document.getElementById("sidebarOverlay").classList.toggle("active");
-      }
+        const monthNames = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
+        graphData.sort((a, b) => a._id - b._id);
 
-      // --- Chart.js Initialization ---
-      document.addEventListener("DOMContentLoaded", function () {
-        const ctx = document.getElementById("salesChart").getContext("2d");
+        const labels = graphData.map((item) => monthNames[item._id - 1]);
+        const values = graphData.map((item) => item.revenue);
 
-        // Gradient Fill
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, "rgba(26, 26, 26, 0.1)");
-        gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+        // Clear old chart to prevent flickering
+        let existingChart = Chart.getChart("salesChart");
+        if (existingChart) existingChart.destroy();
 
         new Chart(ctx, {
           type: "line",
           data: {
-            labels: ["May", "Jun", "Jul", "Aug", "Sep", "Oct"],
+            labels: labels,
             datasets: [
               {
-                label: "Revenue ($)",
-                data: [90000, 110000, 105000, 130000, 125000, 150000],
-                backgroundColor: gradient,
+                label: "Revenue",
+                data: values,
                 borderColor: "#1a1a1a",
-                borderWidth: 2,
-                pointBackgroundColor: "#fff",
-                pointBorderColor: "#1a1a1a",
-                pointRadius: 4,
+                backgroundColor: "rgba(26, 26, 26, 0.1)",
                 fill: true,
                 tension: 0.4,
               },
@@ -823,43 +844,14 @@
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                backgroundColor: "#1a1a1a",
-                titleColor: "#fff",
-                bodyColor: "#fff",
-                padding: 10,
-                displayColors: false,
-                callbacks: {
-                  label: function (context) {
-                    return "$" + context.parsed.y.toLocaleString();
-                  },
-                },
-              },
-            },
             scales: {
-              x: {
-                grid: { display: false, drawBorder: false },
-                ticks: { font: { family: "Poppins" } },
-              },
-              y: {
-                grid: {
-                  color: "#f0f0f0",
-                  borderDash: [5, 5],
-                  drawBorder: false,
-                },
-                ticks: {
-                  callback: function (value) {
-                    return "$" + value / 1000 + "k";
-                  },
-                  font: { family: "Poppins" },
-                },
-              },
+              y: { ticks: { callback: (v) => "Rs. " + v.toLocaleString() } },
             },
           },
         });
-      });
+      }
+
+      document.addEventListener("DOMContentLoaded", loadDashboardData);
     </script>
   </body>
 </html>

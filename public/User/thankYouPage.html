@@ -31,17 +31,23 @@
     }
 
     /* Added Animation */
-    .reveal-up {
+    .reveal-up-element {
       opacity: 0;
-      transform: translateY(30px);
-      animation: revealUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out;
     }
 
-    @keyframes revealUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .reveal-up-element.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Homepage Title Font Style */
+    h1.homepage-font {
+      font-family: "Poppins", sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .success-icon {
@@ -145,12 +151,12 @@
 
 <body>
 
-  <div class="thank-you-container reveal-up">
+  <div class="thank-you-container reveal-up-element">
     <div class="success-icon">
       <i class="fa-solid fa-check"></i>
     </div>
 
-    <h1>Thank You for Your Order!</h1>
+    <h1 class="homepage-font display-5 mb-3">Thank You for Your Order!</h1>
     <p class="order-number-text text-muted mb-4"></p>
 
     <div class="order-card">
@@ -207,7 +213,10 @@
       }
 
       const container = document.querySelector(".thank-you-container");
-      // container.classList.add("reveal-up"); // Class already in HTML for smooth start
+      // Trigger animation after render
+      setTimeout(() => {
+        container.classList.add("active");
+      }, 100);
 
       /* Order ID */
       document.querySelector(".order-number-text").innerText =
@@ -268,36 +277,37 @@
         card.insertBefore(row, shippingRow); // Insert *before* shipping info
       };
 
-      // 1. Total MRP
-      if (order.totals.totalMrp && order.totals.totalMrp > order.totals.subtotal) {
-        addTotal("Total MRP", order.totals.totalMrp);
+      // 1. Actual Price (Total MRP)
+      if (order.totals && order.totals.totalMrp) {
+        addTotal("Actual Price", order.totals.totalMrp);
       }
 
-      // 2. Product Discount
-      if (order.totals.productDiscount && order.totals.productDiscount > 0) {
-        addTotal("Product Discount", `- Rs. ${order.totals.productDiscount}`, "text-success");
+      // 2. Offer Price (Subtotal) - Show only if different from MRP
+      if (order.totals.totalMrp && order.totals.subtotal && order.totals.totalMrp > order.totals.subtotal) {
+        addTotal("Offer Price", order.totals.subtotal, "text-primary fw-bold");
+        // Also show savings? Optional, but "Offer Price" is requested.
+      } else if (!order.totals.totalMrp) {
+        // Fallback if MRP is missing
+        addTotal("Price", order.totals.subtotal);
       }
 
-      // 3. Subtotal (Offer Price)
-      addTotal("Subtotal (Offer Price)", order.totals.subtotal);
-
-      // 4. Coupon Discount
+      // 3. Coupon Discount
       if (order.totals.couponDiscount && order.totals.couponDiscount > 0) {
         addTotal("Coupon Discount", `- Rs. ${order.totals.couponDiscount}`, "text-success");
       }
 
-      // 5. Wallet
+      // 4. Wallet (keep if needed, though not explicitly asked)
       if (order.totals.walletDeducted && order.totals.walletDeducted > 0) {
         addTotal("Wallet Paid", `- Rs. ${order.totals.walletDeducted}`, "text-success");
       }
 
-      // 6. Shipping
-      const shippingCost = order.totals.shipping === 0 ? "FREE" : order.totals.shipping;
+      // 5. Shipping
+      const shippingCost = order.totals.shipping === 0 ? "Free" : order.totals.shipping;
       const shippingColor = order.totals.shipping === 0 ? "text-success fw-bold" : "";
       addTotal("Shipping", shippingCost, shippingColor);
 
-      // 7. Total Payable
-      addTotal("Total Payable", order.totals.totalAmount, "size-lg", true);
+      // 6. Total Payable Amount
+      addTotal("Total Payable Amount", order.totals.totalAmount, "size-lg", true);
 
 
       /* Date Calculation */

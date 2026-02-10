@@ -40,8 +40,20 @@ const addToCart = async (req, res) => {
         }
 
         const itemIndex = cart.items.findIndex(p => p.productId.toString() === productId);
+        let newQuantity = qty;
         if (itemIndex > -1) {
-            cart.items[itemIndex].quantity += qty;
+            newQuantity = cart.items[itemIndex].quantity + qty;
+        }
+
+        // Check Stock
+        if (product.stock < newQuantity) {
+            return res.status(400).json({
+                message: `Insufficient stock. Only ${product.stock} units available.`
+            });
+        }
+
+        if (itemIndex > -1) {
+            cart.items[itemIndex].quantity = newQuantity;
         } else {
             cart.items.push({ productId, quantity: qty });
         }
@@ -75,6 +87,16 @@ const updateCart = async (req, res) => {
 
         const itemIndex = cart.items.findIndex(p => p.productId.toString() === productId);
         if (itemIndex > -1) {
+            // Check Stock
+            const product = await Product.findById(productId);
+            if (!product) return res.status(404).json({ message: "Product not found" });
+
+            if (product.stock < qty) {
+                return res.status(400).json({
+                    message: `Insufficient stock. Only ${product.stock} units available.`
+                });
+            }
+
             cart.items[itemIndex].quantity = qty;
             await cart.save();
 
@@ -144,6 +166,13 @@ function formatCart(cart) {
         subtotal += lineTotal;
         totalMrp += mrp * item.quantity;
 
+        // --- DEBUG STOCK ---
+        if (product.stock === undefined || product.stock === null) {
+            console.warn(`[DEBUG] Product Stock Missing for ${product._id}:`, product);
+        } else {
+            console.log(`[DEBUG] Product Stock for ${product._id}:`, product.stock);
+        }
+
         // Image Handling
         let image = "https://placehold.co/100x120/f0f0f0/333?text=No+Image";
 
@@ -167,6 +196,7 @@ function formatCart(cart) {
             price: price,
             mrp: mrp,
             quantity: item.quantity,
+            stock: product.stock, // Add stock info
             lineTotal: lineTotal
         };
     }).filter(i => i !== null);
@@ -312,6 +342,17 @@ const placeOrder = async (req, res) => {
             });
         }
 
+        // --- 1.5 CHECK STOCK AVAILABILITY ---
+        for (const item of orderItems) {
+            const product = await Product.findById(item.productId);
+            if (!product) {
+                return res.status(404).json({ message: `Product ${item.name} not found` });
+            }
+            if (product.stock < item.quantity) {
+                return res.status(400).json({ message: `Insufficient stock for ${item.name}. Only ${product.stock} left.` });
+            }
+        }
+
         const productDiscount = totalMrp - subtotal;
 
         // --- 2. APPLY COUPON ---
@@ -419,7 +460,13 @@ const placeOrder = async (req, res) => {
             appliedCoupon: appliedCouponCode
         });
 
-        // --- 5. CREATE TRANSACTION (Legacy/History) ---
+        // --- 5. DECREASE STOCK ---
+        for (const item of orderItems) {
+            await Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } });
+        }
+
+
+        // --- 6. CREATE TRANSACTION (Legacy/History) ---
         const pMethod = walletDeducted > 0 ? (totalAmount === 0 ? "Wallet" : `Wallet + ${paymentMethod}`) : paymentMethod;
 
         await Transaction.create({
@@ -431,7 +478,7 @@ const placeOrder = async (req, res) => {
             status: "Success"
         });
 
-        // --- 6. UPDATE COUPON USAGE ---
+        // --- 7. UPDATE COUPON USAGE ---
         if (couponIdToUpdate) {
             const Coupon = require("../models/Coupon");
             const updateKey = `userUsage.${userId}`;

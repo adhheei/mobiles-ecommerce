@@ -4,35 +4,55 @@ const User = require("../models/User");
 
 exports.getDashboardStats = async (req, res) => {
   try {
-    // 1. Calculate Total Revenue from delivered orders
+    // 1. Revenue: Check if your status is 'Delivered' or 'delivered'
     const revenueData = await Order.aggregate([
-      { $match: { status: "Delivered" } },
-      { $group: { _id: null, total: { $sum: "$totalAmount" } } },
+      { $match: { orderStatus: "Delivered" } },
+      { $group: { _id: null, total: { $sum: "$totals.totalAmount" } } }
     ]);
 
-    // 2. Count Orders and Customers
-    const totalOrders = await Order.countDocuments();
-    const totalCustomers = await User.countDocuments({ role: "user" });
+    // 2. Customers: Ensure the role field exists
+    const totalCustomers = await User.countDocuments({ role: 'user' });
 
-    // 3. Calculate Stock Stats safely
-    const products = await Product.find({});
+    // 3. Stock: Summing up actual quantity
+    const stockData = await Product.aggregate([
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$stock" },
+          outOfStock: { $sum: { $cond: [{ $eq: ["$stock", 0] }, 1, 0] } }
+        }
+      }
+    ]);
 
-    // Using a fallback of 0 ensures the calculation doesn't crash if 'stock' is missing
-    const totalInStock = products.reduce((acc, p) => acc + (p.stock || 0), 0);
-    const outOfStockCount = products.filter((p) => (p.stock || 0) === 0).length;
+    // 4. Graph Data: Monthly revenue for the current year
+    const graphData = await Order.aggregate([
+      {
+        $match: {
+          orderStatus: "Delivered",
+          createdAt: { $gte: new Date(new Date().getFullYear(), 0, 1) }
+        }
+      },
+      {
+        $group: {
+          _id: { $month: "$createdAt" },
+          revenue: { $sum: "$totals.totalAmount" }
+        }
+      },
+      { $sort: { "_id": 1 } } // Sort by month (1=Jan, 12=Dec)
+    ]);
 
     res.json({
       success: true,
       stats: {
-        totalRevenue: revenueData.length > 0 ? revenueData[0].total : 0,
-        totalOrders,
+        totalRevenue: revenueData[0]?.total || 0,
+        totalOrders: await Order.countDocuments(),
         totalCustomers,
-        productsInStock: totalInStock,
-        outOfStock: outOfStockCount,
-      },
+        productsInStock: stockData[0]?.total || 0,
+        outOfStock: stockData[0]?.outOfStock || 0,
+        graphData // Send the computed graph data
+      }
     });
   } catch (err) {
-    console.error("Dashboard Stats Error:", err);
     res.status(500).json({ success: false, message: err.message });
   }
 };
