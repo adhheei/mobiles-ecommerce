@@ -1,681 +1,742 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <script src="/js/authGuard.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Your Cart - Jinsa Mobiles</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet" />
-  <style>
-    /* --- GLOBAL VARIABLES & FONTS --- */
-    :root {
-      --primary-black: #1a1a1a;
-      --primary-red: #d32f2f;
-      --bg-light: #f8f9fa;
-    }
-
-    body {
-      font-family: "Poppins", sans-serif;
-      background-color: #fff;
-      padding-top: 100px;
-      color: #1a1a1a;
-    }
-
-    /* Navbar */
-    .navbar {
-      padding: 10px 0;
-      background: white;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    }
-
-    .navbar-brand {
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: var(--primary-black);
-    }
-
-    /* Links Centered & Styled */
-    .navbar-nav .nav-link {
-      font-family: "Poppins";
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: #333 !important;
-      transition: color 0.3s;
-      margin: 0 10px;
-    }
-
-    .navbar-nav .nav-link:hover {
-      color: #0d6efd !important;
-    }
-
-    /* Search Bar Styling */
-    .search-container {
-      position: relative;
-    }
-
-    .search-input {
-      width: 200px;
-      height: 35px;
-      font-size: 0.9rem;
-      padding-right: 35px;
-      border-radius: 50px;
-      border: 1px solid #dee2e6;
-      padding-left: 15px;
-    }
-
-    .search-icon {
-      position: absolute;
-      top: 50%;
-      right: 15px;
-      transform: translateY(-50%);
-      color: #6c757d;
-      cursor: pointer;
-    }
-
-    /* Mobile Adjustments */
-    @media (max-width: 991px) {
-      .navbar-nav {
-        text-align: center;
-        margin-bottom: 15px;
-        align-items: center;
-        width: 100%;
+  <head>
+    <meta charset="UTF-8" />
+    <script src="/js/authGuard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Cart - Jinsa Mobiles</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* --- GLOBAL VARIABLES & FONTS --- */
+      :root {
+        --primary-black: #1a1a1a;
+        --primary-red: #d32f2f;
+        --bg-light: #f8f9fa;
       }
 
-      .nav-icons {
-        justify-content: center;
-        margin-top: 15px;
-        width: 100%;
-        border-top: 1px solid #eee;
-        padding-top: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        align-items: center;
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #fff;
+        padding-top: 100px;
+        color: #1a1a1a;
       }
 
+      /* Navbar */
+      .navbar {
+        padding: 10px 0;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .navbar-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: var(--primary-black);
+      }
+
+      /* Links Centered & Styled */
+      .navbar-nav .nav-link {
+        font-family: "Poppins";
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #333 !important;
+        transition: color 0.3s;
+        margin: 0 10px;
+      }
+
+      .navbar-nav .nav-link:hover {
+        color: #0d6efd !important;
+      }
+
+      /* Search Bar Styling */
       .search-container {
-        margin-bottom: 10px;
-      }
-    }
-
-    @media (min-width: 992px) {
-      .navbar-collapse {
-        margin-left: 50px;
+        position: relative;
       }
 
-      .nav-icons {
+      .search-input {
+        width: 200px;
+        height: 35px;
+        font-size: 0.9rem;
+        padding-right: 35px;
+        border-radius: 50px;
+        border: 1px solid #dee2e6;
+        padding-left: 15px;
+      }
+
+      .search-icon {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        color: #6c757d;
+        cursor: pointer;
+      }
+
+      /* Mobile Adjustments */
+      @media (max-width: 991px) {
+        .navbar-nav {
+          text-align: center;
+          margin-bottom: 15px;
+          align-items: center;
+          width: 100%;
+        }
+
+        .nav-icons {
+          justify-content: center;
+          margin-top: 15px;
+          width: 100%;
+          border-top: 1px solid #eee;
+          padding-top: 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          align-items: center;
+        }
+
+        .search-container {
+          margin-bottom: 10px;
+        }
+      }
+
+      @media (min-width: 992px) {
+        .navbar-collapse {
+          margin-left: 50px;
+        }
+
+        .nav-icons {
+          display: flex;
+          align-items: center;
+          margin-left: auto;
+        }
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 10px 0;
+        margin-top: 10px;
+      }
+
+      .dropdown-item {
+        padding: 10px 20px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: #333;
+        transition: all 0.2s ease;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f8f9fa;
+        color: #d32f2f;
+        padding-left: 25px;
+      }
+
+      /* --- CART PAGE STYLES --- */
+      .page-title {
+        font-size: 2.5rem;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .cart-item-row {
         display: flex;
         align-items: center;
+        padding: 20px 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .cart-img-wrapper {
+        width: 80px;
+        height: 100px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        overflow: hidden;
+        flex-shrink: 0;
+        margin-right: 20px;
+      }
+
+      .cart-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      .item-details {
+        flex-grow: 1;
+      }
+
+      .item-name {
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 5px;
+      }
+
+      .item-meta {
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 5px;
+      }
+
+      .item-price {
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .item-price-original {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 0.8rem;
+        margin-left: 5px;
+      }
+
+      .qty-control {
+        display: flex;
+        align-items: center;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        height: 32px;
+      }
+
+      .qty-btn {
+        border: none;
+        background: none;
+        padding: 0 10px;
+        color: #555;
+        font-size: 1rem;
+      }
+
+      .qty-value {
+        width: 30px;
+        text-align: center;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border: none;
+      }
+
+      .remove-btn {
+        color: #999;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+
+      .remove-btn:hover {
+        color: #d32f2f;
+      }
+
+      .summary-card {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.02);
+      }
+
+      .upsell-mini {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .upsell-mini img {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        margin-right: 10px;
+      }
+
+      .upsell-text h6 {
+        font-size: 0.85rem;
+        margin: 0;
+        font-weight: 600;
+      }
+
+      .upsell-text p {
+        font-size: 0.75rem;
+        margin: 0;
+        color: #666;
+      }
+
+      .upsell-price {
+        margin-left: auto;
+        font-size: 0.85rem;
+        font-weight: 700;
+      }
+
+      .voucher-box {
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        margin-bottom: 20px;
+        text-decoration: none;
+        color: #1a1a1a;
+        transition: background-color 0.2s;
+      }
+
+      .voucher-box:hover {
+        background-color: #f8f9fa;
+        color: #1a1a1a;
+      }
+
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+        color: #555;
+      }
+
+      .summary-total {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+        color: #1a1a1a;
+      }
+
+      .checkout-btn {
+        width: 100%;
+        background: #1a1a1a;
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 50px;
+        font-weight: 600;
+        margin-top: 20px;
+        transition: background 0.2s;
+        text-decoration: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .checkout-btn:hover {
+        background: #333;
+        color: white;
+      }
+
+      .scrolling-wrapper {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        scroll-behavior: smooth;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        padding-bottom: 10px;
+      }
+
+      .scrolling-wrapper::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* Updated CSS for Recommendations */
+      .rec-card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        min-width: 250px;
+        margin-right: 15px;
+      }
+
+      .rec-card-link:hover {
+        color: inherit;
+      }
+
+      .mini-rec-card {
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        transition: border-color 0.2s;
+        background: white;
+      }
+
+      .mini-rec-card:hover {
+        border-color: #1a1a1a;
+      }
+
+      .mini-rec-card img {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+        margin-right: 10px;
+      }
+
+      .btn-add-mini {
+        background: #1a1a1a;
+        color: white;
+        border: none;
+        font-size: 0.7rem;
+        padding: 4px 10px;
+        border-radius: 4px;
         margin-left: auto;
       }
-    }
 
-    /* Dropdown Menu Styles */
-    .dropdown-menu {
-      border: none;
-      border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      padding: 10px 0;
-      margin-top: 10px;
-    }
+      /* Empty Cart Styles */
+      #empty-cart-view {
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
 
-    .dropdown-item {
-      padding: 10px 20px;
-      font-weight: 500;
-      font-size: 0.9rem;
-      color: #333;
-      transition: all 0.2s ease;
-    }
+      .related-section {
+        margin-top: 60px;
+      }
 
-    .dropdown-item:hover {
-      background-color: #f8f9fa;
-      color: #d32f2f;
-      padding-left: 25px;
-    }
+      .product-card {
+        border: none;
+        transition: transform 0.2s;
+        text-align: center;
+        position: relative;
+        height: 100%;
+      }
 
-    /* --- CART PAGE STYLES --- */
-    .page-title {
-      font-size: 2.5rem;
-      font-weight: 600;
-      text-align: center;
-      margin-bottom: 40px;
-    }
+      .product-card img {
+        border-radius: 12px;
+        margin-bottom: 10px;
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        background: #f4f4f4;
+      }
 
-    .cart-item-row {
-      display: flex;
-      align-items: center;
-      padding: 20px 0;
-      border-bottom: 1px solid #eee;
-    }
+      .related-name {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
 
-    .cart-img-wrapper {
-      width: 80px;
-      height: 100px;
-      background: #f9f9f9;
-      border-radius: 8px;
-      overflow: hidden;
-      flex-shrink: 0;
-      margin-right: 20px;
-    }
+      .related-price {
+        color: #d32f2f;
+        font-weight: 700;
+      }
 
-    .cart-img-wrapper img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
+      .bottom-features {
+        border-top: 1px solid #eee;
+        padding: 40px 0;
+        margin-top: 60px;
+        background: #fff;
+      }
 
-    .item-details {
-      flex-grow: 1;
-    }
+      .feature-box {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
 
-    .item-name {
-      font-weight: 600;
-      font-size: 0.95rem;
-      margin-bottom: 5px;
-    }
+      .feature-box i {
+        font-size: 1.5rem;
+        color: #333;
+      }
 
-    .item-meta {
-      font-size: 0.85rem;
-      color: #666;
-      margin-bottom: 5px;
-    }
+      .feature-text h6 {
+        font-weight: 700;
+        margin: 0;
+        font-size: 0.9rem;
+      }
 
-    .item-price {
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
+      .feature-text p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: #666;
+      }
 
-    .item-price-original {
-      text-decoration: line-through;
-      color: #999;
-      font-size: 0.8rem;
-      margin-left: 5px;
-    }
+      footer {
+        background-color: #111;
+        color: #aaa;
+        padding: 60px 0 20px;
+      }
 
-    .qty-control {
-      display: flex;
-      align-items: center;
-      border: 1px solid #dee2e6;
-      border-radius: 4px;
-      height: 32px;
-    }
+      footer h5 {
+        color: white;
+        font-weight: 600;
+        margin-bottom: 20px;
+      }
 
-    .qty-btn {
-      border: none;
-      background: none;
-      padding: 0 10px;
-      color: #555;
-      font-size: 1rem;
-    }
+      footer ul {
+        padding-left: 0;
+        list-style: none;
+      }
 
-    .qty-value {
-      width: 30px;
-      text-align: center;
-      font-size: 0.9rem;
-      font-weight: 600;
-      border: none;
-    }
+      footer ul li {
+        margin-bottom: 10px;
+      }
 
-    .remove-btn {
-      color: #999;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
+      footer a {
+        color: #aaa;
+        text-decoration: none;
+      }
 
-    .remove-btn:hover {
-      color: #d32f2f;
-    }
+      footer a:hover {
+        color: white;
+      }
 
-    .summary-card {
-      background: #fff;
-      border: 1px solid #eee;
-      border-radius: 12px;
-      padding: 25px;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.02);
-    }
+      .newsletter-input {
+        background: #333;
+        border: none;
+        color: white;
+        padding: 10px;
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    </style>
+    <link href="/css/navbar.css" rel="stylesheet" />
+  </head>
 
-    .upsell-mini {
-      background: #f8f9fa;
-      border-radius: 8px;
-      padding: 10px;
-      display: flex;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .upsell-mini img {
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
-      margin-right: 10px;
-    }
-
-    .upsell-text h6 {
-      font-size: 0.85rem;
-      margin: 0;
-      font-weight: 600;
-    }
-
-    .upsell-text p {
-      font-size: 0.75rem;
-      margin: 0;
-      color: #666;
-    }
-
-    .upsell-price {
-      margin-left: auto;
-      font-size: 0.85rem;
-      font-weight: 700;
-    }
-
-    .voucher-box {
-      border: 1px solid #eee;
-      border-radius: 8px;
-      padding: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      margin-bottom: 20px;
-      text-decoration: none;
-      color: #1a1a1a;
-      transition: background-color 0.2s;
-    }
-
-    .voucher-box:hover {
-      background-color: #f8f9fa;
-      color: #1a1a1a;
-    }
-
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.9rem;
-      margin-bottom: 10px;
-      color: #555;
-    }
-
-    .summary-total {
-      display: flex;
-      justify-content: space-between;
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #eee;
-      color: #1a1a1a;
-    }
-
-    .checkout-btn {
-      width: 100%;
-      background: #1a1a1a;
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 50px;
-      font-weight: 600;
-      margin-top: 20px;
-      transition: background 0.2s;
-      text-decoration: none;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .checkout-btn:hover {
-      background: #333;
-      color: white;
-    }
-
-    .scrolling-wrapper {
-      overflow-x: auto;
-      flex-wrap: nowrap;
-      scroll-behavior: smooth;
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-      padding-bottom: 10px;
-    }
-
-    .scrolling-wrapper::-webkit-scrollbar {
-      display: none;
-    }
-
-    /* Updated CSS for Recommendations */
-    .rec-card-link {
-      text-decoration: none;
-      color: inherit;
-      display: block;
-      min-width: 250px;
-      margin-right: 15px;
-    }
-
-    .rec-card-link:hover {
-      color: inherit;
-    }
-
-    .mini-rec-card {
-      border: 1px solid #eee;
-      border-radius: 8px;
-      padding: 10px;
-      display: flex;
-      align-items: center;
-      width: 100%;
-      transition: border-color 0.2s;
-      background: white;
-    }
-
-    .mini-rec-card:hover {
-      border-color: #1a1a1a;
-    }
-
-    .mini-rec-card img {
-      width: 50px;
-      height: 50px;
-      object-fit: contain;
-      margin-right: 10px;
-    }
-
-    .btn-add-mini {
-      background: #1a1a1a;
-      color: white;
-      border: none;
-      font-size: 0.7rem;
-      padding: 4px 10px;
-      border-radius: 4px;
-      margin-left: auto;
-    }
-
-    /* Empty Cart Styles */
-    #empty-cart-view {
-      min-height: 300px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .related-section {
-      margin-top: 60px;
-    }
-
-    .product-card {
-      border: none;
-      transition: transform 0.2s;
-      text-align: center;
-      position: relative;
-      height: 100%;
-    }
-
-    .product-card img {
-      border-radius: 12px;
-      margin-bottom: 10px;
-      width: 100%;
-      height: 300px;
-      object-fit: cover;
-      background: #f4f4f4;
-    }
-
-    .related-name {
-      font-size: 0.95rem;
-      font-weight: 600;
-      margin-bottom: 5px;
-    }
-
-    .related-price {
-      color: #d32f2f;
-      font-weight: 700;
-    }
-
-    .bottom-features {
-      border-top: 1px solid #eee;
-      padding: 40px 0;
-      margin-top: 60px;
-      background: #fff;
-    }
-
-    .feature-box {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .feature-box i {
-      font-size: 1.5rem;
-      color: #333;
-    }
-
-    .feature-text h6 {
-      font-weight: 700;
-      margin: 0;
-      font-size: 0.9rem;
-    }
-
-    .feature-text p {
-      margin: 0;
-      font-size: 0.8rem;
-      color: #666;
-    }
-
-    footer {
-      background-color: #111;
-      color: #aaa;
-      padding: 60px 0 20px;
-    }
-
-    footer h5 {
-      color: white;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
-
-    footer ul {
-      padding-left: 0;
-      list-style: none;
-    }
-
-    footer ul li {
-      margin-bottom: 10px;
-    }
-
-    footer a {
-      color: #aaa;
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      color: white;
-    }
-
-    .newsletter-input {
-      background: #333;
-      border: none;
-      color: white;
-      padding: 10px;
-      width: 100%;
-      margin-bottom: 10px;
-    }
-  </style>
-  <link href="/css/navbar.css" rel="stylesheet" />
-</head>
-
-<body>
-  <div id="navbar-placeholder"></div>
-  <section class="container py-5">
-    <h1 class="page-title">Your cart</h1>
-    <div id="empty-cart-view" class="d-none text-center">
-      <i class="fa-solid fa-cart-arrow-down text-muted mb-4" style="font-size: 5rem"></i>
-      <h3 class="fw-bold">Your cart is empty</h3>
-      <p class="text-muted mb-4">Looks like you haven't added anything to your cart yet.</p>
-      <a href="./index.html" class="btn btn-dark rounded-pill px-5 py-2 fw-bold">Start Shopping</a>
-    </div>
-    <div class="row g-5" id="main-cart-row">
-      <div class="col-lg-8">
-        <div class="mb-4">
-          <h6 class="fw-bold mb-3">You may also like</h6>
-          <div class="scrolling-wrapper d-flex">
-            <a href="./productDetails.html" class="rec-card-link">
-              <div class="mini-rec-card">
-                <img src="https://placehold.co/100x100/f0f0f0/333?text=Case" alt="Rec" />
-                <div>
-                  <div style="font-size: 0.8rem; font-weight: 600">iPhone 15 Case</div>
-                  <div style="font-size: 0.75rem">Rs. 299</div>
-                </div>
-                <button class="btn-add-mini">+ Add</button>
-              </div>
-            </a>
-            <a href="./productDetails.html" class="rec-card-link">
-              <div class="mini-rec-card">
-                <img src="https://placehold.co/100x100/e0e0e0/333?text=Glass" alt="Rec" />
-                <div>
-                  <div style="font-size: 0.8rem; font-weight: 600">Tempered Glass</div>
-                  <div style="font-size: 0.75rem">Rs. 199</div>
-                </div>
-                <button class="btn-add-mini">+ Add</button>
-              </div>
-            </a>
-            <a href="./productDetails.html" class="rec-card-link">
-              <div class="mini-rec-card">
-                <img src="https://placehold.co/100x100/d0d0d0/333?text=Plug" alt="Rec" />
-                <div>
-                  <div style="font-size: 0.8rem; font-weight: 600">20W Adapter</div>
-                  <div style="font-size: 0.75rem">Rs. 899</div>
-                </div>
-                <button class="btn-add-mini">+ Add</button>
-              </div>
-            </a>
-          </div>
-        </div>
-        <div id="cart-items-container">
-          <!-- Items will be injected by JS -->
-        </div>
+  <body>
+    <div id="navbar-placeholder"></div>
+    <section class="container py-5">
+      <h1 class="page-title">Your cart</h1>
+      <div id="empty-cart-view" class="d-none text-center">
+        <i
+          class="fa-solid fa-cart-arrow-down text-muted mb-4"
+          style="font-size: 5rem"
+        ></i>
+        <h3 class="fw-bold">Your cart is empty</h3>
+        <p class="text-muted mb-4">
+          Looks like you haven't added anything to your cart yet.
+        </p>
+        <a
+          href="./index.html"
+          class="btn btn-dark rounded-pill px-5 py-2 fw-bold"
+          >Start Shopping</a
+        >
       </div>
-      <div class="col-lg-4">
-        <div class="summary-card sticky-top" style="top: 20px; z-index: 1">
-          <div id="summary-items-container" class="mb-3">
-            <!-- Summary items injected by JS -->
-          </div>
-          <div id="apply-coupon-btn" class="voucher-box" style="cursor: pointer;">
-            <span id="coupon-text"><i class="fa-solid fa-tag me-2"></i> Apply Coupon</span>
-            <i class="fa-solid fa-chevron-right small" id="coupon-arrow"></i>
-          </div>
-          <div class="summary-row">
-            <span>Total MRP</span>
-            <span id="total-mrp" class="text-muted text-decoration-line-through">Rs. 4,497.00</span>
-          </div>
-          <div class="summary-row text-success">
-            <span>Discount on MRP</span>
-            <span id="total-discount">-Rs. 3,000.00</span>
-          </div>
-          <div class="summary-row">
-            <span>Subtotal</span>
-            <span id="subtotal">Rs. 1,497.00</span>
-          </div>
-          <div class="summary-row">
-            <span>Shipping</span>
-            <span class="text-success fw-bold">Free</span>
-          </div>
-          <div class="summary-total">
-            <span>Total Amount</span>
-            <span id="grand-total">Rs. 1,497.00</span>
-          </div>
-          <a href="#" class="checkout-btn" onclick="proceedToCheckout(event)">
-            <i class="fa-solid fa-lock me-2"></i> Checkout
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="bottom-features">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-4 mb-3 mb-md-0">
-          <div class="feature-box justify-content-center justify-content-md-start">
-            <i class="fa-solid fa-headset"></i>
-            <div class="feature-text">
-              <h6>Customer service</h6>
-              <p>Your Satisfaction Is Our Command</p>
+      <div class="row g-5" id="main-cart-row">
+        <div class="col-lg-8">
+          <div class="mb-4">
+            <h6 class="fw-bold mb-3">You may also like</h6>
+            <div class="scrolling-wrapper d-flex">
+              <a href="./productDetails.html" class="rec-card-link">
+                <div class="mini-rec-card">
+                  <img
+                    src="https://placehold.co/100x100/f0f0f0/333?text=Case"
+                    alt="Rec"
+                  />
+                  <div>
+                    <div style="font-size: 0.8rem; font-weight: 600">
+                      iPhone 15 Case
+                    </div>
+                    <div style="font-size: 0.75rem">Rs. 299</div>
+                  </div>
+                  <button class="btn-add-mini">+ Add</button>
+                </div>
+              </a>
+              <a href="./productDetails.html" class="rec-card-link">
+                <div class="mini-rec-card">
+                  <img
+                    src="https://placehold.co/100x100/e0e0e0/333?text=Glass"
+                    alt="Rec"
+                  />
+                  <div>
+                    <div style="font-size: 0.8rem; font-weight: 600">
+                      Tempered Glass
+                    </div>
+                    <div style="font-size: 0.75rem">Rs. 199</div>
+                  </div>
+                  <button class="btn-add-mini">+ Add</button>
+                </div>
+              </a>
+              <a href="./productDetails.html" class="rec-card-link">
+                <div class="mini-rec-card">
+                  <img
+                    src="https://placehold.co/100x100/d0d0d0/333?text=Plug"
+                    alt="Rec"
+                  />
+                  <div>
+                    <div style="font-size: 0.8rem; font-weight: 600">
+                      20W Adapter
+                    </div>
+                    <div style="font-size: 0.75rem">Rs. 899</div>
+                  </div>
+                  <button class="btn-add-mini">+ Add</button>
+                </div>
+              </a>
             </div>
           </div>
-        </div>
-        <div class="col-md-4 mb-3 mb-md-0">
-          <div class="feature-box justify-content-center justify-content-md-start">
-            <i class="fa-solid fa-truck-fast"></i>
-            <div class="feature-text">
-              <h6>Fast Free Shipping</h6>
-              <p>Enjoy Free Convenience on Your Orders</p>
-            </div>
+          <div id="cart-items-container">
+            <!-- Items will be injected by JS -->
           </div>
         </div>
-        <div class="col-md-4">
-          <div class="feature-box justify-content-center justify-content-md-start">
-            <i class="fa-solid fa-shield-halved"></i>
-            <div class="feature-text">
-              <h6>Secure payment</h6>
-              <p>Your Payment Information is Processed Securely</p>
+        <div class="col-lg-4">
+          <div class="summary-card sticky-top" style="top: 20px; z-index: 1">
+            <div id="summary-items-container" class="mb-3">
+              <!-- Summary items injected by JS -->
+            </div>
+            <div
+              id="apply-coupon-btn"
+              class="voucher-box"
+              style="cursor: pointer"
+            >
+              <span id="coupon-text"
+                ><i class="fa-solid fa-tag me-2"></i> Apply Coupon</span
+              >
+              <i class="fa-solid fa-chevron-right small" id="coupon-arrow"></i>
+            </div>
+            <div class="summary-row">
+              <span>Total MRP</span>
+              <span id="total-mrp">Rs. 0.00</span>
+            </div>
+            <div class="summary-row text-success">
+              <span>Discount on MRP</span>
+              <span id="total-discount">-Rs. 3,000.00</span>
+            </div>
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span id="subtotal">Rs. 1,497.00</span>
+            </div>
+            <div class="summary-row">
+              <span>Shipping</span>
+              <span class="text-success fw-bold">Free</span>
+            </div>
+            <div class="summary-total">
+              <span>Total Amount</span>
+              <span id="grand-total">Rs. 1,497.00</span>
+            </div>
+            <a href="#" class="checkout-btn" onclick="proceedToCheckout(event)">
+              <i class="fa-solid fa-lock me-2"></i> Checkout
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="bottom-features">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4 mb-3 mb-md-0">
+            <div
+              class="feature-box justify-content-center justify-content-md-start"
+            >
+              <i class="fa-solid fa-headset"></i>
+              <div class="feature-text">
+                <h6>Customer service</h6>
+                <p>Your Satisfaction Is Our Command</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3 mb-md-0">
+            <div
+              class="feature-box justify-content-center justify-content-md-start"
+            >
+              <i class="fa-solid fa-truck-fast"></i>
+              <div class="feature-text">
+                <h6>Fast Free Shipping</h6>
+                <p>Enjoy Free Convenience on Your Orders</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div
+              class="feature-box justify-content-center justify-content-md-start"
+            >
+              <i class="fa-solid fa-shield-halved"></i>
+              <div class="feature-text">
+                <h6>Secure payment</h6>
+                <p>Your Payment Information is Processed Securely</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <footer>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-3">
-          <h5>Discover More</h5>
-          <ul>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact Us</a></li>
-            <li><a href="#">Blog</a></li>
-          </ul>
-        </div>
-        <div class="col-md-3">
-          <h5>Explore Products</h5>
-          <ul>
-            <li><a href="#">Mobiles</a></li>
-            <li><a href="#">Accessories</a></li>
-            <li><a href="#">Trendy Cases</a></li>
-          </ul>
-        </div>
-        <div class="col-md-3">
-          <h5>Customer Care</h5>
-          <ul>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Service</a></li>
-            <li><a href="#">Return Policy</a></li>
-          </ul>
-        </div>
-        <div class="col-md-3">
-          <h5>Contact Us</h5>
-          <form id="footerContactForm" style="margin-bottom: 0;">
-            <input type="text" class="newsletter-input mb-2" placeholder="Name"
-              style="font-size: 0.85rem; padding: 8px;" required />
-            <input type="email" class="newsletter-input mb-2" placeholder="Email"
-              style="font-size: 0.85rem; padding: 8px;" required />
-            <textarea class="newsletter-input mb-2" rows="2" placeholder="Message"
-              style="font-size: 0.85rem; padding: 8px; resize: none;" required></textarea>
-            <button type="submit" class="btn btn-light w-100 btn-sm fw-bold">Send</button>
-          </form>
-          <div class="mt-3">
-            <i class="fa-brands fa-facebook me-3"></i>
-            <i class="fa-brands fa-instagram me-3"></i>
-            <i class="fa-brands fa-twitter"></i>
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-3">
+            <h5>Discover More</h5>
+            <ul>
+              <li><a href="#">About Us</a></li>
+              <li><a href="#">Contact Us</a></li>
+              <li><a href="#">Blog</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h5>Explore Products</h5>
+            <ul>
+              <li><a href="#">Mobiles</a></li>
+              <li><a href="#">Accessories</a></li>
+              <li><a href="#">Trendy Cases</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h5>Customer Care</h5>
+            <ul>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Service</a></li>
+              <li><a href="#">Return Policy</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h5>Contact Us</h5>
+            <form id="footerContactForm" style="margin-bottom: 0">
+              <input
+                type="text"
+                class="newsletter-input mb-2"
+                placeholder="Name"
+                style="font-size: 0.85rem; padding: 8px"
+                required
+              />
+              <input
+                type="email"
+                class="newsletter-input mb-2"
+                placeholder="Email"
+                style="font-size: 0.85rem; padding: 8px"
+                required
+              />
+              <textarea
+                class="newsletter-input mb-2"
+                rows="2"
+                placeholder="Message"
+                style="font-size: 0.85rem; padding: 8px; resize: none"
+                required
+              ></textarea>
+              <button type="submit" class="btn btn-light w-100 btn-sm fw-bold">
+                Send
+              </button>
+            </form>
+            <div class="mt-3">
+              <i class="fa-brands fa-facebook me-3"></i>
+              <i class="fa-brands fa-instagram me-3"></i>
+              <i class="fa-brands fa-twitter"></i>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <hr class="border-secondary mt-4" />
-    <div class="text-center small">&copy; 2025 Jinsa Mobiles. All rights reserved.</div>
-  </footer>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/js/cart.js"></script>
-  <script src="/js/navbar.js"></script>
-</body>
-
+      <hr class="border-secondary mt-4" />
+      <div class="text-center small">
+        &copy; 2025 Jinsa Mobiles. All rights reserved.
+      </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/cart.js"></script>
+    <script src="/js/navbar.js"></script>
+  </body>
 </html>
