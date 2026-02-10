@@ -78,13 +78,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // --- 2. COUPON & TOTAL CALC ---
-        const appliedCoupon = sessionStorage.getItem("appliedCoupon");
-        let couponDiscount = 0;
+        let appliedCouponCode = null;
+        const storedCoupon = localStorage.getItem("selectedCoupon");
+        if (storedCoupon) {
+            try {
+                const parsed = JSON.parse(storedCoupon);
+                if (parsed && parsed.code) appliedCouponCode = parsed.code;
+            } catch (e) {
+                console.error("Invalid coupon in storage");
+                localStorage.removeItem("selectedCoupon");
+            }
+        }
 
-        if (appliedCoupon) {
-            // Re-validate coupon to get exact discount amount if needed, 
-            // OR store the discount amount in session.
-            // For now, let's try to Apply it again to get the fresh numbers
+        let couponDiscount = 0;
+        let appliedCoupon = null; // The object or code for display
+
+        if (appliedCouponCode) {
+            // Re-validate coupon to get exact discount amount
             try {
                 const cRes = await fetch('/api/user/coupons/apply', {
                     method: 'POST',
@@ -92,14 +102,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${token}`
                     },
-                    body: JSON.stringify({ couponCode: appliedCoupon, cartTotal: subtotal })
+                    body: JSON.stringify({ couponCode: appliedCouponCode, cartTotal: subtotal })
                 });
                 const cData = await cRes.json();
                 if (cData.success) {
                     couponDiscount = cData.discountAmount;
+                    appliedCoupon = appliedCouponCode;
+
+                    // Update storage with fresh values just in case
+                    localStorage.setItem("selectedCoupon", JSON.stringify({
+                        code: cData.code,
+                        discount: cData.discountAmount,
+                        finalTotal: cData.finalTotal
+                    }));
                 } else {
                     // Coupon became invalid? Remove it.
-                    sessionStorage.removeItem("appliedCoupon");
+                    console.warn("Coupon re-validation failed:", cData.message);
+                    localStorage.removeItem("selectedCoupon");
                 }
             } catch (e) {
                 console.error("Coupon re-check failed", e);
@@ -121,8 +140,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <h6 class="mb-1" style="font-size: 0.9rem; font-weight: 600;">${item.name}</h6>
                     <div class="small text-muted">Qty: ${item.qty}</div>
                     <div class="d-flex align-items-center gap-2 mt-1">
-                        <span class="fw-bold">₹${(item.price * item.qty).toLocaleString()}</span>
-                        ${item.mrp > item.price ? `<span class="text-decoration-line-through text-muted small">₹${(item.mrp * item.qty).toLocaleString()}</span>` : ''}
+                        <span class="fw-bold">Rs. ${(item.price * item.qty).toLocaleString()}</span>
+                        ${item.mrp > item.price ? `<span class="text-decoration-line-through text-muted small">Rs. ${(item.mrp * item.qty).toLocaleString()}</span>` : ''}
                         ${item.mrp > item.price ? `<span class="text-success small fw-bold">${Math.round(((item.mrp - item.price) / item.mrp) * 100)}% Off</span>` : ''}
                     </div>
                 </div>
@@ -285,7 +304,11 @@ async function applyCoupon(code, cartTotal) {
         const data = await res.json();
 
         if (res.ok && data.success) {
-            sessionStorage.setItem("appliedCoupon", data.code);
+            localStorage.setItem("selectedCoupon", JSON.stringify({
+                code: data.code,
+                discount: data.discountAmount,
+                finalTotal: data.finalTotal
+            }));
             Swal.fire({
                 icon: 'success',
                 title: 'Coupon Applied!',
@@ -305,6 +328,6 @@ async function applyCoupon(code, cartTotal) {
 }
 
 function removeCoupon() {
-    sessionStorage.removeItem("appliedCoupon");
+    localStorage.removeItem("selectedCoupon");
     location.reload();
 }

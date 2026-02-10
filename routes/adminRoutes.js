@@ -100,12 +100,15 @@ router.delete("/messages/:id", isAdmin, messageController.deleteMessage);
 // ────────────────
 // COUPON ROUTES
 // ────────────────
-const couponController = require("../controllers/couponController");
-router.post("/coupons", isAdmin, couponController.createCoupon);
-router.get("/coupons", isAdmin, couponController.getCoupons);
-router.get("/coupons/:id", isAdmin, couponController.getCoupon);
-router.put("/coupons/:id", isAdmin, couponController.updateCoupon);
-router.delete("/coupons/:id", isAdmin, couponController.deleteCoupon);
+const { applyCoupon, createCoupon, getCoupons, updateCoupon, deleteCoupon, getCoupon } = require('../controllers/couponController');
+router.post("/coupons", isAdmin, createCoupon);
+router.get("/coupons", isAdmin, getCoupons);
+router.get("/coupons/:id", isAdmin, getCoupon);
+router.put("/coupons/:id", isAdmin, updateCoupon);
+router.delete("/coupons/:id", isAdmin, deleteCoupon);
+router.post("/coupons/apply", protect, applyCoupon);
+
+
 
 // ────────────────
 // TRANSACTION & USER & ORDERS
@@ -146,7 +149,7 @@ const {
 } = require("../controllers/offerController");
 
 // Offer Management Routes
-router.get("/offers",isAdmin, getAllOffers);
+router.get("/offers", isAdmin, getAllOffers);
 router.post("/offers", isAdmin, addOffer);
 router.get("/offers/:id", isAdmin, getOfferById);
 router.put("/offers/:id", isAdmin, updateOffer);

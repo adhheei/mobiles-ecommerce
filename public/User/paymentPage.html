@@ -649,12 +649,21 @@
         console.log("ℹ️ Standard Cart Checkout Mode");
       }
 
+      let couponCode = null;
+      const storedCoupon = localStorage.getItem("selectedCoupon");
+      if (storedCoupon) {
+        try {
+          const parsed = JSON.parse(storedCoupon);
+          if (parsed && parsed.code) couponCode = parsed.code;
+        } catch (e) { console.error("Error parsing coupon"); }
+      }
+
       const payload = {
         paymentMethod: methodMap[paymentMethod] || paymentMethod,
         useWallet: useWallet,
         addressId: addressId,
         buyNowItem: buyNowItem,
-        couponCode: sessionStorage.getItem("appliedCoupon") || null // Get coupon from session
+        couponCode: couponCode
       };
 
       console.log("📤 Sending Order Payload:", payload); // DEBUG LOG
@@ -696,7 +705,7 @@
           // Clear Session logic
           sessionStorage.removeItem("buyNowItem");
           sessionStorage.removeItem("checkoutType");
-          sessionStorage.removeItem("appliedCoupon"); // Clear used coupon
+          localStorage.removeItem("selectedCoupon"); // Clear used coupon
           // Don't clear deliveryAddress yet, might need it, but actually lastOrderData has it.
 
           Swal.fire({

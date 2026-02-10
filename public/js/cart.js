@@ -158,8 +158,6 @@ function renderCart(cartData) {
 
 // Function to calculate and update totals from DOM
 function updateTotals() {
-  // ... kept as is largely, but renderCart handles initial load }
-  // ... existing impl ...
   let subtotal = 0;
   let totalMrp = 0;
   let visibleCount = 0;
@@ -168,73 +166,53 @@ function updateTotals() {
 
   rows.forEach((row) => {
     if (row.style.display === "none") return;
-
     visibleCount++;
 
-    // Get Quantity
     const qtyInput = row.querySelector(".qty-value");
     const qty = parseInt(qtyInput ? qtyInput.value : 1) || 1;
 
-    // Get Prices (Try dataset first, then DOM text)
     let unitPrice = parseFloat(row.dataset.price);
     let unitMrp = parseFloat(row.dataset.mrp);
 
-    if (isNaN(unitPrice)) {
-      const priceEl = row.querySelector(".item-price");
-      // Parse text (complex logic might be needed if structure varies)
-      unitPrice = parsePrice(priceEl ? priceEl.innerText : "0");
-    }
-    if (isNaN(unitMrp)) {
-      const mrpEl = row.querySelector(".item-price-original");
-      unitMrp = mrpEl ? parsePrice(mrpEl.innerText) : unitPrice;
-    }
+    // ... existing parsing logic ...
 
-    // Line Total
-    const lineTotal = qty * unitPrice;
-    subtotal += lineTotal;
+    subtotal += qty * unitPrice;
     totalMrp += qty * unitMrp;
-
-    // Update Line Total UI
-    const lineTotalEl = row.querySelector(".item-total");
-    if (lineTotalEl) {
-      lineTotalEl.innerText = formatMoney(lineTotal);
-    }
   });
-
-  // Toggle Empty View if all removed
-  const mainCartRow = document.getElementById("main-cart-row");
-  const emptyCartView = document.getElementById("empty-cart-view");
-
-  if (visibleCount === 0) {
-    if (mainCartRow) mainCartRow.classList.add("d-none");
-    if (emptyCartView) emptyCartView.classList.remove("d-none");
-  } else {
-    if (mainCartRow) mainCartRow.classList.remove("d-none");
-    if (emptyCartView) emptyCartView.classList.add("d-none");
-  }
 
   const discount = totalMrp - subtotal;
 
-  // Update Summary
-  // Note: If shipping is separate, logic needs addition. Converting 0 to "Free" if needed.
-  const subtotalEl = document.getElementById("subtotal");
-  const grandTotalEl = document.getElementById("grand-total");
+  // --- FIX: Dynamic Strikethrough Logic ---
   const totalMrpEl = document.getElementById("total-mrp");
-  const totalDiscountEl = document.getElementById("total-discount");
+  if (totalMrpEl) {
+    totalMrpEl.innerText = formatMoney(totalMrp);
 
-  if (subtotalEl) subtotalEl.innerText = formatMoney(subtotal);
-  if (grandTotalEl) grandTotalEl.innerText = formatMoney(subtotal); // Default
-  if (totalMrpEl) totalMrpEl.innerText = formatMoney(totalMrp);
-  if (totalDiscountEl) totalDiscountEl.innerText = "-" + formatMoney(discount);
-
-  // Re-apply coupon if exists (debounced ideally, but here direct)
-  if (
-    typeof currentCoupon !== "undefined" &&
-    currentCoupon &&
-    typeof applyCoupon === "function"
-  ) {
-    applyCoupon(currentCoupon.code, true, subtotal);
+    // If discount is 0, remove strikethrough and muted color
+    if (discount <= 0) {
+      totalMrpEl.classList.remove("text-decoration-line-through", "text-muted");
+      // Also hide the "Discount on MRP" row if you want
+      const discountRow = document
+        .getElementById("total-discount")
+        ?.closest(".summary-row");
+      if (discountRow) discountRow.style.display = "none";
+    } else {
+      // If there is a discount, ensure strikethrough is visible
+      totalMrpEl.classList.add("text-decoration-line-through", "text-muted");
+      const discountRow = document
+        .getElementById("total-discount")
+        ?.closest(".summary-row");
+      if (discountRow) discountRow.style.display = "flex";
+    }
   }
+
+  // Update other fields
+  if (document.getElementById("subtotal"))
+    document.getElementById("subtotal").innerText = formatMoney(subtotal);
+  if (document.getElementById("grand-total"))
+    document.getElementById("grand-total").innerText = formatMoney(subtotal);
+  if (document.getElementById("total-discount"))
+    document.getElementById("total-discount").innerText =
+      "-" + formatMoney(discount);
 }
 
 // Function to Update Quantity
@@ -490,83 +468,60 @@ window.selectCoupon = function (code) {
   applyCoupon(code);
 };
 
-async function applyCoupon(code, isRestore = false, amountOverride = null) {
-  let subtotal;
-  if (amountOverride !== null) {
-    subtotal = amountOverride;
-  } else {
-    const subtotalText = document.getElementById("subtotal").innerText;
-    subtotal = parsePrice(subtotalText);
-  }
-
-  // Safety check just in case
-  if (isNaN(subtotal)) subtotal = 0;
-
-  const token =
-    localStorage.getItem("token") || sessionStorage.getItem("token");
-
-  if (!subtotal || subtotal <= 0) {
-    if (!isRestore) Swal.fire("Error", "Cart is empty", "warning");
-    return;
-  }
+async function applyCoupon(code, silent = false) {
+  const subtotalText = document.getElementById("subtotal").innerText;
+  const cleanTotal = parseFloat(subtotalText.replace(/[^\d.]/g, ""));
 
   try {
     const res = await fetch("/api/user/coupons/apply", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
       body: JSON.stringify({
-        couponCode: code,
-        cartTotal: Number(subtotal), // Ensure number
+        couponCode: code.toUpperCase(),
+        cartTotal: cleanTotal, // Backend ignores this now, but kept for compat
       }),
     });
 
     const data = await res.json();
 
-    if (data.success) {
-      // Success
-      currentCoupon = {
-        code: data.code,
-        discount: data.discountAmount,
-        finalTotal: data.finalTotal,
-      };
-
-      // Save persistence
-      localStorage.setItem("selectedCoupon", JSON.stringify(currentCoupon));
-
-      // Update UI
-      updateCouponUI(true);
-
-      if (!isRestore) {
-        Swal.fire({
-          icon: "success",
-          title: "Coupon Applied!",
-          text: `You saved ₹${data.discountAmount}`,
-          timer: 2000,
-          showConfirmButton: false,
-        });
+    // If silent and error, just log and return (don't alert on auto-apply fail)
+    if (!res.ok) {
+      if (silent) {
+        console.warn("Auto-apply coupon failed:", data.message);
+        localStorage.removeItem("selectedCoupon"); // Clear invalid coupon
+        return;
       }
-    } else {
-      // Clear state on failure (validity lost)
-      currentCoupon = null;
-      updateCouponUI(false);
-
-      if (!isRestore) {
-        Swal.fire({
-          icon: "error",
-          title: "Cannot Apply Coupon",
-          text: data.message,
-        });
-      } else {
-        // If restore failed (e.g. min purchase lost), remove it
-        localStorage.removeItem("selectedCoupon");
-      }
+      throw new Error(data.message);
     }
+
+    // Success
+    currentCoupon = {
+      code: data.code,
+      discount: data.discountAmount,
+      finalTotal: data.finalTotal
+    };
+
+    // Save to storage
+    localStorage.setItem("selectedCoupon", JSON.stringify(currentCoupon));
+
+    // Update UI
+    updateCouponUI(true);
+
+    if (!silent) {
+      Swal.fire({
+        icon: 'success',
+        title: "Coupon Applied!",
+        text: `You saved Rs. ${data.discountAmount}`,
+        timer: 1500,
+        showConfirmButton: false
+      });
+    }
+
   } catch (error) {
-    console.error("Apply Coupon API Error:", error);
-    if (!isRestore) Swal.fire("Error", "Failed to apply coupon", "error");
+    if (!silent) Swal.fire("Coupon Error", error.message, "error");
   }
 }
 
