@@ -505,10 +505,42 @@ const adminUpdateWallet = async (req, res) => {
 };
 
 
+// @desc    Remove user avatar
+// @route   DELETE /api/user/avatar
+// @access  Private
+const removeAvatar = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        // Optional: Delete physical file if using local storage
+        // For now, just clearing the reference
+        user.profileImage = null; // or ""
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Avatar removed successfully",
+        });
+    } catch (error) {
+        console.error("Error removing avatar:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server Error",
+        });
+    }
+};
+
 module.exports = {
     getProfile,
     updateProfile,
     updateAvatar,
+    removeAvatar,    // <--- Added
     getWishlist,
     addToWishlist,
     removeFromWishlist,

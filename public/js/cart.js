@@ -66,6 +66,7 @@ function renderCart(cartData) {
     // Render Items
     cartData.items.forEach(item => {
         productIds.push(item.productId);
+        console.log(`[DEBUG] Rendering item ${item.productId}, stock:`, item.stock);
 
         let imgSrc = "https://placehold.co/100x120/f0f0f0/333?text=No+Image";
         if (item.image) {
@@ -94,7 +95,8 @@ function renderCart(cartData) {
         const html = `
       <div class="cart-item-row" id="item-${item.productId}" 
            data-price="${item.price}" 
-           data-mrp="${item.mrp}">
+           data-mrp="${item.mrp}"
+           data-stock="${item.stock !== undefined && item.stock !== null ? item.stock : 0}"> <!-- Added stock data -->
           <div class="cart-img-wrapper">
             <a href="/User/singleProductPage.html?id=${item.productId}">
                 <img src="${imgSrc}" alt="${item.name}" onerror="this.src='${fallback}'" />
@@ -248,7 +250,30 @@ async function updateQty(productId, change) {
         return;
     }
 
-    // Determine max? (Optional, not requested)
+    // Constraint: Max Stock
+    const row = document.getElementById(`item-${productId}`);
+    // Ensure we parse correctly, handle NaN or missing
+    let stock = parseInt(row.dataset.stock);
+
+    // If stock attribute is missing or invalid, we should probably fetch from server or assume valid?
+    // Safer to assume 0 if missing to prevent overselling, but might block legitimate updates if basic data missing.
+    // Let's assume if it came from renderCart, it has stock.
+    if (isNaN(stock)) stock = 0;
+
+    if (newQty > stock) {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'warning',
+            title: 'Stock Limit Reached',
+            text: `Only ${stock} units available`,
+            timer: 2000,
+            showConfirmButton: false
+        });
+        // Reset input to current value (in case it drifted)
+        input.value = currentQty;
+        return;
+    }
 
     // Update input immediately (Optimistic)
     input.value = newQty;
@@ -680,9 +705,30 @@ async function addToCart(productId) {
                 icon: 'success',
                 title: 'Added to cart'
             });
+        } else {
+            // Handle 400 (Stock limit) or other errors
+            const data = await res.json();
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'warning',
+                title: 'Cannot Add Item',
+                text: data.message || "Failed to add to cart",
+                showConfirmButton: false,
+                timer: 2000
+            });
         }
     } catch (err) {
         console.error(err);
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'error',
+            title: 'Error',
+            text: "Network error",
+            showConfirmButton: false,
+            timer: 2000
+        });
     }
 }
 
