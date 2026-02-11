@@ -125,6 +125,7 @@ const {
 const {
   getAdminOrderDetails,
   updateOrderStatus,
+  handleReturnRequest
 } = require("../controllers/orderController");
 
 router.get("/transactions", isAdmin, getTransactions);
@@ -135,6 +136,7 @@ router.get("/wallet/:userId", isAdmin, adminGetWallet);
 router.get("/orders", isAdmin, getAdminOrderDetails);
 router.get("/orders/:id", isAdmin, getAdminOrderDetails);
 router.put("/orders/:id/status", isAdmin, updateOrderStatus);
+router.patch("/orders/:id/return/:itemId", isAdmin, handleReturnRequest);
 
 // ────────────────
 // Offer
@@ -149,7 +151,7 @@ const {
 } = require("../controllers/offerController");
 
 // Offer Management Routes
-router.get("/offers", isAdmin, getAllOffers);
+router.get("/offers", getAllOffers);
 router.post("/offers", isAdmin, addOffer);
 router.get("/offers/:id", isAdmin, getOfferById);
 router.put("/offers/:id", isAdmin, updateOffer);

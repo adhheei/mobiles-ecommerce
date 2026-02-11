@@ -37,7 +37,7 @@ const getOrderDetails = async (req, res) => {
     const order = await Order.findOne({
       _id: req.params.id,
       userId: req.user._id,
-    });
+    }).lean();
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
@@ -231,10 +231,105 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+// @desc    Request return for an order item
+// @route   POST /api/orders/:id/return/:itemId
+// @access  Private
+const requestReturn = async (req, res) => {
+  try {
+    const { reason } = req.body;
+    const { id, itemId } = req.params;
+
+    const order = await Order.findOne({ _id: id, userId: req.user._id });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    if (order.orderStatus !== 'Delivered') {
+      return res.status(400).json({ message: "Return can only be requested for delivered orders" });
+    }
+
+    const item = order.items.id(itemId);
+    if (!item) {
+      return res.status(404).json({ message: "Item not found in order" });
+    }
+
+    if (item.returnStatus !== 'None') {
+      return res.status(400).json({ message: "Return request already submitted or processed" });
+    }
+
+    item.returnStatus = 'Requested';
+    item.returnReason = reason;
+
+    await order.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Return request submitted successfully",
+      order
+    });
+
+  } catch (error) {
+    console.error("Return Request Error:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// @desc    Handle return request (Approve/Reject)
+// @route   PATCH /api/admin/orders/:id/return/:itemId
+// @access  Private/Admin
+const handleReturnRequest = async (req, res) => {
+  try {
+    const { status } = req.body; // 'Approved' or 'Rejected'
+    const { id, itemId } = req.params;
+
+    if (!['Approved', 'Rejected'].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const item = order.items.id(itemId);
+    if (!item) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
+    item.returnStatus = status;
+
+    if (status === 'Approved') {
+      item.status = 'Returned';
+      // Optional: Restock logic here if needed
+    }
+
+    // Check if all items are returned to update main order status
+    const allReturned = order.items.every(i => i.status === 'Returned');
+    if (allReturned) {
+      order.orderStatus = 'Returned';
+    }
+
+    await order.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Return request ${status}`,
+      order
+    });
+
+  } catch (error) {
+    console.error("Admin Return Handle Error:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 module.exports = {
   getMyOrders,
   getOrderDetails,
   cancelOrder,
   getAdminOrderDetails,
   updateOrderStatus,
+  requestReturn,
+  handleReturnRequest
 };

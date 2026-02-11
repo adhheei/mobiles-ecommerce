@@ -62,12 +62,33 @@ function renderOrderDetails(order) {
     // Insert new items after title
     let itemsHtml = '';
     order.items.forEach(item => {
+        let returnActions = '';
+        let returnInfo = '';
+
+        if (item.returnStatus && item.returnStatus !== 'None') {
+            returnInfo = `<div class="mt-1 small"><span class="fw-bold">Return Status:</span> ${item.returnStatus}</div>`;
+            if (item.returnReason) {
+                returnInfo += `<div class="small text-muted">Reason: ${item.returnReason}</div>`;
+            }
+        }
+
+        if (item.returnStatus === 'Requested') {
+            returnActions = `
+                <div class="mt-2">
+                    <button class="btn btn-sm btn-success me-2" onclick="handleAdminReturnAction('${order._id}', '${item._id}', 'Approved')">Approve Return</button>
+                    <button class="btn btn-sm btn-danger" onclick="handleAdminReturnAction('${order._id}', '${item._id}', 'Rejected')">Reject Return</button>
+                </div>
+            `;
+        }
+
         itemsHtml += `
             <div class="item-row">
-              <img src="${item.image || 'https://placehold.co/100'}" class="item-img" alt="${item.name}" />
-              <div class="item-details">
+              <img src="${item.image ? '/' + item.image.replace(/\\/g, '/').replace('public/', '') : '/images/product-placeholder.jpg'}" class="item-img" alt="${item.name}" onerror="this.src='/images/product-placeholder.jpg'" />
+              <div class="item-details" style="flex: 1">
                 <h6>${item.name}</h6>
                 <span class="item-meta">Qty: ${item.quantity} | Status: ${item.status}</span>
+                ${returnInfo}
+                ${returnActions}
               </div>
               <div class="item-total">₹${item.price.toLocaleString()}</div>
             </div>
@@ -147,7 +168,7 @@ function renderOrderDetails(order) {
     const addr = order.shippingAddress;
     shippingCard.querySelector('.info-group').innerHTML = `
         <div class="info-value">${addr.fullName}</div>
-        <div class="info-sub">${addr.street }, ${addr.city}</div>
+        <div class="info-sub">${addr.street}, ${addr.city}</div>
         <div class="info-sub">${addr.state}, ${addr.pincode}</div>
         <div class="info-sub">${addr.country}</div>
         <div class="info-sub">Phone: ${addr.phone}</div>
@@ -255,4 +276,39 @@ function showUserProfileModal(user) {
 
     const myModal = new bootstrap.Modal(document.getElementById('userProfileModal'));
     myModal.show();
+}
+
+async function handleAdminReturnAction(orderId, itemId, status) {
+    const result = await Swal.fire({
+        title: `${status} Return?`,
+        text: `Are you sure you want to mark this return as ${status}?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: `Yes, ${status}`,
+        confirmButtonColor: status === 'Approved' ? '#28a745' : '#dc3545'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const token = localStorage.getItem("token");
+            const res = await fetch(`/api/admin/orders/${orderId}/return/${itemId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status })
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                Swal.fire("Success", data.message, "success").then(() => location.reload());
+            } else {
+                Swal.fire("Error", data.message, "error");
+            }
+        } catch (error) {
+            console.error(error);
+            Swal.fire("Error", "Network Error", "error");
+        }
+    }
 }
