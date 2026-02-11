@@ -1,13 +1,11 @@
-// Global variable for current order ID to use in HTML onclick attributes
+// Global variable
 let currentOrderId = null;
+let currentOrder = null; // Store full order object
 
 document.addEventListener("DOMContentLoaded", async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('id');
     const token = localStorage.getItem("token");
-
-    // Cookie auth fallback
-    // if (!token) { window.location.href = "userLogin.html"; return; } 
 
     if (!orderId) {
         Swal.fire("Error", "Invalid Order ID", "error").then(() => {
@@ -16,17 +14,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    currentOrderId = orderId; // Set global
-
     try {
         const headers = {};
         if (token) headers["Authorization"] = `Bearer ${token}`;
 
         const res = await fetch(`/api/orders/${orderId}`, { headers });
-
         const data = await res.json();
         const order = data.order;
-        currentOrderId = order._id; // Ensure we have the DB ID
+
+        currentOrder = order; // Store globally
+        currentOrderId = order._id;
+        console.log("DEBUG: Order Data:", order);
 
         if (res.ok && data.success) {
             // --- HEADER ---
@@ -42,7 +40,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             statusEl.innerText = order.orderStatus;
             statusEl.className = `badge ${getStatusColor(order.orderStatus)}`;
 
-            // Expected Delivery (Order + 6 to 7 days)
+            // Expected Delivery
             const deliveryStart = new Date(orderDate);
             deliveryStart.setDate(deliveryStart.getDate() + 6);
             const deliveryEnd = new Date(orderDate);
@@ -51,13 +49,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             const deliveryText = order.orderStatus === 'Delivered'
                 ? `Delivered on ${new Date(order.updatedAt).toLocaleDateString()}`
                 : `Est. Delivery: ${deliveryStart.toLocaleDateString()} - ${deliveryEnd.toLocaleDateString()}`;
-
             document.getElementById("estimated-delivery").innerText = deliveryText;
 
 
             // --- ITEMS TABLE ---
             const itemsList = document.getElementById("order-items-list");
-            itemsList.innerHTML = order.items.map(item => `
+            itemsList.innerHTML = order.items.map((item, index) => `
                 <tr>
                     <td class="ps-4 py-3">
                         <div class="d-flex align-items-center gap-3">
@@ -74,7 +71,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <td class="py-3 text-muted">₹${item.price.toLocaleString()}</td>
                     <td class="py-3 fw-bold">₹${(item.price * item.quantity).toLocaleString()}</td>
                     <td class="pe-4 py-3 text-end">
-                        ${getActionButton(order, item)}
+                        ${getActionButton(order, item, index)}
                     </td>
                 </tr>
             `).join('');
@@ -87,7 +84,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             } else {
                 returnSection.style.display = 'none';
             }
-
 
             // --- SHIPPING ADDRESS ---
             const addr = order.shippingAddress;
@@ -104,11 +100,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // --- PAYMENT INFO ---
             document.getElementById("payment-method").innerText = order.paymentMethod;
-
             const payStatusEl = document.getElementById("payment-status");
             payStatusEl.innerText = `Status: ${order.paymentStatus}`;
             payStatusEl.className = order.paymentStatus === 'Paid' ? 'text-success fw-bold' : 'text-warning fw-bold';
-
 
             // --- ORDER SUMMARY ---
             document.getElementById("summary-subtotal").innerText = `₹${order.totals.subtotal.toLocaleString()}`;
@@ -120,7 +114,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const actionContainer = document.getElementById("main-action-btn-container");
             if (order.orderStatus === 'Processing' || order.orderStatus === 'Shipped') {
                 actionContainer.innerHTML = `
-                    <button class="btn btn-outline-danger w-100" onclick="cancelOrder('${order._id}', null)">
+                    <button class="btn btn-outline-danger w-100" onclick="cancelOrder(null)">
                         Cancel Entire Order
                     </button>`;
             } else {
@@ -136,18 +130,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
-function getActionButton(order, item) {
+function getActionButton(order, item, index) {
     if (order.orderStatus === 'Cancelled') return '<span class="text-muted small">Order Cancelled</span>';
+
+    // Check Return Status First
+    if (item.returnStatus === 'Requested') return '<span class="badge bg-warning text-dark">Return Requested</span>';
+    if (item.returnStatus === 'Approved') return '<span class="badge bg-success">Return Approved</span>';
+    if (item.returnStatus === 'Rejected') return '<span class="badge bg-danger">Return Rejected</span>';
 
     if (item.status === 'Cancelled') return '<span class="text-danger small">Item Cancelled</span>';
     if (item.status === 'Returned') return '<span class="text-warning small fw-bold">Returned</span>';
 
+    // Pass index instead of IDs to avoid issues
     if (item.status === 'Delivered') {
-        return `<button class="btn btn-sm btn-outline-warning" onclick="returnOrder('${order._id}', '${item._id}')">Return</button>`;
+        return `<button class="btn btn-sm btn-outline-warning" onclick="returnOrder(${index})">Return</button>`;
     }
 
     if (order.orderStatus === 'Processing' || order.orderStatus === 'Shipped') {
-        return `<button class="btn btn-sm btn-outline-danger" onclick="cancelOrder('${order._id}', '${item._id}')">Cancel</button>`;
+        return `<button class="btn btn-sm btn-outline-danger" onclick="cancelOrder(${index})">Cancel</button>`;
     }
 
     return '-';
@@ -164,28 +164,78 @@ function getStatusColor(status) {
     }
 }
 
-async function cancelOrder(orderId, itemId) {
-    handleOrderAction(orderId, itemId, 'cancel');
+async function cancelOrder(itemIndex) {
+    handleOrderAction(itemIndex, 'cancel');
 }
 
-async function returnOrder(orderId, itemId) {
-    handleOrderAction(orderId, itemId, 'return');
+async function returnOrder(itemIndex) {
+    // Lookup item details from global order object
+    const item = currentOrder.items[itemIndex];
+    if (!item || !item._id) {
+        Swal.fire("Error", "Item ID not found. Please refresh.", "error");
+        return;
+    }
+
+    // Original Return Logic
+    const { value: reason } = await Swal.fire({
+        title: "Return Product",
+        input: "textarea",
+        inputLabel: "Reason for return",
+        inputPlaceholder: "Enter your reason...",
+        inputValidator: (value) => {
+            if (!value) {
+                return "Reason is required!";
+            }
+        },
+        showCancelButton: true,
+        confirmButtonText: "Submit Return",
+        confirmButtonColor: "#f0ad4e"
+    });
+
+    if (reason) {
+        try {
+            const token = localStorage.getItem("token");
+            const res = await fetch(`/api/orders/${currentOrder._id}/return/${item._id}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ reason })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Return Requested",
+                    text: "Your return request has been submitted."
+                }).then(() => location.reload());
+            } else {
+                Swal.fire("Error", data.message || "Failed to submit return request", "error");
+            }
+        } catch (error) {
+            console.error(error);
+            Swal.fire("Error", "Network error", "error");
+        }
+    }
 }
 
-async function handleOrderAction(orderId, itemId, actionType) {
-    const isItem = !!itemId;
-    const isReturn = actionType === 'return';
+async function handleOrderAction(itemIndex, actionType) {
+    // Only handles Cancel now
+    const isItem = itemIndex !== null && itemIndex !== undefined;
 
-    const title = isReturn
-        ? (isItem ? "Return this item?" : "Return entire order?")
-        : (isItem ? "Cancel this item?" : "Cancel entire order?");
+    let itemId = null;
+    if (isItem) {
+        const item = currentOrder.items[itemIndex];
+        if (item) itemId = item._id;
+    }
 
-    const text = isReturn
-        ? "This will initiate a return request."
-        : "This action cannot be undone!";
-
-    const confirmBtnText = isReturn ? "Yes, Return it!" : "Yes, Cancel it!";
-    const confirmBtnColor = isReturn ? "#f0ad4e" : "#d33";
+    const title = isItem ? "Cancel this item?" : "Cancel entire order?";
+    const text = "This action cannot be undone!";
+    const confirmBtnText = "Yes, Cancel it!";
+    const confirmBtnColor = "#d33";
 
     const result = await Swal.fire({
         title: title,
@@ -200,16 +250,10 @@ async function handleOrderAction(orderId, itemId, actionType) {
     if (result.isConfirmed) {
         try {
             const token = localStorage.getItem("token");
-            const body = { action: actionType }; // Send action type
+            const body = { action: actionType };
             if (itemId) body.itemId = itemId;
 
-            // Re-using cancel endpoint or create new? 
-            // Let's use the same endpoint but handle action type or use a new 'status-update' endpoint?
-            // Existing cancel endpoint: PUT /api/orders/:id/cancel
-            // Let's modify the cancel endpoint to support 'return' action or create a new route.
-            // For simplicity, let's call the same endpoint and send 'action': 'return' in body.
-
-            const res = await fetch(`/api/orders/${orderId}/cancel`, {
+            const res = await fetch(`/api/orders/${currentOrder._id}/cancel`, {
                 method: 'PUT',
                 headers: {
                     "Content-Type": "application/json",
@@ -221,7 +265,7 @@ async function handleOrderAction(orderId, itemId, actionType) {
             const data = await res.json();
 
             if (res.ok) {
-                Swal.fire(isReturn ? "Returned!" : "Cancelled!", data.message, "success").then(() => {
+                Swal.fire("Cancelled!", data.message, "success").then(() => {
                     location.reload();
                 });
             } else {

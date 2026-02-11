@@ -1128,7 +1128,8 @@ async function loadHotDeals() {
     const slider = document.getElementById('hotDealsSlider');
     try {
         // 1. Fetch offers
-        const offerRes = await fetch('/api/admin/offers'); 
+        const offerRes = await fetch('/api/admin/offers');
+        console.log("") 
         
         // If still getting 403, it means the backend route is still protected
         if (offerRes.status === 403) {
