@@ -61,8 +61,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <tr>
                     <td class="ps-4 py-3">
                         <div class="d-flex align-items-center gap-3">
-                            <img src="${item.image}" alt="${item.name}" 
-                                 style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;">
+                            <img src="${item.image ? '/' + item.image.replace(/\\/g, '/').replace('public/', '') : '/images/product-placeholder.jpg'}" alt="${item.name}" 
+                                 style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;"
+                                 onerror="this.src='/images/product-placeholder.jpg'">
                             <div>
                                 <h6 class="mb-0 fw-bold small text-truncate" style="max-width: 200px;">${item.name}</h6>
                                 <span class="badge border text-dark fw-normal" style="font-size: 0.7rem;">${item.status}</span>
@@ -90,12 +91,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // --- SHIPPING ADDRESS ---
             const addr = order.shippingAddress;
-            document.getElementById("shipping-address").innerHTML = `
-                <p class="mb-1 fw-bold text-dark">${addr.fullName}</p>
-                <p class="mb-0">${addr.street}</p>
-                <p class="mb-0">${addr.city}, ${addr.state} ${addr.pincode}</p>
-                <p class="mb-0 mt-2"><i class="fa-solid fa-phone me-1 text-muted"></i> ${addr.phone}</p>
-            `;
+            if (addr) {
+                document.getElementById("shipping-address").innerHTML = `
+                    <p class="mb-1 fw-bold text-dark">${addr.fullName}</p>
+                    <p class="mb-0">${addr.street}</p>
+                    <p class="mb-0">${addr.city}, ${addr.state} ${addr.pincode}</p>
+                    <p class="mb-0 mt-2"><i class="fa-solid fa-phone me-1 text-muted"></i> ${addr.phone}</p>
+                `;
+            } else {
+                document.getElementById("shipping-address").innerText = "Address details not available.";
+            }
 
             // --- PAYMENT INFO ---
             document.getElementById("payment-method").innerText = order.paymentMethod;
