@@ -33,6 +33,7 @@ app.use(
         "'self'",
         "https://accounts.google.com",
         "https://cdn.jsdelivr.net",
+        "https://checkout.razorpay.com",
         "'unsafe-inline'",
       ],
       styleSrc: [
@@ -55,8 +56,10 @@ app.use(
         "ws://localhost:*",
         "https://accounts.google.com",
         "https://cdn.jsdelivr.net",
+        "https://lumberjack.razorpay.com",
+        "https://*.razorpay.com",
       ],
-      frameSrc: ["https://accounts.google.com"],
+      frameSrc: ["https://accounts.google.com", "https://api.razorpay.com", "https://*.razorpay.com"],
       fontSrc: [
         "'self'",
         "https://cdnjs.cloudflare.com",

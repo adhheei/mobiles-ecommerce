@@ -29,13 +29,8 @@ const orderSchema = new mongoose.Schema({
         }
     }],
     shippingAddress: {
-        fullName: String,
-        phone: String,
-        street: String,
-        city: String,
-        state: String,
-        pincode: String,
-        country: String
+        type: Object,
+        required: true
     },
     paymentMethod: {
         type: String,

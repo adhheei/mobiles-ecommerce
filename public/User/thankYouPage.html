@@ -159,6 +159,11 @@
     <h1 class="homepage-font display-5 mb-3">Thank You for Your Order!</h1>
     <p class="order-number-text text-muted mb-4"></p>
 
+    <div class="mb-4">
+      <span class="badge bg-success fs-6 px-3 py-2 rounded-pill" id="order-status-badge">Order Placed
+        Successfully</span>
+    </div>
+
     <div class="order-card">
       <div class="order-card-header">
         <h5>Order Summary</h5>
@@ -219,8 +224,16 @@
       }, 100);
 
       /* Order ID */
-      document.querySelector(".order-number-text").innerText =
-        `Your order #${order.orderId} has been successfully placed.`;
+      /* Order ID & Date */
+      document.querySelector(".order-number-text").innerHTML =
+        `Your order <strong>#${order.orderId}</strong> has been placed.<br>
+         <small class="text-muted">${new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</small>`;
+
+      // Add Payment Method Badge
+      const statusBadge = document.getElementById("order-status-badge");
+      if (statusBadge && order.paymentMethod) {
+        statusBadge.innerText = `Order Placed • ${order.paymentMethod}`;
+      }
 
       /* Render Items */
       const card = document.querySelector(".order-card");
@@ -247,8 +260,10 @@
           priceHtml = `<span class="fw-bold">Rs. ${price}</span>`;
         }
 
+        const imageSrc = item.image ? `/${item.image.replace(/\\/g, '/').replace('public/', '')}` : 'https://placehold.co/100x100?text=No+Image';
+
         row.innerHTML = `
-          <img src="${item.image}" class="item-thumb"
+          <img src="${imageSrc}" class="item-thumb"
                onerror="this.src='https://placehold.co/100x100?text=No+Image'">
           <div style="flex-grow: 1;">
             <div class="fw-bold mb-1">${item.name}</div>
@@ -284,8 +299,9 @@
 
       // 2. Offer Price (Subtotal) - Show only if different from MRP
       if (order.totals.totalMrp && order.totals.subtotal && order.totals.totalMrp > order.totals.subtotal) {
-        addTotal("Offer Price", order.totals.subtotal, "text-primary fw-bold");
-        // Also show savings? Optional, but "Offer Price" is requested.
+        addTotal("Offer Price", order.totals.subtotal);
+        const savings = order.totals.totalMrp - order.totals.subtotal;
+        addTotal("Savings", `- Rs. ${savings}`, "text-success");
       } else if (!order.totals.totalMrp) {
         // Fallback if MRP is missing
         addTotal("Price", order.totals.subtotal);

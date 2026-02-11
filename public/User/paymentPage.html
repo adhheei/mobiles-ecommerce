@@ -491,7 +491,7 @@
             <input type="radio" name="payment_method" id="radio-wallet" />
             <span class="payment-label">Jinsa Wallet</span>
             <div class="payment-icons-row text-success fw-bold me-2">
-              <i class="fa-solid fa-wallet me-1"></i> Balance: Rs. 2,500.00
+              <i class="fa-solid fa-wallet me-1"></i> Balance: Rs. <span id="wallet-balance-display">0.00</span>
             </div>
           </div>
           <div class="card-details-form">
@@ -569,7 +569,55 @@
   </div>
 
   <footer>
-    <!-- ... Footer Content ... -->
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3">
+          <h5>Discover More</h5>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Blog</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h5>Explore Products</h5>
+          <ul>
+            <li><a href="#">Mobiles</a></li>
+            <li><a href="#">Accessories</a></li>
+            <li><a href="#">Trendy Cases</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h5>Customer Care</h5>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Return Policy</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h5>Contact Us</h5>
+          <form id="footerContactForm" style="margin-bottom: 0;">
+            <input type="text" class="newsletter-input mb-2" placeholder="Name"
+              style="font-size: 0.85rem; padding: 8px;" required />
+            <input type="email" class="newsletter-input mb-2" placeholder="Email"
+              style="font-size: 0.85rem; padding: 8px;" required />
+            <textarea class="newsletter-input mb-2" rows="2" placeholder="Message"
+              style="font-size: 0.85rem; padding: 8px; resize: none;" required></textarea>
+            <button type="submit" class="btn btn-light w-100 btn-sm fw-bold">Send</button>
+          </form>
+          <div class="mt-3">
+            <i class="fa-brands fa-facebook me-3"></i>
+            <i class="fa-brands fa-instagram me-3"></i>
+            <i class="fa-brands fa-twitter"></i>
+          </div>
+        </div>
+      </div>
+      <hr class="border-secondary mt-4" />
+      <div class="text-center small">
+        &copy; 2025 Jinsa Mobiles. All rights reserved.
+      </div>
+    </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -607,6 +655,7 @@
         'card': 'Card',
         'wallet': 'Wallet',
         'paypal': 'PayPal',
+        'razorpay': 'Razorpay',
         'upi': 'UPI'
       };
 
@@ -658,14 +707,100 @@
         } catch (e) { console.error("Error parsing coupon"); }
       }
 
-      const payload = {
-        paymentMethod: methodMap[paymentMethod] || paymentMethod,
-        useWallet: useWallet,
-        addressId: addressId,
-        buyNowItem: buyNowItem,
-        couponCode: couponCode
-      };
+      // --- RAZORPAY FLOW ---
+      if (paymentMethod === 'razorpay') {
+        try {
+          const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
+          // 1. Create Order on Backend
+          // We need to calculate amount first. 
+          // Best way is to let backend handle it, but for razorpay order creation we need amount.
+          // We can reuse the cart checkout logic to get total or create a specific endpoint.
+          // Here we assume a dedicated endpoint for creating Razorpay order.
+
+          // Calculate amount client-side as estimate (Backend MUST verify)
+          let estimatedAmount = 0;
+          // ... logic to get amount from summary?
+          // Better: Call an endpoint that calculates total and returns Razorpay order ID.
+
+          const rzpRes = await fetch('/api/cart/razorpay-order', {
+            method: 'POST',
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({
+              addressId,
+              buyNowItem,
+              couponCode,
+              useWallet
+            })
+          });
+
+          const rzpOrder = await rzpRes.json();
+          if (!rzpOrder.success) {
+            throw new Error(rzpOrder.message || "Failed to create Razorpay order");
+          }
+
+          const options = {
+            "key": "rzp_test_YOUR_KEY_HERE", // Replace with your actual key or load from config
+            "amount": rzpOrder.order.amount,
+            "currency": "INR",
+            "name": "Jinsa Mobiles",
+            "description": "Order Payment",
+            "order_id": rzpOrder.order.id, // This is the order_id created in backend
+            "handler": async function (response) {
+              // On Success: Call standard checkout with signature
+              await submitOrder({
+                paymentMethod: 'Razorpay',
+                useWallet,
+                addressId,
+                buyNowItem,
+                couponCode,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpaySignature: response.razorpay_signature
+              });
+            },
+            "prefill": {
+              "name": "User Name", // Could fetch from profile
+              "email": "user@example.com",
+              "contact": "9999999999"
+            },
+            "theme": {
+              "color": "#d32f2f"
+            }
+          };
+
+          // Fetch Key from backend to avoid hardcoding (Optional but recommended)
+          // For now assuming we use the one from env or public config
+          // NOTE: You might need to expose a public key endpoint or embed it.
+
+          // Let's assume we get key from backend or it's statically set for now.
+          // Ideally: options.key = rzpOrder.key;
+
+          const rzp1 = new Razorpay(options);
+          rzp1.open();
+
+        } catch (error) {
+          console.error(error);
+          Swal.fire("Error", error.message, "error");
+        }
+        return; // Stop standard flow
+      }
+
+
+      // --- STANDARD FLOW (COD, Wallet, etc) ---
+      await submitOrder({
+        paymentMethod: methodMap[paymentMethod] || paymentMethod,
+        useWallet,
+        addressId,
+        buyNowItem,
+        couponCode
+      });
+    }
+
+    async function submitOrder(payload) {
       console.log("📤 Sending Order Payload:", payload); // DEBUG LOG
 
       try {
@@ -699,6 +834,7 @@
             items: data.orderItems,
             totals: data.totals,
             appliedCoupon: data.appliedCoupon, // Store applied coupon code
+            paymentMethod: payload.paymentMethod, // Store payment method
             address: JSON.parse(sessionStorage.getItem("deliveryAddress") || '{}')
           }));
 
@@ -757,11 +893,11 @@
         try {
           const addr = JSON.parse(addrJson);
           display.innerHTML = `
-                    <div class="fw-bold text-dark">${addr.fullName} <span class="badge bg-light text-dark border ms-2">${addr.addressType}</span></div>
-                    <div>${addr.street}, ${addr.city}</div>
-                    <div>${addr.state} - ${addr.pincode}</div>
-                    <div>Phone: ${addr.phone}</div>
-                `;
+                      <div class="fw-bold text-dark">${addr.fullName} <span class="badge bg-light text-dark border ms-2">${addr.addressType}</span></div>
+                      <div>${addr.street}, ${addr.city}</div>
+                      <div>${addr.state} - ${addr.pincode}</div>
+                      <div>Phone: ${addr.phone}</div>
+                  `;
         } catch (e) {
           console.error("Error parsing address", e);
           display.innerHTML = '<span class="text-danger">Error loading address</span>';
@@ -769,7 +905,46 @@
       } else if (display) {
         display.innerHTML = '<span class="text-warning">No address selected</span>';
       }
+
+      // --- FETCH WALLET BALANCE ---
+      fetchWalletBalance();
     });
+
+    async function fetchWalletBalance() {
+      try {
+        const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+        if (!token) return;
+
+        const res = await fetch('/api/user/wallet', {
+          headers: { "Authorization": "Bearer " + token }
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            const balanceEl = document.getElementById("wallet-balance-display");
+            if (balanceEl) {
+              balanceEl.innerText = data.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+
+              // Disable wallet option if balance is 0
+              const walletOption = document.getElementById("option-wallet");
+              const walletRadio = document.getElementById("radio-wallet");
+
+              if (data.balance <= 0) {
+                if (walletOption) {
+                  walletOption.classList.add("opacity-50");
+                  walletOption.style.pointerEvents = "none";
+                  walletOption.title = "Insufficient Balance";
+                }
+                if (walletRadio) walletRadio.disabled = true;
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Failed to fetch wallet balance", e);
+      }
+    }
   </script>
 
   <script src="/js/navbar.js"></script>
