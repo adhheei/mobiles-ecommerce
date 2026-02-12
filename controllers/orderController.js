@@ -62,6 +62,8 @@ const getOrderDetails = async (req, res) => {
 const cancelOrder = async (req, res) => {
   try {
     const { itemId, action } = req.body; // action: 'cancel' (default) or 'return'
+    const Wallet = require("../models/Wallet"); // Ensure Wallet is imported
+
     const order = await Order.findOne({
       _id: req.params.id,
       userId: req.user._id,
@@ -87,10 +89,6 @@ const cancelOrder = async (req, res) => {
           order.orderStatus,
         )
       ) {
-        // allow cancel if shipped? usually no, but policy depends. strict: only processing.
-        // kept simple: cannot cancel if delivered/cancelled/returned.
-        // Note: user policy says "after delivered add return", ensuring shipped cannot simply be cancelled?
-        // For now, blocking cancel if delivered/cancelled/returned.
         if (
           order.orderStatus === "Delivered" ||
           order.orderStatus === "Cancelled" ||
@@ -103,38 +101,89 @@ const cancelOrder = async (req, res) => {
       }
     }
 
+    let totalRefundAmount = 0;
+
     if (itemId) {
-      // Specific item
+      // --- Specific Item Cancellation/Return ---
       const item = order.items.id(itemId);
       if (!item)
         return res.status(404).json({ message: "Item not found in order" });
 
+      if (item.status === "Cancelled" || item.status === "Returned") {
+        return res.status(400).json({ message: "Item already processed" });
+      }
+
+      // Use the pre-calculated totalItemPrice for refund
+      totalRefundAmount = item.totalItemPrice;
       item.status = targetStatus;
 
-      // Check if all items are same status
+      // Check if all items are same status to update main order status
       const allSame = order.items.every((i) => i.status === targetStatus);
       if (allSame) {
         order.orderStatus = targetStatus;
       }
     } else {
-      // Full Order
+      // --- Full Order Cancellation/Return ---
+      if (
+        order.orderStatus === "Cancelled" ||
+        order.orderStatus === "Returned"
+      ) {
+        return res.status(400).json({ message: "Order already processed" });
+      }
+
+      // Calculate total refund from all items that aren't already terminal
+      order.items.forEach((item) => {
+        if (item.status !== "Cancelled" && item.status !== "Returned") {
+          totalRefundAmount += item.totalItemPrice;
+          item.status = targetStatus;
+        }
+      });
       order.orderStatus = targetStatus;
-      order.items.forEach((item) => (item.status = targetStatus));
+    }
+
+    // --- REFUND LOGIC ---
+    // If order was paid (Online or Wallet), credit back to wallet
+    if (order.paymentStatus === "Paid" && totalRefundAmount > 0) {
+      let wallet = await Wallet.findOne({ userId: req.user._id });
+
+      if (!wallet) {
+        wallet = new Wallet({
+          userId: req.user._id,
+          balance: 0,
+          transactions: [],
+        });
+      }
+
+      wallet.balance += totalRefundAmount;
+      wallet.transactions.push({
+        userId: req.user._id,
+        amount: totalRefundAmount,
+        type: "CREDIT",
+        reason: "REFUND", // Matches your Wallet schema reason enum
+        orderId: order.orderId,
+        createdAt: new Date(),
+      });
+
+      await wallet.save();
+
+      // Update payment status if full order is processed
+      if (
+        order.orderStatus === "Returned" ||
+        order.orderStatus === "Cancelled"
+      ) {
+        order.paymentStatus = "Refunded";
+      } else {
+        order.paymentStatus = "Partially Refunded";
+      }
     }
 
     await order.save();
 
-    if (
-      order.paymentStatus === "Paid" &&
-      (targetStatus === "Returned" || targetStatus === "Cancelled")
-    ) {
-      // Refund logic placeholder
-    }
-
     res.status(200).json({
       success: true,
-      message: `Order ${action === "return" ? "returned" : "cancelled"} successfully`,
+      message: `Order ${action === "return" ? "returned" : "cancelled"} successfully. Rs. ${totalRefundAmount} refunded to wallet.`,
       orderStatus: order.orderStatus,
+      refundedAmount: totalRefundAmount,
     });
   } catch (error) {
     console.error("Cancel/Return Order Error:", error);
@@ -151,14 +200,20 @@ const getAdminOrderDetails = async (req, res) => {
 
     if (orderId) {
       // Populate userId to get actual customer name and email
-      const order = await Order.findById(orderId).populate('userId', 'firstName lastName email mobile createdAt isBlocked');
-      if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+      const order = await Order.findById(orderId).populate(
+        "userId",
+        "firstName lastName email mobile createdAt isBlocked",
+      );
+      if (!order)
+        return res
+          .status(404)
+          .json({ success: false, message: "Order not found" });
       return res.status(200).json({ success: true, order });
     }
 
     // For the general list, populate userId for all orders
     const orders = await Order.find()
-      .populate('userId', 'firstName lastName email')
+      .populate("userId", "firstName lastName email")
       .sort({ createdAt: -1 });
 
     res.status(200).json({ success: true, orders });
@@ -245,8 +300,10 @@ const requestReturn = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    if (order.orderStatus !== 'Delivered') {
-      return res.status(400).json({ message: "Return can only be requested for delivered orders" });
+    if (order.orderStatus !== "Delivered") {
+      return res
+        .status(400)
+        .json({ message: "Return can only be requested for delivered orders" });
     }
 
     const item = order.items.id(itemId);
@@ -254,11 +311,13 @@ const requestReturn = async (req, res) => {
       return res.status(404).json({ message: "Item not found in order" });
     }
 
-    if (item.returnStatus !== 'None') {
-      return res.status(400).json({ message: "Return request already submitted or processed" });
+    if (item.returnStatus !== "None") {
+      return res
+        .status(400)
+        .json({ message: "Return request already submitted or processed" });
     }
 
-    item.returnStatus = 'Requested';
+    item.returnStatus = "Requested";
     item.returnReason = reason;
 
     await order.save();
@@ -266,24 +325,24 @@ const requestReturn = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Return request submitted successfully",
-      order
+      order,
     });
-
   } catch (error) {
     console.error("Return Request Error:", error);
     res.status(500).json({ message: "Server Error" });
   }
 };
 
-// @desc    Handle return request (Approve/Reject)
+// @desc    Handle return request (Approve/Reject) with Proportional Wallet Refund
 // @route   PATCH /api/admin/orders/:id/return/:itemId
 // @access  Private/Admin
 const handleReturnRequest = async (req, res) => {
   try {
     const { status } = req.body; // 'Approved' or 'Rejected'
     const { id, itemId } = req.params;
+    const Wallet = require("../models/Wallet"); // Ensure Wallet model is imported
 
-    if (!['Approved', 'Rejected'].includes(status)) {
+    if (!["Approved", "Rejected"].includes(status)) {
       return res.status(400).json({ message: "Invalid status" });
     }
 
@@ -297,27 +356,74 @@ const handleReturnRequest = async (req, res) => {
       return res.status(404).json({ message: "Item not found" });
     }
 
+    // Prevent double-processing if already Approved or Rejected
+    if (item.returnStatus === "Approved" || item.returnStatus === "Rejected") {
+      return res
+        .status(400)
+        .json({ message: "Return request already processed" });
+    }
+
     item.returnStatus = status;
 
-    if (status === 'Approved') {
-      item.status = 'Returned';
+    if (status === "Approved") {
+      item.status = "Returned";
+
+      // --- WALLET REFUND LOGIC ---
+      // Use the pre-calculated proportional net price stored during checkout
+      const refundAmount = item.totalItemPrice;
+
+      if (refundAmount > 0) {
+        let wallet = await Wallet.findOne({ userId: order.userId });
+
+        // Create wallet if it doesn't exist
+        if (!wallet) {
+          wallet = new Wallet({
+            userId: order.userId,
+            balance: 0,
+            transactions: [],
+          });
+        }
+
+        // Credit the refund amount
+        wallet.balance += refundAmount;
+        wallet.transactions.push({
+          userId: order.userId,
+          amount: refundAmount,
+          type: "CREDIT",
+          reason: "REFUND", // Aligns with your Wallet schema enum
+          orderId: order.orderId,
+          createdAt: new Date(),
+        });
+
+        await wallet.save();
+
+        // Update Order-level payment status to reflect partial or full refund
+        const allItemsTerminal = order.items.every(
+          (i) => i.status === "Returned" || i.status === "Cancelled",
+        );
+        order.paymentStatus = allItemsTerminal
+          ? "Refunded"
+          : "Partially Refunded";
+      }
+
       // Optional: Restock logic here if needed
+      // const Product = require("../models/Product");
+      // await Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } });
     }
 
     // Check if all items are returned to update main order status
-    const allReturned = order.items.every(i => i.status === 'Returned');
+    const allReturned = order.items.every((i) => i.status === "Returned");
     if (allReturned) {
-      order.orderStatus = 'Returned';
+      order.orderStatus = "Returned";
     }
 
     await order.save();
 
     res.status(200).json({
       success: true,
-      message: `Return request ${status}`,
-      order
+      message: `Return request ${status}. Rs. ${item.totalItemPrice} refunded to wallet.`,
+      order,
     });
-
   } catch (error) {
     console.error("Admin Return Handle Error:", error);
     res.status(500).json({ message: "Server Error" });
@@ -331,5 +437,5 @@ module.exports = {
   getAdminOrderDetails,
   updateOrderStatus,
   requestReturn,
-  handleReturnRequest
+  handleReturnRequest,
 };
