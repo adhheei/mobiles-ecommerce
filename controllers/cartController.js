@@ -67,7 +67,7 @@ function formatCart(cart) {
 
 // --- CART ACTIONS ---
 
-const getCart = async (req, res) => {
+exports.getCart = async (req, res) => {
   try {
     const userId = req.user.id;
     let cart = await Cart.findOne({ userId }).populate("items.productId");
@@ -91,7 +91,7 @@ const getCart = async (req, res) => {
   }
 };
 
-const addToCart = async (req, res) => {
+exports.addToCart = async (req, res) => {
   try {
     const userId = req.user.id;
     const { productId, quantity } = req.body;
@@ -110,11 +110,9 @@ const addToCart = async (req, res) => {
       itemIndex > -1 ? cart.items[itemIndex].quantity + qty : qty;
 
     if (product.stock < newQuantity) {
-      return res
-        .status(400)
-        .json({
-          message: `Insufficient stock. Only ${product.stock} units available.`,
-        });
+      return res.status(400).json({
+        message: `Insufficient stock. Only ${product.stock} units available.`,
+      });
     }
 
     if (itemIndex > -1) cart.items[itemIndex].quantity = newQuantity;
@@ -127,7 +125,7 @@ const addToCart = async (req, res) => {
   }
 };
 
-const updateCart = async (req, res) => {
+exports.updateCart = async (req, res) => {
   try {
     const userId = req.user.id;
     const { productId, quantity } = req.body;
@@ -163,7 +161,7 @@ const updateCart = async (req, res) => {
   }
 };
 
-const removeFromCart = async (req, res) => {
+exports.removeFromCart = async (req, res) => {
   try {
     const userId = req.user.id;
     const { productId } = req.params;
@@ -179,7 +177,7 @@ const removeFromCart = async (req, res) => {
   }
 };
 
-const clearCart = async (req, res) => {
+exports.clearCart = async (req, res) => {
   try {
     const userId = req.user.id;
     await Cart.findOneAndUpdate({ userId }, { items: [] });
@@ -189,7 +187,7 @@ const clearCart = async (req, res) => {
   }
 };
 
-const getCartCount = async (req, res) => {
+exports.getCartCount = async (req, res) => {
   try {
     const userId = req.user.id;
     const cart = await Cart.findOne({ userId });
@@ -203,8 +201,7 @@ const getCartCount = async (req, res) => {
 };
 
 // --- CHECKOUT LOGIC ---
-
-const placeOrder = async (req, res) => {
+exports.placeOrder = async (req, res) => {
   try {
     const userId = req.user.id;
     const {
@@ -218,7 +215,7 @@ const placeOrder = async (req, res) => {
       razorpaySignature,
     } = req.body;
 
-    // 1. VERIFY RAZORPAY SIGNATURE
+    // --- 1. RAZORPAY VERIFICATION ---
     if (paymentMethod === "Razorpay") {
       const hmac = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
       hmac.update(razorpayOrderId + "|" + razorpayPaymentId);
@@ -229,23 +226,23 @@ const placeOrder = async (req, res) => {
       }
     }
 
-    // 2. GATHER ITEMS AND VERIFY STOCK
+    // --- 2. GATHER ITEMS & STOCK CHECK ---
     let subtotal = 0;
     let totalMrp = 0;
     let rawItems = [];
 
     if (buyNowItem) {
       const product = await Product.findById(buyNowItem.productId);
-      if (!product || product.stock < buyNowItem.qty) {
-        return res.status(400).json({ message: "Product out of stock" });
-      }
-      const price = product.offerPrice || product.price;
-      subtotal = price * buyNowItem.qty;
+      if (!product || product.stock < buyNowItem.qty)
+        return res
+          .status(400)
+          .json({ success: false, message: "Out of stock" });
+      subtotal = (product.offerPrice || product.price) * buyNowItem.qty;
       totalMrp = (product.actualPrice || product.price) * buyNowItem.qty;
       rawItems.push({
         productId: product._id,
         name: product.name,
-        price,
+        price: product.offerPrice || product.price,
         mrp: product.actualPrice || product.price,
         quantity: buyNowItem.qty,
         image: formatImageUrl(product.mainImage),
@@ -253,22 +250,20 @@ const placeOrder = async (req, res) => {
     } else {
       const cart = await Cart.findOne({ userId }).populate("items.productId");
       if (!cart || cart.items.length === 0)
-        return res.status(400).json({ message: "Cart is empty" });
-
+        return res.status(400).json({ success: false, message: "Cart empty" });
       for (const item of cart.items) {
-        if (item.productId.stock < item.quantity) {
+        if (!item.productId || item.productId.stock < item.quantity)
           return res
             .status(400)
-            .json({ message: `${item.productId.name} is out of stock` });
-        }
-        const price = item.productId.offerPrice || item.productId.price;
-        subtotal += price * item.quantity;
+            .json({ success: false, message: "Stock issue" });
+        subtotal +=
+          (item.productId.offerPrice || item.productId.price) * item.quantity;
         totalMrp +=
           (item.productId.actualPrice || item.productId.price) * item.quantity;
         rawItems.push({
           productId: item.productId._id,
           name: item.productId.name,
-          price,
+          price: item.productId.offerPrice || item.productId.price,
           mrp: item.productId.actualPrice || item.productId.price,
           quantity: item.quantity,
           image: formatImageUrl(item.productId.mainImage),
@@ -276,42 +271,41 @@ const placeOrder = async (req, res) => {
       }
     }
 
-    // 3. PROCESS COUPON
+    // --- 3. COUPON & PROPORTIONAL LOGIC ---
     let couponDiscount = 0;
     let appliedCouponCode = null;
     if (couponCode) {
       const coupon = await Coupon.findOne({ code: couponCode, isActive: true });
       if (coupon && subtotal >= coupon.minPurchase) {
-        const userUses = coupon.userUsage.get(userId.toString()) || 0;
-        if (userUses < coupon.perUserLimit) {
-          couponDiscount =
-            coupon.discountType === "percentage"
-              ? (subtotal * coupon.value) / 100
-              : coupon.value;
-          if (coupon.maxDiscount)
-            couponDiscount = Math.min(couponDiscount, coupon.maxDiscount);
-          couponDiscount = Math.min(couponDiscount, subtotal);
-          appliedCouponCode = couponCode;
-          coupon.totalUsed += 1;
-          coupon.userUsage.set(userId.toString(), userUses + 1);
-          await coupon.save();
-        }
+        couponDiscount =
+          coupon.discountType === "percentage"
+            ? (subtotal * coupon.value) / 100
+            : coupon.value;
+        if (coupon.maxDiscount)
+          couponDiscount = Math.min(couponDiscount, coupon.maxDiscount);
+        couponDiscount = Math.min(couponDiscount, subtotal);
+        appliedCouponCode = couponCode;
+        coupon.totalUsed += 1;
+        coupon.userUsage.set(
+          userId.toString(),
+          (coupon.userUsage.get(userId.toString()) || 0) + 1,
+        );
+        await coupon.save();
       }
     }
 
-    // --- 4. PROPORTIONAL DISCOUNT DISTRIBUTION ---
     let orderItems = [];
     let distributedDiscountTotal = 0;
-
     rawItems.forEach((item, index) => {
       let itemCouponDiscount = 0;
       if (couponDiscount > 0) {
-        if (index === rawItems.length - 1) {
+        if (index === rawItems.length - 1)
           itemCouponDiscount = couponDiscount - distributedDiscountTotal;
-        } else {
-          const itemWeight = (item.price * item.quantity) / subtotal;
+        else {
           itemCouponDiscount =
-            Math.round(itemWeight * couponDiscount * 100) / 100;
+            Math.round(
+              ((item.price * item.quantity) / subtotal) * couponDiscount * 100,
+            ) / 100;
           distributedDiscountTotal += itemCouponDiscount;
         }
       }
@@ -324,7 +318,7 @@ const placeOrder = async (req, res) => {
       });
     });
 
-    // 5. HANDLE WALLET
+    // --- 4. WALLET & ORDER CREATION ---
     let finalAmount = subtotal - couponDiscount;
     let walletDeducted = 0;
     if (useWallet) {
@@ -343,7 +337,6 @@ const placeOrder = async (req, res) => {
       }
     }
 
-    // 6. CREATE ORDER
     const addr = await Address.findById(addressId);
     const newOrder = await Order.create({
       userId,
@@ -376,32 +369,39 @@ const placeOrder = async (req, res) => {
       razorpaySignature,
     });
 
-    // 7. FINAL STOCK UPDATE & CART CLEANUP
-    for (const item of orderItems) {
+    for (const item of orderItems)
       await Product.findByIdAndUpdate(item.productId, {
         $inc: { stock: -item.quantity },
       });
-    }
     if (!buyNowItem) await Cart.findOneAndUpdate({ userId }, { items: [] });
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        orderId: newOrder.orderId,
-        totals: newOrder.totals,
-      });
+    // --- 5. THE SUCCESS RESPONSE ---
+    return res.status(200).json({
+      success: true,
+      orderId: newOrder.orderId,
+      orderItems: newOrder.items,
+      totals: newOrder.totals,
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Order Fail Details:", error);
+    // Explicitly check if res exists before calling status
+    if (res && typeof res.status === "function") {
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Order creation failed: " + error.message,
+        });
+    }
   }
 };
 
-module.exports = {
-  getCart,
-  addToCart,
-  updateCart,
-  removeFromCart,
-  clearCart,
-  getCartCount,
-  placeOrder,
-};
+// module.exports = {
+//   getCart,
+//   addToCart,
+//   updateCart,
+//   removeFromCart,
+//   clearCart,
+//   getCartCount,
+//   placeOrder,
+// };

@@ -810,12 +810,16 @@
         try {
           const token =
             localStorage.getItem("token") || sessionStorage.getItem("token");
+
+          // 1. Show Processing State
           Swal.fire({
             title: "Finalizing Order",
+            text: "Please wait while we confirm your purchase...",
             allowOutsideClick: false,
             didOpen: () => Swal.showLoading(),
           });
 
+          // 2. Call the Checkout API
           const res = await fetch("/api/cart/checkout", {
             method: "POST",
             headers: {
@@ -827,12 +831,14 @@
 
           const data = await res.json();
 
+          // 3. Handle Success
           if (res.ok && data.success) {
+            // Store complete order data for the Thank You Page summary
             sessionStorage.setItem(
               "lastOrderData",
               JSON.stringify({
                 orderId: data.orderId,
-                items: data.orderItems,
+                items: data.orderItems, // These come from your backend response
                 totals: data.totals,
                 paymentMethod: payload.paymentMethod,
                 address: JSON.parse(
@@ -841,26 +847,40 @@
               }),
             );
 
-            // Cleanup
+            // --- CLEANUP SESSION DATA ---
             sessionStorage.removeItem("buyNowItem");
             sessionStorage.removeItem("checkoutType");
             localStorage.removeItem("selectedCoupon");
+            // Clear local cart storage if you use it (optional)
+            localStorage.removeItem("cart");
 
+            // 4. Success Alert & Redirect
             Swal.fire({
               icon: "success",
               title: "Order Placed!",
-              timer: 2000,
+              text: `Your Order ID is: ${data.orderId}`,
+              timer: 2500,
               showConfirmButton: false,
-            }).then(() => (window.location.href = "./thankYouPage.html"));
+            }).then(() => {
+              window.location.href = "./thankYouPage.html";
+            });
           } else {
+            // 5. Handle Known Errors (e.g., "next is not a function" or Stock issues)
             Swal.fire(
               "Order Failed",
-              data.message || "Something went wrong",
+              data.message ||
+                "Something went wrong during checkout. Please try again.",
               "error",
             );
           }
         } catch (error) {
-          Swal.fire("Error", "Network error occurred", "error");
+          // 6. Handle Network/Connection Errors
+          console.error("Submit Order Fetch Error:", error);
+          Swal.fire(
+            "Error",
+            "Network error occurred. Please check your connection and try again.",
+            "error",
+          );
         }
       }
 
