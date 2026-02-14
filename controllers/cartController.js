@@ -67,7 +67,7 @@ function formatCart(cart) {
 
 // --- CART ACTIONS ---
 
-exports.getCart = async (req, res) => {
+const getCart = async (req, res) => {
   try {
     const userId = req.user.id;
     let cart = await Cart.findOne({ userId }).populate("items.productId");
@@ -91,7 +91,7 @@ exports.getCart = async (req, res) => {
   }
 };
 
-exports.addToCart = async (req, res) => {
+const addToCart = async (req, res) => {
   try {
     const userId = req.user.id;
     const { productId, quantity } = req.body;
@@ -125,7 +125,7 @@ exports.addToCart = async (req, res) => {
   }
 };
 
-exports.updateCart = async (req, res) => {
+const updateCart = async (req, res) => {
   try {
     const userId = req.user.id;
     const { productId, quantity } = req.body;
@@ -161,7 +161,7 @@ exports.updateCart = async (req, res) => {
   }
 };
 
-exports.removeFromCart = async (req, res) => {
+const removeFromCart = async (req, res) => {
   try {
     const userId = req.user.id;
     const { productId } = req.params;
@@ -177,7 +177,7 @@ exports.removeFromCart = async (req, res) => {
   }
 };
 
-exports.clearCart = async (req, res) => {
+const clearCart = async (req, res) => {
   try {
     const userId = req.user.id;
     await Cart.findOneAndUpdate({ userId }, { items: [] });
@@ -187,7 +187,7 @@ exports.clearCart = async (req, res) => {
   }
 };
 
-exports.getCartCount = async (req, res) => {
+const getCartCount = async (req, res) => {
   try {
     const userId = req.user.id;
     const cart = await Cart.findOne({ userId });
@@ -201,7 +201,7 @@ exports.getCartCount = async (req, res) => {
 };
 
 // --- CHECKOUT LOGIC ---
-exports.placeOrder = async (req, res) => {
+const placeOrder = async (req, res) => {
   try {
     const userId = req.user.id;
     const {
@@ -215,7 +215,9 @@ exports.placeOrder = async (req, res) => {
       razorpaySignature,
     } = req.body;
 
-    // --- 1. RAZORPAY VERIFICATION ---
+    console.log("DEBUG: placeOrder started", { userId, paymentMethod, useWallet, addressId });
+
+    // 1. VERIFY RAZORPAY SIGNATURE (For Online Payments)
     if (paymentMethod === "Razorpay") {
       const hmac = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
       hmac.update(razorpayOrderId + "|" + razorpayPaymentId);
@@ -226,44 +228,54 @@ exports.placeOrder = async (req, res) => {
       }
     }
 
-    // --- 2. GATHER ITEMS & STOCK CHECK ---
+    // 2. GATHER ITEMS AND VERIFY STOCK
+    console.log("DEBUG: Gathering items...");
     let subtotal = 0;
     let totalMrp = 0;
     let rawItems = [];
 
     if (buyNowItem) {
       const product = await Product.findById(buyNowItem.productId);
-      if (!product || product.stock < buyNowItem.qty)
+      if (!product || product.stock < buyNowItem.qty) {
         return res
           .status(400)
-          .json({ success: false, message: "Out of stock" });
-      subtotal = (product.offerPrice || product.price) * buyNowItem.qty;
+          .json({ success: false, message: "Product is out of stock" });
+      }
+      const price = product.offerPrice || product.price;
+      subtotal = price * buyNowItem.qty;
       totalMrp = (product.actualPrice || product.price) * buyNowItem.qty;
       rawItems.push({
         productId: product._id,
         name: product.name,
-        price: product.offerPrice || product.price,
+        price,
         mrp: product.actualPrice || product.price,
         quantity: buyNowItem.qty,
         image: formatImageUrl(product.mainImage),
       });
     } else {
       const cart = await Cart.findOne({ userId }).populate("items.productId");
-      if (!cart || cart.items.length === 0)
-        return res.status(400).json({ success: false, message: "Cart empty" });
+      if (!cart || cart.items.length === 0) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Cart is empty" });
+      }
       for (const item of cart.items) {
-        if (!item.productId || item.productId.stock < item.quantity)
+        if (!item.productId || item.productId.stock < item.quantity) {
           return res
             .status(400)
-            .json({ success: false, message: "Stock issue" });
-        subtotal +=
-          (item.productId.offerPrice || item.productId.price) * item.quantity;
+            .json({
+              success: false,
+              message: `${item.productId?.name || "Item"} is out of stock`,
+            });
+        }
+        const price = item.productId.offerPrice || item.productId.price;
+        subtotal += price * item.quantity;
         totalMrp +=
           (item.productId.actualPrice || item.productId.price) * item.quantity;
         rawItems.push({
           productId: item.productId._id,
           name: item.productId.name,
-          price: item.productId.offerPrice || item.productId.price,
+          price,
           mrp: item.productId.actualPrice || item.productId.price,
           quantity: item.quantity,
           image: formatImageUrl(item.productId.mainImage),
@@ -271,37 +283,40 @@ exports.placeOrder = async (req, res) => {
       }
     }
 
-    // --- 3. COUPON & PROPORTIONAL LOGIC ---
+    // 3. PROCESS COUPON
+    console.log("DEBUG: Processing coupon...");
     let couponDiscount = 0;
     let appliedCouponCode = null;
     if (couponCode) {
       const coupon = await Coupon.findOne({ code: couponCode, isActive: true });
       if (coupon && subtotal >= coupon.minPurchase) {
-        couponDiscount =
-          coupon.discountType === "percentage"
-            ? (subtotal * coupon.value) / 100
-            : coupon.value;
-        if (coupon.maxDiscount)
-          couponDiscount = Math.min(couponDiscount, coupon.maxDiscount);
-        couponDiscount = Math.min(couponDiscount, subtotal);
-        appliedCouponCode = couponCode;
-        coupon.totalUsed += 1;
-        coupon.userUsage.set(
-          userId.toString(),
-          (coupon.userUsage.get(userId.toString()) || 0) + 1,
-        );
-        await coupon.save();
+        const userUses = coupon.userUsage.get(userId.toString()) || 0;
+        if (userUses < coupon.perUserLimit) {
+          couponDiscount =
+            coupon.discountType === "percentage"
+              ? (subtotal * coupon.value) / 100
+              : coupon.value;
+          if (coupon.maxDiscount)
+            couponDiscount = Math.min(couponDiscount, coupon.maxDiscount);
+          couponDiscount = Math.min(couponDiscount, subtotal);
+          appliedCouponCode = couponCode;
+          coupon.totalUsed += 1;
+          coupon.userUsage.set(userId.toString(), userUses + 1);
+          await coupon.save();
+        }
       }
     }
 
+    // 4. PROPORTIONAL DISTRIBUTION
+    console.log("DEBUG: Calculating proportional distribution...");
     let orderItems = [];
     let distributedDiscountTotal = 0;
     rawItems.forEach((item, index) => {
       let itemCouponDiscount = 0;
       if (couponDiscount > 0) {
-        if (index === rawItems.length - 1)
+        if (index === rawItems.length - 1) {
           itemCouponDiscount = couponDiscount - distributedDiscountTotal;
-        else {
+        } else {
           itemCouponDiscount =
             Math.round(
               ((item.price * item.quantity) / subtotal) * couponDiscount * 100,
@@ -318,7 +333,8 @@ exports.placeOrder = async (req, res) => {
       });
     });
 
-    // --- 4. WALLET & ORDER CREATION ---
+    // 5. WALLET DEDUCTION
+    console.log("DEBUG: Processing wallet deduction...");
     let finalAmount = subtotal - couponDiscount;
     let walletDeducted = 0;
     if (useWallet) {
@@ -337,7 +353,16 @@ exports.placeOrder = async (req, res) => {
       }
     }
 
+    // 6. ADDRESS VALIDATION
+    console.log("DEBUG: Validating address...");
     const addr = await Address.findById(addressId);
+    if (!addr)
+      return res
+        .status(400)
+        .json({ success: false, message: "Shipping address not found" });
+
+    // 7. CREATE ORDER DOCUMENT
+    console.log("DEBUG: Creating order document...");
     const newOrder = await Order.create({
       userId,
       orderId: "ORD-" + Date.now(),
@@ -368,14 +393,30 @@ exports.placeOrder = async (req, res) => {
       razorpayPaymentId,
       razorpaySignature,
     });
+    console.log("DEBUG: Order created", newOrder.orderId);
 
-    for (const item of orderItems)
+    // 8. STOCK UPDATE & CLEANUP
+    console.log("DEBUG: Updating stock...");
+    for (const item of orderItems) {
       await Product.findByIdAndUpdate(item.productId, {
         $inc: { stock: -item.quantity },
       });
+    }
     if (!buyNowItem) await Cart.findOneAndUpdate({ userId }, { items: [] });
 
-    // --- 5. THE SUCCESS RESPONSE ---
+    // 9. SEND ORDER CONFIRMATION EMAIL
+    try {
+      const user = await require("../models/User").findById(userId); // Fetch user email
+      if (user && user.email) {
+        await sendOrderConfirmationEmail(user, newOrder);
+      }
+    } catch (emailErr) {
+      console.error("Failed to send order confirmation email:", emailErr);
+      // Don't fail the order just because email failed
+    }
+
+    // 10. FINAL SUCCESS RESPONSE
+    // return res.status().json() ends the request. Do NOT call next().
     return res.status(200).json({
       success: true,
       orderId: newOrder.orderId,
@@ -383,25 +424,100 @@ exports.placeOrder = async (req, res) => {
       totals: newOrder.totals,
     });
   } catch (error) {
-    console.error("Order Fail Details:", error);
-    // Explicitly check if res exists before calling status
-    if (res && typeof res.status === "function") {
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Order creation failed: " + error.message,
-        });
-    }
+    console.error("Order Creation Error ->", error); // Debugging info in terminal
+    console.error("Error Stack ->", error.stack);
+    // Send a JSON error instead of crashing the server with next(error)
+    return res
+      .status(500)
+      .json({
+        success: false,
+        message: "Internal server error: " + error.message,
+      });
   }
 };
 
-// module.exports = {
-//   getCart,
-//   addToCart,
-//   updateCart,
-//   removeFromCart,
-//   clearCart,
-//   getCartCount,
-//   placeOrder,
-// };
+// --- EMAIL HELPER ---
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+const sendOrderConfirmationEmail = async (user, order) => {
+  try {
+    const itemsHtml = order.items
+      .map(
+        (item) => `
+      <tr style="border-bottom: 1px solid #eee;">
+        <td style="padding: 10px;">${item.name}</td>
+        <td style="padding: 10px; text-align: center;">${item.quantity}</td>
+        <td style="padding: 10px; text-align: right;">₹${item.price}</td>
+      </tr>
+    `
+      )
+      .join("");
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: `Order Confirmation - ${order.orderId}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+          <h2 style="color: #333; text-align: center;">Thank You for Your Order!</h2>
+          <p>Hi ${user.firstName},</p>
+          <p>Your order <strong>${order.orderId}</strong> has been successfully placed.</p>
+          
+          <h3 style="background: #f4f4f4; padding: 10px; border-radius: 5px;">Order Summary</h3>
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="background: #eee;">
+                <th style="padding: 10px; text-align: left;">Product</th>
+                <th style="padding: 10px; text-align: center;">Qty</th>
+                <th style="padding: 10px; text-align: right;">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHtml}
+            </tbody>
+          </table>
+
+          <div style="margin-top: 20px; text-align: right;">
+            <p><strong>Subtotal:</strong> ₹${order.totals.subtotal}</p>
+            <p><strong>Discount:</strong> -₹${order.totals.couponDiscount}</p>
+            <p><strong>Shipping:</strong> ₹${order.totals.shipping}</p>
+            <h3 style="color: #28a745;">Total: ₹${order.totals.totalAmount}</h3>
+          </div>
+
+          <div style="margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 5px;">
+            <h4>Shipping Address:</h4>
+            <p>${order.shippingAddress.fullName}</p>
+            <p>${order.shippingAddress.street}, ${order.shippingAddress.city}</p>
+            <p>${order.shippingAddress.state} - ${order.shippingAddress.pincode}</p>
+            <p>Phone: ${order.shippingAddress.phone}</p>
+          </div>
+
+          <p style="text-align: center; margin-top: 30px; font-size: 12px; color: #777;">
+            Need help? Contact us at support@jinsamobiles.com
+          </p>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ Order confirmation email sent to ${user.email}`);
+  } catch (error) {
+    console.error("❌ Error sending email:", error);
+  }
+};
+
+module.exports = {
+  getCart,
+  addToCart,
+  updateCart,
+  removeFromCart,
+  clearCart,
+  getCartCount,
+  placeOrder,
+};

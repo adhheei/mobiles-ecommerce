@@ -23,6 +23,6 @@ router.delete("/clear", cartController.clearCart);
 
 // Payment & Checkout
 router.post("/razorpay-order", paymentController.createOrder);
-router.post("/checkout", cartController.placeOrder);
+router.post("/checkout", protect, cartController.placeOrder);
 
 module.exports = router;

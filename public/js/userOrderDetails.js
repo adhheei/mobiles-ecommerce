@@ -58,9 +58,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <tr>
                     <td class="ps-4 py-3">
                         <div class="d-flex align-items-center gap-3">
-                            <img src="${item.image ? '/' + item.image.replace(/\\/g, '/').replace('public/', '') : '/images/product-placeholder.jpg'}" alt="${item.name}" 
+                            <img src="${item.image ? '/' + item.image.replace(/\\/g, '/').replace('public/', '') : 'https://placehold.co/100x120?text=No+Image'}" alt="${item.name}" 
                                  style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;"
-                                 onerror="this.src='/images/product-placeholder.jpg'">
+                                 onerror="this.src='https://placehold.co/100x120?text=No+Image'">
                             <div>
                                 <h6 class="mb-0 fw-bold small text-truncate" style="max-width: 200px;">${item.name}</h6>
                                 <span class="badge border text-dark fw-normal" style="font-size: 0.7rem;">${item.status}</span>

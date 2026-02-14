@@ -100,9 +100,8 @@ const orderSchema = new mongoose.Schema({
 });
 
 // Middleware to prevent negative total amounts
-orderSchema.pre("save", function (next) {
+orderSchema.pre("save", async function () {
   if (this.totals.totalAmount < 0) this.totals.totalAmount = 0;
-  next();
 });
 
 module.exports = mongoose.model("Order", orderSchema);
