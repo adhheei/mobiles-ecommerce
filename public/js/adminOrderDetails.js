@@ -83,7 +83,7 @@ function renderOrderDetails(order) {
 
         itemsHtml += `
             <div class="item-row">
-              <img src="${item.image ? '/' + item.image.replace(/\\/g, '/').replace('public/', '') : '/images/product-placeholder.jpg'}" class="item-img" alt="${item.name}" onerror="this.src='/images/product-placeholder.jpg'" />
+              <img src="${item.image ? '/' + item.image.replace(/\\/g, '/').replace('public/', '') : 'https://placehold.co/100x120?text=No+Image'}" class="item-img" alt="${item.name}" onerror="this.src='https://placehold.co/100x120?text=No+Image'" />
               <div class="item-details" style="flex: 1">
                 <h6>${item.name}</h6>
                 <span class="item-meta">Qty: ${item.quantity} | Status: ${item.status}</span>
