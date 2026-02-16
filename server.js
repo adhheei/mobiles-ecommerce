@@ -47,8 +47,12 @@ app.use(
       imgSrc: [
         "'self'",
         "data:",
+        "blob:", // Added for certain image handling
+        "https://*",
         "https://lh3.googleusercontent.com",
-        "https://placehold.co"
+        "https://placehold.co",
+        "http://localhost:*", // Allows images from your local server
+        "https://res.cloudinary.com", // Add this if you use Cloudinary in the future
       ],
       connectSrc: [
         "'self'",
@@ -59,7 +63,11 @@ app.use(
         "https://lumberjack.razorpay.com",
         "https://*.razorpay.com",
       ],
-      frameSrc: ["https://accounts.google.com", "https://api.razorpay.com", "https://*.razorpay.com"],
+      frameSrc: [
+        "https://accounts.google.com",
+        "https://api.razorpay.com",
+        "https://*.razorpay.com",
+      ],
       fontSrc: [
         "'self'",
         "https://cdnjs.cloudflare.com",
@@ -77,7 +85,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express.static("public"));
 
 //  favicon.ico ignore
-app.get('/favicon.ico', (req, res) => res.status(204).end());
+app.get("/favicon.ico", (req, res) => res.status(204).end());
 
 // 🛣️ Routes
 const adminRoutes = require("./routes/adminRoutes");
@@ -110,7 +118,7 @@ app.use((err, req, res, next) => {
   console.error("🔥 Global Error Handler:", err.stack);
   res.status(500).json({
     message: "Unexpected Server Error",
-    error: err.message
+    error: err.message,
   });
 });
 
