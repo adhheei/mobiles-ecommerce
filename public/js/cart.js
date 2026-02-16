@@ -42,63 +42,34 @@ function renderCart(cartData) {
   const container = document.getElementById("cart-items-container");
   const mainCartRow = document.getElementById("main-cart-row");
   const emptyCartView = document.getElementById("empty-cart-view");
+  const summaryContainer = document.getElementById("summary-items-container");
 
   // Handle empty cart
   if (!cartData || !cartData.items || cartData.items.length === 0) {
     if (mainCartRow) mainCartRow.classList.add("d-none");
     if (emptyCartView) emptyCartView.classList.remove("d-none");
-    // Also clear summary if hidden
     return;
   }
 
-  // Show cart
+  // Show cart UI
   if (mainCartRow) mainCartRow.classList.remove("d-none");
   if (emptyCartView) emptyCartView.classList.add("d-none");
 
-  // Clear existing items
-  container.innerHTML = "";
-
-  // Summary Container
-  const summaryContainer = document.getElementById("summary-items-container");
-  if (summaryContainer) summaryContainer.innerHTML = "";
-
-  // Collect IDs for suggestions
+  let mainHtml = "";
+  let summaryHtml = "";
   const productIds = [];
 
-  // Render Items
   cartData.items.forEach((item) => {
     productIds.push(item.productId);
-    console.log(`[DEBUG] Rendering item ${item.productId}, stock:`, item.stock);
 
-    let imgSrc = "https://placehold.co/100x120/f0f0f0/333?text=No+Image";
-    if (item.image) {
-      if (item.image.startsWith("http")) {
-        imgSrc = item.image;
-      } else {
-        // Ensure we don't double slash if already present, but uploads usually need /
-        imgSrc = item.image.startsWith("/") ? item.image : "/" + item.image;
-        // Fix windows backslashes just in case
-        imgSrc = imgSrc.replace(/\\/g, "/");
-        // If it's just a filename (no path), assume /uploads/products/
-        if (!imgSrc.includes("/")) imgSrc = "/uploads/products/" + imgSrc;
-        // Actually cartController returns full path or relative?
-        // Controller says: `image = product.productImages[0]` or placeholder.
-        // Ideally controller should return full web path.
-        // Let's assume controller sends relative path `uploads/products/file.jpg` or `file.jpg`.
-        // Adjust based on observation if needed.
-        // For now, if it looks like a filename, prepend /uploads/products/
-      }
-    }
-
-    // Final fallback onerror
+    // Use your helper function for ALL images
+    const imgSrc = formatImageUrl(item.image);
     const fallback = "https://placehold.co/100x120/f0f0f0/333?text=No+Image";
 
-    // Main List HTML
-    const html = `
+    mainHtml += `
       <div class="cart-item-row" id="item-${item.productId}" 
-           data-price="${item.price}" 
-           data-mrp="${item.mrp}"
-           data-stock="${item.stock !== undefined && item.stock !== null ? item.stock : 0}"> <!-- Added stock data -->
+           data-price="${item.price}" data-mrp="${item.mrp}"
+           data-stock="${item.stock || 0}">
           <div class="cart-img-wrapper">
             <a href="/User/singleProductPage.html?id=${item.productId}">
                 <img src="${imgSrc}" alt="${item.name}" onerror="this.src='${fallback}'" />
@@ -107,9 +78,7 @@ function renderCart(cartData) {
           <div class="item-details">
             <div class="d-flex justify-content-between">
               <div>
-                <a href="/User/singleProductPage.html?id=${item.productId}" class="text-decoration-none text-dark">
-                    <div class="item-name">${item.name}</div>
-                </a>
+                <div class="item-name">${item.name}</div>
                 <div class="item-meta">Color: ${item.color || "N/A"}</div>
                 <div class="item-price">
                   Rs. ${item.price} 
@@ -129,30 +98,26 @@ function renderCart(cartData) {
               <div class="fw-bold item-total">${formatMoney(item.lineTotal || item.price * item.quantity)}</div>
             </div>
           </div>
-        </div>
-    `;
-    container.innerHTML += html;
+      </div>`;
 
-    // Summary List HTML
     if (summaryContainer) {
-      const summaryHtml = `
-              <div class="upsell-mini mb-2">
-                 <img src="${imgSrc}" alt="${item.name}" onerror="this.src='${fallback}'" />
-                 <div class="upsell-text" style="flex: 1; min-width: 0;">
-                   <h6 class="text-truncate" title="${item.name}">${item.name}</h6>
-                   <p class="small text-muted">Qty: ${item.quantity}</p>
-                 </div>
-                 <div class="upsell-price ms-2">${formatMoney(item.lineTotal || item.price * item.quantity)}</div>
-               </div>
-            `;
-      summaryContainer.innerHTML += summaryHtml;
+      summaryHtml += `
+        <div class="upsell-mini mb-2">
+           <img src="${imgSrc}" alt="${item.name}" onerror="this.src='${fallback}'" />
+           <div class="upsell-text" style="flex: 1; min-width: 0;">
+             <h6 class="text-truncate">${item.name}</h6>
+             <p class="small text-muted">Qty: ${item.quantity}</p>
+           </div>
+           <div class="upsell-price ms-2">${formatMoney(item.lineTotal || item.price * item.quantity)}</div>
+        </div>`;
     }
   });
 
-  // Calculate totals
-  updateTotals();
+  // Bulk update DOM once for performance
+  container.innerHTML = mainHtml;
+  if (summaryContainer) summaryContainer.innerHTML = summaryHtml;
 
-  // Fetch Suggestions
+  updateTotals();
   fetchSuggestions(productIds);
 }
 
@@ -468,6 +433,24 @@ window.selectCoupon = function (code) {
   applyCoupon(code);
 };
 
+function formatImageUrl(path) {
+  if (!path) return "https://placehold.co/100x120?text=No+Image";
+
+  // If it's already a full URL, return it
+  if (path.startsWith("http")) return path;
+
+  // FIX: Remove 'public' from the start and fix backslashes
+  // This turns "public/uploads/products/img.jpg" into "/uploads/products/img.jpg"
+  let cleanPath = path.replace(/^public/, "").replace(/\\/g, "/");
+
+  // Ensure it starts with a single leading slash
+  if (!cleanPath.startsWith("/")) {
+    cleanPath = "/" + cleanPath;
+  }
+
+  return cleanPath;
+}
+
 async function applyCoupon(code, silent = false) {
   const subtotalText = document.getElementById("subtotal").innerText;
   const cleanTotal = parseFloat(subtotalText.replace(/[^\d.]/g, ""));
@@ -501,7 +484,7 @@ async function applyCoupon(code, silent = false) {
     currentCoupon = {
       code: data.code,
       discount: data.discountAmount,
-      finalTotal: data.finalTotal
+      finalTotal: data.finalTotal,
     };
 
     // Save to storage
@@ -512,14 +495,13 @@ async function applyCoupon(code, silent = false) {
 
     if (!silent) {
       Swal.fire({
-        icon: 'success',
+        icon: "success",
         title: "Coupon Applied!",
         text: `You saved Rs. ${data.discountAmount}`,
         timer: 1500,
-        showConfirmButton: false
+        showConfirmButton: false,
       });
     }
-
   } catch (error) {
     if (!silent) Swal.fire("Coupon Error", error.message, "error");
   }
