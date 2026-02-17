@@ -689,26 +689,24 @@
     }
   </script>
 
-  <section id="hot-deals-section" class="container py-5 reveal-up">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="section-header fw-bold">Hot Deals</h2>
-    <div>
-      <button class="btn btn-outline-dark rounded-circle me-2" onclick="scrollSection('hotDealsSlider', 'left')">
-        <i class="fa-solid fa-chevron-left"></i>
-      </button>
-      <button class="btn btn-outline-dark rounded-circle" onclick="scrollSection('hotDealsSlider', 'right')">
-        <i class="fa-solid fa-chevron-right"></i>
-      </button>
-    </div>
-  </div>
+  <section id="hot-deals-section" class="py-5 reveal-up">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-header fw-bold mb-0">Hot Deals</h2>
+        </div>
 
-  <div class="row scrolling-wrapper g-2" id="hotDealsSlider">
-    <div class="text-center w-100 py-5">
-      <div class="spinner-border text-danger" role="status">
-        <span class="visually-hidden">Loading Deals...</span>
-      </div>
+        <div id="hotDealsSlider" class="row g-4">
+            <div class="text-center w-100 py-5">
+                <div class="spinner-border text-danger" role="status"></div>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="./productPage.html" class="btn btn-outline-dark rounded-pill px-5 py-2 fw-bold">
+                Explore More <i class="fa-solid fa-arrow-right ms-2"></i>
+            </a>
+        </div>
     </div>
-  </div>
 </section>
 
   <script>
@@ -1051,205 +1049,236 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // Simple Intersection Observer to trigger animations
+    // 1. ANIMATION LOGIC (Intersection Observer)
     document.addEventListener("DOMContentLoaded", function () {
-      const observerOptions = {
-        root: null,
-        rootMargin: "0px",
-        threshold: 0.1, // Trigger when 10% of element is visible
-      };
+        const observerOptions = {
+            root: null,
+            rootMargin: "0px",
+            threshold: 0.1,
+        };
 
-      const observer = new IntersectionObserver((entries, observer) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("active");
-            observer.unobserve(entry.target); // Only animate once
-          }
-        });
-      }, observerOptions);
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("active");
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
 
-      const animatedElements = document.querySelectorAll(".reveal-up");
-      animatedElements.forEach((el) => observer.observe(el));
+        const animatedElements = document.querySelectorAll(".reveal-up");
+        animatedElements.forEach((el) => observer.observe(el));
     });
 
-    // --- OFFER TIMER LOGIC ---
-    // Set the date we're counting down to (24 hours from now for demo)
+    // 2. OFFER TIMER LOGIC
     var countDownDate = new Date().getTime() + (24 * 60 * 60 * 1000);
-
-    // Update the count down every 1 second
     var x = setInterval(function () {
+        var now = new Date().getTime();
+        var distance = countDownDate - now;
 
-      // Get today's date and time
-      var now = new Date().getTime();
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-      // Find the distance between now and the count down date
-      var distance = countDownDate - now;
+        if (document.getElementById("days")) document.getElementById("days").innerHTML = (days < 10 ? "0" : "") + days;
+        if (document.getElementById("hours")) document.getElementById("hours").innerHTML = (hours < 10 ? "0" : "") + hours;
+        if (document.getElementById("minutes")) document.getElementById("minutes").innerHTML = (minutes < 10 ? "0" : "") + minutes;
+        if (document.getElementById("seconds")) document.getElementById("seconds").innerHTML = (seconds < 10 ? "0" : "") + seconds;
 
-      // Time calculations for days, hours, minutes and seconds
-      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-      // Output the result in the elements with id
-      document.getElementById("days").innerHTML = (days < 10 ? "0" : "") + days;
-      document.getElementById("hours").innerHTML = (hours < 10 ? "0" : "") + hours;
-      document.getElementById("minutes").innerHTML = (minutes < 10 ? "0" : "") + minutes;
-      document.getElementById("seconds").innerHTML = (seconds < 10 ? "0" : "") + seconds;
-
-      // If the count down is over, write some text 
-      if (distance < 0) {
-        clearInterval(x);
-        document.getElementById("offer-banner").innerHTML = "OFFER EXPIRED";
-      }
+        if (distance < 0) {
+            clearInterval(x);
+            const banner = document.getElementById("offer-banner");
+            if (banner) banner.innerHTML = "OFFER EXPIRED";
+        }
     }, 1000);
 
-    // --- SCROLL TO HOT DEALS LOGIC ---
+    // 3. SCROLL & IMAGE HELPERS
     function scrollToDeals(e) {
-      e.preventDefault();
-      const section = document.getElementById("hot-deals-section");
-      // Get navbar height dynamically or use fixed value. 
-      // 76px is approx height of your fixed navbar.
-      const navbarHeight = document.querySelector('.navbar').offsetHeight;
+        e.preventDefault();
+        const section = document.getElementById("hot-deals-section");
+        const navbar = document.querySelector('.navbar');
+        const navbarHeight = navbar ? navbar.offsetHeight : 76;
+        const targetPosition = section.offsetTop - navbarHeight - 20;
 
-      const targetPosition = section.offsetTop - navbarHeight - 20; // 20px extra buffer for visual space
-
-      window.scrollTo({
-        top: targetPosition,
-        behavior: "smooth"
-      });
+        window.scrollTo({ top: targetPosition, behavior: "smooth" });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-    loadHotDeals();
-});
+    function formatImageUrl(path) {
+        if (!path) return "https://placehold.co/200x200?text=No+Image";
+        if (path.startsWith("http")) return path;
+        let cleanPath = path.replace(/^public\//, "").replace(/\\/g, "/");
+        if (!cleanPath.startsWith("/")) cleanPath = "/" + cleanPath;
+        return cleanPath;
+    }
 
-async function loadHotDeals() {
-    const slider = document.getElementById('hotDealsSlider');
-    try {
-        // 1. Fetch offers
-        const offerRes = await fetch('/api/admin/offers');
-        console.log("") 
-        
-        // If still getting 403, it means the backend route is still protected
-        if (offerRes.status === 403) {
-            console.error("Access Forbidden: Make the /api/admin/offers route public in your backend.");
-            slider.innerHTML = '<div class="col-12 text-center text-muted py-5">Access denied to offers.</div>';
-            return;
+    // 4. DATA LOADING (New Arrivals, Hot Deals, Wishlist)
+    document.addEventListener('DOMContentLoaded', () => {
+        loadNewArrivals();
+        loadHotDeals();
+        loadUserWishlist();
+    });
+
+    async function loadNewArrivals() {
+        const container = document.getElementById('cardSlider');
+        try {
+            const res = await fetch('/api/admin/products/public?sort=newest&limit=10');
+            const data = await res.json();
+
+            if (data.success && data.products && data.products.length > 0) {
+                const productCards = data.products.map(product => {
+                    const isOutOfStock = product.stock === 0 || product.status === 'outofstock';
+                    const linkHref = isOutOfStock ? 'javascript:void(0)' : `./singleProductPage.html?id=${product._id}`;
+
+                    return `
+                        <div class="col-10 col-md-3">
+                            <a href="${linkHref}" class="text-decoration-none text-dark">
+                                <div class="card product-card mb-3 ${isOutOfStock ? 'opacity-75' : ''}">
+                                    <div class="card-img-wrapper">
+                                        ${isOutOfStock ? '<div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-50 z-2"><span class="badge bg-dark">Sold Out</span></div>' : ''}
+                                        <img src="${formatImageUrl(product.mainImage)}" alt="${product.name}" onerror="this.src='/images/logo.jpg'" />
+                                    </div>
+                                    <div class="text-center">
+                                        <h5 class="card-title fw-bold text-truncate px-2">${product.name}</h5>
+                                        <p class="text-muted small">${product.brand || 'Latest Model'}</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>`;
+                }).join('');
+                container.innerHTML = productCards + `<div class="col-10 col-md-3"><a href="./productPage.html" class="text-decoration-none text-dark h-100 d-block"><div class="card product-card mb-3 h-100 d-flex flex-column justify-content-center align-items-center bg-light border-0" style="min-height: 300px;"><div class="rounded-circle bg-white p-4 shadow-sm mb-3"><i class="fa-solid fa-arrow-right fa-2x text-dark"></i></div><h5 class="fw-bold">View All</h5><p class="text-muted small">Go to Shop</p></div></a></div>`;
+            }
+        } catch (err) {
+            console.error('New Arrivals Error:', err);
         }
+    }
+
+    async function loadHotDeals() {
+    const slider = document.getElementById('hotDealsSlider');
+    if (!slider) return;
+
+    try {
+        // Parallel fetching for performance
+        const [offerRes, productRes] = await Promise.all([
+            fetch('/api/admin/offers'),
+            fetch('/api/admin/products/public?limit=20')
+        ]);
 
         const offerData = await offerRes.json();
-        
-        // 2. SAFE CHECK: Stop the "invalid format" error
-        if (!offerData.success || !offerData.offers || !Array.isArray(offerData.offers)) {
-            slider.innerHTML = '<div class="col-12 text-center text-muted py-5">No active deals found.</div>';
-            return;
+        const productData = await productRes.json();
+
+        if (offerData.success && productData.success) {
+            // Filter IDs for active Category and Product offers
+            const activeCategoryIds = offerData.offers
+                .filter(o => o.offerType === 'Category' && o.status === 'Active' && o.targetId)
+                .map(o => (o.targetId._id || o.targetId).toString());
+
+            const activeProductIds = offerData.offers
+                .filter(o => o.offerType === 'Product' && o.status === 'Active' && o.targetId)
+                .map(o => (o.targetId._id || o.targetId).toString());
+
+            // Get products that meet the offer criteria
+            const activeDeals = productData.products.filter(product => {
+                const pCatId = (product.category || "").toString();
+                const pId = (product._id || "").toString();
+                return activeCategoryIds.includes(pCatId) || activeProductIds.includes(pId);
+            });
+
+            if (activeDeals.length === 0) {
+                slider.innerHTML = '<div class="col-12 text-center text-muted py-5">No active deals found.</div>';
+                return;
+            }
+
+            // Render exactly 4 cards
+            slider.innerHTML = activeDeals.slice(0, 4).map(product => {
+                // Defensive image handling
+                const displayImage = product.mainImage || (product.productImages && product.productImages.length > 0 ? product.productImages[0] : "");
+                const imageSrc = formatImageUrl(displayImage);
+                const discount = Math.round(((product.actualPrice - product.offerPrice) / product.actualPrice) * 100);
+
+                return `
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="product-card h-90 p-3 bg-white rounded-4 shadow-sm border-0 position-relative">
+                            <span class="discount-tag">Save ${discount}%</span>
+                            <div class="card-img-wrapper mb-3">
+                                <a href="./singleProductPage.html?id=${product._id}">
+                                    <img src="${imageSrc}" alt="${product.name}" 
+                                         onerror="this.src='https://placehold.co/200x200?text=No+Image'">
+                                </a>
+                                <button class="wishlist-btn" data-product-id="${product._id}" onclick="toggleWishlist(event, '${product._id}')">
+                                    <i class="fa-regular fa-heart"></i>
+                                </button>
+                            </div>
+                            <div class="text-start px-1">
+                                <div class="brand-name text-muted small">${product.brand || 'Premium'}</div>
+                                <h6 class="fw-bold text-truncate mb-1" title="${product.name}">${product.name}</h6>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <div class="price-info">
+                                        <span class="current-price fs-6">Rs. ${product.offerPrice}</span>
+                                        <span class="original-price ms-1 small">Rs. ${product.actualPrice}</span>
+                                    </div>
+                                    <button class="btn btn-dark btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" 
+                                            style="width: 30px; height: 30px;" 
+                                            onclick="addToCart('${product._id}')">
+                                        <i class="fa-solid fa-shopping-cart small"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
         }
-
-        // 3. Filter active category IDs
-        const activeCategoryIds = offerData.offers
-            .filter(o => o.offerType === 'Category' && o.status === 'Active' && o.targetId)
-            .map(o => (o.targetId._id || o.targetId).toString());
-
-        // 4. Fetch Products and filter them
-        const res = await fetch('/api/admin/products/public?limit=20');
-        const data = await res.json();
-
-        const activeDeals = data.products.filter(product => {
-    // We check against the category ID we just populated
-    const pCatId = (product.category || "").toString();
-    
-    // Check if this product's category has an active offer
-    return activeCategoryIds.includes(pCatId) && product.offerPrice < product.actualPrice;
-});
-        // ... Render activeDeals to slider.innerHTML
-
     } catch (err) {
-        console.error('Fetch Error:', err);
+        console.error('Hot Deals Error:', err);
+        slider.innerHTML = '<div class="col-12 text-center text-danger">Failed to load deals.</div>';
     }
 }
 
-async function toggleWishlist(event, productId) {
-    event.preventDefault(); 
-    event.stopPropagation();
-    
-    const token = localStorage.getItem("token");
-    
-    if (!token) {
-        return Swal.fire({
-            title: "Login Required",
-            text: "Please login to manage your wishlist.",
-            icon: "warning",
-            confirmButtonColor: "#d32f2f"
-        });
-    }
+    // 5. WISHLIST LOGIC
+    async function toggleWishlist(event, productId) {
+        event.preventDefault(); event.stopPropagation();
+        const token = localStorage.getItem("token");
+        if (!token) return Swal.fire({ title: "Login Required", icon: "warning" });
 
-    const btn = event.currentTarget;
-    const icon = btn.querySelector('i');
-    const isAdding = !btn.classList.contains('active');
+        const btn = event.currentTarget;
+        const icon = btn.querySelector('i');
+        const isAdding = !btn.classList.contains('active');
 
-    // UI Update immediately
-    btn.classList.toggle('active');
-    isAdding ? icon.classList.replace('fa-regular', 'fa-solid') : icon.classList.replace('fa-solid', 'fa-regular');
-
-    try {
-        const method = isAdding ? 'POST' : 'DELETE';
-        const url = isAdding ? '/api/user/wishlist' : `/api/user/wishlist/${productId}`;
-        
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` 
-            },
-            body: isAdding ? JSON.stringify({ productId }) : null
-        });
-
-        const data = await response.json();
-        if (!data.success) throw new Error(data.message);
-
-        // --- THE TOAST FIRE ALERT ---
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 1500,
-            timerProgressBar: true
-        });
-
-        Toast.fire({
-            icon: 'success',
-            title: isAdding ? 'Product added to wishlist ❤️' : 'Removed from Wishlist'
-        });
-
-    } catch (error) {
-        console.error("Wishlist error:", error);
-        // Revert UI if server fails
         btn.classList.toggle('active');
-        isAdding ? icon.classList.replace('fa-solid', 'fa-regular') : icon.classList.replace('fa-regular', 'fa-solid');
-        Swal.fire("Error", error.message || "Failed to update wishlist", "error");
-    }
-}
+        isAdding ? icon.classList.replace('fa-regular', 'fa-solid') : icon.classList.replace('fa-solid', 'fa-regular');
 
-async function loadUserWishlist() {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    try {
-        const res = await fetch("/api/user/wishlist", {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
-        if (data.success) {
-            // Store IDs in a Set for fast lookup
-            userWishlistIds = new Set(data.wishlist.map(item => item._id || item));
+        try {
+            const res = await fetch(isAdding ? '/api/user/wishlist' : `/api/user/wishlist/${productId}`, {
+                method: isAdding ? 'POST' : 'DELETE',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: isAdding ? JSON.stringify({ productId }) : null
+            });
+            if (res.ok) Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 }).fire({ icon: 'success', title: isAdding ? 'Added to wishlist ❤️' : 'Removed from Wishlist' });
+        } catch (error) {
+            btn.classList.toggle('active');
+            isAdding ? icon.classList.replace('fa-solid', 'fa-regular') : icon.classList.replace('fa-regular', 'fa-solid');
         }
-    } catch (err) {
-        console.error("Error loading wishlist:", err);
     }
-}
 
-  </script>
+    async function loadUserWishlist() {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        try {
+            const res = await fetch("/api/user/wishlist", { headers: { 'Authorization': `Bearer ${token}` } });
+            const data = await res.json();
+            if (data.success) {
+                const wishlistSet = new Set(data.wishlist.map(item => (item._id || item).toString()));
+                document.querySelectorAll('.wishlist-btn').forEach(btn => {
+                    const pId = btn.getAttribute('data-product-id');
+                    if (wishlistSet.has(pId)) {
+                        btn.classList.add('active');
+                        btn.querySelector('i').classList.replace('fa-regular', 'fa-solid');
+                    }
+                });
+            }
+        } catch (err) { console.error("Wishlist sync error:", err); }
+    }
+</script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/navbar.js"></script>
 </body>
