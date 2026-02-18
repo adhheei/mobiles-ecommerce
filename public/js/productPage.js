@@ -51,6 +51,14 @@ function setupEventListeners() {
     });
   }
 
+  const onSaleOnly = document.getElementById("onSaleOnly");
+  if (onSaleOnly) {
+    onSaleOnly.addEventListener("change", () => {
+      currentPage = 1;
+      loadProducts();
+    });
+  }
+
   if (inStockOnly) {
     inStockOnly.addEventListener("change", () => {
       currentPage = 1;
@@ -203,17 +211,24 @@ async function loadProducts() {
   // Gather Filter Values
   const sort = document.getElementById("sortSelect")?.value || "best-selling";
   const inStock = document.getElementById("inStockOnly")?.checked || false;
+
+  // NEW: Get Offer Toggle state
+  const onSale = document.getElementById("onSaleOnly")?.checked || false;
+
   const maxPrice = document.getElementById("priceRange")?.value || 1000000;
 
   // Categories
-  const selectedCats = Array.from(document.querySelectorAll('#categoryList input:checked'))
-    .map(cb => cb.value)
-    .filter(val => val !== 'all');
+  const selectedCats = Array.from(
+    document.querySelectorAll("#categoryList input:checked"),
+  )
+    .map((cb) => cb.value)
+    .filter((val) => val !== "all");
   const categoryParam = selectedCats.length > 0 ? selectedCats.join(",") : "";
 
   // Brands
-  const selectedBrands = Array.from(document.querySelectorAll('#brandList input:checked'))
-    .map(cb => cb.value);
+  const selectedBrands = Array.from(
+    document.querySelectorAll("#brandList input:checked"),
+  ).map((cb) => cb.value);
   const brandParam = selectedBrands.length > 0 ? selectedBrands.join(",") : "";
 
   // Search
@@ -225,15 +240,18 @@ async function loadProducts() {
     limit: limit,
     sort: sort,
     inStock: inStock,
+    onSale: onSale,
     maxPrice: maxPrice,
-    search: search
+    search: search,
   });
 
   if (categoryParam) queryParams.append("category", categoryParam);
   if (brandParam) queryParams.append("brand", brandParam);
 
   try {
-    const res = await fetch(`/api/admin/products/public?${queryParams.toString()}`);
+    const res = await fetch(
+      `/api/admin/products/public?${queryParams.toString()}`,
+    );
     const data = await res.json();
 
     document.getElementById("loading").style.display = "none";
@@ -319,8 +337,7 @@ async function loadCategoriesForFilter() {
 
       let allChecked = selectedCategories.length === 0;
 
-      categoryList.innerHTML =
-        `<li><input type="checkbox" class="form-check-input" id="category-all" value="all" ${allChecked ? "checked" : ""} /><label for="category-all" class="form-check-label">All Categories</label></li>`;
+      categoryList.innerHTML = `<li><input type="checkbox" class="form-check-input" id="category-all" value="all" ${allChecked ? "checked" : ""} /><label for="category-all" class="form-check-label">All Categories</label></li>`;
 
       data.categories.forEach((cat) => {
         const isChecked = selectedCategories.includes(cat._id);
@@ -338,14 +355,16 @@ async function loadCategoriesForFilter() {
 
 function setupCategoryFilterListeners() {
   const allCheckbox = document.getElementById("category-all");
-  const otherCheckboxes = document.querySelectorAll('#categoryList input[type="checkbox"]:not(#category-all)');
+  const otherCheckboxes = document.querySelectorAll(
+    '#categoryList input[type="checkbox"]:not(#category-all)',
+  );
 
   // "All" checkbox listener
   if (allCheckbox) {
     allCheckbox.addEventListener("change", (e) => {
       if (e.target.checked) {
         // Uncheck all others
-        otherCheckboxes.forEach(cb => cb.checked = false);
+        otherCheckboxes.forEach((cb) => (cb.checked = false));
       }
       currentPage = 1;
       loadProducts();
@@ -359,7 +378,7 @@ function setupCategoryFilterListeners() {
         allCheckbox.checked = false;
       }
       // If all deselected, maybe select "All"? Optional.
-      const anyChecked = Array.from(otherCheckboxes).some(c => c.checked);
+      const anyChecked = Array.from(otherCheckboxes).some((c) => c.checked);
       if (!anyChecked && allCheckbox) {
         allCheckbox.checked = true;
       }
@@ -585,34 +604,38 @@ async function addToCart(productId) {
 function renderProductCard(product) {
   const pId = product._id || product.id;
   const isOutOfStock = product.stock === 0 || product.status === "outofstock";
-  const linkHref = isOutOfStock
-    ? "javascript:void(0)"
-    : `./singleProductPage.html?id=${pId}`;
-  const isInWishlist = userWishlistIds.has(pId);
+
+  // Logic to determine if an offer badge should show
+  const currentPrice =
+    product.offerPrice || product.salePrice || product.price || 0;
+  const originalPrice = product.actualPrice || product.regularPrice || 0;
+  const hasOffer = currentPrice < originalPrice;
 
   return `
     <div class="col-6 col-md-4 col-lg-3 col-xl-20-percent mb-4">
-      <a href="${linkHref}" class="product-card-link" style="${isOutOfStock ? "cursor: not-allowed;" : ""}">
-        <div class="product-card ${isOutOfStock ? "sold-out" : ""}">
-          <div class="card-img-wrapper">
-            ${isOutOfStock ? '<div class="badge-overlay"><span class="sold-out-badge">Sold Out</span></div>' : ""}
-            <button class="wishlist-btn ${isInWishlist ? "active" : ""}" data-id="${pId}">
-              <i class="${isInWishlist ? "fa-solid" : "fa-regular"} fa-heart"></i>
-            </button>
-            ${!isOutOfStock ? `<div class="add-to-cart-banner" data-id="${pId}">Add to Cart</div>` : ""}
-            <img src="${product.mainImage}" alt="${product.name}" onerror="this.src='/images/logo.jpg'" />
-          </div>
-          <div class="product-info px-2">
-            <div class="product-vendor">${product.brand || 'Generic'}</div>
-            <div class="d-flex justify-content-between align-items-start gap-2">
-               <h6 class="product-title" title="${product.name}">${product.name}</h6>
-               <div class="text-end flex-shrink-0">
-                  <div class="current-price">₹${product.offerPrice.toLocaleString("en-IN")}</div>
-                  ${product.offerPrice < product.actualPrice ? `<div class="old-price">₹${product.actualPrice.toLocaleString("en-IN")}</div>` : ''}
-               </div>
-            </div>
+      <div class="product-card h-100 ${isOutOfStock ? "sold-out" : ""}">
+        <div class="card-img-wrapper" onclick="window.location.href='./singleProductPage.html?id=${pId}'" style="cursor: pointer;">
+          
+          ${hasOffer ? `<div class="offer-badge-card">SAVE ${Math.round((1 - currentPrice / originalPrice) * 100)}%</div>` : ""}
+          
+          <button class="wishlist-btn" data-id="${pId}">
+            <i class="fa-regular fa-heart"></i>
+          </button>
+          
+          ${!isOutOfStock ? `<div class="add-to-cart-banner" data-id="${pId}">ADD TO CART</div>` : ""}
+          <img src="${product.mainImage}" alt="${product.name}" onerror="this.src='/images/logo.jpg'" />
+        </div>
+        
+        <div class="product-info px-2">
+          <div class="product-vendor">${product.brand || "Generic"}</div>
+          <div class="price-row">
+             <h6 class="product-title mb-0">${product.name}</h6>
+             <div class="ms-auto text-end">
+                <div class="current-price text-danger fw-bold">₹${currentPrice.toLocaleString("en-IN")}</div>
+                ${hasOffer ? `<div class="old-price text-muted small text-decoration-line-through">₹${originalPrice.toLocaleString("en-IN")}</div>` : ""}
+             </div>
           </div>
         </div>
-      </a>
+      </div>
     </div>`;
 }
