@@ -6,90 +6,102 @@ const userSchema = new mongoose.Schema(
     firstName: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
     lastName: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
     email: {
       type: String,
       required: true,
       unique: true,
-      lowercase: true
+      lowercase: true,
     },
+    // CHANGED: phone is now optional for Google Users
     phone: {
       type: String,
-      required: true,
-      unique: true
+      unique: true,
+      sparse: true, // Allows multiple null/missing values while maintaining uniqueness for others
     },
     profileImage: {
       type: String,
-      default: null
+      default: null,
     },
+    // CHANGED: password is now optional for Google Users
     password: {
       type: String,
-      required: true,
-      minlength: 6
+      minlength: 6,
+      required: function() { return !this.isGoogleUser; }
+    },
+    // ADDED: googleId to track OAuth users
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
     },
     isGoogleUser: {
       type: Boolean,
-      default: false
+      default: false,
     },
     isBlocked: {
       type: Boolean,
-      default: false
+      default: false,
     },
     status: {
       type: String,
       enum: ["active", "blocked"],
-      default: "active"
+      default: "active",
     },
     role: {
       type: String,
       enum: ["user", "admin"],
-      default: "user"
+      default: "user",
     },
     isVerified: {
       type: Boolean,
-      default: false
+      default: false,
     },
     otp: {
       type: String,
-      default: null
+      default: null,
     },
     otpExpires: {
       type: Date,
-      default: null
+      default: null,
     },
     otpAttempts: {
       type: Number,
-      default: 0
+      default: 0,
     },
     lockUntil: {
       type: Date,
-      default: null
+      default: null,
     },
     wishlist: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Product"
-      }
-    ]
+        ref: "Product",
+      },
+    ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // 🔐 Hash password before saving
-userSchema.pre("save", async function () {
-  if (!this.isModified("password")) return;
+userSchema.pre("save", async function (next) {
+  // Only hash if password exists and is modified
+  if (!this.password || !this.isModified("password")) return next();
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
 userSchema.methods.matchPassword = async function (enteredPassword) {
+  // If user has no password (Google user), comparison should fail
+  if (!this.password) return false;
   return await bcrypt.compare(enteredPassword, this.password);
 };
 

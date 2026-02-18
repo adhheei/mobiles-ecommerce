@@ -7,6 +7,8 @@ const morgan = require("morgan");
 const path = require("path");
 const fs = require("fs");
 require("dotenv").config();
+const passport = require('passport');
+require('./config/passport');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -83,6 +85,16 @@ app.use(morgan("combined"));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express.static("public"));
+
+// Session middleware is required for Passport
+app.use(require('express-session')({
+  secret: 'jinsa_secret_key',
+  resave: false,
+  saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 //  favicon.ico ignore
 app.get("/favicon.ico", (req, res) => res.status(204).end());
