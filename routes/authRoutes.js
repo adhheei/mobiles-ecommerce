@@ -23,4 +23,7 @@ router.post("/resend-otp", authController.sendOtp);
 // /api/auth/reset-password
 router.post("/reset-password", authController.resetPassword);
 
+// This matches the fetch URL in your userLogin.html
+router.post('/google-signup', authController.googleSignup);
+
 module.exports = router;

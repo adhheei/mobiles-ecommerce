@@ -28,17 +28,15 @@ const transporter = nodemailer.createTransport({
 
 // Generate JWT & Send Cookie
 const sendTokenResponse = (model, statusCode, res) => {
-  const token = jwt.sign(
-    { id: model._id, role: model.role },
-    JWT_SECRET,
-    { expiresIn: "30d" }
-  );
+  const token = jwt.sign({ id: model._id, role: model.role }, JWT_SECRET, {
+    expiresIn: "30d",
+  });
 
   const options = {
     expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax"
+    sameSite: "lax",
   };
 
   res
@@ -66,9 +64,17 @@ const sendTokenResponse = (model, statusCode, res) => {
 // 1. SIGNUP
 exports.signup = async (req, res) => {
   try {
-    const { firstName, lastName, email, phone, password, confirmPassword } = req.body;
+    const { firstName, lastName, email, phone, password, confirmPassword } =
+      req.body;
 
-    if (!firstName || !lastName || !email || !phone || !password || !confirmPassword) {
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !phone ||
+      !password ||
+      !confirmPassword
+    ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -152,7 +158,6 @@ exports.signup = async (req, res) => {
     }
 
     res.status(200).json({ message: "OTP sent to your email" });
-
   } catch (error) {
     console.error("Signup Error:", error);
     res.status(500).json({ message: "Server error during signup" });
@@ -171,11 +176,15 @@ exports.login = async (req, res) => {
     }
 
     if (!user.isVerified) {
-      return res.status(401).json({ message: "Please verify your email first" });
+      return res
+        .status(401)
+        .json({ message: "Please verify your email first" });
     }
 
     if (user.isBlocked) {
-      return res.status(403).json({ message: "Your account is blocked by admin" });
+      return res
+        .status(403)
+        .json({ message: "Your account is blocked by admin" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -185,7 +194,6 @@ exports.login = async (req, res) => {
     }
 
     sendTokenResponse(user, 200, res);
-
   } catch (err) {
     console.log("Login Error:", err);
     return res.status(500).json({ message: "Server error" });
@@ -225,7 +233,9 @@ exports.sendOtp = async (req, res) => {
 
     // Check Lock
     if (user.lockUntil && user.lockUntil > Date.now()) {
-      return res.status(429).json({ message: "Too many attempts. Try again later." });
+      return res
+        .status(429)
+        .json({ message: "Too many attempts. Try again later." });
     }
 
     // Generate 6-digit numeric OTP
@@ -248,7 +258,9 @@ exports.sendOtp = async (req, res) => {
       // Mock Check
       if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
         console.log(`⚠️ [MOCK EMAIL] OTP for ${user.email}: ${otp}`);
-        return res.status(200).json({ success: true, message: "OTP sent (Mock Mode)" });
+        return res
+          .status(200)
+          .json({ success: true, message: "OTP sent (Mock Mode)" });
       }
 
       await transporter.sendMail({
@@ -258,11 +270,15 @@ exports.sendOtp = async (req, res) => {
         text: message,
       });
 
-      return res.status(200).json({ success: true, message: "OTP sent to email" });
+      return res
+        .status(200)
+        .json({ success: true, message: "OTP sent to email" });
     } else {
       // Mock SMS
       console.log(`📲 [MOCK SMS] OTP for ${user.phone}: ${otp}`);
-      return res.status(200).json({ success: true, message: "OTP sent to phone" });
+      return res
+        .status(200)
+        .json({ success: true, message: "OTP sent to phone" });
     }
   } catch (err) {
     console.error("sendOtp Error:", err);
@@ -305,7 +321,9 @@ exports.verifyOtp = async (req, res) => {
       if (user.otpAttempts >= 5) {
         user.lockUntil = Date.now() + 15 * 60 * 1000; // 15 min lock
         await user.save();
-        return res.status(429).json({ message: "Locked for 15 minutes due to too many failed attempts." });
+        return res.status(429).json({
+          message: "Locked for 15 minutes due to too many failed attempts.",
+        });
       }
       await user.save();
       return res.status(400).json({ message: "Invalid OTP" });
@@ -347,12 +365,14 @@ exports.resetPassword = async (req, res) => {
     }
 
     if (newPassword.length < 6) {
-      return res.status(400).json({ message: "Password must be at least 6 chars" });
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 chars" });
     }
 
     // Support both Email and Phone for lookup
     const user = await User.findOne({
-      $or: [{ email: email }, { phone: email }]
+      $or: [{ email: email }, { phone: email }],
     });
 
     if (!user) {
@@ -387,9 +407,8 @@ exports.resetPassword = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Password reset successfully. Please login."
+      message: "Password reset successfully. Please login.",
     });
-
   } catch (err) {
     console.error("resetPassword Error:", err);
     res.status(500).json({ message: "Server error" });
@@ -397,31 +416,47 @@ exports.resetPassword = async (req, res) => {
 };
 
 // 7. GOOGLE AUTH
-// exports.googleSignup = async (req, res) => {
-//   try {
-//     const { credential } = req.body;
-//     const ticket = await client.verifyIdToken({
-//       idToken: credential,
-//       audience: process.env.GOOGLE_CLIENT_ID,
-//     });
-//     const { email, given_name, family_name } = ticket.getPayload();
+exports.googleSignup = async (req, res) => {
+  try {
+    const { credential } = req.body;
 
-//     let user = await User.findOne({ email });
-//     if (!user) {
-//       user = await User.create({
-//         firstName: given_name,
-//         lastName: family_name || "",
-//         email,
-//         phone: "google-" + Date.now(),
-//         password: email + process.env.JWT_SECRET,
-//         isGoogleUser: true,
-//       });
-//     }
-//     sendTokenResponse(user, 200, res);
-//   } catch (error) {
-//     res.status(401).json({ success: false, message: "Invalid Google token" });
-//   }
-// };
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, given_name, family_name, picture } = payload;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = await User.create({
+        googleId,
+        firstName: given_name,
+        lastName: family_name || " ",
+        email,
+        profileImage: picture,
+        isGoogleUser: true,
+        isVerified: true,
+      });
+    } else if (!user.googleId) {
+      user.googleId = googleId;
+      user.isGoogleUser = true;
+      await user.save();
+    }
+
+    // Use the helper function to keep response structure consistent
+    return sendTokenResponse(user, 200, res);
+  } catch (error) {
+    console.error("DETAILED AUTH ERROR:", error.message);
+    res.status(400).json({
+      success: false,
+      message: "Google verification failed",
+      error: error.message,
+    });
+  }
+};
 
 // 8. ADMIN LOGIN
 const loginAttempts = new Map();
@@ -455,17 +490,21 @@ exports.loginAdmin = async (req, res) => {
 
     loginAttempts.delete(ip);
 
-    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "1d" });
-    res.cookie("admin_jwt", token, {
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax"
-    }).json({
-      success: true,
-      token,
-      admin: { id: user._id, email: user.email, role: user.role }
+    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, {
+      expiresIn: "1d",
     });
+    res
+      .cookie("admin_jwt", token, {
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+      })
+      .json({
+        success: true,
+        token,
+        admin: { id: user._id, email: user.email, role: user.role },
+      });
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
