@@ -723,32 +723,40 @@
       }
 
       // 4. LIVE DELETE OFFER
-      async function deleteOffer(id) {
+      async function deleteOffer(offerId) {
         const result = await Swal.fire({
-          title: "Are you sure?",
-          text: "This will restore original prices for all affected products.",
+          title: "Delete Offer?",
+          text: "This will remove the discount from the associated products.",
           icon: "warning",
           showCancelButton: true,
-          confirmButtonColor: "#dc3545",
+          confirmButtonColor: "#d33",
           confirmButtonText: "Yes, delete it!",
         });
 
         if (result.isConfirmed) {
           try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(`/api/admin/offers/${id}`, {
+            const token = localStorage.getItem("adminToken"); // Ensure you use the correct admin token
+            const res = await fetch(`/api/admin/offers/${offerId}`, {
               method: "DELETE",
-              headers: { Authorization: `Bearer ${token}` },
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
             });
+
             const data = await res.json();
 
-            if (data.success) {
-              Swal.fire("Deleted!", "The offer has been removed.", "success");
-              fetchOffers(); // Refresh the table
+            if (res.ok) {
+              Swal.fire(
+                "Deleted!",
+                "The offer has been removed.",
+                "success",
+              ).then(() => location.reload()); // Refresh table
             } else {
-              throw new Error(data.message);
+              throw new Error(data.message || "Server rejected the deletion");
             }
           } catch (error) {
+            console.error("Delete error:", error);
             Swal.fire("Error", error.message, "error");
           }
         }

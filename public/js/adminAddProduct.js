@@ -1,4 +1,3 @@
-// public/js/adminAddProduct.js
 document.addEventListener("DOMContentLoaded", () => {
   const mainUploadArea = document.getElementById("mainUploadArea");
   const mainImageInput = document.getElementById("mainImageInput");
@@ -40,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const select = document.getElementById("categorySelect");
         select.innerHTML = '<option value="">Select Category</option>';
 
-        // Use "categories" key (not "data")
         data.categories.forEach((cat) => {
           const option = document.createElement("option");
           option.value = cat._id;
@@ -109,8 +107,10 @@ document.addEventListener("DOMContentLoaded", () => {
         .getElementById("productDescription")
         .value.trim();
       const sku = document.getElementById("productSku").value.trim();
-      const actualPrice = document.getElementById("actualPrice").value;
-      const offerPrice = document.getElementById("offerPrice").value;
+
+      // Capture the single price field
+      const price = document.getElementById("productPrice").value;
+
       const stock = document.getElementById("stockQuantity").value;
       const status = document.getElementById("productStatus").value;
       const visibility = document.getElementById("productVisibility").value;
@@ -118,7 +118,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const brand = document.getElementById("productBrand").value.trim();
       const category = categorySelect.value;
 
-      if (!name || !actualPrice || !offerPrice || !stock || !category) {
+      // Validation check for the new price field
+      if (!name || !price || !stock || !category) {
         Swal.fire("Error", "Please fill all required fields", "error");
         return;
       }
@@ -127,8 +128,12 @@ document.addEventListener("DOMContentLoaded", () => {
       formData.append("name", name);
       formData.append("description", description);
       if (sku) formData.append("sku", sku);
-      formData.append("actualPrice", actualPrice);
-      formData.append("offerPrice", offerPrice);
+
+      // Sync both price fields for backend compatibility
+      formData.append("price", price);
+      formData.append("actualPrice", price);
+      formData.append("offerPrice", price);
+
       formData.append("stock", stock);
       formData.append("status", status);
       formData.append("visibility", visibility);
@@ -156,19 +161,12 @@ document.addEventListener("DOMContentLoaded", () => {
           body: formData,
         });
 
-        const contentType = res.headers.get("content-type");
-        if (!contentType?.includes("application/json")) {
-          throw new Error(
-            "Server returned non-JSON response. Check server logs."
-          );
-        }
-
         const data = await res.json();
         if (data.success) {
           Swal.fire("Success!", "Product added successfully.", "success").then(
             () => {
               window.location.href = "./adminProducts.html";
-            }
+            },
           );
         } else {
           throw new Error(data.error || "Failed to add product");

@@ -117,24 +117,42 @@ exports.addOffer = async (req, res) => {
 // DELETE an offer
 exports.deleteOffer = async (req, res) => {
   try {
-    const offer = await Offer.findById(req.params.id);
-    if (!offer)
+    const { id } = req.params;
+
+    // 1. Find the offer first to get associated products/category
+    const offer = await Offer.findById(id);
+    if (!offer) {
       return res
         .status(404)
         .json({ success: false, message: "Offer not found" });
+    }
 
-    const query =
-      offer.offerType === "Category"
-        ? { category: offer.targetId }
-        : { _id: offer.targetId };
-    await Product.updateMany(query, [{ $set: { offerPrice: "$actualPrice" } }]);
+    // 2. Reset product prices before deleting the offer
+    // This stops the 'undefined' price issues in the shop
+    if (offer.targetType === "Product") {
+      await Product.updateMany(
+        { _id: { $in: offer.targetIds } },
+        { $set: { offerPrice: undefined } }, // Reverts to actualPrice logic
+      );
+    } else if (offer.targetType === "Category") {
+      await Product.updateMany(
+        { category: offer.targetIds[0] },
+        { $set: { offerPrice: undefined } },
+      );
+    }
 
-    await Offer.findByIdAndDelete(req.params.id);
-    res
-      .status(200)
-      .json({ success: true, message: "Offer deleted and prices restored" });
+    // 3. Delete the offer document
+    await Offer.findByIdAndDelete(id);
+
+    res.json({ success: true, message: "Offer deleted and prices restored" });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Offer Delete Error:", error);
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Internal Server Error: " + error.message,
+      });
   }
 };
 

@@ -246,68 +246,85 @@ exports.getCategoriesWithCounts = async (req, res) => {
 // ✅ ADD product
 exports.addProduct = async (req, res) => {
   try {
+    // 1. Extract data from request body
     const {
       name,
-      description = "",
+      description,
       sku,
-      actualPrice,
-      offerPrice,
+      price, // The single price field from your updated admin form
       stock,
-      status = "active",
-      visibility = "public",
-      publishDate,
-      tags = "",
       category,
       brand,
-    } = req.body;
-
-    if (!name || !actualPrice || !offerPrice || !stock || !category) {
-      return res
-        .status(400)
-        .json({ success: false, error: "Required fields missing" });
-    }
-
-    const tagArray = tags
-      .split(",")
-      .map((t) => t.trim())
-      .filter((t) => t);
-
-    const productData = {
-      name: name.trim(),
-      description: description.trim(),
-      sku: sku?.trim(),
-      actualPrice: parseFloat(actualPrice),
-      offerPrice: parseFloat(offerPrice),
-      stock: parseInt(stock),
       status,
       visibility,
+      publishDate,
+    } = req.body;
+
+    // 2. Strict Validation: Prevent 500 errors by catching missing data early
+    if (!name || !price || !stock || !category) {
+      return res.status(400).json({
+        success: false,
+        error: "Required fields (Name, Price, Stock, Category) are missing.",
+      });
+    }
+
+    // 3. Prepare the Product Data object
+    const productData = {
+      name: name.trim(),
+      description: description ? description.trim() : "",
+      sku: sku ? sku.trim() : undefined,
+
+      // Single Price Mapping: Maps one input to both schema fields
+      // Using parseFloat ensures numeric storage even if sent as a string
+      actualPrice: parseFloat(price),
+      offerPrice: parseFloat(price),
+
+      stock: parseInt(stock),
+      status: status || "active",
+      visibility: visibility || "public",
       publishDate: publishDate ? new Date(publishDate) : undefined,
-      tags: tagArray,
       brand: brand || "Generic",
-      category,
+      category: category,
     };
 
-    if (req.files?.mainImage) {
-      productData.mainImage = req.files.mainImage[0].path;
-    }
-    if (req.files?.gallery) {
-      productData.gallery = req.files.gallery.map((f) => f.path);
+    // 4. Robust Image Handling
+    // Checks if files exist before trying to map them to prevent crashes
+    if (req.files) {
+      if (req.files.mainImage && req.files.mainImage[0]) {
+        productData.mainImage = req.files.mainImage[0].path;
+      }
+
+      if (req.files.gallery && Array.isArray(req.files.gallery)) {
+        productData.gallery = req.files.gallery.map((f) => f.path);
+      }
     }
 
+    // 5. Save to Database
     const product = new Product(productData);
     await product.save();
 
-    res
-      .status(201)
-      .json({ success: true, message: "Product added successfully" });
+    // 6. Success Response
+    res.status(201).json({
+      success: true,
+      message: "Product added successfully",
+    });
   } catch (err) {
-    console.error(err);
+    // Log the full error to the terminal for debugging
+    console.error("Add Product Error:", err);
+
+    // Handle duplicate SKU errors specifically
     if (err.code === 11000) {
-      return res
-        .status(400)
-        .json({ success: false, error: "SKU already exists" });
+      return res.status(400).json({
+        success: false,
+        error: "Product with this SKU already exists.",
+      });
     }
-    res.status(500).json({ success: false, error: "Server error" });
+
+    // Return a clean error message to the frontend
+    res.status(500).json({
+      success: false,
+      error: "Server Error: " + err.message,
+    });
   }
 };
 
