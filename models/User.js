@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       minlength: 6,
-      required: function() { return !this.isGoogleUser; }
+      required: function () { return !this.isGoogleUser; }
     },
     // ADDED: googleId to track OAuth users
     googleId: {
@@ -90,13 +90,13 @@ const userSchema = new mongoose.Schema(
 );
 
 // 🔐 Hash password before saving
-userSchema.pre("save", async function (next) {
+// 🔐 Hash password before saving
+userSchema.pre("save", async function () {
   // Only hash if password exists and is modified
-  if (!this.password || !this.isModified("password")) return next();
+  if (!this.password || !this.isModified("password")) return;
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  next();
 });
 
 userSchema.methods.matchPassword = async function (enteredPassword) {
