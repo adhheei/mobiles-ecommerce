@@ -43,11 +43,12 @@ exports.getPublicProducts = async (req, res) => {
       category,
       brand,
       inStock,
+      onSale, // 1. Extract onSale from query
       maxPrice,
       search,
     } = req.query;
 
-    let query = { status: "active", visibility: "public" }; // Fixed base query
+    let query = { status: "active", visibility: "public" };
 
     // Filtering Logic
     if (category && category !== "all") {
@@ -72,6 +73,15 @@ exports.getPublicProducts = async (req, res) => {
 
     if (inStock === "true") {
       query.stock = { $gt: 0 };
+    }
+
+    if (onSale === "true") {
+      // Filters products where the offerPrice is strictly less than the actualPrice
+      query.$expr = { $lt: ["$offerPrice", "$actualPrice"] };
+    }
+
+    if (maxPrice) {
+      query.offerPrice = { $lte: Number(maxPrice) };
     }
 
     if (search) {

@@ -213,7 +213,7 @@ const addToWishlist = async (req, res) => {
         console.error("Error adding to wishlist:", error);
         res.status(500).json({
             success: false,
-            message: "Server Error",
+            message: `Server Error: ${error.message}`, // Send actual error to UI
         });
     }
 };
@@ -224,6 +224,7 @@ const addToWishlist = async (req, res) => {
 const removeFromWishlist = async (req, res) => {
     try {
         const { productId } = req.params;
+        console.log("Removing from wishlist, ID:", productId);
 
         const user = await User.findById(req.user._id);
 
@@ -234,9 +235,12 @@ const removeFromWishlist = async (req, res) => {
             });
         }
 
-        user.wishlist = user.wishlist.filter(
-            (id) => id.toString() !== productId
-        );
+        // Safety check for wishlist
+        if (user.wishlist && Array.isArray(user.wishlist)) {
+            user.wishlist = user.wishlist.filter(
+                (id) => id && id.toString() !== productId
+            );
+        }
 
         await user.save();
 
@@ -249,7 +253,7 @@ const removeFromWishlist = async (req, res) => {
         console.error("Error removing from wishlist:", error);
         res.status(500).json({
             success: false,
-            message: "Server Error",
+            message: `Server Error: ${error.message}`,
         });
     }
 };
