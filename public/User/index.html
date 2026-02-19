@@ -1305,11 +1305,12 @@
                  onerror="this.src='/images/logo.jpg'">
         </div>
 
-        <button class="btn btn-primary w-100 py-2 rounded-0 border-0 fw-bold text-uppercase d-flex align-items-center justify-content-center"
-                style="background-color: #0d6efd; font-size: 0.85rem; letter-spacing: 1px;"
-                onclick="event.stopPropagation(); addToCart('${pId}')">
-            ADD TO CART
-        </button>
+        <div class="product-card" onclick="window.location.href='/User/singleProductPage.html?id=${pId}'">
+    <button class="btn btn-primary w-100 py-2" 
+            onclick="event.stopPropagation();addToCart('${pId}')">
+        ADD TO CART
+    </button>
+  </div>
 
         <div class="p-3 d-flex flex-column flex-grow-1">
             <p class="text-muted small mb-1 text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.5px;">
@@ -1389,6 +1390,67 @@
           isAdding
             ? icon.classList.replace("fa-solid", "fa-regular")
             : icon.classList.replace("fa-regular", "fa-solid");
+        }
+      }
+
+      async function addToCart(productId) {
+        // 1. Critical Validation: Stop "undefined" errors
+        if (!productId || productId === "undefined" || productId === "null") {
+          console.error("Cart Error: Invalid Product ID");
+          return;
+        }
+
+        // 2. Authentication Check
+        const token =
+          localStorage.getItem("token") || sessionStorage.getItem("token");
+        if (!token) {
+          Swal.fire({
+            title: "Login Required",
+            text: "Please login to add items to your cart",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Login Now",
+          }).then((result) => {
+            if (result.isConfirmed)
+              window.location.href = "/User/userLogin.html";
+          });
+          return;
+        }
+
+        try {
+          const res = await fetch("/api/cart/add", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ productId, quantity: 1 }),
+          });
+
+          const data = await res.json();
+
+          if (res.ok) {
+            Swal.fire({
+              toast: true,
+              position: "top-end",
+              icon: "success",
+              title: "Added to cart",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            // Update the cart badge if you have a refresh function defined globally
+            if (typeof window.updateCartBadge === "function") {
+              window.updateCartBadge();
+            }
+          } else {
+            Swal.fire(
+              "Warning",
+              data.message || "Failed to add item",
+              "warning",
+            );
+          }
+        } catch (err) {
+          console.error("Cart operation failed:", err);
         }
       }
 
