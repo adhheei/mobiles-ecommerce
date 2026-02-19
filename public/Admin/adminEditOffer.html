@@ -42,11 +42,13 @@
           opacity: 0;
           transform: translateY(20px);
         }
+
         to {
           opacity: 1;
           transform: translateY(0);
         }
       }
+
       .content-animate {
         animation: slideInUp 0.6s ease-out forwards;
       }
@@ -66,6 +68,7 @@
         z-index: 1000;
         transition: transform 0.3s ease;
       }
+
       .brand-section {
         display: flex;
         align-items: center;
@@ -74,22 +77,26 @@
         text-decoration: none;
         color: var(--primary-black);
       }
+
       .brand-logo {
         width: 40px;
         height: 40px;
         border-radius: 50%;
         object-fit: cover;
       }
+
       .brand-text-container {
         display: flex;
         flex-direction: column;
         line-height: 1.1;
       }
+
       .brand-title {
         font-weight: 800;
         font-size: 1rem;
         color: #000;
       }
+
       .brand-subtitle {
         font-size: 0.55rem;
         letter-spacing: 2px;
@@ -105,9 +112,11 @@
         flex-grow: 1;
         overflow-y: auto;
       }
+
       .menu-item {
         margin-bottom: 5px;
       }
+
       .menu-link {
         display: flex;
         align-items: center;
@@ -119,20 +128,24 @@
         border-radius: 8px;
         transition: all 0.2s;
       }
+
       .menu-link i {
         width: 25px;
         font-size: 1.1rem;
         color: #777;
       }
+
       .menu-link:hover {
         background-color: var(--bg-light);
         color: #000;
       }
+
       .menu-link.active {
         background-color: var(--active-bg);
         color: #000;
         font-weight: 600;
       }
+
       .menu-link.active i {
         color: #000;
       }
@@ -142,6 +155,7 @@
         padding-top: 20px;
         border-top: 1px solid var(--border-color);
       }
+
       .profile-info {
         display: flex;
         align-items: center;
@@ -150,21 +164,25 @@
         text-decoration: none;
         color: inherit;
       }
+
       .admin-avatar {
         width: 35px;
         height: 35px;
         border-radius: 50%;
         background: #ccc;
       }
+
       .admin-details h6 {
         margin: 0;
         font-size: 0.9rem;
         font-weight: 600;
       }
+
       .admin-details span {
         font-size: 0.75rem;
         color: var(--text-muted);
       }
+
       .logout-btn {
         width: 100%;
         background-color: var(--bg-light);
@@ -181,6 +199,7 @@
         transition: 0.2s;
         text-decoration: none;
       }
+
       .logout-btn:hover {
         background-color: #e2e6ea;
         color: #000;
@@ -205,6 +224,7 @@
         top: 0;
         z-index: 999;
       }
+
       .mobile-nav .brand-section {
         display: flex;
         align-items: center;
@@ -213,18 +233,21 @@
         text-decoration: none;
         color: var(--primary-black);
       }
+
       .brand-text-mobile {
         display: flex;
         flex-direction: column;
         line-height: 1.1;
         text-align: left;
       }
+
       .brand-title-mobile {
         font-weight: 800;
         font-size: 1rem;
         color: #000;
         display: block;
       }
+
       .brand-subtitle-mobile {
         font-size: 0.6rem;
         letter-spacing: 1px;
@@ -243,10 +266,12 @@
         flex-wrap: wrap;
         gap: 15px;
       }
+
       .header-left {
         display: flex;
         flex-direction: column;
       }
+
       .back-link {
         display: inline-flex;
         align-items: center;
@@ -257,18 +282,22 @@
         margin-bottom: 15px;
         transition: color 0.2s;
       }
+
       .back-link:hover {
         color: var(--primary-black);
       }
+
       .back-link i {
         margin-right: 8px;
       }
+
       .page-title {
         font-size: 1.8rem;
         font-weight: 800;
         margin: 0 0 5px 0;
         color: #000;
       }
+
       .page-description {
         color: var(--text-muted);
         margin: 0;
@@ -290,6 +319,7 @@
         gap: 8px;
         text-decoration: none;
       }
+
       .btn-delete-offer:hover {
         background-color: #dc3545;
         color: #fff;
@@ -304,9 +334,11 @@
         padding: 25px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
       }
+
       .form-group {
         margin-bottom: 25px;
       }
+
       .form-label {
         display: block;
         font-weight: 600;
@@ -314,6 +346,7 @@
         font-size: 0.9rem;
         color: #333;
       }
+
       .form-control,
       .form-select {
         width: 100%;
@@ -324,6 +357,7 @@
         color: var(--primary-black);
         font-family: "Poppins", sans-serif;
       }
+
       .form-control:focus,
       .form-select:focus {
         box-shadow: none;
@@ -338,11 +372,13 @@
         border-radius: 12px;
         overflow: hidden;
       }
+
       .input-group .form-control {
         border: none;
         border-radius: 0;
         flex-grow: 1;
       }
+
       .input-group-text {
         padding: 12px 15px;
         background-color: #fcfcfc;
@@ -361,11 +397,13 @@
         margin: 30px 0 5px 0;
         color: #000;
       }
+
       .section-desc {
         font-size: 0.85rem;
         color: var(--text-muted);
         margin-bottom: 20px;
       }
+
       .form-help-text {
         display: block;
         margin-top: 5px;
@@ -379,6 +417,7 @@
         gap: 25px;
         align-items: center;
       }
+
       .status-option {
         display: flex;
         align-items: center;
@@ -386,6 +425,7 @@
         font-size: 0.95rem;
         color: #333;
       }
+
       .status-option input[type="radio"] {
         margin-right: 8px;
         accent-color: #000;
@@ -400,6 +440,7 @@
         margin-top: 30px;
         gap: 15px;
       }
+
       .btn-cancel {
         background-color: var(--active-bg);
         color: #333;
@@ -409,9 +450,11 @@
         font-weight: 600;
         transition: 0.2s;
       }
+
       .btn-cancel:hover {
         background-color: #dcdcdc;
       }
+
       .btn-create {
         background-color: var(--primary-black);
         color: #fff;
@@ -421,6 +464,7 @@
         font-weight: 600;
         transition: 0.2s;
       }
+
       .btn-create:hover {
         background-color: #333;
       }
@@ -429,17 +473,21 @@
         .sidebar {
           transform: translateX(-100%);
         }
+
         .sidebar.active {
           transform: translateX(0);
           box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
         }
+
         .main-content {
           margin-left: 0;
           padding: 20px;
         }
+
         .mobile-nav {
           display: flex;
         }
+
         .sidebar-overlay {
           display: none;
           position: fixed;
@@ -450,19 +498,24 @@
           background: rgba(0, 0, 0, 0.5);
           z-index: 998;
         }
+
         .sidebar-overlay.active {
           display: block;
         }
+
         .page-header {
           flex-direction: column;
           align-items: flex-start;
         }
+
         .form-card {
           padding: 20px;
         }
+
         .input-group {
           flex-wrap: wrap;
         }
+
         .input-group-text {
           width: 100%;
           border-left: none;
@@ -470,6 +523,7 @@
           text-align: left;
           padding: 8px 15px;
         }
+
         .btn-delete-offer {
           width: 100%;
           justify-content: center;
@@ -477,6 +531,7 @@
       }
     </style>
   </head>
+
   <body>
     <div class="mobile-nav">
       <a href="#" class="brand-section">
@@ -623,9 +678,13 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="offerType" class="form-label">Offer Type</label>
-                <select id="offerType" class="form-select">
-                  <option value="percentage">Percentage Discount</option>
-                  <option value="fixed">Fixed Amount Discount</option>
+                <select
+                  id="offerType"
+                  class="form-select"
+                  onchange="loadTargets(this.value)"
+                >
+                  <option value="Category">Category Offer</option>
+                  <option value="Product">Product Offer</option>
                 </select>
               </div>
             </div>
@@ -741,96 +800,72 @@
         document.getElementById("sidebarOverlay").classList.toggle("active");
       }
 
-      // 1. Fetch Existing Offer Data
-      async function loadOfferData() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const offerId = urlParams.get("id");
-        const token = localStorage.getItem("token");
-
-        if (!offerId) return;
+      // 2. Dynamic Target Loader
+      async function loadTargets(type) {
+        const targetSelect = document.getElementById("targetId");
+        targetSelect.innerHTML =
+          '<option value="" disabled selected>Loading...</option>';
 
         try {
-          // Wait for categories to load so the dropdown is ready
-          await loadCategories();
+          let url =
+            type === "Category"
+              ? "/api/admin/products/categories"
+              : "/api/admin/products?limit=100"; // Fetch products (adjust limit as needed)
 
-          const res = await fetch(`/api/admin/offers/${offerId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          const result = await res.json();
+          const res = await fetch(url);
+          const data = await res.json();
 
-          if (result.success) {
-            const offer = result.offer;
+          if (data.success) {
+            targetSelect.innerHTML = '<option value="">Select Target</option>';
 
-            // Basic Fields
-            document.getElementById("offerName").value = offer.name;
-            document.getElementById("discountValue").value =
-              offer.discountPercentage;
+            // Handle different response structures
+            const items =
+              type === "Category" ? data.categories : data.formatted;
 
-            // --- FIX: Fetching Minimum Purchase ---
-            // Ensure your backend controller sends 'minPurchaseAmount' or similar
-            if (document.getElementById("minPurchase")) {
-              document.getElementById("minPurchase").value =
-                offer.minPurchaseAmount || 0;
-            }
-
-            // --- FIX: Fetching Offer Type ---
-            // Map backend 'Category'/'Product' back to frontend 'percentage'/'fixed'
-            const typeSelect = document.getElementById("offerType");
-            if (offer.offerType === "Category") {
-              typeSelect.value = "percentage";
-            } else if (offer.offerType === "Product") {
-              typeSelect.value = "fixed";
-            }
-
-            // Dates
-            document.getElementById("startDate").value =
-              offer.startDate.split("T")[0];
-            document.getElementById("endDate").value =
-              offer.endDate.split("T")[0];
-
-            // Set the dropdown to the correct category ID
-            const targetIdSelect = document.getElementById("targetId");
-            if (targetIdSelect) {
-              targetIdSelect.value = offer.targetId._id || offer.targetId;
-            }
-
-            // Status
-            if (offer.status === "Inactive" || offer.status === "inactive") {
-              document.querySelector(
-                'input[name="status"][value="inactive"]',
-              ).checked = true;
-            } else {
-              document.querySelector(
-                'input[name="status"][value="active"]',
-              ).checked = true;
-            }
+            items.forEach((item) => {
+              const option = document.createElement("option");
+              // Products use 'id', Categories use '_id' in some controllers, standardizing to check both
+              option.value = item._id || item.id;
+              option.textContent = item.name;
+              targetSelect.appendChild(option);
+            });
           }
-        } catch (error) {
-          console.error("Load Error:", error);
-          Swal.fire("Error", "Failed to load offer data", "error");
+        } catch (err) {
+          console.error("Failed to load targets:", err);
+          targetSelect.innerHTML =
+            '<option value="">Error loading items</option>';
         }
       }
 
-      async function loadCategories() {
-        const targetSelect = document.getElementById("targetId");
-        if (!targetSelect)
-          throw new Error("Dropdown 'targetId' not found in HTML");
-
+      // 1. Fetch Existing Offer Data
+      async function loadOfferData() {
         try {
-          const res = await fetch("/api/admin/categories");
-          const result = await res.json();
-          const categoriesArray = result.data || []; // Your controller uses the 'data' key
+          const urlParams = new URLSearchParams(window.location.search);
+          const offerId = urlParams.get("id");
 
-          targetSelect.innerHTML =
-            '<option value="" disabled>Select a category</option>';
-          categoriesArray.forEach((cat) => {
-            const option = document.createElement("option");
-            option.value = cat.id; // Using 'id' from your controller's map function
-            option.textContent = cat.name;
-            targetSelect.appendChild(option);
-          });
+          const res = await fetch(`/api/admin/offers/${offerId}`);
+          const result = await res.json();
+
+          // 1. Check if the request was successful and data exists
+          if (!result.success || !result.data) {
+            throw new Error("Offer data missing from server response");
+          }
+
+          const offer = result.data;
+
+          // 2. Safety check before accessing properties
+          if (offer && offer._id) {
+            document.getElementById("offerName").value = offer.name;
+            document.getElementById("offerType").value = offer.offerType;
+            // ... fill other fields
+          }
         } catch (error) {
-          console.error("Category Load Error:", error);
+          console.error("Load Error:", error);
+          Swal.fire(
+            "Error",
+            "Failed to load offer data: " + error.message,
+            "error",
+          );
         }
       }
 
@@ -838,10 +873,7 @@
       async function updateOffer() {
         const offerData = {
           name: document.getElementById("offerName").value,
-          offerType:
-            document.getElementById("offerType").value === "percentage"
-              ? "Category"
-              : "Product",
+          offerType: document.getElementById("offerType").value,
           discountPercentage: parseFloat(
             document.getElementById("discountValue").value,
           ),

@@ -145,7 +145,7 @@ router.patch("/orders/:id/return/:itemId", isAdmin, handleReturnRequest);
 // OFFER MANAGEMENT
 router.get("/offers", getAllOffers);
 router.post("/offers", isAdmin, addOffer);
-router.get("/offers/:id", isAdmin, getHotDeals);
+router.get('/offers/:id', offerController.getOfferById);
 router.delete("/offers/:id", isAdmin, deleteOffer);
 
 // LINE 159 FIXED: offerController is now defined

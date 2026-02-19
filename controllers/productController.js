@@ -246,12 +246,11 @@ exports.getCategoriesWithCounts = async (req, res) => {
 // ✅ ADD product
 exports.addProduct = async (req, res) => {
   try {
-    // 1. Extract data from request body
     const {
       name,
       description,
       sku,
-      price, // The single price field from your updated admin form
+      price, // Destructure the single price field from your updated form
       stock,
       category,
       brand,
@@ -260,7 +259,7 @@ exports.addProduct = async (req, res) => {
       publishDate,
     } = req.body;
 
-    // 2. Strict Validation: Prevent 500 errors by catching missing data early
+    // 1. Validation: Catch missing fields early to prevent 500 crashes
     if (!name || !price || !stock || !category) {
       return res.status(400).json({
         success: false,
@@ -268,14 +267,14 @@ exports.addProduct = async (req, res) => {
       });
     }
 
-    // 3. Prepare the Product Data object
+    // 2. Prepare the Product Data object
     const productData = {
       name: name.trim(),
       description: description ? description.trim() : "",
       sku: sku ? sku.trim() : undefined,
 
-      // Single Price Mapping: Maps one input to both schema fields
-      // Using parseFloat ensures numeric storage even if sent as a string
+      // --- CRITICAL FIX: Map single price to both schema fields ---
+      // This satisfies the database requirements without dual inputs
       actualPrice: parseFloat(price),
       offerPrice: parseFloat(price),
 
@@ -287,40 +286,36 @@ exports.addProduct = async (req, res) => {
       category: category,
     };
 
-    // 4. Robust Image Handling
-    // Checks if files exist before trying to map them to prevent crashes
+    // 3. Handle Images securely
     if (req.files) {
       if (req.files.mainImage && req.files.mainImage[0]) {
         productData.mainImage = req.files.mainImage[0].path;
       }
-
       if (req.files.gallery && Array.isArray(req.files.gallery)) {
         productData.gallery = req.files.gallery.map((f) => f.path);
       }
     }
 
-    // 5. Save to Database
+    // 4. Save to Database
     const product = new Product(productData);
     await product.save();
 
-    // 6. Success Response
     res.status(201).json({
       success: true,
       message: "Product added successfully",
     });
   } catch (err) {
-    // Log the full error to the terminal for debugging
     console.error("Add Product Error:", err);
 
-    // Handle duplicate SKU errors specifically
+    // Handle duplicate SKU or unique key errors
     if (err.code === 11000) {
       return res.status(400).json({
         success: false,
-        error: "Product with this SKU already exists.",
+        error: "A product with this SKU already exists.",
       });
     }
 
-    // Return a clean error message to the frontend
+    // Return the specific error to the frontend instead of generic 500
     res.status(500).json({
       success: false,
       error: "Server Error: " + err.message,
