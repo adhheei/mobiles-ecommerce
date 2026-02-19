@@ -629,59 +629,54 @@ async function fetchSuggestions(productIds) {
   }
 }
 
-// Quick Add from suggestions
+// Add this to your index page or a shared JS file
 async function addToCart(productId) {
+  // 1. Validation to prevent 'undefined' errors
+  if (!productId || productId === "undefined") {
+    console.error("Cart Error: Product ID is missing");
+    return;
+  }
+
+  const token =
+    localStorage.getItem("token") || sessionStorage.getItem("token");
+  if (!token) {
+    Swal.fire({
+      title: "Login Required",
+      text: "Please login to add items to your cart",
+      icon: "warning",
+      confirmButtonText: "Login",
+    }).then(() => (window.location.href = "/User/userLogin.html"));
+    return;
+  }
+
   try {
     const res = await fetch("/api/cart/add", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization:
-          "Bearer " +
-          (localStorage.getItem("token") || sessionStorage.getItem("token")),
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ productId, quantity: 1 }),
     });
 
+    const data = await res.json();
     if (res.ok) {
-      // Refresh cart
-      fetchCart();
-      window.updateCartBadge();
-      const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 1500,
-        timerProgressBar: true,
-      });
-      Toast.fire({
-        icon: "success",
-        title: "Added to cart",
-      });
-    } else {
-      // Handle 400 (Stock limit) or other errors
-      const data = await res.json();
       Swal.fire({
         toast: true,
         position: "top-end",
-        icon: "warning",
-        title: "Cannot Add Item",
-        text: data.message || "Failed to add to cart",
+        icon: "success",
+        title: "Added to cart",
         showConfirmButton: false,
-        timer: 2000,
+        timer: 1500,
       });
+      // Update the cart badge in the navbar if the function exists
+      if (typeof window.updateCartBadge === "function")
+        window.updateCartBadge();
+    } else {
+      Swal.fire("Wait!", data.message || "Failed to add item", "warning");
     }
   } catch (err) {
-    console.error(err);
-    Swal.fire({
-      toast: true,
-      position: "top-end",
-      icon: "error",
-      title: "Error",
-      text: "Network error",
-      showConfirmButton: false,
-      timer: 2000,
-    });
+    console.error("Add to cart error:", err);
   }
 }
 
