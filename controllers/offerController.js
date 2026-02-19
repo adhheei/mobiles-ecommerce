@@ -16,6 +16,20 @@ exports.getAllOffers = async (req, res) => {
   }
 };
 
+exports.getOfferById = async (req, res) => {
+  try {
+    const offer = await Offer.findById(req.params.id);
+    if (!offer) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Offer not found" });
+    }
+    res.json({ success: true, data: offer }); // Wrap in 'data' for frontend compatibility
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 exports.updateOffer = async (req, res) => {
   try {
     const { id } = req.params;
@@ -60,6 +74,8 @@ exports.updateOffer = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// ...
 
 // Internal helper to update prices when an offer is added/edited
 const updateProductPrices = async (offerType, targetId, discountPercentage) => {
@@ -147,17 +163,16 @@ exports.deleteOffer = async (req, res) => {
     res.json({ success: true, message: "Offer deleted and prices restored" });
   } catch (error) {
     console.error("Offer Delete Error:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Internal Server Error: " + error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error: " + error.message,
+    });
   }
 };
 
 // THE FIX: Returns Products with active discounts for the Landing Page
 exports.getHotDeals = async (req, res) => {
+  console.log("🔥 getHotDeals called");
   try {
     const now = new Date();
 
