@@ -881,29 +881,41 @@
       }
 
       // 4. Delete Function
-      async function deleteOffer() {
-        const confirm = await Swal.fire({
-          title: "Are you sure?",
-          text: "This action cannot be undone!",
+      async function deleteOffer(offerId) {
+        const result = await Swal.fire({
+          title: "Delete Offer?",
+          text: "This will remove the discount from the associated products.",
           icon: "warning",
           showCancelButton: true,
-          confirmButtonColor: "#dc3545",
+          confirmButtonColor: "#d33",
           confirmButtonText: "Yes, delete it!",
         });
 
-        if (confirm.isConfirmed) {
+        if (result.isConfirmed) {
           try {
+            const token = localStorage.getItem("adminToken"); // Ensure you use the correct admin token
             const res = await fetch(`/api/admin/offers/${offerId}`, {
               method: "DELETE",
-              headers: { Authorization: `Bearer ${token}` },
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
             });
-            if ((await res.json()).success) {
-              Swal.fire("Deleted!", "Offer removed.", "success").then(
-                () => (window.location.href = "./adminOffers.html"),
-              );
+
+            const data = await res.json();
+
+            if (res.ok) {
+              Swal.fire(
+                "Deleted!",
+                "The offer has been removed.",
+                "success",
+              ).then(() => location.reload()); // Refresh table
+            } else {
+              throw new Error(data.message || "Server rejected the deletion");
             }
-          } catch (err) {
-            Swal.fire("Error", "Delete failed", "error");
+          } catch (error) {
+            console.error("Delete error:", error);
+            Swal.fire("Error", error.message, "error");
           }
         }
       }
