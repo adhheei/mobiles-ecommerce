@@ -9,7 +9,6 @@ const nodemailer = require("nodemailer");
 
 // --- HELPER FUNCTIONS ---
 
-// Helper to format image path
 const formatImageUrl = (filePath) => {
   if (!filePath) return "https://placehold.co/100x120/f0f0f0/333?text=No+Image";
   return (
@@ -21,7 +20,6 @@ const formatImageUrl = (filePath) => {
   );
 };
 
-// Helper: Format Cart for Frontend
 function formatCart(cart) {
   let subtotal = 0;
   let totalMrp = 0;
@@ -215,9 +213,7 @@ const placeOrder = async (req, res) => {
       razorpaySignature,
     } = req.body;
 
-    console.log("DEBUG: placeOrder started", { userId, paymentMethod, useWallet, addressId });
-
-    // 1. VERIFY RAZORPAY SIGNATURE (For Online Payments)
+    // 1. VERIFY RAZORPAY SIGNATURE
     if (paymentMethod === "Razorpay") {
       const hmac = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
       hmac.update(razorpayOrderId + "|" + razorpayPaymentId);
@@ -229,7 +225,6 @@ const placeOrder = async (req, res) => {
     }
 
     // 2. GATHER ITEMS AND VERIFY STOCK
-    console.log("DEBUG: Gathering items...");
     let subtotal = 0;
     let totalMrp = 0;
     let rawItems = [];
@@ -261,12 +256,10 @@ const placeOrder = async (req, res) => {
       }
       for (const item of cart.items) {
         if (!item.productId || item.productId.stock < item.quantity) {
-          return res
-            .status(400)
-            .json({
-              success: false,
-              message: `${item.productId?.name || "Item"} is out of stock`,
-            });
+          return res.status(400).json({
+            success: false,
+            message: `${item.productId?.name || "Item"} is out of stock`,
+          });
         }
         const price = item.productId.offerPrice || item.productId.price;
         subtotal += price * item.quantity;
@@ -284,7 +277,6 @@ const placeOrder = async (req, res) => {
     }
 
     // 3. PROCESS COUPON
-    console.log("DEBUG: Processing coupon...");
     let couponDiscount = 0;
     let appliedCouponCode = null;
     if (couponCode) {
@@ -308,7 +300,6 @@ const placeOrder = async (req, res) => {
     }
 
     // 4. PROPORTIONAL DISTRIBUTION
-    console.log("DEBUG: Calculating proportional distribution...");
     let orderItems = [];
     let distributedDiscountTotal = 0;
     rawItems.forEach((item, index) => {
@@ -333,36 +324,27 @@ const placeOrder = async (req, res) => {
       });
     });
 
-    // 5. WALLET DEDUCTION
-    console.log("DEBUG: Processing wallet deduction...");
-    let finalAmount = subtotal - couponDiscount;
-    let walletDeducted = 0;
-    if (useWallet) {
-      const wallet = await Wallet.findOne({ userId });
-      if (wallet && wallet.balance > 0) {
-        walletDeducted = Math.min(wallet.balance, finalAmount);
-        wallet.balance -= walletDeducted;
-        wallet.transactions.push({
-          amount: walletDeducted,
-          type: "DEBIT",
-          reason: "ORDER_PAYMENT",
-          orderId: "ORD-" + Date.now(),
-        });
-        await wallet.save();
-        finalAmount -= walletDeducted;
-      }
-    }
-
-    // 6. ADDRESS VALIDATION
-    console.log("DEBUG: Validating address...");
+    // 5. ADDRESS VALIDATION
     const addr = await Address.findById(addressId);
     if (!addr)
       return res
         .status(400)
         .json({ success: false, message: "Shipping address not found" });
 
-    // 7. CREATE ORDER DOCUMENT
-    console.log("DEBUG: Creating order document...");
+    // 6. CALCULATE WALLET DEDUCTION PRE-ORDER
+    let finalAmount = subtotal - couponDiscount;
+    let walletDeducted = 0;
+    let wallet = null;
+
+    if (useWallet) {
+      wallet = await Wallet.findOne({ userId });
+      if (wallet && wallet.balance > 0) {
+        walletDeducted = Math.min(wallet.balance, finalAmount);
+        // We do not save the wallet here yet because Order.create might fail
+      }
+    }
+
+    // 7. CREATE ORDER DOCUMENT (CRITICAL: Do this BEFORE wallet logic)
     const newOrder = await Order.create({
       userId,
       orderId: "ORD-" + Date.now(),
@@ -373,12 +355,14 @@ const placeOrder = async (req, res) => {
         productDiscount: totalMrp - subtotal,
         couponDiscount,
         walletDeducted,
-        totalAmount: Math.max(0, finalAmount),
+        totalAmount: Math.max(0, finalAmount - walletDeducted),
         shipping: 0,
       },
       paymentMethod,
       paymentStatus:
-        paymentMethod === "COD" && finalAmount > 0 ? "Pending" : "Paid",
+        paymentMethod === "COD" && finalAmount - walletDeducted > 0
+          ? "Pending"
+          : "Paid",
       shippingAddress: {
         fullName: addr.fullName,
         phone: addr.phone,
@@ -393,10 +377,21 @@ const placeOrder = async (req, res) => {
       razorpayPaymentId,
       razorpaySignature,
     });
-    console.log("DEBUG: Order created", newOrder.orderId);
 
-    // 8. STOCK UPDATE & CLEANUP
-    console.log("DEBUG: Updating stock...");
+    // 8. FINAL WALLET UPDATE (POST-CREATE)
+    if (useWallet && walletDeducted > 0 && wallet) {
+      wallet.balance -= walletDeducted;
+      wallet.transactions.push({
+        userId: userId, // FIX: Pass required userId
+        amount: walletDeducted,
+        type: "DEBIT",
+        reason: "ORDER_PAYMENT",
+        orderId: newOrder.orderId, // FIX: Use initialized newOrder
+      });
+      await wallet.save();
+    }
+
+    // 9. STOCK UPDATE & CLEANUP
     for (const item of orderItems) {
       await Product.findByIdAndUpdate(item.productId, {
         $inc: { stock: -item.quantity },
@@ -404,19 +399,14 @@ const placeOrder = async (req, res) => {
     }
     if (!buyNowItem) await Cart.findOneAndUpdate({ userId }, { items: [] });
 
-    // 9. SEND ORDER CONFIRMATION EMAIL
+    // 10. SEND ORDER CONFIRMATION EMAIL
     try {
-      const user = await require("../models/User").findById(userId); // Fetch user email
-      if (user && user.email) {
-        await sendOrderConfirmationEmail(user, newOrder);
-      }
+      const user = await require("../models/User").findById(userId);
+      if (user && user.email) await sendOrderConfirmationEmail(user, newOrder);
     } catch (emailErr) {
-      console.error("Failed to send order confirmation email:", emailErr);
-      // Don't fail the order just because email failed
+      console.error("Failed to send email:", emailErr);
     }
 
-    // 10. FINAL SUCCESS RESPONSE
-    // return res.status().json() ends the request. Do NOT call next().
     return res.status(200).json({
       success: true,
       orderId: newOrder.orderId,
@@ -424,9 +414,7 @@ const placeOrder = async (req, res) => {
       totals: newOrder.totals,
     });
   } catch (error) {
-    console.error("Order Creation Error ->", error); // Debugging info in terminal
-    console.error("Error Stack ->", error.stack);
-    // Send a JSON error instead of crashing the server with next(error)
+    console.error("Order Creation Error ->", error);
     return res
       .status(500)
       .json({
@@ -455,7 +443,7 @@ const sendOrderConfirmationEmail = async (user, order) => {
         <td style="padding: 10px; text-align: center;">${item.quantity}</td>
         <td style="padding: 10px; text-align: right;">₹${item.price}</td>
       </tr>
-    `
+    `,
       )
       .join("");
 

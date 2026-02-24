@@ -143,6 +143,7 @@ router.put("/orders/:id/status", isAdmin, updateOrderStatus);
 router.patch("/orders/:id/return/:itemId", isAdmin, handleReturnRequest);
 
 // OFFER MANAGEMENT
+router.get("/offers/hot", getHotDeals); // Move this BEFORE /:id
 router.get("/offers", getAllOffers);
 router.post("/offers", isAdmin, addOffer);
 router.get('/offers/:id', offerController.getOfferById);

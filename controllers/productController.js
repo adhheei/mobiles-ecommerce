@@ -250,7 +250,7 @@ exports.addProduct = async (req, res) => {
       name,
       description,
       sku,
-      price, // Destructure the single price field from your updated form
+      price, // The single price field from your updated form
       stock,
       category,
       brand,
@@ -259,11 +259,14 @@ exports.addProduct = async (req, res) => {
       publishDate,
     } = req.body;
 
-    // 1. Validation: Catch missing fields early to prevent 500 crashes
-    if (!name || !price || !stock || !category) {
+    // 1. Validation: Catch missing/invalid fields early
+    const parsedPrice = parseFloat(price);
+    const parsedStock = parseInt(stock);
+
+    if (!name || isNaN(parsedPrice) || isNaN(parsedStock) || !category) {
       return res.status(400).json({
         success: false,
-        error: "Required fields (Name, Price, Stock, Category) are missing.",
+        error: "Required fields (Name, valid Price, Stock, Category) are missing.",
       });
     }
 
@@ -273,26 +276,28 @@ exports.addProduct = async (req, res) => {
       description: description ? description.trim() : "",
       sku: sku ? sku.trim() : undefined,
 
-      // --- CRITICAL FIX: Map single price to both schema fields ---
-      // This satisfies the database requirements without dual inputs
-      actualPrice: parseFloat(price),
-      offerPrice: parseFloat(price),
+      // --- CRITICAL FIX: Ensure valid numeric storage ---
+      // Map single price to both schema fields
+      actualPrice: parsedPrice,
+      offerPrice: parsedPrice,
 
-      stock: parseInt(stock),
+      stock: parsedStock,
       status: status || "active",
       visibility: visibility || "public",
-      publishDate: publishDate ? new Date(publishDate) : undefined,
+      publishDate: publishDate ? new Date(publishDate) : new Date(),
       brand: brand || "Generic",
       category: category,
     };
 
     // 3. Handle Images securely
     if (req.files) {
+      // Fix: Normalize path for formatImageUrl helper
       if (req.files.mainImage && req.files.mainImage[0]) {
-        productData.mainImage = req.files.mainImage[0].path;
+        productData.mainImage = req.files.mainImage[0].path.replace(/\\/g, "/");
       }
+      
       if (req.files.gallery && Array.isArray(req.files.gallery)) {
-        productData.gallery = req.files.gallery.map((f) => f.path);
+        productData.gallery = req.files.gallery.map((f) => f.path.replace(/\\/g, "/"));
       }
     }
 
@@ -300,25 +305,25 @@ exports.addProduct = async (req, res) => {
     const product = new Product(productData);
     await product.save();
 
-    res.status(201).json({
-      success: true,
-      message: "Product added successfully",
+    res.status(201).json({ 
+      success: true, 
+      message: "Product added successfully" 
     });
+
   } catch (err) {
     console.error("Add Product Error:", err);
 
-    // Handle duplicate SKU or unique key errors
+    // 5. Explicit Error Handling
     if (err.code === 11000) {
-      return res.status(400).json({
-        success: false,
-        error: "A product with this SKU already exists.",
+      return res.status(400).json({ 
+        success: false, 
+        error: "A product with this SKU already exists." 
       });
     }
 
-    // Return the specific error to the frontend instead of generic 500
-    res.status(500).json({
-      success: false,
-      error: "Server Error: " + err.message,
+    res.status(500).json({ 
+      success: false, 
+      error: "Server Error: " + err.message 
     });
   }
 };
