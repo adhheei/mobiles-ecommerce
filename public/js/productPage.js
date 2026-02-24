@@ -127,261 +127,17 @@ function debounce(func, wait) {
   };
 }
 
-async function loadProducts() {
-  const container = document.getElementById("productContainer");
-  if (!container) return;
-
-  document.getElementById("loading").style.display = "block";
-  container.innerHTML = "";
-  document.getElementById("emptyState").style.display = "none";
-
-  // Gather Filter Values
-  const sort = sortSelect?.value || "best-selling";
-  const inStock = inStockOnly?.checked || false;
-  const onSale = onSaleOnly?.checked || false; // Captured state
-  const maxPrice = priceRange?.value || 1000000;
-  const search = document.getElementById("navbarSearch")?.value || "";
-
-  // Helper for image paths
-  function formatImageUrl(path) {
-    if (!path) return "/images/logo.jpg";
-    if (path.startsWith("http")) return path;
-    let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "");
-    return cleanPath.startsWith("/") ? cleanPath : "/" + cleanPath;
-  }
-
-  // Build Query
-  const queryParams = new URLSearchParams({
-    page: currentPage,
-    limit: limit,
-    sort: sort,
-    inStock: inStock,
-    onSale: onSale, // Sent to backend API
-    maxPrice: maxPrice,
-    search: search,
-  });
-
-  // Categories
-  const selectedCats = Array.from(
-    document.querySelectorAll("#categoryList input:checked"),
-  )
-    .map((cb) => cb.value)
-    .filter((val) => val !== "all");
-  if (selectedCats.length > 0)
-    queryParams.append("category", selectedCats.join(","));
-
-  // Brands
-  const selectedBrands = Array.from(
-    document.querySelectorAll("#brandList input:checked"),
-  ).map((cb) => cb.value);
-  if (selectedBrands.length > 0)
-    queryParams.append("brand", selectedBrands.join(","));
-
-  try {
-    const res = await fetch(
-      `/api/admin/products/public?${queryParams.toString()}`,
-    );
-    const data = await res.json();
-
-    document.getElementById("loading").style.display = "none";
-
-    if (data.success && data.products.length > 0) {
-      container.innerHTML = data.products
-        .map((p) => renderProductCard(p))
-        .join("");
-      syncWishlistUI(); // Re-sync UI after render
-      if (data.pagination) renderPagination(data.pagination);
-    } else {
-      document.getElementById("emptyState").style.display = "block";
-      document.getElementById("paginationContainer").innerHTML = "";
-    }
-  } catch (err) {
-    console.error("Fetch failed:", err);
-    document.getElementById("loading").style.display = "none";
-  }
-}
-
-// Pagination logic (Preserved style)
-function renderPagination(pagination) {
-  const container = document.getElementById("paginationContainer");
-  if (!container) return;
-  const { page, pages } = pagination;
-  let html = `<li class="page-item ${page <= 1 ? "disabled" : ""}">
-                <button class="page-link" onclick="changePage(${page - 1})">Previous</button></li>`;
-
-  for (let i = 1; i <= pages; i++) {
-    html += `<li class="page-item ${page === i ? "active" : ""}">
-                <button class="page-link" onclick="changePage(${i})">${i}</button></li>`;
-  }
-
-  html += `<li class="page-item ${page >= pages ? "disabled" : ""}">
-            <button class="page-link" onclick="changePage(${page + 1})">Next</button></li>`;
-  container.innerHTML = html;
-}
-
-window.changePage = function (newPage) {
-  if (newPage < 1) return;
-  currentPage = newPage;
-  loadProducts();
-  const grid = document.getElementById("productContainer");
-  if (grid) grid.scrollIntoView({ behavior: "smooth", block: "start" });
-};
-
-// Wishlist Handling
-async function loadUserWishlist() {
-  const token =
-    localStorage.getItem("token") || sessionStorage.getItem("token");
-  if (!token) return;
-  try {
-    const res = await fetch("/api/user/wishlist", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await res.json();
-    if (data.success) {
-      isUserLoggedIn = true;
-      userWishlistIds = new Set(
-        data.wishlist.map((item) => String(item._id || item)),
-      );
-    }
-  } catch (err) {
-    console.error("Wishlist error:", err);
-  }
-}
-
-async function toggleWishlist(btn, productId) {
-  const normalizedId = String(productId).trim();
-  if (!normalizedId || normalizedId === "undefined") return;
-  if (pendingWishlistOperations.has(normalizedId)) return;
-
-  const token =
-    localStorage.getItem("token") || sessionStorage.getItem("token");
-  if (!token) {
-    window.location.href = `/User/userLogin.html?redirect=${encodeURIComponent(window.location.pathname)}`;
-    return;
-  }
-
-  const isAdding = !userWishlistIds.has(normalizedId);
-  const icon = btn.querySelector("i");
-  btn.disabled = true;
-  btn.classList.toggle("active", isAdding);
-  icon?.classList.replace(
-    isAdding ? "fa-regular" : "fa-solid",
-    isAdding ? "fa-solid" : "fa-regular",
-  );
-
-  pendingWishlistOperations.set(normalizedId, true);
-  try {
-    const url = isAdding
-      ? "/api/user/wishlist"
-      : `/api/user/wishlist/${normalizedId}`;
-    const res = await fetch(url, {
-      method: isAdding ? "POST" : "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: isAdding ? JSON.stringify({ productId: normalizedId }) : null,
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) throw new Error("Server Error");
-    isAdding
-      ? userWishlistIds.add(normalizedId)
-      : userWishlistIds.delete(normalizedId);
-  } catch (error) {
-    btn.classList.toggle("active", !isAdding);
-    icon?.classList.replace(
-      isAdding ? "fa-solid" : "fa-regular",
-      isAdding ? "fa-regular" : "fa-solid",
-    );
-    Swal.fire({
-      icon: "warning",
-      title: "Action Failed",
-      text: "Server issue. Try again.",
-    });
-  } finally {
-    btn.disabled = false;
-    pendingWishlistOperations.delete(normalizedId);
-  }
-}
-
-function syncWishlistUI() {
-  document.querySelectorAll(".wishlist-btn").forEach((btn) => {
-    const id = btn.dataset.id;
-    const active = userWishlistIds.has(String(id));
-    btn.classList.toggle("active", active);
-    const icon = btn.querySelector("i");
-    if (icon)
-      icon.className = active ? "fa-solid fa-heart" : "fa-regular fa-heart";
-  });
-}
-
-// Render Card logic with Fixed Heights & Fallbacks
-function renderProductCard(product) {
-  const isOutOfStock = product.stock === 0 || product.status === "outofstock";
-  const rawId =
-    product._id ||
-    product.id ||
-    (product._id && product._id.$oid ? product._id.$oid : null);
-  const pId = rawId ? String(rawId).trim() : null;
-
-  if (!pId || pId === "undefined") return "";
-
-  const actualPrice = product.actualPrice || product.regularPrice || 0;
-  const offerPrice = product.offerPrice || product.salePrice || actualPrice;
-  const hasDiscount = offerPrice < actualPrice;
-
-  return `
-    <div class="col-6 col-md-4 col-lg-3 col-xl-20-percent mb-4">
-      <div class="product-card h-100 ${isOutOfStock ? "sold-out" : ""}" style="min-height:400px; display:flex; flex-direction:column;">
-        <div class="card-img-wrapper" ${!isOutOfStock ? `onclick="window.location.href='./singleProductPage.html?id=${pId}'" style="cursor:pointer;"` : ""}>
-          ${hasDiscount ? `<div class="sale-badge">SAVE</div>` : ""}
-          <button class="wishlist-btn" data-id="${pId}"><i class="fa-heart"></i></button>
-          ${!isOutOfStock ? `<div class="add-to-cart-banner" data-id="${pId}">ADD TO CART</div>` : ""}
-          <img src="${formatImageUrl(product.mainImage)}" alt="${product.name}" onerror="this.src='/images/logo.jpg'" />
-        </div>
-        <div class="product-info px-2 flex-grow-1 d-flex flex-column">
-          <div class="product-vendor">${product.brand || "Generic"}</div>
-          <h6 class="product-title" style="height:2.6em; overflow:hidden;">${product.name}</h6>
-          <div class="price-row mt-auto pb-2">
-            <span class="current-price text-danger fw-bold">₹${offerPrice.toLocaleString("en-IN")}</span>
-            ${hasDiscount ? `<span class="old-price ms-1">₹${actualPrice.toLocaleString("en-IN")}</span>` : ""}
-          </div>
-        </div>
-      </div>
-    </div>`;
-}
-
-// Handle Add To Cart
-async function addToCart(productId) {
-  const token =
-    localStorage.getItem("token") || sessionStorage.getItem("token");
-  if (!token) return (window.location.href = "/User/userLogin.html");
-  try {
-    const res = await fetch("/api/cart/add", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ productId, quantity: 1 }),
-    });
-    if (res.ok)
-      Swal.fire({
-        icon: "success",
-        title: "Added to Cart!",
-        timer: 1500,
-        showConfirmButton: false,
-      });
-  } catch (err) {
-    console.error(err);
-  }
+// Helper for image paths
+function formatImageUrl(path) {
+  if (!path) return "/images/logo.jpg";
+  if (path.startsWith("http")) return path;
+  let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "");
+  return cleanPath.startsWith("/") ? cleanPath : "/" + cleanPath;
 }
 
 // Common functions
 async function handleProductClicks(event) {
+  // 1. Wishlist Toggle
   const wishlistBtn = event.target.closest(".wishlist-btn");
   if (wishlistBtn) {
     event.preventDefault();
@@ -390,12 +146,24 @@ async function handleProductClicks(event) {
     if (id) await toggleWishlist(wishlistBtn, id);
     return;
   }
+
+  // 2. Add to Cart
   const cartBanner = event.target.closest(".add-to-cart-banner");
   if (cartBanner) {
     event.preventDefault();
     event.stopPropagation();
     const id = cartBanner.dataset.id;
     if (id) addToCart(id);
+    return;
+  }
+
+  // 3. Image Wrapper (Redirect to Details)
+  const imgWrapper = event.target.closest(".card-img-wrapper");
+  if (imgWrapper) {
+    const id = imgWrapper.dataset.id;
+    if (id) {
+      window.location.href = `./singleProductPage.html?id=${id}`;
+    }
   }
 }
 // Open filter sidebar
@@ -1013,7 +781,7 @@ function renderProductCard(product) {
   return `
     <div class="col-6 col-md-4 col-lg-3 col-xl-20-percent mb-4">
       <div class="product-card h-100 ${isOutOfStock ? "sold-out" : ""}">
-        <div class="card-img-wrapper" ${!isOutOfStock ? `onclick="window.location.href='./singleProductPage.html?id=${pId}'" style="cursor:pointer;"` : ""}>
+        <div class="card-img-wrapper" data-id="${pId}">
           ${hasDiscount ? `<div class="sale-badge">SAVE ${discountPercent}%</div>` : ""}
           <button class="wishlist-btn ${userWishlistIds.has(pId) ? "active" : ""}" data-id="${pId}">
             <i class="fa-${userWishlistIds.has(pId) ? "solid" : "regular"} fa-heart"></i>
