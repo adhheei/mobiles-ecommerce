@@ -435,20 +435,10 @@ window.selectCoupon = function (code) {
 
 function formatImageUrl(path) {
   if (!path) return "https://placehold.co/100x120?text=No+Image";
-
-  // If it's already a full URL, return it
   if (path.startsWith("http")) return path;
-
-  // FIX: Remove 'public' from the start and fix backslashes
-  // This turns "public/uploads/products/img.jpg" into "/uploads/products/img.jpg"
-  let cleanPath = path.replace(/^public/, "").replace(/\\/g, "/");
-
-  // Ensure it starts with a single leading slash
-  if (!cleanPath.startsWith("/")) {
-    cleanPath = "/" + cleanPath;
-  }
-
-  return cleanPath;
+  // Normalize slashes FIRST, then remove public/ prefix
+  let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "");
+  return cleanPath.startsWith("/") ? cleanPath : "/" + cleanPath;
 }
 
 async function applyCoupon(code, silent = false) {

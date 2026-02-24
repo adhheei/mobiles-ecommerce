@@ -70,6 +70,13 @@ function setActiveLink() {
     });
 }
 
+function formatImageUrl(path) {
+    if (!path) return "/images/logo.jpg";
+    if (path.startsWith("http")) return path;
+    let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "");
+    return cleanPath.startsWith("/") ? cleanPath : "/" + cleanPath;
+}
+
 // Main initialization function
 function initializeNavbarFeatures() {
     const navbarSearch = document.getElementById('navbarSearch');
@@ -220,7 +227,7 @@ function initializeNavbarFeatures() {
                     const div = document.createElement('div');
                     div.className = 'autocomplete-item';
                     div.innerHTML = `
-                    <img src="${prod.image || '/images/logo.jpg'}" class="suggestion-img" onerror="this.src='/images/logo.jpg'" />
+                    <img src="${formatImageUrl(prod.image)}" class="suggestion-img" onerror="this.src='/images/logo.jpg'" />
                     <div class="suggestion-text">
                         <span class="suggestion-name">${prod.label}</span>
                     </div>
@@ -376,13 +383,7 @@ async function checkUserLogin() {
         let userName = userData.firstName || (userData.name ? userData.name.split(' ')[0] : 'User');
 
         if (userData.profileImage) {
-            let imgSrc = userData.profileImage;
-            // Normalize path
-            imgSrc = imgSrc.replace(/\\/g, "/");
-            if (imgSrc.startsWith("public/")) imgSrc = imgSrc.replace("public/", "");
-            if (!imgSrc.startsWith("http") && !imgSrc.startsWith("/")) {
-                imgSrc = '/' + imgSrc;
-            }
+            let imgSrc = formatImageUrl(userData.profileImage);
             if (!imgSrc.startsWith('http')) {
                 imgSrc += (imgSrc.includes("?") ? "&" : "?") + `t=${new Date().getTime()}`;
             }

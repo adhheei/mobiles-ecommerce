@@ -16,12 +16,18 @@ async function fetchWishlist() {
         if (data.success) {
             renderWishlist(data.wishlist);
         } else {
-            // Handle error or unauthorized
             console.error('Failed to fetch wishlist:', data.message);
         }
     } catch (error) {
         console.error('Error fetching wishlist:', error);
     }
+}
+
+function formatImageUrl(path) {
+    if (!path) return "/images/product_placeholder.png";
+    if (path.startsWith("http")) return path;
+    let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "");
+    return cleanPath.startsWith("/") ? cleanPath : "/" + cleanPath;
 }
 
 function renderWishlist(products) {
@@ -43,7 +49,7 @@ function renderWishlist(products) {
                         <div class="wishlist-img-box">
                             ${product.stock === 0 ? '<span class="sold-out-badge">Out of Stock</span>' : ''}
                             <img 
-                                src="${(product.mainImage || '/images/product_placeholder.png').replace('public', '')}" 
+                                src="${formatImageUrl(product.mainImage)}" 
                                 alt="${product.name}" 
                                 class="wishlist-img"
                                 onerror="this.onerror=null;this.src='/images/product_placeholder.png';"

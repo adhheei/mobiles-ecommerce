@@ -142,6 +142,14 @@ async function loadProducts() {
   const maxPrice = priceRange?.value || 1000000;
   const search = document.getElementById("navbarSearch")?.value || "";
 
+  // Helper for image paths
+  function formatImageUrl(path) {
+    if (!path) return "/images/logo.jpg";
+    if (path.startsWith("http")) return path;
+    let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "");
+    return cleanPath.startsWith("/") ? cleanPath : "/" + cleanPath;
+  }
+
   // Build Query
   const queryParams = new URLSearchParams({
     page: currentPage,
@@ -332,7 +340,7 @@ function renderProductCard(product) {
           ${hasDiscount ? `<div class="sale-badge">SAVE</div>` : ""}
           <button class="wishlist-btn" data-id="${pId}"><i class="fa-heart"></i></button>
           ${!isOutOfStock ? `<div class="add-to-cart-banner" data-id="${pId}">ADD TO CART</div>` : ""}
-          <img src="${product.mainImage || "/images/logo.jpg"}" alt="${product.name}" onerror="this.src='/images/logo.jpg'" />
+          <img src="${formatImageUrl(product.mainImage)}" alt="${product.name}" onerror="this.src='/images/logo.jpg'" />
         </div>
         <div class="product-info px-2 flex-grow-1 d-flex flex-column">
           <div class="product-vendor">${product.brand || "Generic"}</div>
@@ -810,7 +818,7 @@ async function toggleWishlist(btn, productId) {
     if (!res.ok || !data.success) {
       throw new Error(
         data.message ||
-          `Failed to ${isAdding ? "add" : "remove"} from wishlist`,
+        `Failed to ${isAdding ? "add" : "remove"} from wishlist`,
       );
     }
 

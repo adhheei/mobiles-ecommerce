@@ -212,9 +212,7 @@ exports.getHotDeals = async (req, res) => {
         return {
           _id: product._id,
           name: product.name,
-          mainImage:
-            product.mainImage ||
-            (product.productImages && product.productImages[0]),
+          mainImage: product.mainImage || (product.gallery && product.gallery[0]),
           originalPrice: product.actualPrice,
           offerPrice: offerPrice,
           discountPercentage: appliedOffer.discountPercentage,
