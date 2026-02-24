@@ -608,12 +608,14 @@ async function fetchSuggestions(productIds) {
                 <a href="/User/singleProductPage.html?id=${p.id}" class="rec-card-link">
                   <div class="mini-rec-card">
                     <img src="${imgUrl}" alt="${p.name}" onerror="this.src='https://placehold.co/100x100/f0f0f0/333?text=No+Image'" />
-                    <div>
-                      <div style="font-size: 0.8rem; font-weight: 600" class="text-truncate" style="max-width: 120px;">${p.name}</div>
-                      <div style="font-size: 0.75rem">Rs. ${p.offerPrice || p.actualPrice}</div>
+                    <div class="rec-info">
+                      <div class="rec-name">${p.name}</div>
+                      <div class="rec-price">Rs. ${p.offerPrice || p.actualPrice}</div>
                     </div>
-                    <button class="btn-add-mini" onclick="event.preventDefault(); addToCart('${p.id}')">
-                        <i class="fa-solid fa-plus"></i>
+                    <button class="btn-add-mini d-flex align-items-center justify-content-center" 
+                            style="width: 32px; height: 32px; padding: 0; border-radius: 50%;"
+                            onclick="event.preventDefault(); addToCart('${p.id}')">
+                        <i class="fa-solid fa-plus" style="font-size: 0.8rem;"></i>
                     </button>
                   </div>
                 </a>
