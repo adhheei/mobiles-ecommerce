@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/authMiddleware');
 const {
+    downloadInvoice,
     getMyOrders,
     getOrderDetails,
     cancelOrder,
@@ -12,5 +13,6 @@ router.get('/', protect, getMyOrders);
 router.get('/:id', protect, getOrderDetails);
 router.put('/:id/cancel', protect, cancelOrder);
 router.post('/:id/return/:itemId', protect, requestReturn);
+router.get('/download-invoice/:orderId', protect, downloadInvoice);
 
 module.exports = router;

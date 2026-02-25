@@ -43,25 +43,33 @@ document.addEventListener("DOMContentLoaded", async () => {
       statusEl.innerText = order.orderStatus;
       statusEl.className = `badge ${getStatusColor(order.orderStatus)}`;
 
-      // Expected Delivery Logic
-      const deliveryStart = new Date(orderDate);
-      deliveryStart.setDate(deliveryStart.getDate() + 6);
-      const deliveryEnd = new Date(orderDate);
-      deliveryEnd.setDate(deliveryEnd.getDate() + 7);
+      // --- FIXED: Expected Delivery Logic (Hidden for Cancelled/Returned) ---
+      const estDeliveryEl = document.getElementById("estimated-delivery");
 
-      const deliveryText =
-        order.orderStatus === "Delivered"
-          ? `Delivered on ${new Date(order.updatedAt).toLocaleDateString()}`
-          : `Est. Delivery: ${deliveryStart.toLocaleDateString()} - ${deliveryEnd.toLocaleDateString()}`;
-      document.getElementById("estimated-delivery").innerText = deliveryText;
+      if (
+        order.orderStatus === "Cancelled" ||
+        order.orderStatus === "Returned"
+      ) {
+        // Hide delivery text if order is no longer active
+        estDeliveryEl.innerText = "";
+      } else if (order.orderStatus === "Delivered") {
+        estDeliveryEl.innerText = `| Delivered on ${new Date(order.updatedAt).toLocaleDateString()}`;
+        estDeliveryEl.className = "text-primary fw-bold";
+      } else {
+        const deliveryStart = new Date(orderDate);
+        deliveryStart.setDate(deliveryStart.getDate() + 6);
+        const deliveryEnd = new Date(orderDate);
+        deliveryEnd.setDate(deliveryEnd.getDate() + 7);
 
-      // --- 2. ITEMS TABLE WITH FIXED IMAGES ---
+        estDeliveryEl.innerText = `| Est. Delivery: ${deliveryStart.toLocaleDateString()} - ${deliveryEnd.toLocaleDateString()}`;
+        estDeliveryEl.className = "text-success fw-bold";
+      }
+
+      // --- 2. ITEMS TABLE ---
       const itemsList = document.getElementById("order-items-list");
       itemsList.innerHTML = order.items
         .map((item, index) => {
-          // Use fixed helper for image paths
           const imgSrc = formatImageUrl(item.image);
-
           return `
             <tr>
                 <td class="ps-4 py-3">
@@ -81,8 +89,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <td class="pe-4 py-3 text-end">
                     ${getActionButton(order, item, index)}
                 </td>
-            </tr>
-          `;
+            </tr>`;
         })
         .join("");
 
@@ -101,21 +108,57 @@ document.addEventListener("DOMContentLoaded", async () => {
             <p class="mb-1 fw-bold text-dark">${addr.fullName}</p>
             <p class="mb-0">${addr.street}</p>
             <p class="mb-0">${addr.city}, ${addr.state} ${addr.pincode}</p>
-            <p class="mb-0 mt-2"><i class="fa-solid fa-phone me-1 text-muted"></i> ${addr.phone}</p>
-        `;
+            <p class="mb-0 mt-2"><i class="fa-solid fa-phone me-1 text-muted"></i> ${addr.phone}</p>`;
       }
 
-      // --- 5. PAYMENT INFO ---
-      document.getElementById("payment-method").innerText = order.paymentMethod;
+      // --- Updated Section 5: PAYMENT INFO (Complete Fix) ---
+      const paymentMethodDisplay = document.getElementById("payment-method");
       const payStatusEl = document.getElementById("payment-status");
-      payStatusEl.innerText = `Status: ${order.paymentStatus}`;
-      payStatusEl.className =
-        order.paymentStatus === "Paid"
-          ? "text-success fw-bold"
-          : "text-warning fw-bold";
+
+      if (paymentMethodDisplay && payStatusEl) {
+        paymentMethodDisplay.innerText = order.paymentMethod;
+
+        const isCancelled = order.orderStatus === "Cancelled";
+        const isReturned = order.orderStatus === "Returned";
+
+        if (order.paymentMethod === "WALLET") {
+          if (isCancelled) {
+            payStatusEl.innerText = "Status: Refunded to Wallet";
+            payStatusEl.className = "text-warning fw-bold";
+          } else if (isReturned) {
+            payStatusEl.innerText = "Status: Returned to Wallet";
+            payStatusEl.className = "text-warning fw-bold";
+          } else {
+            payStatusEl.innerText = `Status: ${order.paymentStatus}`;
+            payStatusEl.className =
+              order.paymentStatus === "Paid"
+                ? "text-success fw-bold"
+                : "text-warning fw-bold";
+          }
+        } else if (order.paymentMethod === "COD") {
+          if (isCancelled || isReturned) {
+            payStatusEl.innerText = "Status: Voided";
+            payStatusEl.className = "text-muted fw-bold";
+          } else {
+            payStatusEl.innerText = `Status: ${order.paymentStatus}`;
+            payStatusEl.className = "text-warning fw-bold";
+          }
+        } else {
+          // For other online payment methods (Razorpay, etc.)
+          if (isCancelled || isReturned) {
+            payStatusEl.innerText = "Status: Refunded";
+            payStatusEl.className = "text-warning fw-bold";
+          } else {
+            payStatusEl.innerText = `Status: ${order.paymentStatus}`;
+            payStatusEl.className =
+              order.paymentStatus === "Paid"
+                ? "text-success fw-bold"
+                : "text-warning fw-bold";
+          }
+        }
+      }
 
       // --- 6. ORDER SUMMARY ---
-      // Ensure totals exist before rendering
       const totals = order.totals || {};
       document.getElementById("summary-subtotal").innerText =
         `₹${(totals.subtotal || 0).toLocaleString()}`;
@@ -152,18 +195,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   } catch (error) {
     console.error("Fetch Error:", error);
-    Swal.fire("Error", "Network Error occurred while fetching order", "error");
+    Swal.fire("Error", "Network Error occurred", "error");
   }
 });
 
-/**
- * Normalizes image paths for frontend display
- */
+/** Helper Functions **/
+
 function formatImageUrl(path) {
   if (!path) return "https://placehold.co/100x120?text=No+Image";
   if (path.startsWith("http")) return path;
-
-  // Remove 'public/' and fix slashes
   let cleanPath = path.replace(/^public\//, "").replace(/\\/g, "/");
   if (!cleanPath.startsWith("/")) cleanPath = "/" + cleanPath;
   return cleanPath;
@@ -173,17 +213,13 @@ function getActionButton(order, item, index) {
   if (order.orderStatus === "Cancelled" || item.status === "Cancelled")
     return '<span class="text-danger small">Cancelled</span>';
 
-  // Return Statuses
   if (item.returnStatus === "Requested")
     return '<span class="badge bg-warning text-dark">Return Requested</span>';
   if (item.returnStatus === "Approved")
     return '<span class="badge bg-success">Return Approved</span>';
-  if (item.returnStatus === "Rejected")
-    return '<span class="badge bg-danger">Return Rejected</span>';
   if (item.status === "Returned")
     return '<span class="text-warning small fw-bold">Returned</span>';
 
-  // Available Actions
   if (item.status === "Delivered") {
     return `<button class="btn btn-sm btn-outline-warning" onclick="returnOrder(${index})">Return</button>`;
   }
@@ -191,7 +227,6 @@ function getActionButton(order, item, index) {
   if (order.orderStatus === "Processing" || order.orderStatus === "Shipped") {
     return `<button class="btn btn-sm btn-outline-danger" onclick="cancelOrder(${index})">Cancel</button>`;
   }
-
   return "-";
 }
 
@@ -212,11 +247,6 @@ async function cancelOrder(itemIndex) {
 
 async function returnOrder(itemIndex) {
   const item = currentOrder.items[itemIndex];
-  if (!item || !item._id) {
-    Swal.fire("Error", "Item information missing. Please refresh.", "error");
-    return;
-  }
-
   const { value: reason } = await Swal.fire({
     title: "Return Product",
     input: "textarea",
@@ -224,8 +254,6 @@ async function returnOrder(itemIndex) {
     inputPlaceholder: "Explain why you are returning this item...",
     inputValidator: (value) => !value && "Reason is required!",
     showCancelButton: true,
-    confirmButtonText: "Submit Return",
-    confirmButtonColor: "#f0ad4e",
   });
 
   if (reason) {
@@ -242,42 +270,31 @@ async function returnOrder(itemIndex) {
           body: JSON.stringify({ reason }),
         },
       );
-
-      if (res.ok) {
-        Swal.fire(
-          "Success",
-          "Return request submitted successfully.",
-          "success",
-        ).then(() => location.reload());
-      } else {
-        const data = await res.json();
-        Swal.fire("Error", data.message || "Failed to submit return", "error");
-      }
+      if (res.ok)
+        Swal.fire("Success", "Return request submitted.", "success").then(() =>
+          location.reload(),
+        );
     } catch (error) {
-      Swal.fire("Error", "Network connection failed", "error");
+      Swal.fire("Error", "Request failed", "error");
     }
   }
 }
 
 async function handleOrderAction(itemIndex, actionType) {
   const isItem = itemIndex !== null && itemIndex !== undefined;
-  let itemId = isItem ? currentOrder.items[itemIndex]._id : null;
-
   const result = await Swal.fire({
     title: isItem ? "Cancel this item?" : "Cancel entire order?",
     text: "This action cannot be undone!",
     icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, Cancel it!",
   });
 
   if (result.isConfirmed) {
     try {
       const token = localStorage.getItem("token");
       const body = { action: actionType };
-      if (itemId) body.itemId = itemId;
+      if (isItem) body.itemId = currentOrder.items[itemIndex]._id;
 
       const res = await fetch(`/api/orders/${currentOrder._id}/cancel`, {
         method: "PUT",
@@ -288,16 +305,52 @@ async function handleOrderAction(itemIndex, actionType) {
         body: JSON.stringify(body),
       });
 
-      const data = await res.json();
-      if (res.ok) {
-        Swal.fire("Cancelled!", data.message, "success").then(() =>
+      if (res.ok)
+        Swal.fire("Updated!", "Order status updated.", "success").then(() =>
           location.reload(),
         );
-      } else {
-        Swal.fire("Failed", data.message, "error");
-      }
     } catch (error) {
-      Swal.fire("Error", "Network error occurred", "error");
+      Swal.fire("Error", "Network error", "error");
     }
+  }
+}
+
+async function downloadPDFReceipt() {
+  const token = localStorage.getItem("token");
+
+  // Show a loading state (optional)
+  Swal.fire({
+    title: "Generating PDF...",
+    didOpen: () => {
+      Swal.showLoading();
+    },
+  });
+
+  try {
+    const response = await fetch(
+      `/api/orders/download-invoice/${currentOrderId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Invoice_${currentOrderId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      Swal.close();
+    } else {
+      throw new Error("Failed to download");
+    }
+  } catch (error) {
+    Swal.fire("Error", "Could not generate PDF receipt", "error");
   }
 }

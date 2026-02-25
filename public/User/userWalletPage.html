@@ -1,508 +1,623 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script src="/js/authGuard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Wallet - Jinsa Mobiles</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-<head>
-  <meta charset="UTF-8" />
-  <script src="/js/authGuard.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Wallet - Jinsa Mobiles</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet" />
-
-  <style>
-    :root {
-      --primary-black: #1a1a1a;
-      --bg-light: #f8f9fa;
-      --border-color: #eee;
-    }
-
-    body {
-      font-family: "Poppins", sans-serif;
-      background-color: #fff;
-      color: var(--primary-black);
-      padding-top: 80px;
-    }
-
-    /* --- ANIMATIONS --- */
-    @keyframes slideInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
+    <style>
+      :root {
+        --primary-black: #1a1a1a;
+        --bg-light: #f8f9fa;
+        --border-color: #eee;
       }
 
-      to {
-        opacity: 1;
-        transform: translateY(0);
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #fff;
+        color: var(--primary-black);
+        padding-top: 80px;
       }
-    }
 
-    .content-animate {
-      animation: slideInUp 0.6s ease-out forwards;
-    }
+      /* --- ANIMATIONS --- */
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
 
-    /* --- LAYOUT --- */
-    .profile-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px 20px;
-    }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-    .sidebar {
-      background-color: #fff;
-      border-right: 1px solid var(--border-color);
-      min-height: 600px;
-      padding-right: 20px;
-    }
+      .content-animate {
+        animation: slideInUp 0.6s ease-out forwards;
+      }
 
-    .sidebar-menu {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .sidebar-item {
-      margin-bottom: 5px;
-    }
-
-    .sidebar-link {
-      display: flex;
-      align-items: center;
-      padding: 12px 20px;
-      color: #555;
-      text-decoration: none;
-      font-weight: 500;
-      border-radius: 8px;
-      transition: all 0.2s;
-    }
-
-    .sidebar-link i {
-      margin-right: 15px;
-      width: 20px;
-      text-align: center;
-    }
-
-    .sidebar-link:hover {
-      background-color: #f8f9fa;
-      color: #000;
-    }
-
-    .sidebar-link.active {
-      background-color: #000;
-      color: #fff;
-    }
-
-    .logout-btn {
-      color: #dc3545;
-    }
-
-    .logout-btn:hover {
-      color: #b02a37;
-      background-color: #f8f9fa;
-    }
-
-    .main-content {
-      padding-left: 40px;
-    }
-
-    .page-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 30px;
-    }
-
-    /* Wallet Specifics */
-    .wallet-card {
-      background: radial-gradient(circle at top right, #333, #000);
-      color: #fff;
-      border-radius: 16px;
-      padding: 40px;
-      margin-bottom: 30px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .wallet-card::before {
-      content: '';
-      position: absolute;
-      top: -50px;
-      right: -50px;
-      width: 150px;
-      height: 150px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 50%;
-    }
-
-    .balance-label {
-      font-size: 0.9rem;
-      opacity: 0.8;
-      margin-bottom: 5px;
-      display: block;
-    }
-
-    .balance-amount {
-      font-size: 2.5rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-    }
-
-    .transaction-card {
-      border: 1px solid #eee;
-      border-radius: 12px;
-      background: #fff;
-      overflow: hidden;
-    }
-
-    .transaction-item {
-      padding: 20px;
-      border-bottom: 1px solid #f9f9f9;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: background 0.2s;
-    }
-
-    .transaction-item:last-child {
-      border-bottom: none;
-    }
-
-    .transaction-item:hover {
-      background: #fcfcfc;
-    }
-
-    .txn-icon {
-      width: 45px;
-      height: 45px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      margin-right: 15px;
-    }
-
-    .txn-credit {
-      background: #d1e7dd;
-      color: #0f5132;
-    }
-
-    .txn-debit {
-      background: #f8d7da;
-      color: #842029;
-    }
-
-    .txn-details h6 {
-      margin: 0;
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-
-    .txn-meta {
-      font-size: 0.8rem;
-      color: #777;
-      margin-top: 3px;
-    }
-
-    .txn-amount {
-      font-weight: 700;
-      font-size: 1rem;
-    }
-
-    .amount-plus {
-      color: #198754;
-    }
-
-    .amount-minus {
-      color: #dc3545;
-    }
-
-    /* Footer */
-    footer {
-      background-color: #111;
-      color: #aaa;
-      padding: 60px 0 20px;
-      margin-top: 60px;
-    }
-
-    footer h5 {
-      color: white;
-      margin-bottom: 20px;
-      font-weight: 600;
-    }
-
-    footer ul {
-      padding: 0;
-      list-style: none;
-    }
-
-    footer ul li {
-      margin-bottom: 10px;
-    }
-
-    footer a {
-      color: #aaa;
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      color: white;
-    }
-
-    @media (max-width: 991px) {
+      /* --- LAYOUT --- */
       .profile-container {
-        padding: 0 15px 40px 15px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px 20px;
       }
 
       .sidebar {
-        border-right: none;
-        min-height: auto;
-        padding: 10px 0;
-        border-bottom: 1px solid #eee;
-        position: sticky;
-        top: 85px;
-        z-index: 99;
-        background: #fff;
-        overflow-x: auto;
-        white-space: nowrap;
-        width: 100vw;
-        margin-left: -15px;
-        padding-left: 15px;
-        scrollbar-width: none;
-      }
-
-      .sidebar::-webkit-scrollbar {
-        display: none;
-      }
-
-      .sidebar-menu {
-        display: flex;
-        gap: 10px;
+        background-color: #fff;
+        border-right: 1px solid var(--border-color);
+        min-height: 600px;
         padding-right: 20px;
       }
 
+      .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
       .sidebar-item {
-        margin-bottom: 0;
-        display: inline-block;
+        margin-bottom: 5px;
       }
 
       .sidebar-link {
-        border: 1px solid #eee;
-        padding: 8px 16px;
-        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        color: #555;
+        text-decoration: none;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.2s;
+      }
+
+      .sidebar-link i {
+        margin-right: 15px;
+        width: 20px;
+        text-align: center;
+      }
+
+      .sidebar-link:hover {
+        background-color: #f8f9fa;
+        color: #000;
       }
 
       .sidebar-link.active {
-        border-color: #000;
+        background-color: #000;
+        color: #fff;
+      }
+
+      .logout-btn {
+        color: #dc3545;
+      }
+
+      .logout-btn:hover {
+        color: #b02a37;
+        background-color: #f8f9fa;
       }
 
       .main-content {
-        margin-top: 20px;
-        padding-left: 10px;
+        padding-left: 40px;
       }
-    }
 
-    .newsletter-input {
-      background: #333;
-      border: none;
-      color: white;
-      padding: 10px;
-      width: 100%;
-      margin-bottom: 10px;
-    }
-  </style>
+      .page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 30px;
+      }
 
-  <link href="/css/navbar.css" rel="stylesheet" />
-</head>
+      /* Wallet Specifics */
+      .wallet-card {
+        background: radial-gradient(circle at top right, #333, #000);
+        color: #fff;
+        border-radius: 16px;
+        padding: 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        position: relative;
+        overflow: hidden;
+      }
 
-<body>
+      .wallet-card::before {
+        content: "";
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 150px;
+        height: 150px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+      }
 
-  <div id="navbar-placeholder"></div>
+      .balance-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        margin-bottom: 5px;
+        display: block;
+      }
 
-  <div class="profile-container">
-    <div class="row">
+      .balance-amount {
+        font-size: 2.5rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+      }
 
-      <div class="col-lg-3 sidebar">
-        <ul class="sidebar-menu">
-          <li class="sidebar-item"><a href="./userProfilePage.html" class="sidebar-link"><i
-                class="fa-regular fa-user"></i> Profile</a></li>
-          <li class="sidebar-item"><a href="./userOrdersPage.html" class="sidebar-link"><i
-                class="fa-solid fa-bag-shopping"></i> Orders</a></li>
-          <li class="sidebar-item"><a href="./userWalletPage.html" class="sidebar-link active"><i
-                class="fa-solid fa-wallet"></i> Wallet</a></li>
-          <li class="sidebar-item"><a href="./userWishListPage.html" class="sidebar-link"><i
-                class="fa-regular fa-heart"></i> Wishlist</a></li>
-          <li class="sidebar-item"><a href="./userAddressPage.html" class="sidebar-link"><i
-                class="fa-solid fa-location-dot"></i> Address</a></li>
-          <li class="sidebar-item"><a href="./changePassword.html" class="sidebar-link"><i class="fa-solid fa-lock"></i>
-              Password</a></li>
-          <li class="sidebar-item"><a href="./userCoupon.html" class="sidebar-link"><i class="fa-solid fa-ticket"></i>
-              Coupon</a></li>
-          <li class="sidebar-item"><a href="./userLogin.html" class="sidebar-link logout-btn"><i
-                class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a></li>
-        </ul>
-      </div>
+      .transaction-card {
+        border: 1px solid #eee;
+        border-radius: 12px;
+        background: #fff;
+        overflow: hidden;
+      }
 
-      <div class="col-lg-9 main-content content-animate">
-        <h2 class="page-title text-center text-lg-start">My Wallet</h2>
+      .transaction-item {
+        padding: 20px;
+        border-bottom: 1px solid #f9f9f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background 0.2s;
+      }
 
-        <!-- Balance Card -->
-        <div class="wallet-card">
-          <span class="balance-label">Current Balance</span>
-          <div class="balance-amount" id="walletBalance">Rs. 0.00</div>
-          <div class="mt-3 text-white-50 small">
-            <i class="fa-solid fa-circle-info me-1"></i> Use your wallet balance for fast and secure checkout.
-          </div>
+      .transaction-item:last-child {
+        border-bottom: none;
+      }
+
+      .transaction-item:hover {
+        background: #fcfcfc;
+      }
+
+      #allTransactionsModal .modal-body {
+        max-height: 70vh; /* Keeps the popup from becoming taller than the screen */
+        overflow-y: auto;
+      }
+
+      .txn-details h6 {
+        line-height: 1.2;
+      }
+
+      .txn-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-right: 15px;
+      }
+
+      .txn-credit {
+        background: #d1e7dd;
+        color: #0f5132;
+      }
+
+      .txn-debit {
+        background: #f8d7da;
+        color: #842029;
+      }
+
+      .txn-details h6 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      .txn-meta {
+        font-size: 0.8rem;
+        color: #777;
+        margin-top: 3px;
+      }
+
+      .txn-amount {
+        font-weight: 700;
+        font-size: 1rem;
+      }
+
+      .amount-plus {
+        color: #198754;
+      }
+
+      .amount-minus {
+        color: #dc3545;
+      }
+
+      /* Footer */
+      footer {
+        background-color: #111;
+        color: #aaa;
+        padding: 60px 0 20px;
+        margin-top: 60px;
+      }
+
+      footer h5 {
+        color: white;
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+
+      footer ul {
+        padding: 0;
+        list-style: none;
+      }
+
+      footer ul li {
+        margin-bottom: 10px;
+      }
+
+      footer a {
+        color: #aaa;
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        color: white;
+      }
+
+      @media (max-width: 991px) {
+        .profile-container {
+          padding: 0 15px 40px 15px;
+        }
+
+        .sidebar {
+          border-right: none;
+          min-height: auto;
+          padding: 10px 0;
+          border-bottom: 1px solid #eee;
+          position: sticky;
+          top: 85px;
+          z-index: 99;
+          background: #fff;
+          overflow-x: auto;
+          white-space: nowrap;
+          width: 100vw;
+          margin-left: -15px;
+          padding-left: 15px;
+          scrollbar-width: none;
+        }
+
+        .sidebar::-webkit-scrollbar {
+          display: none;
+        }
+
+        .sidebar-menu {
+          display: flex;
+          gap: 10px;
+          padding-right: 20px;
+        }
+
+        .sidebar-item {
+          margin-bottom: 0;
+          display: inline-block;
+        }
+
+        .sidebar-link {
+          border: 1px solid #eee;
+          padding: 8px 16px;
+          font-size: 0.9rem;
+        }
+
+        .sidebar-link.active {
+          border-color: #000;
+        }
+
+        .main-content {
+          margin-top: 20px;
+          padding-left: 10px;
+        }
+      }
+
+      .newsletter-input {
+        background: #333;
+        border: none;
+        color: white;
+        padding: 10px;
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    </style>
+
+    <link href="/css/navbar.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div id="navbar-placeholder"></div>
+
+    <div class="profile-container">
+      <div class="row">
+        <div class="col-lg-3 sidebar">
+          <ul class="sidebar-menu">
+            <li class="sidebar-item">
+              <a href="./userProfilePage.html" class="sidebar-link"
+                ><i class="fa-regular fa-user"></i> Profile</a
+              >
+            </li>
+            <li class="sidebar-item">
+              <a href="./userOrdersPage.html" class="sidebar-link"
+                ><i class="fa-solid fa-bag-shopping"></i> Orders</a
+              >
+            </li>
+            <li class="sidebar-item">
+              <a href="./userWalletPage.html" class="sidebar-link active"
+                ><i class="fa-solid fa-wallet"></i> Wallet</a
+              >
+            </li>
+            <li class="sidebar-item">
+              <a href="./userWishListPage.html" class="sidebar-link"
+                ><i class="fa-regular fa-heart"></i> Wishlist</a
+              >
+            </li>
+            <li class="sidebar-item">
+              <a href="./userAddressPage.html" class="sidebar-link"
+                ><i class="fa-solid fa-location-dot"></i> Address</a
+              >
+            </li>
+            <li class="sidebar-item">
+              <a href="./changePassword.html" class="sidebar-link"
+                ><i class="fa-solid fa-lock"></i> Password</a
+              >
+            </li>
+            <li class="sidebar-item">
+              <a href="./userCoupon.html" class="sidebar-link"
+                ><i class="fa-solid fa-ticket"></i> Coupon</a
+              >
+            </li>
+            <li class="sidebar-item">
+              <a href="./userLogin.html" class="sidebar-link logout-btn"
+                ><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a
+              >
+            </li>
+          </ul>
         </div>
 
-        <h5 class="mb-3 fw-bold">Recent Transactions</h5>
+        <div class="col-lg-9 main-content content-animate">
+          <h2 class="page-title text-center text-lg-start">My Wallet</h2>
 
-        <div class="transaction-card">
-          <div id="transactionList">
-            <div class="text-center p-5 text-muted">
-              <i class="fas fa-spinner fa-spin mb-2"></i> Loading transactions...
+          <!-- Balance Card -->
+          <div class="wallet-card">
+            <span class="balance-label">Current Balance</span>
+            <div class="balance-amount" id="walletBalance">Rs. 0.00</div>
+            <div class="mt-3 text-white-50 small">
+              <i class="fa-solid fa-circle-info me-1"></i> Use your wallet
+              balance for fast and secure checkout.
+            </div>
+          </div>
+
+          <h5 class="mb-3 fw-bold">Recent Transactions</h5>
+
+          <div class="transaction-card">
+            <div id="transactionList">
+              <div class="text-center p-5 text-muted">
+                <i class="fas fa-spinner fa-spin mb-2"></i> Loading
+                transactions...
+              </div>
             </div>
           </div>
         </div>
-
       </div>
     </div>
-  </div>
 
-  <footer>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-3">
-          <h5>Discover More</h5>
-          <ul>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact Us</a></li>
-            <li><a href="#">Blog</a></li>
-          </ul>
-        </div>
-        <div class="col-md-3">
-          <h5>Explore Products</h5>
-          <ul>
-            <li><a href="#">Mobiles</a></li>
-            <li><a href="#">Accessories</a></li>
-            <li><a href="#">Trendy Cases</a></li>
-          </ul>
-        </div>
-        <div class="col-md-3">
-          <h5>Customer Care</h5>
-          <ul>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Service</a></li>
-            <li><a href="#">Return Policy</a></li>
-          </ul>
-        </div>
-        <div class="col-md-3">
-          <h5>Contact Us</h5>
-          <form id="footerContactForm" style="margin-bottom: 0;">
-            <input type="text" class="newsletter-input mb-2" placeholder="Name" required />
-            <input type="email" class="newsletter-input mb-2" placeholder="Email" required />
-            <textarea class="newsletter-input mb-2" rows="2" placeholder="Message" required
-              style="resize: none;"></textarea>
-            <button type="submit" class="btn btn-light w-100 btn-sm fw-bold">Send</button>
-          </form>
-          <div class="mt-3">
-            <i class="fa-brands fa-facebook me-3"></i>
-            <i class="fa-brands fa-instagram me-3"></i>
-            <i class="fa-brands fa-twitter"></i>
+    <div
+      class="modal fade"
+      id="allTransactionsModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold">Transaction History</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body p-0">
+            <div
+              id="fullTransactionList"
+              class="transaction-card border-0 rounded-0"
+            ></div>
           </div>
         </div>
       </div>
     </div>
-    <hr class="border-secondary mt-4" />
-    <div class="text-center small">
-      &copy; 2025 Jinsa Mobiles. All rights reserved.
-    </div>
-  </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/js/navbar.js"></script>
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-3">
+            <h5>Discover More</h5>
+            <ul>
+              <li><a href="#">About Us</a></li>
+              <li><a href="#">Contact Us</a></li>
+              <li><a href="#">Blog</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h5>Explore Products</h5>
+            <ul>
+              <li><a href="#">Mobiles</a></li>
+              <li><a href="#">Accessories</a></li>
+              <li><a href="#">Trendy Cases</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h5>Customer Care</h5>
+            <ul>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Service</a></li>
+              <li><a href="#">Return Policy</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h5>Contact Us</h5>
+            <form id="footerContactForm" style="margin-bottom: 0">
+              <input
+                type="text"
+                class="newsletter-input mb-2"
+                placeholder="Name"
+                required
+              />
+              <input
+                type="email"
+                class="newsletter-input mb-2"
+                placeholder="Email"
+                required
+              />
+              <textarea
+                class="newsletter-input mb-2"
+                rows="2"
+                placeholder="Message"
+                required
+                style="resize: none"
+              ></textarea>
+              <button type="submit" class="btn btn-light w-100 btn-sm fw-bold">
+                Send
+              </button>
+            </form>
+            <div class="mt-3">
+              <i class="fa-brands fa-facebook me-3"></i>
+              <i class="fa-brands fa-instagram me-3"></i>
+              <i class="fa-brands fa-twitter"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr class="border-secondary mt-4" />
+      <div class="text-center small">
+        &copy; 2025 Jinsa Mobiles. All rights reserved.
+      </div>
+    </footer>
 
-  <script>
-    function formatMoney(amount) {
-      return "Rs. " + Number(amount).toLocaleString("en-IN") + ".00";
-    }
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/navbar.js"></script>
 
-    function formatDate(dateString) {
-      const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-      return new Date(dateString).toLocaleDateString('en-IN', options);
-    }
-
-    async function fetchWallet() {
-      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-      const balanceEl = document.getElementById('walletBalance');
-      const listEl = document.getElementById('transactionList');
-
-      try {
-        const res = await fetch('/api/user/wallet', {
-          headers: { "Authorization": "Bearer " + token }
-        });
-        const data = await res.json();
-
-        if (data.success) {
-          // Update Balance
-          balanceEl.innerText = formatMoney(data.balance);
-
-          // Render Transactions
-          if (data.transactions.length === 0) {
-            listEl.innerHTML = '<div class="text-center p-5 text-muted">No transactions found.</div>';
-            return;
-          }
-
-          let html = '';
-          data.transactions.forEach(txn => {
-            const isCredit = txn.type === 'CREDIT';
-            const iconClass = isCredit ? 'fa-arrow-down' : 'fa-arrow-up'; // Down for incoming (credit), Up for outgoing
-            const colorClass = isCredit ? 'txn-credit' : 'txn-debit';
-            const amountClass = isCredit ? 'amount-plus' : 'amount-minus';
-            const sign = isCredit ? '+' : '-';
-
-            // Readable Reasons
-            const reasons = {
-              'ORDER_PAYMENT': 'Payment for Order',
-              'REFUND': 'Order Refund',
-              'ADMIN_ADD': 'Bonus / Cashback', // or Added by Admin
-              'ADMIN_DEDUCT': 'Adjustment / Penalty',
-              'CASHBACK': 'Cashback Reward'
-            };
-            const reasonText = reasons[txn.reason] || txn.reason;
-
-
-            html += `
-                        <div class="transaction-item">
-                            <div class="d-flex align-items-center">
-                                <div class="txn-icon ${colorClass}">
-                                    <i class="fa-solid ${iconClass}"></i>
-                                </div>
-                                <div class="txn-details">
-                                    <h6>${reasonText}</h6>
-                                    <div class="txn-meta">${formatDate(txn.createdAt)}</div>
-                                </div>
-                            </div>
-                            <div class="txn-amount ${amountClass}">
-                                ${sign}${formatMoney(txn.amount)}
-                            </div>
-                        </div>
-                    `;
-          });
-          listEl.innerHTML = html;
-        } else {
-          listEl.innerHTML = '<div class="text-center p-4 text-danger">Failed to load wallet data.</div>';
-        }
-      } catch (error) {
-        console.error(error);
-        listEl.innerHTML = '<div class="text-center p-4 text-danger">Error loading data.</div>';
+    <script>
+      function formatMoney(amount) {
+        return "Rs. " + Number(amount).toLocaleString("en-IN") + ".00";
       }
-    }
 
-    document.addEventListener("DOMContentLoaded", fetchWallet);
-  </script>
+      function formatDate(dateString) {
+        const options = {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        };
+        return new Date(dateString).toLocaleDateString("en-IN", options);
+      }
 
-</body>
+      function createTransactionRow(txn) {
+        const isCredit = txn.type === "CREDIT";
+        const iconClass = isCredit ? "fa-arrow-down" : "fa-arrow-up";
+        const colorClass = isCredit ? "txn-credit" : "txn-debit";
+        const amountClass = isCredit ? "amount-plus" : "amount-minus";
+        const sign = isCredit ? "+" : "-";
 
+        const reasons = {
+          ORDER_PAYMENT: "Payment for Order",
+          REFUND: "Order Refund",
+          ADMIN_ADD: "Bonus / Cashback",
+          ADMIN_DEDUCT: "Adjustment / Penalty",
+          CASHBACK: "Cashback Reward",
+        };
+        const reasonText = reasons[txn.reason] || txn.reason;
+
+        // Generate Order ID HTML only if orderId exists
+        const orderIdHtml = txn.orderId
+          ? `<div class="text-muted" style="font-size: 0.75rem; margin-top: 2px;">
+            <i class="fa-solid fa-hashtag small"></i> ID: <strong>${txn.orderId}</strong>
+           </div>`
+          : "";
+
+        return `
+        <div class="transaction-item">
+            <div class="d-flex align-items-center">
+                <div class="txn-icon ${colorClass}">
+                    <i class="fa-solid ${iconClass}"></i>
+                </div>
+                <div class="txn-details">
+                    <h6 class="mb-0">${reasonText}</h6>
+                    ${orderIdHtml}
+                    <div class="txn-meta">${formatDate(txn.createdAt)}</div>
+                </div>
+            </div>
+            <div class="txn-amount ${amountClass}">
+                ${sign}${formatMoney(txn.amount)}
+            </div>
+        </div>`;
+      }
+
+      async function fetchWallet() {
+        const token =
+          localStorage.getItem("token") || sessionStorage.getItem("token");
+        const balanceEl = document.getElementById("walletBalance");
+        const listEl = document.getElementById("transactionList");
+        const fullListEl = document.getElementById("fullTransactionList");
+
+        try {
+          const res = await fetch("/api/user/wallet", {
+            headers: { Authorization: "Bearer " + token },
+          });
+          const data = await res.json();
+
+          if (data.success) {
+            balanceEl.innerText = formatMoney(data.balance);
+
+            if (data.transactions.length === 0) {
+              listEl.innerHTML =
+                '<div class="text-center p-5 text-muted">No transactions found.</div>';
+              return;
+            }
+
+            // 1. Render only the first 5 in the main UI
+            const recentOnes = data.transactions.slice(0, 5);
+            listEl.innerHTML = recentOnes
+              .map((txn) => createTransactionRow(txn))
+              .join("");
+
+            // 2. Add "Show More" button if there are more than 5
+            if (data.transactions.length > 5) {
+              listEl.innerHTML += `
+                    <div class="p-3 text-center border-top">
+                        <button class="btn btn-sm btn-outline-dark rounded-pill px-4" 
+                                data-bs-toggle="modal" data-bs-target="#allTransactionsModal">
+                            Show More <i class="fa-solid fa-chevron-down ms-1"></i>
+                        </button>
+                    </div>`;
+            }
+
+            // 3. Render ALL transactions into the Modal
+            fullListEl.innerHTML = data.transactions
+              .map((txn) => createTransactionRow(txn))
+              .join("");
+          } else {
+            listEl.innerHTML =
+              '<div class="text-center p-4 text-danger">Failed to load wallet data.</div>';
+          }
+        } catch (error) {
+          console.error(error);
+          listEl.innerHTML =
+            '<div class="text-center p-4 text-danger">Error loading data.</div>';
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", fetchWallet);
+    </script>
+  </body>
 </html>
