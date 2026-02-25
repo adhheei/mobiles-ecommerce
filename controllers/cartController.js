@@ -338,6 +338,16 @@ const placeOrder = async (req, res) => {
 
     if (useWallet) {
       wallet = await Wallet.findOne({ userId });
+      if (!wallet || wallet.balance < finalAmount) {
+        // If the payment method is specifically WALLET, it MUST cover the full amount
+        if (paymentMethod.toUpperCase() === "WALLET") {
+          return res.status(400).json({
+            success: false,
+            message: "Insufficient wallet balance. Please use another payment method or add funds.",
+          });
+        }
+      }
+
       if (wallet && wallet.balance > 0) {
         walletDeducted = Math.min(wallet.balance, finalAmount);
         // We do not save the wallet here yet because Order.create might fail

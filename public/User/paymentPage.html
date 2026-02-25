@@ -1,934 +1,929 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <script src="/js/authGuard.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Payment - Jinsa Mobiles</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
 
-    <style>
-      /* --- GLOBAL VARIABLES & FONTS --- */
-      :root {
-        --primary-black: #1a1a1a;
-        --primary-red: #d32f2f;
-        --bg-light: #f8f9fa;
-        --border-color: #e5e5e5;
+<head>
+  <meta charset="UTF-8" />
+  <script src="/js/authGuard.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment - Jinsa Mobiles</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    /* --- GLOBAL VARIABLES & FONTS --- */
+    :root {
+      --primary-black: #1a1a1a;
+      --primary-red: #d32f2f;
+      --bg-light: #f8f9fa;
+      --border-color: #e5e5e5;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #fff;
+      padding-top: 100px;
+      /* Adjusted for fixed navbar */
+      color: #1a1a1a;
+      overflow-x: hidden;
+    }
+
+    /* --- ANIMATION CSS --- */
+    .reveal-up {
+      opacity: 0;
+      transform: translateY(50px);
+      transition: all 0.8s ease-out;
+    }
+
+    .reveal-up.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* -------------------- */
+
+    /* --- HEADER STYLES (CONSISTENT) --- */
+    .navbar {
+      padding: 10px 0;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--primary-black);
+    }
+
+    .navbar-nav .nav-link {
+      font-family: "Poppins", sans-serif !important;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1a1a1a !important;
+      margin: 0 15px;
+      transition: color 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: #0d6efd !important;
+    }
+
+    .search-container {
+      position: relative;
+    }
+
+    .search-input {
+      width: 200px;
+      height: 40px;
+      font-size: 0.9rem;
+      padding-right: 40px;
+      border-radius: 50px;
+      border: 1px solid #dee2e6;
+      padding-left: 15px;
+    }
+
+    .search-icon {
+      position: absolute;
+      top: 50%;
+      right: 15px;
+      transform: translateY(-50%);
+      color: #6c757d;
+      cursor: pointer;
+    }
+
+    .nav-icons i {
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: var(--primary-black);
+    }
+
+    /* Mobile Adjustments */
+    @media (max-width: 991px) {
+      .navbar-nav {
+        text-align: center;
+        margin-bottom: 15px;
+        align-items: center;
+        width: 100%;
       }
 
-      body {
-        font-family: "Poppins", sans-serif;
-        background-color: #fff;
-        padding-top: 100px;
-        /* Adjusted for fixed navbar */
-        color: #1a1a1a;
-        overflow-x: hidden;
-      }
-
-      /* --- ANIMATION CSS --- */
-      .reveal-up {
-        opacity: 0;
-        transform: translateY(50px);
-        transition: all 0.8s ease-out;
-      }
-
-      .reveal-up.active {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      /* -------------------- */
-
-      /* --- HEADER STYLES (CONSISTENT) --- */
-      .navbar {
-        padding: 10px 0;
-        background: white;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-      }
-
-      .navbar-brand {
-        font-weight: 700;
-        font-size: 1.5rem;
-        color: var(--primary-black);
-      }
-
-      .navbar-nav .nav-link {
-        font-family: "Poppins", sans-serif !important;
-        font-size: 1rem;
-        font-weight: 600;
-        color: #1a1a1a !important;
-        margin: 0 15px;
-        transition: color 0.3s ease;
-      }
-
-      .navbar-nav .nav-link:hover {
-        color: #0d6efd !important;
+      .nav-icons {
+        justify-content: center;
+        margin-top: 15px;
+        width: 100%;
+        border-top: 1px solid #eee;
+        padding-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
       }
 
       .search-container {
-        position: relative;
+        margin-bottom: 10px;
+      }
+    }
+
+    @media (min-width: 992px) {
+      .navbar-collapse {
+        margin-left: 50px;
       }
 
-      .search-input {
-        width: 200px;
-        height: 40px;
-        font-size: 0.9rem;
-        padding-right: 40px;
-        border-radius: 50px;
-        border: 1px solid #dee2e6;
-        padding-left: 15px;
-      }
-
-      .search-icon {
-        position: absolute;
-        top: 50%;
-        right: 15px;
-        transform: translateY(-50%);
-        color: #6c757d;
-        cursor: pointer;
-      }
-
-      .nav-icons i {
-        font-size: 1.2rem;
-        cursor: pointer;
-        color: var(--primary-black);
-      }
-
-      /* Mobile Adjustments */
-      @media (max-width: 991px) {
-        .navbar-nav {
-          text-align: center;
-          margin-bottom: 15px;
-          align-items: center;
-          width: 100%;
-        }
-
-        .nav-icons {
-          justify-content: center;
-          margin-top: 15px;
-          width: 100%;
-          border-top: 1px solid #eee;
-          padding-top: 20px;
-          display: flex;
-          flex-direction: column;
-          gap: 15px;
-          align-items: center;
-        }
-
-        .search-container {
-          margin-bottom: 10px;
-        }
-      }
-
-      @media (min-width: 992px) {
-        .navbar-collapse {
-          margin-left: 50px;
-        }
-
-        .nav-icons {
-          display: flex;
-          align-items: center;
-          margin-left: auto;
-        }
-      }
-
-      /* Dropdown Menu Styles */
-      .dropdown-menu {
-        border: none;
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        padding: 10px 0;
-        margin-top: 10px;
-      }
-
-      .dropdown-item {
-        padding: 10px 20px;
-        font-weight: 500;
-        font-size: 0.9rem;
-        color: #333;
-        transition: all 0.2s ease;
-      }
-
-      .dropdown-item:hover {
-        background-color: #f8f9fa;
-        color: #d32f2f;
-        padding-left: 25px;
-      }
-
-      /* --- PAYMENT PAGE STYLES --- */
-
-      .checkout-container {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 40px 15px;
-      }
-
-      .main-heading {
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin-bottom: 30px;
-      }
-
-      .section-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        margin-bottom: 20px;
-      }
-
-      /* Payment Options */
-      .payment-option {
-        border: 1px solid #e9ecef;
-        border-radius: 8px;
-        margin-bottom: 15px;
-        overflow: hidden;
-        cursor: pointer;
-        transition: border-color 0.2s;
-      }
-
-      .payment-header {
-        padding: 15px;
-        background: #fff;
+      .nav-icons {
         display: flex;
         align-items: center;
-      }
-
-      .payment-header input[type="radio"] {
-        width: 1.2em;
-        height: 1.2em;
-        margin-right: 15px;
-        cursor: pointer;
-      }
-
-      .payment-header input[type="radio"]:checked {
-        background-color: #1a1a1a;
-        border-color: #1a1a1a;
-      }
-
-      .payment-label {
-        font-weight: 600;
-        font-size: 0.95rem;
-        flex-grow: 1;
-      }
-
-      .payment-icons-row i {
-        font-size: 1.2rem;
-        margin-left: 5px;
-        color: #555;
-      }
-
-      /* Card Form */
-      .card-details-form {
-        background: #f8f9fa;
-        padding: 20px;
-        border-top: 1px solid #e9ecef;
-        display: none;
-        /* Hidden by default */
-      }
-
-      .payment-option.active .card-details-form {
-        display: block;
-        /* Show when active */
-      }
-
-      .payment-option.active {
-        border: 1px solid #1a1a1a;
-      }
-
-      .form-control {
-        padding: 12px 15px;
-        border-radius: 6px;
-        border: 1px solid #ced4da;
-        font-size: 0.9rem;
-        background: white;
-      }
-
-      .input-icon-wrap {
-        position: relative;
-      }
-
-      .input-icon-end {
-        position: absolute;
-        top: 50%;
-        right: 15px;
-        transform: translateY(-50%);
-        color: #6c757d;
-      }
-
-      /* Complete Button */
-      .btn-complete {
-        background: #1a1a1a;
-        color: white;
-        width: 100%;
-        padding: 15px;
-        border-radius: 50px;
-        font-weight: 600;
-        border: none;
-        margin-top: 30px;
-        font-size: 1rem;
-        transition: background 0.2s;
-        text-decoration: none;
-        /* Ensure link looks like button */
-        display: block;
-        text-align: center;
-      }
-
-      .btn-complete:hover {
-        background: #333;
-        color: white;
-      }
-
-      /* Order Summary */
-      .order-summary {
-        background: #fdfdfd;
-        border: 1px solid #eee;
-        border-radius: 16px;
-        padding: 25px;
-        position: sticky;
-        top: 120px;
-      }
-
-      .summary-item {
-        display: flex;
-        gap: 15px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #eee;
-      }
-
-      .summary-img {
-        width: 60px;
-        height: 60px;
-        border-radius: 8px;
-        object-fit: cover;
-        background: #f1f1f1;
-      }
-
-      .summary-details h6 {
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin-bottom: 4px;
-      }
-
-      .summary-details p {
-        font-size: 0.8rem;
-        color: #666;
-        margin: 0;
-      }
-
-      /* Updated Price Styling */
-      .summary-price-container {
         margin-left: auto;
-        text-align: right;
       }
+    }
 
-      .original-price {
-        text-decoration: line-through;
-        color: #999;
-        font-size: 0.8rem;
-        display: block;
-      }
+    /* Dropdown Menu Styles */
+    .dropdown-menu {
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      padding: 10px 0;
+      margin-top: 10px;
+    }
 
-      .offer-price {
-        font-weight: 700;
-        font-size: 0.95rem;
-        color: #1a1a1a;
-        display: block;
-      }
+    .dropdown-item {
+      padding: 10px 20px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #333;
+      transition: all 0.2s ease;
+    }
 
-      .promo-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid #eee;
-        font-size: 0.85rem;
-        color: #555;
-        cursor: pointer;
-        text-decoration: none;
-      }
+    .dropdown-item:hover {
+      background-color: #f8f9fa;
+      color: #d32f2f;
+      padding-left: 25px;
+    }
 
-      .summary-calc {
-        padding-top: 15px;
-      }
+    /* --- PAYMENT PAGE STYLES --- */
 
-      .calc-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 8px;
-        font-size: 0.9rem;
-        color: #555;
-      }
+    .checkout-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 15px;
+    }
 
-      .calc-row.total {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #1a1a1a;
-        margin-top: 15px;
-        padding-top: 15px;
-        border-top: 1px solid #eee;
-      }
+    .main-heading {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 30px;
+    }
 
-      .free-shipping {
-        color: #d32f2f;
-        font-weight: 600;
-        border: 1px solid #d32f2f;
-        padding: 2px 8px;
-        border-radius: 12px;
-        font-size: 0.75rem;
-      }
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
 
-      .discount-text {
-        color: #2e7d32;
-        /* Green for discount */
-        font-weight: 600;
-      }
+    /* Payment Options */
+    .payment-option {
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
 
-      /* Bottom Trust Section */
-      .trust-section {
-        margin-top: 60px;
-        border-top: 1px solid #eee;
-        padding-top: 40px;
-        text-align: center;
-      }
+    .payment-header {
+      padding: 15px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+    }
 
-      .payment-icons i {
-        font-size: 2rem;
-        margin: 0 10px;
-        color: #333;
-      }
+    .payment-header input[type="radio"] {
+      width: 1.2em;
+      height: 1.2em;
+      margin-right: 15px;
+      cursor: pointer;
+    }
 
-      .guarantee-box {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-      }
+    .payment-header input[type="radio"]:checked {
+      background-color: #1a1a1a;
+      border-color: #1a1a1a;
+    }
 
-      .guarantee-text {
-        font-size: 0.8rem;
-        color: #666;
-        max-width: 350px;
-        line-height: 1.5;
-      }
+    .payment-label {
+      font-weight: 600;
+      font-size: 0.95rem;
+      flex-grow: 1;
+    }
 
-      /* Footer */
-      footer {
-        background-color: #111;
-        color: #aaa;
-        padding: 60px 0 20px;
-        margin-top: 0;
-      }
+    .payment-icons-row i {
+      font-size: 1.2rem;
+      margin-left: 5px;
+      color: #555;
+    }
 
-      footer h5 {
-        color: white;
-        font-weight: 600;
-        margin-bottom: 20px;
-      }
+    /* Card Form */
+    .card-details-form {
+      background: #f8f9fa;
+      padding: 20px;
+      border-top: 1px solid #e9ecef;
+      display: none;
+      /* Hidden by default */
+    }
 
-      footer ul {
-        padding-left: 0;
-        list-style: none;
-      }
+    .payment-option.active .card-details-form {
+      display: block;
+      /* Show when active */
+    }
 
-      footer ul li {
-        margin-bottom: 10px;
-      }
+    .payment-option.active {
+      border: 1px solid #1a1a1a;
+    }
 
-      footer a {
-        color: #aaa;
-        text-decoration: none;
-      }
+    .form-control {
+      padding: 12px 15px;
+      border-radius: 6px;
+      border: 1px solid #ced4da;
+      font-size: 0.9rem;
+      background: white;
+    }
 
-      footer a:hover {
-        color: white;
-      }
+    .input-icon-wrap {
+      position: relative;
+    }
 
-      .newsletter-input {
-        background: #333;
-        border: none;
-        color: white;
-        padding: 10px;
-        width: 100%;
-        margin-bottom: 10px;
-      }
-    </style>
+    .input-icon-end {
+      position: absolute;
+      top: 50%;
+      right: 15px;
+      transform: translateY(-50%);
+      color: #6c757d;
+    }
 
-    <link href="/css/navbar.css" rel="stylesheet" />
-  </head>
+    /* Complete Button */
+    .btn-complete {
+      background: #1a1a1a;
+      color: white;
+      width: 100%;
+      padding: 15px;
+      border-radius: 50px;
+      font-weight: 600;
+      border: none;
+      margin-top: 30px;
+      font-size: 1rem;
+      transition: background 0.2s;
+      text-decoration: none;
+      /* Ensure link looks like button */
+      display: block;
+      text-align: center;
+    }
 
-  <body>
-    <div id="navbar-placeholder"></div>
+    .btn-complete:hover {
+      background: #333;
+      color: white;
+    }
 
-    <div class="checkout-container reveal-up">
-      <div class="row g-5">
-        <div class="col-lg-7">
-          <h2 class="main-heading">Payment</h2>
+    /* Order Summary */
+    .order-summary {
+      background: #fdfdfd;
+      border: 1px solid #eee;
+      border-radius: 16px;
+      padding: 25px;
+      position: sticky;
+      top: 120px;
+    }
 
-          <!-- New Shipping Address Display -->
-          <div
-            class="card mb-4 border-0 shadow-sm"
-            style="background-color: #f8f9fa; border-radius: 12px"
-          >
-            <div class="card-body p-3">
-              <div
-                class="d-flex justify-content-between align-items-center mb-2"
-              >
-                <h6 class="fw-bold mb-0">
-                  <i class="fa-solid fa-location-dot me-2 text-danger"></i
-                  >Delivering to
-                </h6>
-                <a
-                  href="./address.html"
-                  class="text-decoration-none small fw-bold"
-                  >Change</a
-                >
-              </div>
-              <div id="shipping-address-display" class="small text-muted ps-4">
-                <!-- Address will be injected here -->
-                <div class="placeholder-glow">
-                  <span class="placeholder col-6"></span><br />
-                  <span class="placeholder col-8"></span>
-                </div>
+    .summary-item {
+      display: flex;
+      gap: 15px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .summary-img {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #f1f1f1;
+    }
+
+    .summary-details h6 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .summary-details p {
+      font-size: 0.8rem;
+      color: #666;
+      margin: 0;
+    }
+
+    /* Updated Price Styling */
+    .summary-price-container {
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .original-price {
+      text-decoration: line-through;
+      color: #999;
+      font-size: 0.8rem;
+      display: block;
+    }
+
+    .offer-price {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #1a1a1a;
+      display: block;
+    }
+
+    .promo-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 0.85rem;
+      color: #555;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .summary-calc {
+      padding-top: 15px;
+    }
+
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .calc-row.total {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+
+    .free-shipping {
+      color: #d32f2f;
+      font-weight: 600;
+      border: 1px solid #d32f2f;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+    }
+
+    .discount-text {
+      color: #2e7d32;
+      /* Green for discount */
+      font-weight: 600;
+    }
+
+    /* Bottom Trust Section */
+    .trust-section {
+      margin-top: 60px;
+      border-top: 1px solid #eee;
+      padding-top: 40px;
+      text-align: center;
+    }
+
+    .payment-icons i {
+      font-size: 2rem;
+      margin: 0 10px;
+      color: #333;
+    }
+
+    .guarantee-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .guarantee-text {
+      font-size: 0.8rem;
+      color: #666;
+      max-width: 350px;
+      line-height: 1.5;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #111;
+      color: #aaa;
+      padding: 60px 0 20px;
+      margin-top: 0;
+    }
+
+    footer h5 {
+      color: white;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    footer ul {
+      padding-left: 0;
+      list-style: none;
+    }
+
+    footer ul li {
+      margin-bottom: 10px;
+    }
+
+    footer a {
+      color: #aaa;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: white;
+    }
+
+    .newsletter-input {
+      background: #333;
+      border: none;
+      color: white;
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  </style>
+
+  <link href="/css/navbar.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <div class="checkout-container reveal-up">
+    <div class="row g-5">
+      <div class="col-lg-7">
+        <h2 class="main-heading">Payment</h2>
+
+        <!-- New Shipping Address Display -->
+        <div class="card mb-4 border-0 shadow-sm" style="background-color: #f8f9fa; border-radius: 12px">
+          <div class="card-body p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="fw-bold mb-0">
+                <i class="fa-solid fa-location-dot me-2 text-danger"></i>Delivering to
+              </h6>
+              <a href="./address.html" class="text-decoration-none small fw-bold">Change</a>
+            </div>
+            <div id="shipping-address-display" class="small text-muted ps-4">
+              <!-- Address will be injected here -->
+              <div class="placeholder-glow">
+                <span class="placeholder col-6"></span><br />
+                <span class="placeholder col-8"></span>
               </div>
             </div>
           </div>
-
-          <h4 class="section-title">Payment Method</h4>
-
-          <div class="payment-option" id="option-wallet">
-            <div class="payment-header" onclick="selectPayment('wallet')">
-              <input type="radio" name="payment_method" id="radio-wallet" />
-              <span class="payment-label">Jinsa Wallet</span>
-              <div class="payment-icons-row text-success fw-bold me-2">
-                <i class="fa-solid fa-wallet me-1"></i> Balance: Rs.
-                <span id="wallet-balance-display">0.00</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="payment-option active" id="option-razorpay">
-            <div class="payment-header" onclick="selectPayment('razorpay')">
-              <input
-                type="radio"
-                name="payment_method"
-                checked
-                id="radio-razorpay"
-              />
-              <span class="payment-label">Online Payment (Razorpay)</span>
-              <div class="payment-icons-row">
-                <i class="fa-brands fa-cc-visa"></i>
-                <i class="fa-brands fa-cc-mastercard"></i>
-                <i class="fa-solid fa-building-columns"></i>
-              </div>
-            </div>
-          </div>
-
-          <div class="payment-option" id="option-cod">
-            <div class="payment-header" onclick="selectPayment('cod')">
-              <input type="radio" name="payment_method" id="radio-cod" />
-              <span class="payment-label">Cash on Delivery</span>
-              <div class="payment-icons-row">
-                <i class="fa-solid fa-money-bill-1 text-success"></i>
-              </div>
-            </div>
-          </div>
-
-          <button type="button" class="btn-complete" onclick="placeOrder()">
-            Complete Order
-          </button>
         </div>
 
-        <div class="col-lg-5">
-          <div class="order-summary reveal-up">
-            <!-- Dynamic Content Loaded via checkoutSummary.js -->
+        <h4 class="section-title">Payment Method</h4>
+
+        <div class="payment-option" id="option-wallet">
+          <div class="payment-header" onclick="selectPayment('wallet')">
+            <input type="radio" name="payment_method" id="radio-wallet" />
+            <span class="payment-label">Jinsa Wallet</span>
+            <div class="payment-icons-row text-success fw-bold me-2">
+              <i class="fa-solid fa-wallet me-1"></i> Balance: Rs.
+              <span id="wallet-balance-display">0.00</span>
+            </div>
           </div>
         </div>
+
+        <div class="payment-option active" id="option-razorpay">
+          <div class="payment-header" onclick="selectPayment('razorpay')">
+            <input type="radio" name="payment_method" checked id="radio-razorpay" />
+            <span class="payment-label">Online Payment (Razorpay)</span>
+            <div class="payment-icons-row">
+              <i class="fa-brands fa-cc-visa"></i>
+              <i class="fa-brands fa-cc-mastercard"></i>
+              <i class="fa-solid fa-building-columns"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="payment-option" id="option-cod">
+          <div class="payment-header" onclick="selectPayment('cod')">
+            <input type="radio" name="payment_method" id="radio-cod" />
+            <span class="payment-label">Cash on Delivery</span>
+            <div class="payment-icons-row">
+              <i class="fa-solid fa-money-bill-1 text-success"></i>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="btn-complete" onclick="placeOrder()">
+          Complete Order
+        </button>
       </div>
 
-      <!-- Trust Section ... -->
+      <div class="col-lg-5">
+        <div class="order-summary reveal-up">
+          <!-- Dynamic Content Loaded via checkoutSummary.js -->
+        </div>
+      </div>
     </div>
 
-    <footer>
-      <div class="container">
-        <div class="row">
-          <div class="col-md-3">
-            <h5>Discover More</h5>
-            <ul>
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">Contact Us</a></li>
-              <li><a href="#">Blog</a></li>
-            </ul>
-          </div>
-          <div class="col-md-3">
-            <h5>Explore Products</h5>
-            <ul>
-              <li><a href="#">Mobiles</a></li>
-              <li><a href="#">Accessories</a></li>
-              <li><a href="#">Trendy Cases</a></li>
-            </ul>
-          </div>
-          <div class="col-md-3">
-            <h5>Customer Care</h5>
-            <ul>
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Terms of Service</a></li>
-              <li><a href="#">Return Policy</a></li>
-            </ul>
-          </div>
-          <div class="col-md-3">
-            <h5>Contact Us</h5>
-            <form id="footerContactForm" style="margin-bottom: 0">
-              <input
-                type="text"
-                class="newsletter-input mb-2"
-                placeholder="Name"
-                style="font-size: 0.85rem; padding: 8px"
-                required
-              />
-              <input
-                type="email"
-                class="newsletter-input mb-2"
-                placeholder="Email"
-                style="font-size: 0.85rem; padding: 8px"
-                required
-              />
-              <textarea
-                class="newsletter-input mb-2"
-                rows="2"
-                placeholder="Message"
-                style="font-size: 0.85rem; padding: 8px; resize: none"
-                required
-              ></textarea>
-              <button type="submit" class="btn btn-light w-100 btn-sm fw-bold">
-                Send
-              </button>
-            </form>
-            <div class="mt-3">
-              <i class="fa-brands fa-facebook me-3"></i>
-              <i class="fa-brands fa-instagram me-3"></i>
-              <i class="fa-brands fa-twitter"></i>
-            </div>
-          </div>
+    <!-- Trust Section ... -->
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3">
+          <h5>Discover More</h5>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Blog</a></li>
+          </ul>
         </div>
-        <hr class="border-secondary mt-4" />
-        <div class="text-center small">
-          &copy; 2025 Jinsa Mobiles. All rights reserved.
+        <div class="col-md-3">
+          <h5>Explore Products</h5>
+          <ul>
+            <li><a href="#">Mobiles</a></li>
+            <li><a href="#">Accessories</a></li>
+            <li><a href="#">Trendy Cases</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h5>Customer Care</h5>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Return Policy</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h5>Contact Us</h5>
+          <form id="footerContactForm" style="margin-bottom: 0">
+            <input type="text" class="newsletter-input mb-2" placeholder="Name" style="font-size: 0.85rem; padding: 8px"
+              required />
+            <input type="email" class="newsletter-input mb-2" placeholder="Email"
+              style="font-size: 0.85rem; padding: 8px" required />
+            <textarea class="newsletter-input mb-2" rows="2" placeholder="Message"
+              style="font-size: 0.85rem; padding: 8px; resize: none" required></textarea>
+            <button type="submit" class="btn btn-light w-100 btn-sm fw-bold">
+              Send
+            </button>
+          </form>
+          <div class="mt-3">
+            <i class="fa-brands fa-facebook me-3"></i>
+            <i class="fa-brands fa-instagram me-3"></i>
+            <i class="fa-brands fa-twitter"></i>
+          </div>
         </div>
       </div>
-    </footer>
+      <hr class="border-secondary mt-4" />
+      <div class="text-center small">
+        &copy; 2025 Jinsa Mobiles. All rights reserved.
+      </div>
+    </div>
+  </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script>
-      function selectPayment(method) {
-        document
-          .querySelectorAll(".payment-option")
-          .forEach((opt) => opt.classList.remove("active"));
-        const selectedOption = document.getElementById("option-" + method);
-        if (selectedOption) {
-          selectedOption.classList.add("active");
-          const radio = document.getElementById("radio-" + method);
-          if (radio) radio.checked = true;
-        }
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    function selectPayment(method) {
+      document
+        .querySelectorAll(".payment-option")
+        .forEach((opt) => opt.classList.remove("active"));
+      const selectedOption = document.getElementById("option-" + method);
+      if (selectedOption) {
+        selectedOption.classList.add("active");
+        const radio = document.getElementById("radio-" + method);
+        if (radio) radio.checked = true;
+      }
+    }
+
+    async function placeOrder() {
+      const selectedPayment = document.querySelector(
+        'input[name="payment_method"]:checked',
+      );
+      if (!selectedPayment) {
+        Swal.fire("Error", "Please select a payment method", "error");
+        return;
       }
 
-      async function placeOrder() {
-        const selectedPayment = document.querySelector(
-          'input[name="payment_method"]:checked',
-        );
-        if (!selectedPayment) {
-          Swal.fire("Error", "Please select a payment method", "error");
-          return;
-        }
+      const paymentMethod = selectedPayment.id.replace("radio-", "");
+      const addressId = localStorage.getItem("selectedAddressId");
+      const useWallet = paymentMethod === "wallet";
 
-        const paymentMethod = selectedPayment.id.replace("radio-", "");
-        const addressId = localStorage.getItem("selectedAddressId");
-        const useWallet = paymentMethod === "wallet";
+      if (!addressId) {
+        Swal.fire("Error", "No address selected. Please go back.", "error");
+        return;
+      }
 
-        if (!addressId) {
-          Swal.fire("Error", "No address selected. Please go back.", "error");
-          return;
-        }
+      // --- WALLET BALANCE CHECK ---
+      if (useWallet) {
+        const totalElement =
+          document.getElementById("final-amount-val") ||
+          document.querySelector(".order-summary .total-amount") ||
+          document.querySelector(".calc-row.total span:last-child");
 
-        // --- BUY NOW / CART CHECK ---
-        const checkoutType = sessionStorage.getItem("checkoutType");
-        let buyNowItem =
-          checkoutType === "buyNow"
-            ? JSON.parse(sessionStorage.getItem("buyNowItem") || "null")
-            : null;
-
-        let couponCode = null;
-        const storedCoupon = localStorage.getItem("selectedCoupon");
-        if (storedCoupon) {
-          try {
-            const parsed = JSON.parse(storedCoupon);
-            if (parsed?.code) couponCode = parsed.code;
-          } catch (e) {}
-        }
-
-        // --- BRANCH PAYMENT FLOWS ---
-        if (paymentMethod === "razorpay") {
-          await handleRazorpayFlow(
-            addressId,
-            buyNowItem,
-            couponCode,
-            useWallet,
+        let orderTotal = 0;
+        if (totalElement) {
+          orderTotal = parseFloat(
+            totalElement.innerText.replace(/[^\d.]/g, ""),
           );
-        } else {
-          await submitOrder({
-            paymentMethod: paymentMethod.toUpperCase(),
-            useWallet,
-            addressId,
-            buyNowItem,
-            couponCode,
-          });
+        }
+
+        const balanceText = document.getElementById(
+          "wallet-balance-display",
+        ).innerText;
+        const currentBalance = parseFloat(
+          balanceText.replace(/[^\d.]/g, ""),
+        );
+
+        if (currentBalance < orderTotal) {
+          Swal.fire(
+            "Insufficient Funds",
+            "Your wallet balance is less than the order total. Please choose another payment method.",
+            "error",
+          );
+          return;
         }
       }
 
-      async function handleRazorpayFlow(
-        addressId,
-        buyNowItem,
-        couponCode,
-        useWallet,
-      ) {
+      // --- BUY NOW / CART CHECK ---
+      const checkoutType = sessionStorage.getItem("checkoutType");
+      let buyNowItem =
+        checkoutType === "buyNow"
+          ? JSON.parse(sessionStorage.getItem("buyNowItem") || "null")
+          : null;
+
+      let couponCode = null;
+      const storedCoupon = localStorage.getItem("selectedCoupon");
+      if (storedCoupon) {
         try {
-          const token =
-            localStorage.getItem("token") || sessionStorage.getItem("token");
+          const parsed = JSON.parse(storedCoupon);
+          if (parsed?.code) couponCode = parsed.code;
+        } catch (e) { }
+      }
 
-          // 1. IMPROVED SELECTOR LOGIC
-          // We target the specific 'Total Amount' row in your sidebar
-          const totalElement =
-            document.getElementById("final-amount-val") ||
-            document.querySelector(".order-summary .total-amount") ||
-            document.querySelector(".calc-row.total span:last-child");
+      // --- BRANCH PAYMENT FLOWS ---
+      if (paymentMethod === "razorpay") {
+        await handleRazorpayFlow(
+          addressId,
+          buyNowItem,
+          couponCode,
+          useWallet,
+        );
+      } else {
+        await submitOrder({
+          paymentMethod: paymentMethod.toUpperCase(),
+          useWallet,
+          addressId,
+          buyNowItem,
+          couponCode,
+        });
+      }
+    }
 
-          console.log("Searching for total amount element...", totalElement); // Debugging line
+    async function handleRazorpayFlow(
+      addressId,
+      buyNowItem,
+      couponCode,
+      useWallet,
+    ) {
+      try {
+        const token =
+          localStorage.getItem("token") || sessionStorage.getItem("token");
 
-          let amount = 0;
-          if (totalElement) {
-            // Clean the string: Remove ₹, Rs, commas, and spaces
-            const rawText = totalElement.innerText.trim();
-            amount = parseFloat(rawText.replace(/[^\d.]/g, ""));
-            console.log("Parsed Amount for Backend:", amount);
-          }
+        // 1. IMPROVED SELECTOR LOGIC
+        // We target the specific 'Total Amount' row in your sidebar
+        const totalElement =
+          document.getElementById("final-amount-val") ||
+          document.querySelector(".order-summary .total-amount") ||
+          document.querySelector(".calc-row.total span:last-child");
 
-          // 2. FAIL-SAFE CHECK
-          if (!amount || isNaN(amount) || amount <= 0) {
-            return Swal.fire({
-              icon: "error",
-              title: "Calculation Error",
-              text: "Could not find order total. Please ensure the Order Summary is loaded.",
-            });
-          }
+        console.log("Searching for total amount element...", totalElement); // Debugging line
 
-          Swal.fire({
-            title: "Initiating Payment...",
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading(),
+        let amount = 0;
+        if (totalElement) {
+          // Clean the string: Remove ₹, Rs, commas, and spaces
+          const rawText = totalElement.innerText.trim();
+          amount = parseFloat(rawText.replace(/[^\d.]/g, ""));
+          console.log("Parsed Amount for Backend:", amount);
+        }
+
+        // 2. FAIL-SAFE CHECK
+        if (!amount || isNaN(amount) || amount <= 0) {
+          return Swal.fire({
+            icon: "error",
+            title: "Calculation Error",
+            text: "Could not find order total. Please ensure the Order Summary is loaded.",
           });
+        }
 
-          // 3. SEND TO SERVER
-          const rzpRes = await fetch("/api/cart/razorpay-order", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + token,
-            },
-            body: JSON.stringify({
+        Swal.fire({
+          title: "Initiating Payment...",
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading(),
+        });
+
+        // 3. SEND TO SERVER
+        const rzpRes = await fetch("/api/cart/razorpay-order", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+          body: JSON.stringify({
+            addressId,
+            buyNowItem,
+            couponCode,
+            useWallet,
+            amount,
+          }),
+        });
+
+        const rzpData = await rzpRes.json();
+        Swal.close();
+
+        if (!rzpData.success) {
+          throw new Error(rzpData.message || "Failed to initiate Razorpay");
+        }
+
+        // 4. OPEN RAZORPAY MODAL
+        const options = {
+          key: rzpData.key_id,
+          amount: rzpData.order.amount, // Already in paise from backend
+          currency: "INR",
+          name: "Jinsa Mobiles",
+          description: "Order Payment",
+          order_id: rzpData.order.id,
+          handler: async function (response) {
+            // Finalize order after successful payment
+            await submitOrder({
+              paymentMethod: "Razorpay",
+              useWallet,
               addressId,
               buyNowItem,
               couponCode,
-              useWallet,
-              amount,
-            }),
-          });
-
-          const rzpData = await rzpRes.json();
-          Swal.close();
-
-          if (!rzpData.success) {
-            throw new Error(rzpData.message || "Failed to initiate Razorpay");
-          }
-
-          // 4. OPEN RAZORPAY MODAL
-          const options = {
-            key: rzpData.key_id,
-            amount: rzpData.order.amount, // Already in paise from backend
-            currency: "INR",
-            name: "Jinsa Mobiles",
-            description: "Order Payment",
-            order_id: rzpData.order.id,
-            handler: async function (response) {
-              // Finalize order after successful payment
-              await submitOrder({
-                paymentMethod: "Razorpay",
-                useWallet,
-                addressId,
-                buyNowItem,
-                couponCode,
-                razorpayPaymentId: response.razorpay_payment_id,
-                razorpayOrderId: response.razorpay_order_id,
-                razorpaySignature: response.razorpay_signature,
-              });
-            },
-            prefill: {
-              name: "Customer",
-              email: "user@example.com",
-            },
-            theme: { color: "#1a1a1a" },
-            modal: {
-              ondismiss: function () {
-                Swal.fire(
-                  "Payment Cancelled",
-                  "You closed the payment window.",
-                  "info",
-                );
-              },
-            },
-          };
-
-          const rzpInstance = new Razorpay(options);
-          rzpInstance.open();
-        } catch (error) {
-          console.error("Razorpay Flow Error:", error);
-          Swal.fire("Error", error.message, "error");
-        }
-      }
-
-      async function submitOrder(payload) {
-        try {
-          const token =
-            localStorage.getItem("token") || sessionStorage.getItem("token");
-
-          // 1. Show Processing State
-          Swal.fire({
-            title: "Finalizing Order",
-            text: "Please wait while we confirm your purchase...",
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading(),
-          });
-
-          // 2. Call the Checkout API
-          const res = await fetch("/api/cart/checkout", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + token,
-            },
-            body: JSON.stringify(payload),
-          });
-
-          const data = await res.json();
-
-          // 3. Handle Success
-          if (res.ok && data.success) {
-            // Store complete order data for the Thank You Page summary
-            sessionStorage.setItem(
-              "lastOrderData",
-              JSON.stringify({
-                orderId: data.orderId,
-                items: data.orderItems, // These come from your backend response
-                totals: data.totals,
-                paymentMethod: payload.paymentMethod,
-                address: JSON.parse(
-                  sessionStorage.getItem("deliveryAddress") || "{}",
-                ),
-              }),
-            );
-
-            // --- CLEANUP SESSION DATA ---
-            sessionStorage.removeItem("buyNowItem");
-            sessionStorage.removeItem("checkoutType");
-            localStorage.removeItem("selectedCoupon");
-            // Clear local cart storage if you use it (optional)
-            localStorage.removeItem("cart");
-
-            // 4. Success Alert & Redirect
-            Swal.fire({
-              icon: "success",
-              title: "Order Placed!",
-              text: `Your Order ID is: ${data.orderId}`,
-              timer: 2500,
-              showConfirmButton: false,
-            }).then(() => {
-              window.location.href = "./thankYouPage.html";
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpayOrderId: response.razorpay_order_id,
+              razorpaySignature: response.razorpay_signature,
             });
-          } else {
-            // 5. Handle Known Errors (e.g., "next is not a function" or Stock issues)
-            Swal.fire(
-              "Order Failed",
-              data.message ||
-                "Something went wrong during checkout. Please try again.",
-              "error",
-            );
-          }
-        } catch (error) {
-          // 6. Handle Network/Connection Errors
-          console.error("Submit Order Fetch Error:", error);
+          },
+          prefill: {
+            name: "Customer",
+            email: "user@example.com",
+          },
+          theme: { color: "#1a1a1a" },
+          modal: {
+            ondismiss: function () {
+              Swal.fire(
+                "Payment Cancelled",
+                "You closed the payment window.",
+                "info",
+              );
+            },
+          },
+        };
+
+        const rzpInstance = new Razorpay(options);
+        rzpInstance.open();
+      } catch (error) {
+        console.error("Razorpay Flow Error:", error);
+        Swal.fire("Error", error.message, "error");
+      }
+    }
+
+    async function submitOrder(payload) {
+      try {
+        const token =
+          localStorage.getItem("token") || sessionStorage.getItem("token");
+
+        // 1. Show Processing State
+        Swal.fire({
+          title: "Finalizing Order",
+          text: "Please wait while we confirm your purchase...",
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading(),
+        });
+
+        // 2. Call the Checkout API
+        const res = await fetch("/api/cart/checkout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+
+        // 3. Handle Success
+        if (res.ok && data.success) {
+          // Store complete order data for the Thank You Page summary
+          sessionStorage.setItem(
+            "lastOrderData",
+            JSON.stringify({
+              orderId: data.orderId,
+              items: data.orderItems, // These come from your backend response
+              totals: data.totals,
+              paymentMethod: payload.paymentMethod,
+              address: JSON.parse(
+                sessionStorage.getItem("deliveryAddress") || "{}",
+              ),
+            }),
+          );
+
+          // --- CLEANUP SESSION DATA ---
+          sessionStorage.removeItem("buyNowItem");
+          sessionStorage.removeItem("checkoutType");
+          localStorage.removeItem("selectedCoupon");
+          // Clear local cart storage if you use it (optional)
+          localStorage.removeItem("cart");
+
+          // 4. Success Alert & Redirect
+          Swal.fire({
+            icon: "success",
+            title: "Order Placed!",
+            text: `Your Order ID is: ${data.orderId}`,
+            timer: 2500,
+            showConfirmButton: false,
+          }).then(() => {
+            window.location.href = "./thankYouPage.html";
+          });
+        } else {
+          // 5. Handle Known Errors (e.g., "next is not a function" or Stock issues)
           Swal.fire(
-            "Error",
-            "Network error occurred. Please check your connection and try again.",
+            "Order Failed",
+            data.message ||
+            "Something went wrong during checkout. Please try again.",
             "error",
           );
         }
+      } catch (error) {
+        // 6. Handle Network/Connection Errors
+        console.error("Submit Order Fetch Error:", error);
+        Swal.fire(
+          "Error",
+          "Network error occurred. Please check your connection and try again.",
+          "error",
+        );
       }
+    }
 
-      document.addEventListener("DOMContentLoaded", () => {
-        const addrJson = sessionStorage.getItem("deliveryAddress");
-        if (addrJson) {
-          const addr = JSON.parse(addrJson);
-          document.getElementById("shipping-address-display").innerHTML = `
+    document.addEventListener("DOMContentLoaded", () => {
+      const addrJson = sessionStorage.getItem("deliveryAddress");
+      if (addrJson) {
+        const addr = JSON.parse(addrJson);
+        document.getElementById("shipping-address-display").innerHTML = `
                     <div class="fw-bold">${addr.fullName} <span class="badge bg-light text-dark border ms-2">${addr.addressType}</span></div>
                     <div>${addr.street}, ${addr.city}</div><div>${addr.state} - ${addr.pincode}</div><div>Phone: ${addr.phone}</div>`;
-        }
-        fetchWalletBalance();
-        document
-          .querySelectorAll(".reveal-up")
-          .forEach((el) => el.classList.add("active"));
-      });
+      }
+      fetchWalletBalance();
+      document
+        .querySelectorAll(".reveal-up")
+        .forEach((el) => el.classList.add("active"));
+    });
 
-      async function fetchWalletBalance() {
-        try {
-          const token =
-            localStorage.getItem("token") || sessionStorage.getItem("token");
-          const res = await fetch("/api/user/wallet", {
-            headers: { Authorization: "Bearer " + token },
-          });
-          if (res.ok) {
-            const data = await res.json();
-            if (data.success) {
-              const balanceEl = document.getElementById(
-                "wallet-balance-display",
-              );
-              balanceEl.innerText = data.balance.toLocaleString("en-IN", {
-                minimumFractionDigits: 2,
-              });
-              if (data.balance <= 0) {
-                document
-                  .getElementById("option-wallet")
-                  .classList.add("opacity-50");
-                document.getElementById("option-wallet").style.pointerEvents =
-                  "none";
-                document.getElementById("radio-wallet").disabled = true;
-              }
+    async function fetchWalletBalance() {
+      try {
+        const token =
+          localStorage.getItem("token") || sessionStorage.getItem("token");
+        const res = await fetch("/api/user/wallet", {
+          headers: { Authorization: "Bearer " + token },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            const balanceEl = document.getElementById(
+              "wallet-balance-display",
+            );
+            balanceEl.innerText = data.balance.toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+            });
+            if (data.balance <= 0) {
+              document
+                .getElementById("option-wallet")
+                .classList.add("opacity-50");
+              document.getElementById("option-wallet").style.pointerEvents =
+                "none";
+              document.getElementById("radio-wallet").disabled = true;
             }
           }
-        } catch (e) {}
-      }
-    </script>
+        }
+      } catch (e) { }
+    }
+  </script>
 
-    <script src="/js/navbar.js"></script>
-    <script src="/js/checkoutSummary.js?v=2"></script>
-  </body>
+  <script src="/js/navbar.js"></script>
+  <script src="/js/checkoutSummary.js?v=2"></script>
+</body>
+
 </html>
