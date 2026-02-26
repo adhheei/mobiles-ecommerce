@@ -100,6 +100,12 @@ function renderOrderDetails(order) {
 
     // 3. Totals
     const summaryContainer = document.querySelector('.mt-4.pt-3.border-top');
+    const walletRow = (order.totals.walletAmount && order.totals.walletAmount > 0) ? `
+        <div class="summary-row text-danger">
+            <span>Wallet Used</span>
+            <span>-₹${order.totals.walletAmount.toLocaleString()}</span>
+        </div>` : '';
+
     summaryContainer.innerHTML = `
         <div class="summary-row">
             <span>Subtotal</span>
@@ -113,6 +119,7 @@ function renderOrderDetails(order) {
             <span>Discount</span>
             <span>-₹${order.totals.couponDiscount.toLocaleString()}</span>
         </div>
+        ${walletRow}
         <div class="summary-row total">
             <span>Total</span>
             <span>₹${order.totals.totalAmount.toLocaleString()}</span>

@@ -166,6 +166,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         totals.shipping === 0 ? "Free" : `₹${totals.shipping}`;
       document.getElementById("summary-discount").innerText =
         `- ₹${(totals.couponDiscount || 0).toLocaleString()}`;
+
+      const walletContainer = document.getElementById("summary-wallet-container");
+      const walletSpan = document.getElementById("summary-wallet");
+      if (totals.walletAmount && totals.walletAmount > 0) {
+        walletContainer.style.setProperty("display", "flex", "important");
+        walletSpan.innerText = `- ₹${totals.walletAmount.toLocaleString()}`;
+      } else {
+        walletContainer.style.setProperty("display", "none", "important");
+      }
+
       document.getElementById("summary-total").innerText =
         `₹${(totals.totalAmount || 0).toLocaleString()}`;
 

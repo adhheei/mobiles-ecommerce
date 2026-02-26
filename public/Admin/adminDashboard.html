@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 
 <head>
@@ -560,10 +560,7 @@
         <a href="../Admin/adminMessages.html" class="menu-link"><i class="fa-regular fa-envelope"></i>
           &nbsp;Messages</a>
       </li>
-      <li class="menu-item">
-        <a href="../Admin/adminAnalytics.html" class="menu-link"><i class="fa-solid fa-chart-simple"></i>
-          &nbsp;Analytics</a>
-      </li>
+      <!-- Analytics Link -->
       <li class="menu-item">
         <a href="../Admin/adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i> &nbsp;Coupon
           Management</a>
@@ -742,23 +739,21 @@
       if (!ctx) return;
 
       const monthNames = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
       ];
-      graphData.sort((a, b) => a._id - b._id);
 
-      const labels = graphData.map((item) => monthNames[item._id - 1]);
-      const values = graphData.map((item) => item.revenue);
+      // Create an array of 12 zeros for the revenue
+      const values = new Array(12).fill(0);
+
+      // Populate actual data
+      graphData.forEach(item => {
+        if (item._id >= 1 && item._id <= 12) {
+          values[item._id - 1] = item.revenue;
+        }
+      });
+
+      const labels = monthNames;
 
       // Clear old chart to prevent flickering
       let existingChart = Chart.getChart("salesChart");

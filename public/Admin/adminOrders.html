@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 
 <head>
@@ -362,7 +362,7 @@
       color: #000;
     }
 
-    /* Status Badges â€” MATCH DASHBOARD STYLE */
+    /* Status Badges — MATCH DASHBOARD STYLE */
     .badge-custom {
       padding: 6px 14px;
       border-radius: 20px;
@@ -404,6 +404,8 @@
     }
 
     .btn-view-details {
+      display: inline-block;
+      white-space: nowrap;
       padding: 8px 18px;
       border-radius: 30px;
       border: 1px solid #eee;
@@ -544,10 +546,7 @@
         <a href="../Admin/adminMessages.html" class="menu-link"><i class="fa-regular fa-envelope"></i>
           &nbsp;Messages</a>
       </li>
-      <li class="menu-item">
-        <a href="../Admin/adminAnalytics.html" class="menu-link"><i class="fa-solid fa-chart-simple"></i>
-          &nbsp;Analytics</a>
-      </li>
+      <!-- Analytics Link -->
       <li class="menu-item">
         <a href="../Admin/adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i> &nbsp;Coupon
           Management</a>
@@ -643,6 +642,9 @@
   <script>
     // 1. GLOBAL STATE
     let debounceTimer;
+    let allOrders = []; // Store all fetched orders for client-side filtering/sorting
+    let currentPage = 1;
+    const ordersPerPage = 5;
 
     // 2. Fetch function
     async function fetchOrders(search = "") {
@@ -661,9 +663,11 @@
 
         const data = await res.json();
 
-        if (data.orders && data.orders.length > 0) {
-          renderTable(data.orders);
+        if (data.orders) {
+          allOrders = data.orders; // Cache for filtering
+          applyFiltersAndRender();
         } else {
+          allOrders = [];
           tableBody.innerHTML = `<tr><td colspan="7" class="text-center">No orders found.</td></tr>`;
         }
       } catch (error) {
@@ -672,31 +676,99 @@
       }
     }
 
-    // 2. Render function
+    // 3. Client-side Filter, Sort, Paginate
+    function applyFiltersAndRender() {
+      const statusFilter = document.getElementById("filterStatus")?.value || "all";
+      const sortOption = document.getElementById("sortOrders")?.value || "newest";
+
+      let filtered = [...allOrders];
+
+      // Filter by Status
+      if (statusFilter !== "all") {
+        filtered = filtered.filter(
+          o => o.orderStatus && o.orderStatus.toLowerCase() === statusFilter.toLowerCase()
+        );
+      }
+
+      // Sort
+      filtered.sort((a, b) => {
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+        const priceA = a.totals?.totalAmount || 0;
+        const priceB = b.totals?.totalAmount || 0;
+
+        switch (sortOption) {
+          case "newest": return dateB - dateA;
+          case "oldest": return dateA - dateB;
+          case "amount-high": return priceB - priceA;
+          case "amount-low": return priceA - priceB;
+          default: return dateB - dateA;
+        }
+      });
+
+      // Pagination
+      const totalOrders = filtered.length;
+      const totalPages = Math.ceil(totalOrders / ordersPerPage) || 1;
+
+      // Ensure current page is valid
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      const startIndex = (currentPage - 1) * ordersPerPage;
+      const paginatedOrders = filtered.slice(startIndex, startIndex + ordersPerPage);
+
+      renderTable(paginatedOrders);
+      updatePaginationUI(startIndex, paginatedOrders.length, totalOrders, totalPages);
+    }
+
+    function updatePaginationUI(startIndex, currentCount, totalOrders, totalPages) {
+      const wrapper = document.querySelector(".pagination-wrapper");
+      if (!wrapper) return;
+
+      if (totalOrders === 0) {
+        wrapper.innerHTML = `<span class="text-muted small">Showing 0 entries</span>`;
+        return;
+      }
+
+      const endCount = startIndex + currentCount;
+      wrapper.innerHTML = `
+        <span class="text-muted small">Showing ${startIndex + 1} to ${endCount} of ${totalOrders} entries</span>
+        <div class="d-flex align-items-center gap-2">
+          <button class="page-nav-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? "disabled" : ""}><i class="fa-solid fa-chevron-left"></i></button>
+          <span class="fw-bold px-2 small">${currentPage}</span>
+          <button class="page-nav-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? "disabled" : ""}><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      `;
+    }
+
+    window.changePage = function (newPage) {
+      currentPage = newPage;
+      applyFiltersAndRender();
+    };
+
+    // 4. Render function
     function renderTable(ordersList) {
       const tableBody = document.getElementById("ordersTableBody");
       if (!tableBody) return;
       tableBody.innerHTML = "";
 
+      if (ordersList.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="7" class="text-center">No matching orders.</td></tr>`;
+        return;
+      }
+
       ordersList.forEach((order) => {
         const row = document.createElement("tr");
 
-        // 1. Define the 'user' variable FIRST
         const user = order.userId;
-
-        // 2. Combine firstName and lastName from your User Schema
         const customerName = order.shippingAddress?.fullName || "Guest User";
         const customerEmail = user ? user.email : "No Email";
 
-        // 3. Define the statusClass logic
         const status = order.orderStatus || "Pending";
         let statusClass = "status-pending";
         if (status === "Delivered") statusClass = "status-delivered";
         else if (status === "Shipped") statusClass = "status-shipped";
         else if (status === "Cancelled") statusClass = "status-cancelled";
-
-        // 4. Handle the Price safely
-        const amount = order.totalAmount || order.payableAmount || 0;
 
         row.innerHTML = `
   <td><span class="order-id">#${order.orderId}</span></td>
@@ -707,7 +779,7 @@
   </td>
   <td><span class="text-muted small fw-bold">${order.paymentMethod || "COD"}</span></td>
   <td><span class="badge-custom ${statusClass}">${status}</span></td>
-  <td class="price">Rs. ${order.totals.totalAmount}</td>
+  <td class="price">Rs. ${order.totals?.totalAmount || 0}</td>
   <td class="text-end">
     <a href="./adminOrderDetails.html?id=${order._id}" class="btn-view-details">View Details</a>
   </td>
@@ -716,7 +788,7 @@
       });
     }
 
-    // 3. INITIALIZE AFTER EVERYTHING IS DEFINED
+    // 5. INITIALIZE
     document.addEventListener("DOMContentLoaded", function () {
       fetchOrders();
 
@@ -725,9 +797,22 @@
         searchInput.addEventListener("input", function () {
           clearTimeout(debounceTimer);
           debounceTimer = setTimeout(() => {
-            fetchOrders(this.value.trim());
+            fetchOrders(this.value.trim()); // Could also do client side search
           }, 500);
         });
+      }
+
+      const filterStatus = document.getElementById("filterStatus");
+      if (filterStatus) {
+        filterStatus.addEventListener("change", () => {
+          currentPage = 1;
+          applyFiltersAndRender();
+        });
+      }
+
+      const sortOrders = document.getElementById("sortOrders");
+      if (sortOrders) {
+        sortOrders.addEventListener("change", applyFiltersAndRender);
       }
     });
   </script>
