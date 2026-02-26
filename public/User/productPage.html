@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Shop Accessories - Jinsa Mobiles</title>
 
-  <!-- Local Bootstrap CSS (root path) -->
-  <link href="/libs/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
@@ -716,33 +716,35 @@
     }
 
     /* Container for the badge */
-.offer-badge-card {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background-color: #d32f2f; /* Primary Red */
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 4px;
-    z-index: 3;
-    text-transform: uppercase;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
+    .offer-badge-card {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background-color: #d32f2f;
+      /* Primary Red */
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 4px;
+      z-index: 3;
+      text-transform: uppercase;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
 
-/* Ensure the wishlist button doesn't conflict */
-.wishlist-btn {
-    z-index: 4; /* Higher than the badge */
-}
+    /* Ensure the wishlist button doesn't conflict */
+    .wishlist-btn {
+      z-index: 4;
+      /* Higher than the badge */
+    }
 
-/* Fix for the 'undefined' text alignment seen in your logs */
-.price-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: auto;
-}
+    /* Fix for the 'undefined' text alignment seen in your logs */
+    .price-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: auto;
+    }
   </style>
 
   <link href="/css/navbar.css" rel="stylesheet" />
@@ -780,7 +782,7 @@
         </div>
         <div class="collapse show" id="categoryCollapse">
           <ul class="filter-list" id="categoryList">
-            </ul>
+          </ul>
         </div>
       </div>
 
@@ -790,7 +792,7 @@
         </div>
         <div class="collapse show" id="brandCollapse">
           <ul class="filter-list" id="brandList">
-            </ul>
+          </ul>
         </div>
       </div>
 
@@ -803,7 +805,7 @@
         </div>
       </div>
     </div>
-</div>
+  </div>
 
   <div class="container-fluid px-lg-5 pb-5">
     <div class="shop-toolbar d-flex justify-content-between align-items-center gap-3">
@@ -815,8 +817,8 @@
         <select class="custom-select-pill" id="sortSelect">
           <option value="best-selling">Best selling</option>
           <option value="featured">Featured</option>
-          <option value="price-low-high">Price: Low to High</option>
-          <option value="price-high-low">Price: High to Low</option>
+          <option value="price_low">Price: Low to High</option>
+          <option value="price_high">Price: High to Low</option>
           <option value="newest">Newest Arrivals</option>
         </select>
       </div>
@@ -903,8 +905,7 @@
 
   <!-- Local Bootstrap JS (root path) replaced with CDN -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- JavaScript file (root path) -->
-  <script src="/libs/sweetalert2.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="/js/productPage.js?v=3"></script>
 
   <script src="/js/navbar.js"></script>
