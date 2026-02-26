@@ -1,5 +1,7 @@
 // public/js/adminEditProduct.js
 document.addEventListener('DOMContentLoaded', () => {
+  // Common sidebar logic is now handled in adminCommon.js
+
   // Get product ID from URL
   const urlParams = new URLSearchParams(window.location.search);
   const productId = urlParams.get('id');
@@ -24,28 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const categorySelect = document.getElementById('categorySelect');
 
-  // Sidebar toggle
-  const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebarOverlay');
-
-  if (sidebarToggleBtn) {
-    sidebarToggleBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('active');
-      overlay.classList.toggle('active');
-    });
-  }
-  if (overlay) {
-    overlay.addEventListener('click', () => {
-      sidebar.classList.remove('active');
-      overlay.classList.remove('active');
-    });
-  }
-
   // Load categories
   async function loadCategories() {
     try {
-      const res = await fetch('/api/admin/products/categories');
+      const res = await window.adminFetch('/api/admin/products/categories');
       const data = await res.json();
 
       if (data.success) {
@@ -65,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load product data
   async function loadProduct() {
     try {
-      const res = await fetch(`/api/admin/products/${productId}`);
+      const res = await window.adminFetch(`/api/admin/products/${productId}`);
       const data = await res.json();
 
       if (data.success && data.product) {
@@ -218,12 +202,8 @@ document.addEventListener('DOMContentLoaded', () => {
         didOpen: () => Swal.showLoading()
       });
 
-      const token = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
-      const res = await fetch(`/api/admin/products/${productId}`, {
+      const res = await window.adminFetch(`/api/admin/products/${productId}`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
         body: formData
       });
 
@@ -255,12 +235,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (result.isConfirmed) {
       try {
-        const token = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
-        const res = await fetch(`/api/admin/products/${productId}`, {
+        const res = await window.adminFetch(`/api/admin/products/${productId}`, {
           method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
         });
         const data = await res.json();
         if (data.success) {

@@ -13,24 +13,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const prevBtn = document.getElementById("prevBtn");
   const nextBtn = document.getElementById("nextBtn");
 
-  // Sidebar toggle
-  if (sidebarToggleBtn) {
-    sidebarToggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("active");
-      overlay.classList.toggle("active");
-    });
-  }
-  if (overlay) {
-    overlay.addEventListener("click", () => {
-      sidebar.classList.remove("active");
-      overlay.classList.remove("active");
-    });
-  }
+  // Sidebar toggle is now handled by adminCommon.js
 
   // Load categories for filter dropdown
   async function loadCategoriesForFilter() {
     try {
-      const res = await fetch("/api/admin/products/categories");
+      const res = await window.adminFetch("/api/admin/products/categories");
       const data = await res.json();
 
       if (data.success) {
@@ -65,12 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
         sort: sort
       });
 
-      const res = await fetch(`/api/admin/products?${params}`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json'
-        }
-      });
+      const res = await window.adminFetch(`/api/admin/products?${params}`);
 
       if (!res.ok) {
         throw new Error(`HTTP ${res.status} - ${res.statusText}`);
@@ -203,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (result.isConfirmed) {
       try {
-        const res = await fetch(`/api/admin/products/${id}`, {
+        const res = await window.adminFetch(`/api/admin/products/${id}`, {
           method: "DELETE",
         });
         const data = await res.json();

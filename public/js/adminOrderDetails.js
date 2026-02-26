@@ -7,16 +7,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("adminToken");
     if (!token) {
-        window.location.href = '/Admin/adminLogin.html';
+        window.location.href = "/Admin/adminLogin.html";
         return;
     }
 
     try {
-        const res = await fetch(`/api/admin/orders/${orderId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const res = await window.adminFetch(`/api/admin/orders/${orderId}`);
         const data = await res.json();
 
         if (!data.success) {
@@ -191,10 +189,10 @@ async function updateStatus() {
     };
 
     const statusEnum = statusMap[newStatus];
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("adminToken");
 
     if (!token) {
-        window.location.href = '/Admin/adminLogin.html';
+        window.location.href = "/Admin/adminLogin.html";
         return;
     }
 
@@ -208,12 +206,8 @@ async function updateStatus() {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const res = await fetch(`/api/admin/orders/${window.currentOrderId}/status`, {
+                const res = await window.adminFetch(`/api/admin/orders/${window.currentOrderId}/status`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
                     body: JSON.stringify({ status: statusEnum })
                 });
                 const data = await res.json();
@@ -290,14 +284,9 @@ async function handleAdminReturnAction(orderId, itemId, status) {
 
     if (result.isConfirmed) {
         try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(`/api/admin/orders/${orderId}/return/${itemId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ status })
+            const res = await window.adminFetch(`/api/admin/orders/${orderId}/return/${itemId}`, {
+                method: "PATCH",
+                body: JSON.stringify({ status }),
             });
 
             const data = await res.json();

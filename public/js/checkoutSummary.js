@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", async () => {
+async function loadCheckoutSummary() {
   const summaryContainer = document.querySelector(".order-summary");
   if (!summaryContainer) return;
 
@@ -131,7 +131,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const deliveryCharge = 0;
-    const finalAmount = Math.max(0, subtotal - couponDiscount + deliveryCharge);
+    let finalAmount = Math.max(0, subtotal - couponDiscount + deliveryCharge);
+
+    // --- NEW: WALLET DEDUCTION LOGIC ---
+    let walletDeducted = 0;
+    const walletToggle = document.getElementById("use-wallet-toggle");
+    if (walletToggle && walletToggle.checked) {
+      const balanceText = document.getElementById("wallet-balance-display").innerText;
+      const currentBalance = parseFloat(balanceText.replace(/[^\d.]/g, "")) || 0;
+      walletDeducted = Math.min(currentBalance, finalAmount);
+      finalAmount -= walletDeducted;
+    }
+    // ---------------------------------
 
     // --- 3. RENDER UI ---
 
@@ -193,44 +204,51 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <span>₹${totalMrp.toLocaleString()}</span>
                 </div>
                 
-                ${
-                  discount > 0
-                    ? `
+                ${discount > 0
+        ? `
                 <div class="d-flex justify-content-between mb-2 small text-success">
                     <span>Discount</span>
                     <span>- ₹${discount.toLocaleString()}</span>
                 </div>`
-                    : ""
-                }
+        : ""
+      }
 
                 <div class="d-flex justify-content-between mb-2 small">
                     <span>Subtotal</span>
                     <span>₹${subtotal.toLocaleString()}</span>
                 </div>
 
-                ${
-                  couponDiscount > 0
-                    ? `
+                ${couponDiscount > 0
+        ? `
                 <div class="d-flex justify-content-between mb-2 small text-success fw-bold">
                     <span>Coupon Discount</span>
                     <span>- ₹${couponDiscount.toLocaleString()}</span>
                 </div>`
-                    : ""
-                }
+        : ""
+      }
 
-                <div class="d-flex justify-content-between mb-3 small">
+                <div class="d-flex justify-content-between mb-2 small">
                     <span>Delivery Charges</span>
                     <span class="${deliveryCharge === 0 ? "text-success fw-bold" : ""}">
                         ${deliveryCharge === 0 ? "Free Shipping" : "₹" + deliveryCharge}
                     </span>
                 </div>
 
+                ${walletDeducted > 0
+        ? `
+                <div class="d-flex justify-content-between mb-3 small text-primary fw-bold">
+                    <span>Wallet Applied</span>
+                    <span>- ₹${walletDeducted.toLocaleString()}</span>
+                </div>`
+        : ""
+      }
+
                 <div class="d-flex justify-content-between py-3 border-top border-bottom mb-3 calc-row total">
                     <span class="fw-bold" style="font-size: 1.1rem;">Total Amount</span>
                     <span class="fw-bold total-amount" id="final-amount-val" style="font-size: 1.1rem;">₹${finalAmount.toLocaleString()}</span>
                 </div>
                 
-                <p class="text-success small mb-0"><i class="fa-solid fa-check-circle me-1"></i> You will save ₹${(discount + couponDiscount).toLocaleString()} on this order</p>
+                <p class="text-success small mb-0"><i class="fa-solid fa-check-circle me-1"></i> You will save ₹${(discount + couponDiscount + walletDeducted).toLocaleString()} on this order</p>
             </div>
         `;
   } catch (error) {
@@ -238,7 +256,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     summaryContainer.innerHTML =
       '<div class="alert alert-danger">Error loading summary</div>';
   }
-});
+}
 
 // --- HELPER FUNCTIONS ---
 
@@ -273,8 +291,8 @@ async function openCouponModal(cartTotal) {
   const couponsHtml =
     coupons.length > 0
       ? coupons
-          .map(
-            (c) => `
+        .map(
+          (c) => `
         <div class="text-start border rounded p-2 mb-2 ${c.isExpired || c.isUsed ? "bg-light text-muted" : "border-success"}" 
               style="cursor: ${c.isExpired || c.isUsed ? "not-allowed" : "pointer"}"
               onclick="${!c.isExpired && !c.isUsed ? `selectCoupon('${c.code}')` : ""}">
@@ -286,8 +304,8 @@ async function openCouponModal(cartTotal) {
             ${c.isExpired ? '<div class="text-danger small">Expired</div>' : ""}
         </div>
     `,
-          )
-          .join("")
+        )
+        .join("")
       : '<div class="text-muted small">No coupons available</div>';
 
   Swal.fire({
@@ -350,7 +368,8 @@ async function applyCoupon(code, cartTotal) {
         timer: 1500,
         showConfirmButton: false,
       }).then(() => {
-        location.reload();
+        if (window.refreshCheckoutSummary) window.refreshCheckoutSummary();
+        else location.reload();
       });
     } else {
       Swal.fire("Invalid Coupon", data.message, "error");
@@ -361,7 +380,14 @@ async function applyCoupon(code, cartTotal) {
   }
 }
 
-function removeCoupon() {
+async function removeCoupon() {
   localStorage.removeItem("selectedCoupon");
-  location.reload();
+  if (window.refreshCheckoutSummary) await window.refreshCheckoutSummary();
+  else location.reload();
 }
+
+// Initialize on page load
+document.addEventListener("DOMContentLoaded", loadCheckoutSummary);
+
+// Expose refresh function globally
+window.refreshCheckoutSummary = loadCheckoutSummary;

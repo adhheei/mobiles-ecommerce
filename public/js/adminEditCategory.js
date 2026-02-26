@@ -1,5 +1,8 @@
 // public/js/adminEditCategory.js
 document.addEventListener("DOMContentLoaded", () => {
+  // Common sidebar logic is now handled in adminCommon.js
+
+  // Load category data
   const urlParams = new URLSearchParams(window.location.search);
   const categoryId = urlParams.get("id");
 
@@ -21,28 +24,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const currentImageInfo = document.getElementById("currentImageInfo");
   const fileInput = document.getElementById("catImageInput");
 
-  // Sidebar toggle
-  const sidebarToggleBtn = document.getElementById("sidebarToggleBtn");
-  const sidebar = document.getElementById("sidebar");
-  const overlay = document.getElementById("sidebarOverlay");
-
-  if (sidebarToggleBtn) {
-    sidebarToggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("active");
-      overlay.classList.toggle("active");
-    });
-  }
-  if (overlay) {
-    overlay.addEventListener("click", () => {
-      sidebar.classList.remove("active");
-      overlay.classList.remove("active");
-    });
-  }
-
   // Load category data
   async function loadCategory() {
     try {
-      const res = await fetch(`/api/admin/categories/${categoryId}`);
+      const res = await window.adminFetch(`/api/admin/categories/${categoryId}`);
       const data = await res.json();
 
       if (data.success) {
@@ -147,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
           didOpen: () => Swal.showLoading(),
         });
 
-        const res = await fetch(`/api/admin/categories/${categoryId}`, {
+        const res = await window.adminFetch(`/api/admin/categories/${categoryId}`, {
           method: "PUT",
           body: formData,
         });

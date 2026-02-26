@@ -84,14 +84,13 @@ router.post("/login", loginAdmin);
 // DASHBOARD
 router.get(
   "/dashboard-stats",
-  protect,
   isAdmin,
   adminController.getDashboardStats,
 );
 
 // CATEGORY ROUTES
-router.get("/categories", getAllCategories);
-router.get("/categories/:id", getCategoryById);
+router.get("/categories", isAdmin, getAllCategories);
+router.get("/categories/:id", isAdmin, getCategoryById);
 router.post("/categories", isAdmin, uploadCategory, createCategory);
 router.put("/categories/:id", isAdmin, uploadCategory, updateCategory);
 router.delete("/categories/:id", isAdmin, deleteCategory);
@@ -106,12 +105,12 @@ router.get(
 );
 router.post("/products/suggestions", publicProductController.getSuggestions);
 
-router.get("/products/categories", getCategoriesForDropdown);
-router.get("/products", getAllProducts);
+router.get("/products/categories", isAdmin, getCategoriesForDropdown);
+router.get("/products", isAdmin, getAllProducts);
 router.post("/products", isAdmin, uploadProduct, addProduct);
-router.get("/brands", getUniqueBrands);
+router.get("/brands", isAdmin, getUniqueBrands);
 router.get("/public", getPublicProducts);
-router.get("/products/:id", getProductById);
+router.get("/products/:id", isAdmin, getProductById);
 router.put("/products/:id", isAdmin, uploadProduct, updateProduct);
 router.delete("/products/:id", isAdmin, deleteProduct);
 
@@ -129,13 +128,13 @@ router.get("/coupons", isAdmin, getCoupons);
 router.get("/coupons/:id", isAdmin, getCoupon);
 router.put("/coupons/:id", isAdmin, updateCoupon);
 router.delete("/coupons/:id", isAdmin, deleteCoupon);
-router.post("/coupons/apply", protect, applyCoupon);
+router.post("/coupons/apply", isAdmin, applyCoupon);
 
 // TRANSACTION & USER & ORDERS
 router.get("/transactions", isAdmin, getTransactions);
 router.get("/transactions/download", isAdmin, downloadTransactions);
 router.get("/users", isAdmin, getAllUsers);
-router.patch("/users/:id/block", isAdmin, toggleBlockUser);
+router.patch('/users/:id/block', isAdmin, toggleBlockUser);
 router.get("/wallet/:userId", isAdmin, adminGetWallet);
 router.get("/orders", isAdmin, getAdminOrderDetails);
 router.get("/orders/:id", isAdmin, getAdminOrderDetails);

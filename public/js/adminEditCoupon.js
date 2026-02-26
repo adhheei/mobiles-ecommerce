@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function fetchCouponDetails(id) {
     try {
-        const response = await fetch(`/api/admin/coupons/${id}`);
+        const response = await window.adminFetch(`/api/admin/coupons/${id}`);
         const data = await response.json();
 
         if (response.ok && data.success) {
@@ -108,12 +108,9 @@ async function updateCoupon(id) {
             perUserLimit
         };
 
-        const response = await fetch(`/api/admin/coupons/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
+        const response = await window.adminFetch(`/api/admin/coupons/${id}`, {
+            method: "PUT",
+            body: JSON.stringify(payload),
         });
 
         const data = await response.json();
@@ -162,7 +159,9 @@ async function deleteCoupon(id) {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const response = await fetch(`/api/admin/coupons/${id}`, { method: 'DELETE' });
+                const response = await window.adminFetch(`/api/admin/coupons/${id}`, {
+                    method: "DELETE",
+                });
                 if (response.ok) {
                     Swal.fire('Deleted!', 'Coupon has been deleted.', 'success').then(() => {
                         window.location.href = "./adminCoupons.html";

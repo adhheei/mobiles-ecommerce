@@ -21,23 +21,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-
 async function fetchCoupons() {
   try {
-    const token = localStorage.getItem("adminToken");
-
-    if (!token) {
-      Swal.fire("Unauthorized", "Please login again", "error");
-      window.location.href = "/Admin/adminLogin.html";
-      return;
-    }
-
-    const response = await fetch("/api/admin/coupons", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
+    const response = await window.adminFetch("/api/admin/coupons");
     const data = await response.json();
 
     if (!response.ok) {
@@ -160,11 +146,8 @@ async function deleteCoupon(id) {
     if (!result.isConfirmed) return;
 
     try {
-      const res = await fetch(`/api/admin/coupons/${id}`, {
+      const res = await window.adminFetch(`/api/admin/coupons/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       if (!res.ok) throw new Error("Delete failed");
@@ -189,7 +172,4 @@ function copyCode(code) {
   });
 }
 
-function toggleSidebar() {
-  document.getElementById("sidebar").classList.toggle("active");
-  document.getElementById("sidebarOverlay").classList.toggle("active");
-}
+// Sidebar toggle is now handled by adminCommon.js

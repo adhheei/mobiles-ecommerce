@@ -12,7 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
       currentPage = page;
       currentSearch = search;
 
-      const res = await fetch(`/api/admin/categories?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`);
+      const res = await window.adminFetch(
+        `/api/admin/categories?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`
+      );
 
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
@@ -162,7 +164,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (result.isConfirmed) {
       try {
-        const res = await fetch(`/api/admin/categories/${id}`, { method: 'DELETE' });
+        const res = await window.adminFetch(`/api/admin/categories/${id}`, {
+          method: "DELETE",
+        });
         const data = await res.json();
 
         if (data.success) {

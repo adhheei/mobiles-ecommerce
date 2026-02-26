@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="en">
 
 <head>
@@ -665,8 +665,8 @@
 
 <body>
   <div class="mobile-nav">
-    <a href="#" class="brand-section">
-      <img src="../../images/logo.jpg" alt="Logo" class="brand-logo" />
+    <a href="./adminDashboard.html" class="brand-section">
+      <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
       <div class="brand-text-mobile">
         <span class="brand-title-mobile">JINSA MOBILES</span>
         <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
@@ -689,30 +689,47 @@
     </a>
 
     <ul class="sidebar-menu">
-      <li class="menu-item"><a href="../Admin/adminDashboard.html" class="menu-link"><i
-            class="fa-solid fa-border-all"></i> &nbsp;Dashboard</a></li>
-      <li class="menu-item"><a href="../Admin/adminOrders.html" class="menu-link"><i
-            class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a></li>
-      <li class="menu-item"><a href="../Admin/adminTransactions.html" class="menu-link"><i
-            class="fa-solid fa-money-bill-transfer"></i> &nbsp;Transactions</a></li>
-      <li class="menu-item"><a href="../Admin/adminProducts.html" class="menu-link"><i class="fa-solid fa-box-open"></i>
-          &nbsp;Products</a></li>
-      <li class="menu-item"><a href="../Admin/adminCustomers.html" class="menu-link active"><i
-            class="fa-solid fa-users"></i> &nbsp;Customers</a></li>
-      <li class="menu-item"><a href="../Admin/adminMessages.html" class="menu-link"><i
-            class="fa-regular fa-envelope"></i> &nbsp;Messages</a></li>
-      <li class="menu-item"><a href="../Admin/adminAnalytics.html" class="menu-link"><i
-            class="fa-solid fa-chart-simple"></i> &nbsp;Analytics</a></li>
-      <li class="menu-item"><a href="../Admin/adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i>
-          &nbsp;Coupon Management</a></li>
-      <li class="menu-item"><a href="../Admin/adminCategories.html" class="menu-link"><i
-            class="fa-solid fa-layer-group"></i> &nbsp;Category Management</a></li>
-      <li class="menu-item"><a href="../Admin/adminOffers.html" class="menu-link"><i class="fa-solid fa-gift"></i>
-          &nbsp;Offer</a></li>
+      <li class="menu-item">
+        <a href="../Admin/adminDashboard.html" class="menu-link"><i class="fa-solid fa-border-all"></i>
+          &nbsp;Dashboard</a>
+      </li>
+      <li class="menu-item">
+        <a href="../Admin/adminOrders.html" class="menu-link"><i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a>
+      </li>
+      <li class="menu-item">
+        <a href="../Admin/adminTransactions.html" class="menu-link"><i class="fa-solid fa-money-bill-transfer"></i>
+          &nbsp;Transactions</a>
+      </li>
+      <li class="menu-item">
+        <a href="../Admin/adminProducts.html" class="menu-link"><i class="fa-solid fa-box-open"></i> &nbsp;Products</a>
+      </li>
+      <li class="menu-item">
+        <a href="../Admin/adminCustomers.html" class="menu-link active"><i class="fa-solid fa-users"></i>
+          &nbsp;Customers</a>
+      </li>
+      <li class="menu-item">
+        <a href="../Admin/adminMessages.html" class="menu-link"><i class="fa-regular fa-envelope"></i>
+          &nbsp;Messages</a>
+      </li>
+      <li class="menu-item">
+        <a href="../Admin/adminAnalytics.html" class="menu-link"><i class="fa-solid fa-chart-simple"></i>
+          &nbsp;Analytics</a>
+      </li>
+      <li class="menu-item">
+        <a href="../Admin/adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i> &nbsp;Coupon
+          Management</a>
+      </li>
+      <li class="menu-item">
+        <a href="../Admin/adminCategories.html" class="menu-link"><i class="fa-solid fa-layer-group"></i> &nbsp;Category
+          Management</a>
+      </li>
+      <li class="menu-item">
+        <a href="../Admin/adminOffers.html" class="menu-link"><i class="fa-solid fa-gift"></i> &nbsp;Offer</a>
+      </li>
     </ul>
 
     <div class="admin-profile">
-      <a href="../Admin/adminProfile.html" class="profile-info text-decoration-none text-reset">
+      <a href="./adminProfile.html" class="profile-info text-decoration-none text-reset">
         <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
         <div class="admin-details">
           <h6 id="sidebarName" class="m-0">Admin</h6>
@@ -793,20 +810,18 @@
           <!-- Dynamic Content -->
         </div>
         <div class="modal-footer border-0 pt-0">
-          <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
+            Close
+          </button>
         </div>
       </div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/js/adminBadge.js"></script> <!-- Optional common badge script if needed -->
+  <script src="/js/adminCommon.js"></script>
+  <script src="/js/adminBadge.js"></script>
   <script>
-    function toggleSidebar() {
-      document.getElementById("sidebar").classList.toggle("active");
-      document.getElementById("sidebarOverlay").classList.toggle("active");
-    }
-
     // --- STATE VARIABLES ---
     let allCustomers = [];
     let currentCustomers = [];
@@ -821,7 +836,7 @@
     // --- FETCH DATA ---
     async function fetchUsers() {
       try {
-        const response = await fetch('/api/admin/users');
+        const response = await window.adminFetch("/api/admin/users");
         const data = await response.json();
 
         // DEBUG: Look at this log in your browser console (F12)
@@ -839,29 +854,39 @@
 
     // --- CORE LOGIC ---
     function applyLogic() {
-      const searchTerm = document.getElementById("searchInput").value.toLowerCase();
-      const status = document.getElementById("filterStatus").value.toLowerCase();
+      const searchTerm = document
+        .getElementById("searchInput")
+        .value.toLowerCase();
+      const status = document
+        .getElementById("filterStatus")
+        .value.toLowerCase();
       const sort = document.getElementById("sortCustomers").value;
 
       // 1. Filter
-      currentCustomers = allCustomers.filter(c => {
-        const fullName = (c.firstName + ' ' + c.lastName).toLowerCase();
-        const matchesSearch = fullName.includes(searchTerm) || c.email.toLowerCase().includes(searchTerm);
+      currentCustomers = allCustomers.filter((c) => {
+        const fullName = (c.firstName + " " + c.lastName).toLowerCase();
+        const matchesSearch =
+          fullName.includes(searchTerm) ||
+          c.email.toLowerCase().includes(searchTerm);
 
-        let userStatus = c.status ? c.status.toLowerCase() : (c.isBlocked ? 'suspended' : 'active');
-        const matchesStatus = status === 'all' || userStatus === status;
+        let userStatus = c.status
+          ? c.status.toLowerCase()
+          : c.isBlocked
+            ? "suspended"
+            : "active";
+        const matchesStatus = status === "all" || userStatus === status;
 
         return matchesSearch && matchesStatus;
       });
 
       // 2. Sort
       currentCustomers.sort((a, b) => {
-        if (sort === 'date') {
+        if (sort === "date") {
           return new Date(b.createdAt) - new Date(a.createdAt);
         }
         // Default sort by name
-        const nameA = (a.firstName + ' ' + a.lastName).toLowerCase();
-        const nameB = (b.firstName + ' ' + b.lastName).toLowerCase();
+        const nameA = (a.firstName + " " + a.lastName).toLowerCase();
+        const nameB = (b.firstName + " " + b.lastName).toLowerCase();
         return nameA.localeCompare(nameB);
       });
 
@@ -869,9 +894,15 @@
       renderTable();
     }
 
-    function handleSearch() { applyLogic(); }
-    function handleFilter() { applyLogic(); }
-    function handleSort() { applyLogic(); }
+    function handleSearch() {
+      applyLogic();
+    }
+    function handleFilter() {
+      applyLogic();
+    }
+    function handleSort() {
+      applyLogic();
+    }
 
     // --- RENDER TABLE (Pagination Wrapper) ---
     function renderTable() {
@@ -880,23 +911,30 @@
       const paginated = currentCustomers.slice(start, end);
 
       renderUserTable(paginated);
-      updatePagination(start + 1, Math.min(end, currentCustomers.length), currentCustomers.length);
+      updatePagination(
+        start + 1,
+        Math.min(end, currentCustomers.length),
+        currentCustomers.length,
+      );
     }
 
     // --- RENDER ROWS ---
     function renderUserTable(users) {
-      const tableBody = document.getElementById('customerTableBody'); // Fixed ID
+      const tableBody = document.getElementById("customerTableBody"); // Fixed ID
 
       if (users.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">No customers found.</td></tr>';
+        tableBody.innerHTML =
+          '<tr><td colspan="5" class="text-center py-4 text-muted">No customers found.</td></tr>';
         return;
       }
 
-      tableBody.innerHTML = users.map(user => `
+      tableBody.innerHTML = users
+        .map(
+          (user) => `
     <tr>
       <td>
         <div class="d-flex align-items-center">
-          <img src="${user.profileImage || '/images/default-avatar.png'}" class="rounded-circle me-2" width="40">
+          <img src="${user.profileImage || "/images/default-avatar.png"}" class="rounded-circle me-2" width="40">
           <div>
             <div class="fw-bold">${user.firstName} ${user.lastName}</div>
             <small class="text-muted">Registered: ${new Date(user.createdAt).toLocaleDateString()}</small>
@@ -905,24 +943,27 @@
       </td>
       <td>
         <div>${user.email}</div>
-        <small class="text-muted">${user.phone || 'N/A'}</small>
+        <small class="text-muted">${user.phone || "N/A"}</small>
       </td>
       
       <td>${user.orderCount || 0} Orders</td> 
       
-      <td><span class="badge bg-success-light text-success">${user.status || (user.isBlocked ? 'Suspended' : 'Active')}</span></td>
+      <td><span class="badge bg-success-light text-success">${user.status || (user.isBlocked ? "Suspended" : "Active")}</span></td>
       <td>
         <button class="btn btn-sm btn-light" onclick='viewDetails(${JSON.stringify(user).replace(/'/g, "&apos;")})'><i class="fa-regular fa-eye"></i></button>
-        <button class="btn btn-sm btn-light" onclick="toggleBlockCustomer('${user._id}', ${user.isBlocked}, '${(user.firstName + ' ' + user.lastName).replace(/'/g, "\\'")}')">
+        <button class="btn btn-sm btn-light" onclick="toggleBlockCustomer('${user._id}', ${user.isBlocked}, '${(user.firstName + " " + user.lastName).replace(/'/g, "\\'")}')">
             <i class="fa-solid fa-ban"></i>
         </button>
       </td>
     </tr>
-  `).join('');
+  `,
+        )
+        .join("");
     }
     // --- PAGINATION LOGIC ---
     function updatePagination(start, end, total) {
-      document.getElementById("pageInfoText").innerText = `Showing ${start} to ${end} of ${total} customers`;
+      document.getElementById("pageInfoText").innerText =
+        `Showing ${start} to ${end} of ${total} customers`;
       document.getElementById("pageNumberDisplay").innerText = currentPage;
 
       const totalPages = Math.ceil(total / rowsPerPage);
@@ -942,8 +983,8 @@
     function viewDetails(c) {
       const fullName = `${c.firstName} ${c.lastName}`;
       const isBlocked = c.isBlocked;
-      const displayStatus = isBlocked ? 'Suspended' : 'Active';
-      const statusClass = isBlocked ? 'status-suspended' : 'status-active';
+      const displayStatus = isBlocked ? "Suspended" : "Active";
+      const statusClass = isBlocked ? "status-suspended" : "status-active";
 
       const modalBody = document.getElementById("modalBodyContent");
       modalBody.innerHTML = `
@@ -966,7 +1007,7 @@
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Phone</span>
-                    <span class="detail-value">${c.phone || 'N/A'}</span>
+                    <span class="detail-value">${c.phone || "N/A"}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Registered On</span>
@@ -975,65 +1016,66 @@
                 <hr class="my-2 border-light">
                 <div class="detail-row">
                     <span class="detail-label">Total Orders</span>
-                    <span class="detail-value fs-5">${c.ordersCount || 0}</span>
+                    <span class="detail-value fs-5">${c.orderCount || 0}</span>
                 </div>
           `;
 
-      const modal = new bootstrap.Modal(document.getElementById("customerModal"));
+      const modal = new bootstrap.Modal(
+        document.getElementById("customerModal"),
+      );
       modal.show();
     }
 
-
     // --- BLOCK / UNBLOCK ACTION ---
     function toggleBlockCustomer(id, isBlocked, name) {
-      const actionText = isBlocked ? 'Unblock' : 'Block';
-      const confirmColor = isBlocked ? '#198754' : '#dc3545';
-      const btnText = isBlocked ? 'Yes, Unblock!' : 'Yes, Block!';
+      const actionText = isBlocked ? "Unblock" : "Block";
+      const confirmColor = isBlocked ? "#198754" : "#dc3545";
+      const btnText = isBlocked ? "Yes, Unblock!" : "Yes, Block!";
 
       Swal.fire({
         title: `${actionText} User?`,
         text: `Are you sure you want to ${actionText.toLowerCase()} ${name}?`,
-        icon: isBlocked ? 'question' : 'warning',
+        icon: isBlocked ? "question" : "warning",
         showCancelButton: true,
         confirmButtonColor: confirmColor,
-        cancelButtonColor: '#1a1a1a',
-        confirmButtonText: btnText
+        cancelButtonColor: "#1a1a1a",
+        confirmButtonText: btnText,
       }).then(async (result) => {
         if (result.isConfirmed) {
           try {
-            const response = await fetch(`/api/admin/users/${id}/block`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ isBlocked: !isBlocked })
+            const response = await window.adminFetch(`/api/admin/users/${id}/block`, {
+              method: "PATCH",
+              body: JSON.stringify({ isBlocked: !isBlocked }),
             });
 
             const data = await response.json();
 
             if (response.ok) {
               // Update local state
-              const userIndex = allCustomers.findIndex(u => u._id === id);
+              const userIndex = allCustomers.findIndex((u) => u._id === id);
               if (userIndex > -1) {
                 allCustomers[userIndex].isBlocked = !isBlocked;
-                allCustomers[userIndex].status = !isBlocked ? 'Suspended' : 'Active';
+                allCustomers[userIndex].status = !isBlocked
+                  ? "Suspended"
+                  : "Active";
               }
               applyLogic(); // Re-render
 
-              Swal.fire(
-                'Success!',
-                data.message,
-                'success'
-              );
+              Swal.fire("Success!", data.message, "success");
             } else {
-              Swal.fire('Error', data.message || 'Failed to update user', 'error');
+              Swal.fire(
+                "Error",
+                data.message || "Failed to update user",
+                "error",
+              );
             }
           } catch (err) {
             console.error(err);
-            Swal.fire('Error', 'Server error occurred', 'error');
+            Swal.fire("Error", "Server error occurred", "error");
           }
         }
       });
     }
-
   </script>
 </body>
 

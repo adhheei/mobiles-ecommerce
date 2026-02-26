@@ -338,19 +338,21 @@ const placeOrder = async (req, res) => {
 
     if (useWallet) {
       wallet = await Wallet.findOne({ userId });
-      if (!wallet || wallet.balance < finalAmount) {
-        // If the payment method is specifically WALLET, it MUST cover the full amount
-        if (paymentMethod.toUpperCase() === "WALLET") {
+
+      // If paymentMethod is specifically WALLET, it MUST cover everything
+      if (paymentMethod === "WALLET") {
+        if (!wallet || wallet.balance < finalAmount) {
           return res.status(400).json({
             success: false,
-            message: "Insufficient wallet balance. Please use another payment method or add funds.",
+            message: "Insufficient wallet balance to cover full order amount.",
           });
         }
-      }
-
-      if (wallet && wallet.balance > 0) {
-        walletDeducted = Math.min(wallet.balance, finalAmount);
-        // We do not save the wallet here yet because Order.create might fail
+        walletDeducted = finalAmount;
+      } else {
+        // Partial wallet use for COD or Razorpay
+        if (wallet && wallet.balance > 0) {
+          walletDeducted = Math.min(wallet.balance, finalAmount);
+        }
       }
     }
 
@@ -370,7 +372,7 @@ const placeOrder = async (req, res) => {
       },
       paymentMethod,
       paymentStatus:
-        paymentMethod === "COD" && finalAmount - walletDeducted > 0
+        (paymentMethod === "COD" || paymentMethod === "Razorpay") && finalAmount - walletDeducted > 0
           ? "Pending"
           : "Paid",
       shippingAddress: {
@@ -390,15 +392,25 @@ const placeOrder = async (req, res) => {
 
     // 8. FINAL WALLET UPDATE (POST-CREATE)
     if (useWallet && walletDeducted > 0 && wallet) {
-      wallet.balance -= walletDeducted;
-      wallet.transactions.push({
-        userId: userId, // FIX: Pass required userId
+      // Re-fetch to ensure no race condition between check and deduct
+      const freshWallet = await Wallet.findOne({ userId });
+      if (!freshWallet || freshWallet.balance < walletDeducted) {
+        // This is a rare edge case: user balance dropped between check and deduction
+        // In a production app, we'd use a transaction or rollback the order.
+        // For now, we will deduct what we can and update order totals if needed, 
+        // but strictly, we should probably throw an error.
+        throw new Error("Wallet balance changed during processing. Please try again.");
+      }
+
+      freshWallet.balance -= walletDeducted;
+      freshWallet.transactions.push({
+        userId: userId,
         amount: walletDeducted,
         type: "DEBIT",
         reason: "ORDER_PAYMENT",
-        orderId: newOrder.orderId, // FIX: Use initialized newOrder
+        orderId: newOrder.orderId,
       });
-      await wallet.save();
+      await freshWallet.save();
     }
 
     // 9. STOCK UPDATE & CLEANUP

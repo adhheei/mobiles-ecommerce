@@ -83,12 +83,9 @@ async function createCoupon() {
             perUserLimit
         };
 
-        const response = await fetch('/api/admin/coupons', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
+        const response = await window.adminFetch("/api/admin/coupons", {
+            method: "POST",
+            body: JSON.stringify(payload),
         });
 
         const data = await response.json();

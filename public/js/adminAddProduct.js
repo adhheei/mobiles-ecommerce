@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Common sidebar logic is now handled in adminCommon.js
+
   const mainUploadArea = document.getElementById("mainUploadArea");
   const mainImageInput = document.getElementById("mainImageInput");
   const mainImagePreview = document.getElementById("mainImagePreview");
@@ -11,28 +13,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const categorySelect = document.getElementById("categorySelect");
 
-  // Sidebar toggle
-  const sidebarToggleBtn = document.getElementById("sidebarToggleBtn");
-  const sidebar = document.getElementById("sidebar");
-  const overlay = document.getElementById("sidebarOverlay");
-
-  if (sidebarToggleBtn) {
-    sidebarToggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("active");
-      overlay.classList.toggle("active");
-    });
-  }
-  if (overlay) {
-    overlay.addEventListener("click", () => {
-      sidebar.classList.remove("active");
-      overlay.classList.remove("active");
-    });
-  }
-
   // Load categories for dropdown
   async function loadCategories() {
     try {
-      const res = await fetch("/api/admin/products/categories");
+      const res = await window.adminFetch("/api/admin/products/categories");
       const data = await res.json();
 
       if (data.success) {
@@ -150,13 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       try {
-        Swal.fire({
-          title: "Adding Product...",
-          allowOutsideClick: false,
-          didOpen: () => Swal.showLoading(),
-        });
-
-        const res = await fetch("/api/admin/products", {
+        const res = await window.adminFetch("/api/admin/products", {
           method: "POST",
           body: formData,
         });

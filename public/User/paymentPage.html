@@ -488,16 +488,25 @@
 
         <h4 class="section-title">Payment Method</h4>
 
-        <div class="payment-option" id="option-wallet">
-          <div class="payment-header" onclick="selectPayment('wallet')">
-            <input type="radio" name="payment_method" id="radio-wallet" />
-            <span class="payment-label">Jinsa Wallet</span>
-            <div class="payment-icons-row text-success fw-bold me-2">
-              <i class="fa-solid fa-wallet me-1"></i> Balance: Rs.
-              <span id="wallet-balance-display">0.00</span>
+        <div class="card mb-4 border-0 shadow-sm"
+          style="background-color: #fff; border: 1px solid #e5e5e5 !important; border-radius: 12px">
+          <div class="card-body p-4">
+            <div class="form-check d-flex align-items-center mb-0">
+              <input class="form-check-input me-3" type="checkbox" id="use-wallet-toggle" onchange="toggleWalletUsage()"
+                style="width: 1.4em; height: 1.4em; cursor: pointer;">
+              <label class="form-check-label fw-bold d-flex align-items-center flex-grow-1" for="use-wallet-toggle"
+                style="cursor: pointer;">
+                <div>
+                  <i class="fa-solid fa-wallet me-2 text-success"></i> Use Wallet Balance
+                  <div class="small text-muted fw-normal" id="wallet-balance-status">Available: Rs. <span
+                      id="wallet-balance-display">0.00</span></div>
+                </div>
+              </label>
             </div>
           </div>
         </div>
+
+        <h4 class="section-title">Remaining Payment Method</h4>
 
         <div class="payment-option active" id="option-razorpay">
           <div class="payment-header" onclick="selectPayment('razorpay')">
@@ -521,7 +530,7 @@
           </div>
         </div>
 
-        <button type="button" class="btn-complete" onclick="placeOrder()">
+        <button type="button" class="btn-complete mt-4" onclick="placeOrder()">
           Complete Order
         </button>
       </div>
@@ -606,6 +615,13 @@
       }
     }
 
+    // --- NEW: WALLET TOGGLE ---
+    function toggleWalletUsage() {
+      if (window.refreshCheckoutSummary) {
+        window.refreshCheckoutSummary();
+      }
+    }
+
     async function placeOrder() {
       const selectedPayment = document.querySelector(
         'input[name="payment_method"]:checked',
@@ -617,43 +633,16 @@
 
       const paymentMethod = selectedPayment.id.replace("radio-", "");
       const addressId = localStorage.getItem("selectedAddressId");
-      const useWallet = paymentMethod === "wallet";
+      const useWallet = document.getElementById("use-wallet-toggle").checked;
 
       if (!addressId) {
         Swal.fire("Error", "No address selected. Please go back.", "error");
         return;
       }
 
-      // --- WALLET BALANCE CHECK ---
-      if (useWallet) {
-        const totalElement =
-          document.getElementById("final-amount-val") ||
-          document.querySelector(".order-summary .total-amount") ||
-          document.querySelector(".calc-row.total span:last-child");
-
-        let orderTotal = 0;
-        if (totalElement) {
-          orderTotal = parseFloat(
-            totalElement.innerText.replace(/[^\d.]/g, ""),
-          );
-        }
-
-        const balanceText = document.getElementById(
-          "wallet-balance-display",
-        ).innerText;
-        const currentBalance = parseFloat(
-          balanceText.replace(/[^\d.]/g, ""),
-        );
-
-        if (currentBalance < orderTotal) {
-          Swal.fire(
-            "Insufficient Funds",
-            "Your wallet balance is less than the order total. Please choose another payment method.",
-            "error",
-          );
-          return;
-        }
-      }
+      // --- STOCK & INTEGRITY CHECK (RE-CHECK TOTAL) ---
+      const totalValStrip = document.getElementById("final-amount-val").innerText.replace(/[^\d.]/g, "");
+      const finalPayable = parseFloat(totalValStrip) || 0;
 
       // --- BUY NOW / CART CHECK ---
       const checkoutType = sessionStorage.getItem("checkoutType");
@@ -669,6 +658,17 @@
           const parsed = JSON.parse(storedCoupon);
           if (parsed?.code) couponCode = parsed.code;
         } catch (e) { }
+      }
+
+      // If amount is 0 (fully paid by wallet), handle as a wallet transaction regardless of radio
+      if (finalPayable === 0 && useWallet) {
+        return await submitOrder({
+          paymentMethod: "WALLET",
+          useWallet,
+          addressId,
+          buyNowItem,
+          couponCode,
+        });
       }
 
       // --- BRANCH PAYMENT FLOWS ---
@@ -700,30 +700,15 @@
         const token =
           localStorage.getItem("token") || sessionStorage.getItem("token");
 
-        // 1. IMPROVED SELECTOR LOGIC
-        // We target the specific 'Total Amount' row in your sidebar
-        const totalElement =
-          document.getElementById("final-amount-val") ||
-          document.querySelector(".order-summary .total-amount") ||
-          document.querySelector(".calc-row.total span:last-child");
+        // Use the reactive total from the summary
+        const totalElement = document.getElementById("final-amount-val");
+        if (!totalElement) throw new Error("Order summary not loaded");
 
-        console.log("Searching for total amount element...", totalElement); // Debugging line
+        const amount = parseFloat(totalElement.innerText.replace(/[^\d.]/g, ""));
+        console.log("Initiating Razorpay for remaining amount:", amount);
 
-        let amount = 0;
-        if (totalElement) {
-          // Clean the string: Remove ₹, Rs, commas, and spaces
-          const rawText = totalElement.innerText.trim();
-          amount = parseFloat(rawText.replace(/[^\d.]/g, ""));
-          console.log("Parsed Amount for Backend:", amount);
-        }
-
-        // 2. FAIL-SAFE CHECK
-        if (!amount || isNaN(amount) || amount <= 0) {
-          return Swal.fire({
-            icon: "error",
-            title: "Calculation Error",
-            text: "Could not find order total. Please ensure the Order Summary is loaded.",
-          });
+        if (isNaN(amount) || amount < 0) {
+          return Swal.fire("Error", "Invalid order amount", "error");
         }
 
         Swal.fire({
@@ -758,13 +743,12 @@
         // 4. OPEN RAZORPAY MODAL
         const options = {
           key: rzpData.key_id,
-          amount: rzpData.order.amount, // Already in paise from backend
+          amount: rzpData.order.amount,
           currency: "INR",
           name: "Jinsa Mobiles",
           description: "Order Payment",
           order_id: rzpData.order.id,
           handler: async function (response) {
-            // Finalize order after successful payment
             await submitOrder({
               paymentMethod: "Razorpay",
               useWallet,
@@ -781,15 +765,6 @@
             email: "user@example.com",
           },
           theme: { color: "#1a1a1a" },
-          modal: {
-            ondismiss: function () {
-              Swal.fire(
-                "Payment Cancelled",
-                "You closed the payment window.",
-                "info",
-              );
-            },
-          },
         };
 
         const rzpInstance = new Razorpay(options);
