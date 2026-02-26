@@ -89,6 +89,7 @@ router.get(
 );
 
 // CATEGORY ROUTES
+router.get("/categories/public", getAllCategories);
 router.get("/categories", isAdmin, getAllCategories);
 router.get("/categories/:id", isAdmin, getCategoryById);
 router.post("/categories", isAdmin, uploadCategory, createCategory);
@@ -96,6 +97,7 @@ router.put("/categories/:id", isAdmin, uploadCategory, updateCategory);
 router.delete("/categories/:id", isAdmin, deleteCategory);
 
 // PRODUCT ROUTES
+router.get("/products/categories/public", publicProductController.getAllCategories);
 router.get("/products/categories-with-counts", getCategoriesWithCounts);
 router.get("/products/public", publicProductController.getPublicProducts);
 router.get("/search/suggestions", publicProductController.getSearchSuggestions);

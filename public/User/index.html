@@ -1382,7 +1382,7 @@
                  onerror="this.src='/images/logo.jpg'">
         </div>
 
-        <div class="px-3 pb-3 mt-auto">
+        <div class="px-3 mt-auto">
             <button class="btn btn-primary w-100 py-2 rounded-pill fw-bold" style="font-size: 0.8rem;"
                     onclick="event.stopPropagation();addToCart('${pId}')">
                 ADD TO CART
@@ -1568,7 +1568,7 @@
       const container = document.getElementById("categorySlider");
       if (!container) return;
       try {
-        const res = await fetch("/api/admin/categories");
+        const res = await fetch("/api/admin/products/categories/public");
         const data = await res.json();
 
         if (data.success && data.data && data.data.length > 0) {
@@ -1577,7 +1577,7 @@
               (cat) => `
             <a href="./productPage.html?category=${cat._id || cat.id}" class="category-item">
                 <div class="category-circle">
-                    <img src="${formatImageUrl(cat.img)}" alt="${cat.name}" onerror="this.src='/images/logo.jpg'">
+                    <img src="${formatImageUrl(cat.img || cat.image)}" alt="${cat.name}" onerror="this.src='/images/logo.jpg'">
                 </div>
                 <span class="category-name">${cat.name}</span>
             </a>`,

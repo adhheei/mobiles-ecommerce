@@ -681,41 +681,13 @@
               <th>Status</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td class="order-id">#12345</td>
-              <td>John Doe</td>
-              <td>2023-10-27</td>
-              <td>
-                <span class="badge-custom status-shipped">Shipped</span>
-              </td>
-            </tr>
-            <tr>
-              <td class="order-id">#12346</td>
-              <td>Jane Smith</td>
-              <td>2023-10-27</td>
-              <td>
-                <span class="badge-custom status-processing">Processing</span>
-              </td>
-            </tr>
-            <tr>
-              <td class="order-id">#12347</td>
-              <td>Sam Wilson</td>
-              <td>2023-10-26</td>
-              <td>
-                <span class="badge-custom status-cancelled">Cancelled</span>
-              </td>
-            </tr>
-            <tr>
-              <td class="order-id">#12348</td>
-              <td>Emily Brown</td>
-              <td>2023-10-26</td>
-              <td>
-                <span class="badge-custom status-shipped">Shipped</span>
-              </td>
-            </tr>
+          <tbody id="recentOrdersBody">
+            <!-- Dynamically populated -->
           </tbody>
         </table>
+      </div>
+      <div class="mt-3 text-center">
+        <a href="../Admin/adminOrders.html" class="btn btn-outline-dark btn-sm">Show More</a>
       </div>
     </div>
   </div>
@@ -755,6 +727,10 @@
           updateEl("outOfStockText", `${stats.outOfStock || 0} out of stock`);
 
           if (stats.graphData) initSalesChart(stats.graphData);
+
+          if (stats.recentOrders && Array.isArray(stats.recentOrders)) {
+            renderRecentOrders(stats.recentOrders);
+          }
         }
       } catch (err) {
         console.error("Dashboard Fetch Error:", err);
@@ -810,6 +786,51 @@
             y: { ticks: { callback: (v) => "Rs. " + v.toLocaleString() } },
           },
         },
+      });
+    }
+
+    function renderRecentOrders(orders) {
+      const tbody = document.getElementById("recentOrdersBody");
+      if (!tbody) return;
+
+      tbody.innerHTML = "";
+
+      if (orders.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center">No recent orders found.</td></tr>`;
+        return;
+      }
+
+      orders.forEach(order => {
+        const tr = document.createElement("tr");
+
+        // Format Date
+        const orderDate = new Date(order.createdAt).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+
+        // Safe check for user name
+        const customerName = order.userId
+          ? `${order.userId.firstName || ''} ${order.userId.lastName || ''}`.trim()
+          : "Unknown User";
+
+        // Status Map
+        let statusClass = "badge-custom";
+        const st = (order.orderStatus || "").toLowerCase();
+        if (st === "delivered" || st === "shipped") statusClass += " status-shipped";
+        else if (st === "cancelled" || st === "returned") statusClass += " status-cancelled";
+        else statusClass += " status-processing";
+
+        tr.innerHTML = `
+          <td class="order-id">${order.orderId}</td>
+          <td>${customerName}</td>
+          <td>${orderDate}</td>
+          <td>
+            <span class="${statusClass}">${order.orderStatus}</span>
+          </td>
+        `;
+        tbody.appendChild(tr);
       });
     }
 

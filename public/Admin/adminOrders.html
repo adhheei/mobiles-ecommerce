@@ -651,7 +651,10 @@
 
       try {
         tableBody.innerHTML = `<tr><td colspan="7" class="text-center">Loading...</td></tr>`;
-
+        let url = '/api/admin/orders';
+        if (search) {
+          url += `?search=${encodeURIComponent(search)}`;
+        }
         const res = await window.adminFetch(url);
 
         if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);

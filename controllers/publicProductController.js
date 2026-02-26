@@ -34,6 +34,24 @@ exports.getCategoriesWithCounts = async (req, res) => {
   }
 };
 
+exports.getAllCategories = async (req, res) => {
+  try {
+    const categories = await Category.find({ isActive: true }).sort({ createdAt: -1 });
+
+    const formatted = categories.map((cat) => ({
+      _id: cat._id.toString(),
+      id: cat._id.toString(),
+      name: cat.name,
+      image: cat.image ? `/uploads/categories/${path.basename(cat.image)}` : "/images/logo.jpg",
+    }));
+
+    res.json({ success: true, data: formatted });
+  } catch (err) {
+    console.error("Error fetching public categories:", err);
+    res.status(500).json({ success: false, error: "Failed to load categories" });
+  }
+};
+
 exports.getPublicProducts = async (req, res) => {
   try {
     const {

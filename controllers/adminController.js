@@ -41,6 +41,12 @@ exports.getDashboardStats = async (req, res) => {
       { $sort: { "_id": 1 } } // Sort by month (1=Jan, 12=Dec)
     ]);
 
+    // 5. Recent Orders
+    const recentOrders = await Order.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .populate("userId", "firstName lastName");
+
     res.json({
       success: true,
       stats: {
@@ -49,7 +55,8 @@ exports.getDashboardStats = async (req, res) => {
         totalCustomers,
         productsInStock: stockData[0]?.total || 0,
         outOfStock: stockData[0]?.outOfStock || 0,
-        graphData // Send the computed graph data
+        graphData, // Send the computed graph data
+        recentOrders // Send recent orders
       }
     });
   } catch (err) {
