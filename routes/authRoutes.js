@@ -1,29 +1,21 @@
 const express = require("express");
 const router = express.Router();
-const authController = require("../controllers/authController");
+const auth = require("../controllers/auth");
 
-// /api/auth/signup
-router.post("/signup", authController.signup);
+// 1. REGISTRATION & LOGIN
+router.post("/signup", auth.signup);
+router.post("/login", auth.login);
+router.post("/logout", auth.logout);
 
-// /api/auth/login
-router.post("/login", authController.login);
+// 2. OTP MANAGEMENT (Signup & Forgot Password)
+router.post("/send-otp", auth.sendOtp);
+router.post("/verify-otp", auth.verifyOtp);
+router.post("/resend-otp", auth.sendOtp); // Reuses sendOtp logic
 
-// /api/auth/logout
-router.post("/logout", authController.logout);
+// 3. PASSWORD RECOVERY
+router.post("/reset-password", auth.resetPassword);
 
-// /api/auth/send-otp (was forgot-password)
-router.post("/send-otp", authController.sendOtp);
-
-// /api/auth/verify-otp
-router.post("/verify-otp", authController.verifyOtp);
-
-// /api/auth/resend-otp
-router.post("/resend-otp", authController.sendOtp);
-
-// /api/auth/reset-password
-router.post("/reset-password", authController.resetPassword);
-
-// This matches the fetch URL in your userLogin.html
-router.post('/google-signup', authController.googleSignup);
+// 4. SOCIAL AUTHENTICATION
+router.post('/google-signup', auth.googleSignup);
 
 module.exports = router;

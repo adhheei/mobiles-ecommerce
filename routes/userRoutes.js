@@ -1,37 +1,24 @@
 const express = require("express");
 const router = express.Router();
-const {
-    getProfile,
-    updateProfile,
-    updateAvatar,
-    removeAvatar,
-    getWishlist,
-    addToWishlist,
-    removeFromWishlist,
-    changePassword,
-    getWallet,
-    applyWallet
-} = require("../controllers/userController");
-const { getAvailableCoupons, applyCoupon } = require("../controllers/couponController");
+const user = require("../controllers/user");
+const wishlist = require("../controllers/wishlist");
+const wallet = require("../controllers/wallet");
 const { protect } = require("../middleware/authMiddleware");
 const upload = require("../middleware/upload");
 
-router.get("/profile", protect, getProfile);
-router.put("/profile", protect, updateProfile);
-router.put("/avatar", protect, upload.single, updateAvatar);
-router.delete("/avatar", protect, removeAvatar);
+router.get("/profile", user.getProfile);
+router.put("/profile", user.updateProfile);
+router.put("/avatar", upload.single, user.updateAvatar);
+router.delete("/avatar", user.removeAvatar);
+router.post("/change-password", user.changePassword);
 
-router.get("/wishlist", protect, getWishlist);
-router.post("/wishlist", protect, addToWishlist);
-router.delete("/wishlist/:productId", protect, removeFromWishlist);
+router.get("/wishlist", wishlist.getWishlist);
+router.post("/wishlist", wishlist.addToWishlist);
+router.delete("/wishlist/:productId", wishlist.removeFromWishlist);
 
-router.get("/coupons", protect, getAvailableCoupons);
-router.post("/coupons/apply", protect, applyCoupon);
-
-router.post("/change-password", protect, changePassword);
 
 // Wallet Routes
-router.get("/wallet", protect, getWallet);
-router.post("/wallet/apply", protect, applyWallet);
+router.get("/wallet", wallet.getWallet);
+router.post("/wallet/apply", wallet.applyWallet);
 
 module.exports = router;

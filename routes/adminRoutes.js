@@ -1,74 +1,24 @@
-// routes/adminRoutes.js
 const express = require("express");
 const router = express.Router();
-const path = require("path");
 const { protect, isAdmin } = require("../middleware/authMiddleware");
 
 // ──────────────────────────────────────────────────────────────────────────────
-// CONTROLLER IMPORTS
+// MODULAR CONTROLLER IMPORTS (Pointed to Folder Hubs)
 // ──────────────────────────────────────────────────────────────────────────────
+const { loginAdmin } = require("../controllers/auth");
+const { getDashboardStats } = require("../controllers/admin");
+const category = require("../controllers/category");
+const product = require("../controllers/product");
+const publicProduct = require("../controllers/publicProduct");
+const offer = require("../controllers/offer");
+const message = require("../controllers/message");
+const coupon = require("../controllers/coupon");
+const transaction = require("../controllers/transaction");
+const user = require("../controllers/user");
+const wallet = require("../controllers/wallet");
+const order = require("../controllers/order");
 
-// 1. AUTH & ADMIN
-const { loginAdmin } = require("../controllers/authController");
-const adminController = require("../controllers/adminController");
-
-// 2. CATEGORY
-const {
-  getAllCategories,
-  getCategoryById,
-  createCategory,
-  updateCategory,
-  deleteCategory,
-} = require("../controllers/categoryController");
-
-// 3. PRODUCT
-const productController = require("../controllers/productController");
-const {
-  getAllProducts,
-  addProduct,
-  getCategoriesForDropdown,
-  getProductById,
-  updateProduct,
-  deleteProduct,
-  getUniqueBrands,
-  getPublicProducts,
-  getCategoriesWithCounts,
-} = productController;
-
-// 4. OFFERS (FIXED: Assigning to offerController for line 159)
-const offerController = require("../controllers/offerController");
-const { addOffer, updateOffer, deleteOffer, getAllOffers, getHotDeals } =
-  offerController;
-
-// 5. PUBLIC & MESSAGES & COUPONS
-const publicProductController = require("../controllers/publicProductController");
-const messageController = require("../controllers/messageController");
-const {
-  applyCoupon,
-  createCoupon,
-  getCoupons,
-  updateCoupon,
-  deleteCoupon,
-  getCoupon,
-} = require("../controllers/couponController");
-
-// 6. TRANSACTIONS, USERS & ORDERS
-const {
-  getTransactions,
-  downloadTransactions,
-} = require("../controllers/transactionController");
-const {
-  getAllUsers,
-  toggleBlockUser,
-  adminGetWallet,
-} = require("../controllers/userController");
-const {
-  getAdminOrderDetails,
-  updateOrderStatus,
-  handleReturnRequest,
-} = require("../controllers/orderController");
-
-// 7. MIDDLEWARE
+// File Uploads
 const {
   single: uploadCategory,
   product: uploadProduct,
@@ -78,79 +28,69 @@ const {
 // ROUTES
 // ──────────────────────────────────────────────────────────────────────────────
 
-// ADMIN LOGIN
+// AUTH
 router.post("/login", loginAdmin);
+router.get("/dashboard-stats", isAdmin, getDashboardStats);
 
-// DASHBOARD
-router.get(
-  "/dashboard-stats",
-  isAdmin,
-  adminController.getDashboardStats,
-);
+// CATEGORY MANAGEMENT
+router.get("/categories/public", category.getAllCategories);
+router.get("/categories", isAdmin, category.getAllCategories);
+router.get("/categories/:id", isAdmin, category.getCategoryById);
+router.post("/categories", isAdmin, uploadCategory, category.createCategory);
+router.put("/categories/:id", isAdmin, uploadCategory, category.updateCategory);
+router.delete("/categories/:id", isAdmin, category.deleteCategory);
 
-// CATEGORY ROUTES
-router.get("/categories/public", getAllCategories);
-router.get("/categories", isAdmin, getAllCategories);
-router.get("/categories/:id", isAdmin, getCategoryById);
-router.post("/categories", isAdmin, uploadCategory, createCategory);
-router.put("/categories/:id", isAdmin, uploadCategory, updateCategory);
-router.delete("/categories/:id", isAdmin, deleteCategory);
+// PRODUCT MANAGEMENT (Admin & Public Analytics)
+router.get("/products/categories/public", publicProduct.getAllCategories);
+router.get("/products/categories-with-counts", product.getCategoriesWithCounts);
+router.get("/products/public", publicProduct.getPublicProducts);
+router.get("/search/suggestions", publicProduct.getSearchSuggestions);
+router.get("/products/brands-with-counts", publicProduct.getBrandsWithCounts);
+router.post("/products/suggestions", publicProduct.getSuggestions);
 
-// PRODUCT ROUTES
-router.get("/products/categories/public", publicProductController.getAllCategories);
-router.get("/products/categories-with-counts", getCategoriesWithCounts);
-router.get("/products/public", publicProductController.getPublicProducts);
-router.get("/search/suggestions", publicProductController.getSearchSuggestions);
-router.get(
-  "/products/brands-with-counts",
-  publicProductController.getBrandsWithCounts,
-);
-router.post("/products/suggestions", publicProductController.getSuggestions);
+router.get("/products/categories", isAdmin, product.getCategoriesForDropdown);
+router.get("/products", isAdmin, product.getAllProducts);
+router.post("/products", isAdmin, uploadProduct, product.addProduct);
+router.get("/brands", isAdmin, product.getUniqueBrands);
+router.get("/products/:id", isAdmin, product.getProductById);
+router.put("/products/:id", isAdmin, uploadProduct, product.updateProduct);
+router.delete("/products/:id", isAdmin, product.deleteProduct);
 
-router.get("/products/categories", isAdmin, getCategoriesForDropdown);
-router.get("/products", isAdmin, getAllProducts);
-router.post("/products", isAdmin, uploadProduct, addProduct);
-router.get("/brands", isAdmin, getUniqueBrands);
-router.get("/public", getPublicProducts);
-router.get("/products/:id", isAdmin, getProductById);
-router.put("/products/:id", isAdmin, uploadProduct, updateProduct);
-router.delete("/products/:id", isAdmin, deleteProduct);
+// MESSAGE / SUPPORT
+router.get("/messages", isAdmin, message.getMessages);
+router.patch("/messages/:id/seen", isAdmin, message.markAsSeen);
+router.patch("/messages/:id/replied", isAdmin, message.markAsReplied);
+router.get("/messages/unread-count", isAdmin, message.getUnreadCount);
+router.post("/messages/:id/reply", isAdmin, message.replyToMessage);
+router.delete("/messages/:id", isAdmin, message.deleteMessage);
 
-// MESSAGE ROUTES
-router.get("/messages", isAdmin, messageController.getMessages);
-router.patch("/messages/:id/seen", isAdmin, messageController.markAsSeen);
-router.patch("/messages/:id/replied", isAdmin, messageController.markAsReplied);
-router.get("/messages/unread-count", isAdmin, messageController.getUnreadCount);
-router.post("/messages/:id/reply", isAdmin, messageController.replyToMessage);
-router.delete("/messages/:id", isAdmin, messageController.deleteMessage);
+// COUPON MANAGEMENT
+router.get("/coupons", isAdmin, coupon.getCoupons);
+router.get("/coupons/:id", isAdmin, coupon.getCoupon);
+router.post("/coupons", isAdmin, coupon.createCoupon);
+router.put("/coupons/:id", isAdmin, coupon.updateCoupon);
+router.delete("/coupons/:id", isAdmin, coupon.deleteCoupon);
+router.post("/coupons/apply", isAdmin, coupon.applyCoupon);
 
-// COUPON ROUTES
-router.post("/coupons", isAdmin, createCoupon);
-router.get("/coupons", isAdmin, getCoupons);
-router.get("/coupons/:id", isAdmin, getCoupon);
-router.put("/coupons/:id", isAdmin, updateCoupon);
-router.delete("/coupons/:id", isAdmin, deleteCoupon);
-router.post("/coupons/apply", isAdmin, applyCoupon);
+// TRANSACTIONS & USERS
+router.get("/transactions", isAdmin, transaction.getTransactions);
+router.get("/transactions/download", isAdmin, transaction.downloadTransactions);
+router.get("/users", isAdmin, user.getAllUsers);
+router.patch("/users/:id/block", isAdmin, user.toggleBlockUser);
+router.get("/wallet/:userId", isAdmin, wallet.adminGetWallet);
 
-// TRANSACTION & USER & ORDERS
-router.get("/transactions", isAdmin, getTransactions);
-router.get("/transactions/download", isAdmin, downloadTransactions);
-router.get("/users", isAdmin, getAllUsers);
-router.patch('/users/:id/block', isAdmin, toggleBlockUser);
-router.get("/wallet/:userId", isAdmin, adminGetWallet);
-router.get("/orders", isAdmin, getAdminOrderDetails);
-router.get("/orders/:id", isAdmin, getAdminOrderDetails);
-router.put("/orders/:id/status", isAdmin, updateOrderStatus);
-router.patch("/orders/:id/return/:itemId", isAdmin, handleReturnRequest);
+// ORDER & RETURN MANAGEMENT
+router.get("/orders", isAdmin, order.getAdminOrderDetails);
+router.get("/orders/:id", isAdmin, order.getAdminOrderDetails);
+router.put("/orders/:id/status", isAdmin, order.updateOrderStatus);
+router.patch("/orders/:id/return/:itemId", isAdmin, order.handleReturnRequest);
 
 // OFFER MANAGEMENT
-router.get("/offers/hot", getHotDeals); // Move this BEFORE /:id
-router.get("/offers", getAllOffers);
-router.post("/offers", isAdmin, addOffer);
-router.get('/offers/:id', offerController.getOfferById);
-router.delete("/offers/:id", isAdmin, deleteOffer);
-
-// LINE 159 FIXED: offerController is now defined
-router.put("/offers/update/:id", offerController.updateOffer);
+router.get("/offers/hot", offer.getHotDeals);
+router.get("/offers", offer.getAllOffers);
+router.post("/offers", isAdmin, offer.addOffer);
+router.get("/offers/:id", offer.getOfferById);
+router.put("/offers/update/:id", isAdmin, offer.updateOffer);
+router.delete("/offers/:id", isAdmin, offer.deleteOffer);
 
 module.exports = router;

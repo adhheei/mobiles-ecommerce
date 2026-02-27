@@ -1,28 +1,26 @@
 const express = require("express");
 const router = express.Router();
-const cartController = require("../controllers/cartController");
-const paymentController = require("../controllers/paymentController");
+const cart = require("../controllers/cart");
+const order = require("../controllers/order");
+const razorpay = require("../controllers/razorpay");
 const { protect } = require("../middleware/authMiddleware");
 
-// Debugging tip: If the server crashes here, protect is undefined
 if (!protect) {
-  console.error(
-    "❌ ERROR: 'protect' middleware is undefined. Check your exports!",
-  );
+    console.error("❌ ERROR: 'protect' middleware is undefined. Check authMiddleware.js!");
 }
 
-// Line 9: Apply protection to all routes below
 router.use(protect);
 
-router.get("/", cartController.getCart);
-router.get("/count", cartController.getCartCount);
-router.post("/add", cartController.addToCart);
-router.put("/update", cartController.updateCart);
-router.delete("/remove/:productId", cartController.removeFromCart);
-router.delete("/clear", cartController.clearCart);
+// 1. CART MANAGEMENT
+router.get("/", cart.getCart);
+router.get("/count", cart.getCartCount);
+router.post("/add", cart.addToCart);
+router.put("/update", cart.updateCart);
+router.delete("/remove/:productId", cart.removeFromCart);
+router.delete("/clear", cart.clearCart);
 
-// Payment & Checkout
-router.post("/razorpay-order", paymentController.createOrder);
-router.post("/checkout", protect, cartController.placeOrder);
+// 2. PAYMENT & CHECKOUT
+router.post("/razorpay-order", razorpay.createOrder);
+router.post("/checkout", order.placeOrder);
 
 module.exports = router;
