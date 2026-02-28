@@ -25,7 +25,7 @@ const sendTokenResponse = (user, statusCode, res) => {
     // 3. Send Response
     res
         .status(statusCode)
-        .cookie("jwt", token, options)
+        .cookie("token", token, options)
         .json({
             success: true,
             token,

@@ -4,9 +4,8 @@ const User = require("../models/User");
 const protect = async (req, res, next) => {
   let token;
 
-  // ✅ Check for token in cookies (preferred) or Authorization header
-  if (req.cookies && req.cookies.jwt) {
-    token = req.cookies.jwt;
+  if (req.cookies && req.cookies.token) {
+    token = req.cookies.token;
   } else if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer ")
@@ -22,13 +21,11 @@ const protect = async (req, res, next) => {
   }
 
   try {
-    // 4. Verify Token
     const decoded = jwt.verify(
       token,
       process.env.JWT_SECRET || "supersecretkey",
     );
 
-    // 5. Check if User still exists
     const user = await User.findById(decoded.id).select("-password");
 
     if (!user) {
@@ -38,15 +35,13 @@ const protect = async (req, res, next) => {
       });
     }
 
-    // 6. Check Blocked Status
     if (user.isBlocked) {
       return res.status(403).json({
         success: false,
-        message: "Your account is blocked. Please contact support."
+        message: "Your account is blocked. Please contact support.",
       });
     }
 
-    // 7. Grant Access
     req.user = user;
     next();
   } catch (err) {
@@ -64,16 +59,12 @@ const protect = async (req, res, next) => {
   }
 };
 
-
 const isAdmin = async (req, res, next) => {
   let token;
 
-  // 1. Check for admin_jwt cookie (preferred for admin)
   if (req.cookies && req.cookies.admin_jwt) {
     token = req.cookies.admin_jwt;
-  }
-  // 2. Fallback to header (if you want to keep API flexibility)
-  else if (
+  } else if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer ")
   ) {
@@ -90,7 +81,7 @@ const isAdmin = async (req, res, next) => {
   try {
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET || "supersecretkey"
+      process.env.JWT_SECRET || "supersecretkey",
     );
 
     const user = await User.findById(decoded.id).select("-password");
@@ -102,7 +93,7 @@ const isAdmin = async (req, res, next) => {
       });
     }
 
-    req.admin = user; // Attach admin user
+    req.admin = user;
     next();
   } catch (err) {
     console.error("Admin Auth Error:", err.message);

@@ -1,8 +1,6 @@
 
 // navbar.js - Global navbar functionality
 
-// navbar.js - Global navbar functionality
-
 // Function to load the navbar dynamically
 async function loadNavbar() {
     const placeholder = document.getElementById('navbar-placeholder');

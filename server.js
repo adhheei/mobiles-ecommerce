@@ -1,4 +1,3 @@
-// server.js
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -6,135 +5,110 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const path = require("path");
 const fs = require("fs");
+const passport = require("passport");
+const cookieParser = require("cookie-parser");
+const session = require("express-session");
 require("dotenv").config();
-const passport = require('passport');
-require('./config/passport');
+require("./config/passport");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// 📁 Create upload directories (add products too!)
-const uploadDirs = [
-  "./public/uploads/categories",
-  "./public/uploads/products", // 👈 Add this for future products
-];
+// 📁 Ensure Upload Directories Exist
+const uploadDirs = ["./public/uploads/categories", "./public/uploads/products"];
 uploadDirs.forEach((dir) => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-    console.log(`📁 Created directory: ${dir}`);
-  }
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 });
 
-// 🔧 Middleware
-app.use(helmet());
+// 🔧 Security & Logic Middleware
 app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: [
-        "'self'",
-        "https://accounts.google.com",
-        "https://cdn.jsdelivr.net",
-        "https://checkout.razorpay.com",
-        "'unsafe-inline'",
-      ],
-      styleSrc: [
-        "'self'",
-        "https://cdn.jsdelivr.net",
-        "https://cdnjs.cloudflare.com",
-        "https://accounts.google.com",
-        "https://fonts.googleapis.com",
-        "'unsafe-inline'",
-      ],
-      imgSrc: [
-        "'self'",
-        "data:",
-        "blob:", // Added for certain image handling
-        "https://*",
-        "https://lh3.googleusercontent.com",
-        "https://placehold.co",
-        "http://localhost:*", // Allows images from your local server
-        "https://res.cloudinary.com", // Add this if you use Cloudinary in the future
-      ],
-      connectSrc: [
-        "'self'",
-        "http://localhost:*",
-        "ws://localhost:*",
-        "https://accounts.google.com",
-        "https://cdn.jsdelivr.net",
-        "https://lumberjack.razorpay.com",
-        "https://*.razorpay.com",
-      ],
-      frameSrc: [
-        "https://accounts.google.com",
-        "https://api.razorpay.com",
-        "https://*.razorpay.com",
-      ],
-      fontSrc: [
-        "'self'",
-        "https://cdnjs.cloudflare.com",
-        "https://fonts.gstatic.com",
-      ],
-      scriptSrcAttr: ["'unsafe-inline'"], // Allow inline event handlers
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "https://accounts.google.com",
+          "https://cdn.jsdelivr.net",
+          "https://checkout.razorpay.com",
+          "'unsafe-inline'",
+        ],
+        styleSrc: [
+          "'self'",
+          "https://cdn.jsdelivr.net",
+          "https://cdnjs.cloudflare.com",
+          "https://accounts.google.com",
+          "https://fonts.googleapis.com",
+          "'unsafe-inline'",
+        ],
+        imgSrc: ["'self'", "data:", "blob:", "https://*", "http://localhost:*"],
+        connectSrc: [
+          "'self'",
+          "http://localhost:*",
+          "ws://localhost:*",
+          "https://accounts.google.com",
+          "https://*.razorpay.com",
+          "https://cdn.jsdelivr.net",
+        ],
+        frameSrc: ["https://accounts.google.com", "https://*.razorpay.com"],
+        fontSrc: [
+          "'self'",
+          "https://cdnjs.cloudflare.com",
+          "https://fonts.gstatic.com",
+        ],
+        scriptSrcAttr: ["'unsafe-inline'"],
+      },
     },
   }),
 );
-app.use(require("cookie-parser")()); // 🍪 Cookie parser
+
 app.use(cors());
-app.use(morgan("combined"));
+app.use(morgan("dev")); // Changed to 'dev' for cleaner console logs
+app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express.static("public"));
 
-// Session middleware is required for Passport
-app.use(require('express-session')({
-  secret: 'jinsa_secret_key',
-  resave: false,
-  saveUninitialized: false
-}));
-
+// 🍪 Session & Passport
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "jinsa_secret_key",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === "production" },
+  }),
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
-//  favicon.ico ignore
-app.get("/favicon.ico", (req, res) => res.status(204).end());
-
 // 🛣️ Routes
-const adminRoutes = require("./routes/adminRoutes");
-const authRoutes = require("./routes/authRoutes");
-const userRoutes = require("./routes/userRoutes");
-app.use("/api/admin", adminRoutes); // admin routes
-app.use("/api/auth", authRoutes); // auth routes
-app.use("/api/user", userRoutes); // user routes
-app.use("/api/addresses", require("./routes/addressRoutes")); // address routes
-app.use("/api/cart", require("./routes/cartRoutes")); // cart routes
-app.use("/api/orders", require("./routes/orderRoutes")); // order routes
-app.use("/api/contact", require("./routes/contactRoutes")); // contact routes
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/user", require("./routes/userRoutes"));
+app.use("/api/addresses", require("./routes/addressRoutes"));
+app.use("/api/cart", require("./routes/cartRoutes"));
+app.use("/api/orders", require("./routes/orderRoutes"));
+app.use("/api/contact", require("./routes/contactRoutes"));
 
 // 🏠 Home route
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+app.get("/", (req, res) =>
+  res.sendFile(path.join(__dirname, "public", "index.html")),
+);
+app.get("/favicon.ico", (req, res) => res.status(204).end());
 
-// 🔄 Connect to MongoDB
+// 🔄 Database Connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => {
-    console.error("❌ MongoDB connection error:", err.message);
-    process.exit(1);
-  });
+  .catch((err) => console.error("❌ MongoDB Error:", err.message));
 
 // 🌍 Global Error Handler
 app.use((err, req, res, next) => {
-  console.error("🔥 Global Error Handler:", err.stack);
-  res.status(500).json({
-    message: "Unexpected Server Error",
-    error: err.message,
+  console.error("🔥 Server Error:", err.stack);
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Unexpected Server Error",
   });
 });
 
-// 🚀 Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Server: http://localhost:${PORT}`));

@@ -127,4 +127,15 @@ const changePassword = async (req, res) => {
   }
 };
 
-module.exports = { getProfile, updateProfile, updateAvatar, removeAvatar, changePassword };
+const logoutUser = (req, res) => {
+  // Clear ONLY the user-specific cookie
+  res.cookie("token", "none", {
+    expires: new Date(Date.now() + 5 * 1000),
+    httpOnly: true,
+    path: "/"
+  });
+
+  res.status(200).json({ success: true, message: "User logged out" });
+};
+
+module.exports = { getProfile, updateProfile, updateAvatar, removeAvatar, changePassword, logoutUser };
