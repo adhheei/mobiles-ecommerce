@@ -1,38 +1,31 @@
 // controllers/offer/getHotDeals.js
-const Offer = require("../../models/Offer");
 const Product = require("../../models/Product");
 
 const getHotDeals = async (req, res) => {
   try {
-    const now = new Date();
-    const activeOffers = await Offer.find({
-      status: "Active",
-      startDate: { $lte: now },
-      endDate: { $gte: now },
+    const products = await Product.find({
+      status: "active",
+      visibility: "public",
+      $expr: { $lt: ["$offerPrice", "$actualPrice"] }
+    }).populate("category");
+
+    const deals = products.map((product) => {
+      // Calculate frontend discount percentage natively
+      const discountPercentage = Math.round(
+        ((product.actualPrice - product.offerPrice) / product.actualPrice) * 100
+      );
+
+      return {
+        ...product._doc,
+        discountPercentage: discountPercentage > 0 ? discountPercentage : 0,
+      };
     });
 
-    const products = await Product.find().populate("category");
-
-    const deals = products
-      .map((product) => {
-        const productOffer = activeOffers.find(
-          (o) =>
-            o.offerType === "Product" &&
-            o.targetId.toString() === product._id.toString(),
-        );
-
-        const deal = {
-          ...product._doc,
-          offer: productOffer || null,
-        };
-        return deal;
-      })
-      .filter(Boolean);
-
-    res.status(200).json({ success: true, deals: deals.slice(0, 8) });
+    res.status(200).json({ success: true, deals: deals });
   } catch (error) {
+    console.error("Hot Deals Error:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 
-module.exports = getHotDeals;
+module.exports = { getHotDeals };
