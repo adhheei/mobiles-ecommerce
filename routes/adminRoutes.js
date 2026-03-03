@@ -17,6 +17,7 @@ const transaction = require("../controllers/transaction");
 const user = require("../controllers/user");
 const wallet = require("../controllers/wallet");
 const order = require("../controllers/order");
+const purchaseController = require("../controllers/admin/purchaseController");
 
 // File Uploads
 const {
@@ -90,5 +91,9 @@ router.post("/offers", isAdmin, offer.addOffer);
 router.get("/offers/:id", offer.getOfferById);
 router.put("/offers/update/:id", isAdmin, offer.updateOffer);
 router.delete("/offers/:id", isAdmin, offer.deleteOffer);
+
+// PURCHASE MANAGEMENT
+router.post("/purchase/add", isAdmin, purchaseController.addPurchase);
+router.get("/purchase/report", isAdmin, purchaseController.getPurchaseReport);
 
 module.exports = router;

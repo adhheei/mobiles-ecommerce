@@ -1,778 +1,915 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Profile - Jinsa Mobiles Admin</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        :root {
-            --primary-black: #1a1a1a;
-            --bg-light: #f8f9fa;
-            --border-color: #eee;
-            --sidebar-width: 260px;
-            --active-bg: #e9ecef;
-            --text-muted: #6c757d;
+      :root {
+        --primary-black: #1a1a1a;
+        --bg-light: #f8f9fa;
+        --border-color: #eee;
+        --sidebar-width: 260px;
+        --active-bg: #e9ecef;
+        --text-muted: #6c757d;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: var(--bg-light);
+        overflow-x: hidden;
+        color: var(--primary-black);
+      }
+
+      /* --- ANIMATIONS --- */
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
         }
 
-        body {
-            font-family: "Poppins", sans-serif;
-            background-color: var(--bg-light);
-            overflow-x: hidden;
-            color: var(--primary-black);
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
+      }
 
-        /* --- ANIMATIONS --- */
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
+      .content-animate {
+        animation: slideInUp 0.6s ease-out forwards;
+      }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+      /* --- SIDEBAR --- */
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        background-color: #fff;
+        border-right: 1px solid var(--border-color);
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        z-index: 1000;
+        transition: transform 0.3s ease;
+      }
 
-        .content-animate {
-            animation: slideInUp 0.6s ease-out forwards;
-        }
+      .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 40px;
+        text-decoration: none;
+        color: var(--primary-black);
+      }
 
-        /* --- SIDEBAR --- */
+      .brand-logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .brand-text-container {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+      }
+
+      .brand-title {
+        font-weight: 800;
+        font-size: 1rem;
+        color: #000;
+      }
+
+      .brand-subtitle {
+        font-size: 0.55rem;
+        letter-spacing: 2px;
+        color: #777;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-grow: 1;
+        overflow-y: auto;
+      }
+
+      .menu-item {
+        margin-bottom: 5px;
+      }
+
+      .menu-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        color: #555;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        transition: all 0.2s;
+      }
+
+      .menu-link i {
+        width: 25px;
+        font-size: 1.1rem;
+        color: #777;
+      }
+
+      .menu-link:hover {
+        background-color: var(--bg-light);
+        color: #000;
+      }
+
+      .menu-link.active {
+        background-color: var(--active-bg);
+        color: #000;
+        font-weight: 600;
+      }
+
+      .menu-link.active i {
+        color: #000;
+      }
+
+      /* Admin Profile */
+      .admin-profile {
+        margin-top: auto;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+      }
+
+      .profile-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .admin-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: #ccc;
+      }
+
+      .admin-details h6 {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      .admin-details span {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+
+      .logout-btn {
+        width: 100%;
+        background-color: var(--bg-light);
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: 0.2s;
+        text-decoration: none;
+      }
+
+      .logout-btn:hover {
+        background-color: #e2e6ea;
+        color: #000;
+      }
+
+      /* --- MAIN CONTENT --- */
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 30px;
+        transition: margin-left 0.3s ease;
+      }
+
+      /* Mobile Nav */
+      .mobile-nav {
+        display: none;
+        background: #fff;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 999;
+      }
+
+      .mobile-nav .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 0;
+        text-decoration: none;
+        color: var(--primary-black);
+      }
+
+      .brand-text-mobile {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+        text-align: left;
+      }
+
+      .brand-title-mobile {
+        font-weight: 800;
+        font-size: 1rem;
+        color: #000;
+        display: block;
+      }
+
+      .brand-subtitle-mobile {
+        font-size: 0.6rem;
+        letter-spacing: 1px;
+        color: #777;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: block;
+      }
+
+      /* Header */
+      .page-header {
+        margin-bottom: 30px;
+      }
+
+      .page-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin: 0;
+        color: #000;
+      }
+
+      .page-description {
+        color: var(--text-muted);
+        margin: 0;
+        font-size: 0.95rem;
+      }
+
+      /* Profile & Password Cards */
+      .form-card {
+        background-color: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        padding: 25px;
+        margin-bottom: 25px;
+      }
+
+      .form-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .form-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #333;
+        margin-bottom: 8px;
+      }
+
+      .form-control {
+        padding: 12px 15px;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        color: var(--primary-black);
+        font-family: "Poppins", sans-serif;
+      }
+
+      .form-control:focus {
+        box-shadow: none;
+        border-color: #000;
+      }
+
+      /* Avatar Section */
+      .avatar-section {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .large-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: #666;
+        font-weight: 700;
+        border: 2px solid #fff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .avatar-btn {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        color: #333;
+        padding: 8px 15px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: 0.2s;
+      }
+
+      .avatar-btn:hover {
+        background-color: #f8f9fa;
+        border-color: #ccc;
+      }
+
+      /* Password Specifics */
+      .password-toggle {
+        position: relative;
+      }
+
+      .password-toggle i {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #888;
+      }
+
+      /* Password Requirements */
+      .password-requirements {
+        margin-top: 8px;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+
+      .requirement {
+        display: flex;
+        align-items: center;
+        margin-bottom: 3px;
+      }
+
+      .requirement i {
+        margin-right: 8px;
+        font-size: 0.7rem;
+      }
+
+      .valid {
+        color: #198754;
+      }
+
+      .invalid {
+        color: #dc3545;
+      }
+
+      .btn-save {
+        background-color: var(--primary-black);
+        color: #fff;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: 0.2s;
+      }
+
+      .btn-save:hover {
+        background-color: #333;
+      }
+
+      @media (max-width: 991px) {
         .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            background-color: #fff;
-            border-right: 1px solid var(--border-color);
-            position: fixed;
-            top: 0;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            z-index: 1000;
-            transition: transform 0.3s ease;
+          transform: translateX(-100%);
         }
 
-        .brand-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 40px;
-            text-decoration: none;
-            color: var(--primary-black);
+        .sidebar.active {
+          transform: translateX(0);
+          box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
         }
 
-        .brand-logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .brand-text-container {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.1;
-        }
-
-        .brand-title {
-            font-weight: 800;
-            font-size: 1rem;
-            color: #000;
-        }
-
-        .brand-subtitle {
-            font-size: 0.55rem;
-            letter-spacing: 2px;
-            color: #777;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-
-        .menu-item {
-            margin-bottom: 5px;
-        }
-
-        .menu-link {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            color: #555;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9rem;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-
-        .menu-link i {
-            width: 25px;
-            font-size: 1.1rem;
-            color: #777;
-        }
-
-        .menu-link:hover {
-            background-color: var(--bg-light);
-            color: #000;
-        }
-
-        .menu-link.active {
-            background-color: var(--active-bg);
-            color: #000;
-            font-weight: 600;
-        }
-
-        .menu-link.active i {
-            color: #000;
-        }
-
-        /* Admin Profile */
-        .admin-profile {
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .profile-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .admin-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: #ccc;
-        }
-
-        .admin-details h6 {
-            margin: 0;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .admin-details span {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .logout-btn {
-            width: 100%;
-            background-color: var(--bg-light);
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: 0.2s;
-            text-decoration: none;
-        }
-
-        .logout-btn:hover {
-            background-color: #e2e6ea;
-            color: #000;
-        }
-
-        /* --- MAIN CONTENT --- */
         .main-content {
-            margin-left: var(--sidebar-width);
-            padding: 30px;
-            transition: margin-left 0.3s ease;
+          margin-left: 0;
+          padding: 20px;
         }
 
-        /* Mobile Nav */
         .mobile-nav {
-            display: none;
-            background: #fff;
-            padding: 15px 20px;
-            border-bottom: 1px solid #eee;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 999;
+          display: flex;
         }
 
-        .mobile-nav .brand-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 0;
-            text-decoration: none;
-            color: var(--primary-black);
+        .sidebar-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 998;
         }
 
-        .brand-text-mobile {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.1;
-            text-align: left;
+        .sidebar-overlay.active {
+          display: block;
         }
 
-        .brand-title-mobile {
-            font-weight: 800;
-            font-size: 1rem;
-            color: #000;
-            display: block;
-        }
-
-        .brand-subtitle-mobile {
-            font-size: 0.6rem;
-            letter-spacing: 1px;
-            color: #777;
-            font-weight: 600;
-            text-transform: uppercase;
-            display: block;
-        }
-
-        /* Header */
-        .page-header {
-            margin-bottom: 30px;
-        }
-
-        .page-title {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin: 0;
-            color: #000;
-        }
-
-        .page-description {
-            color: var(--text-muted);
-            margin: 0;
-            font-size: 0.95rem;
-        }
-
-        /* Profile & Password Cards */
-        .form-card {
-            background-color: #fff;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            padding: 25px;
-            margin-bottom: 25px;
-        }
-
-        .form-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .form-label {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #333;
-            margin-bottom: 8px;
-        }
-
-        .form-control {
-            padding: 12px 15px;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            color: var(--primary-black);
-            font-family: "Poppins", sans-serif;
-        }
-
-        .form-control:focus {
-            box-shadow: none;
-            border-color: #000;
-        }
-
-        /* Avatar Section */
         .avatar-section {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 30px;
+          flex-direction: column;
+          text-align: center;
         }
-
-        .large-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background-color: #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: #666;
-            font-weight: 700;
-            border: 2px solid #fff;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .avatar-btn {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            color: #333;
-            padding: 8px 15px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-
-        .avatar-btn:hover {
-            background-color: #f8f9fa;
-            border-color: #ccc;
-        }
-
-        /* Password Specifics */
-        .password-toggle {
-            position: relative;
-        }
-
-        .password-toggle i {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #888;
-        }
-
-        /* Password Requirements */
-        .password-requirements {
-            margin-top: 8px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .requirement {
-            display: flex;
-            align-items: center;
-            margin-bottom: 3px;
-        }
-
-        .requirement i {
-            margin-right: 8px;
-            font-size: 0.7rem;
-        }
-
-        .valid {
-            color: #198754;
-        }
-
-        .invalid {
-            color: #dc3545;
-        }
-
-        .btn-save {
-            background-color: var(--primary-black);
-            color: #fff;
-            border: none;
-            padding: 10px 30px;
-            border-radius: 30px;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-
-        .btn-save:hover {
-            background-color: #333;
-        }
-
-        @media (max-width: 991px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.active {
-                transform: translateX(0);
-                box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 20px;
-            }
-
-            .mobile-nav {
-                display: flex;
-            }
-
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 998;
-            }
-
-            .sidebar-overlay.active {
-                display: block;
-            }
-
-            .avatar-section {
-                flex-direction: column;
-                text-align: center;
-            }
-        }
+      }
     </style>
-</head>
+  </head>
 
-<body>
-
+  <body>
     <div class="mobile-nav">
-        <a href="./adminDashboard.html" class="brand-section">
-            <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
-            <div class="brand-text-mobile">
-                <span class="brand-title-mobile">JINSA MOBILES</span>
-                <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
-            </div>
-        </a>
-        <button class="btn btn-light" onclick="toggleSidebar()">
-            <i class="fa-solid fa-bars"></i>
-        </button>
+      <a href="./adminDashboard.html" class="brand-section">
+        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
+        <div class="brand-text-mobile">
+          <span class="brand-title-mobile">JINSA MOBILES</span>
+          <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
+        </div>
+      </a>
+      <button class="btn btn-light" onclick="toggleSidebar()">
+        <i class="fa-solid fa-bars"></i>
+      </button>
     </div>
 
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div
+      class="sidebar-overlay"
+      id="sidebarOverlay"
+      onclick="toggleSidebar()"
+    ></div>
 
     <nav class="sidebar" id="sidebar">
-        <a href="./adminDashboard.html" class="brand-section">
-            <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
-            <div class="brand-text-container">
-                <span class="brand-title">JINSA MOBILES</span>
-                <span class="brand-subtitle">AND ACCESSORIES</span>
-            </div>
-        </a>
-
-        <ul class="sidebar-menu">
-            <li class="menu-item"><a href="../Admin/adminDashboard.html" class="menu-link"><i
-                        class="fa-solid fa-border-all"></i> &nbsp;Dashboard</a></li>
-            <li class="menu-item"><a href="../Admin/adminOrders.html" class="menu-link"><i
-                        class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a></li>
-            <li class="menu-item"><a href="../Admin/adminTransactions.html" class="menu-link"><i
-                        class="fa-solid fa-money-bill-transfer"></i> &nbsp;Transactions</a></li>
-            <li class="menu-item"><a href="../Admin/adminProducts.html" class="menu-link"><i
-                        class="fa-solid fa-box-open"></i> &nbsp;Products</a></li>
-            <li class="menu-item"><a href="../Admin/adminCustomers.html" class="menu-link"><i
-                        class="fa-solid fa-users"></i> &nbsp;Customers</a></li>
-            <li class="menu-item"><a href="../Admin/adminMessages.html" class="menu-link"><i
-                        class="fa-regular fa-envelope"></i> &nbsp;Messages</a></li>
-            <!-- Analytics Link -->
-      <li class="menu-item"><a href="../Admin/adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i>
-                    &nbsp;Coupon Management</a></li>
-            <li class="menu-item"><a href="../Admin/adminCategories.html" class="menu-link"><i
-                        class="fa-solid fa-layer-group"></i> &nbsp;Category Management</a></li>
-            <li class="menu-item"><a href="../Admin/adminOffers.html" class="menu-link"><i class="fa-solid fa-gift"></i>
-                    &nbsp;Offer</a></li>
-        </ul>
-
-        <div class="admin-profile">
-            <a href="./adminProfile.html" class="profile-info text-decoration-none text-reset">
-                <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
-                <div class="admin-details">
-                    <h6 id="sidebarName" class="m-0">Admin</h6>
-                    <span class="small text-muted">admin@example.com</span>
-                </div>
-            </a>
-            <a href="./adminLogin.html" class="logout-btn">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
-            </a>
+      <a href="./adminDashboard.html" class="brand-section">
+        <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
+        <div class="brand-text-container">
+          <span class="brand-title">JINSA MOBILES</span>
+          <span class="brand-subtitle">AND ACCESSORIES</span>
         </div>
+      </a>
+
+      <ul class="sidebar-menu">
+        <li class="menu-item">
+          <a href="../Admin/adminDashboard.html" class="menu-link"
+            ><i class="fa-solid fa-border-all"></i> &nbsp;Dashboard</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminOrders.html" class="menu-link"
+            ><i class="fa-solid fa-cart-shopping"></i> &nbsp;Orders</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminTransactions.html" class="menu-link"
+            ><i class="fa-solid fa-money-bill-transfer"></i>
+            &nbsp;Transactions</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminProducts.html" class="menu-link"
+            ><i class="fa-solid fa-box-open"></i> &nbsp;Products</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminPurchaseReport.html" class="menu-link"
+            ><i class="fa-solid fa-file"></i> &nbsp;Purchase Report</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminCustomers.html" class="menu-link"
+            ><i class="fa-solid fa-users"></i> &nbsp;Customers</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminMessages.html" class="menu-link"
+            ><i class="fa-regular fa-envelope"></i> &nbsp;Messages</a
+          >
+        </li>
+        <!-- Analytics Link -->
+        <li class="menu-item">
+          <a href="../Admin/adminCoupons.html" class="menu-link"
+            ><i class="fa-solid fa-tag"></i> &nbsp;Coupon Management</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminCategories.html" class="menu-link"
+            ><i class="fa-solid fa-layer-group"></i> &nbsp;Category
+            Management</a
+          >
+        </li>
+        <li class="menu-item">
+          <a href="../Admin/adminOffers.html" class="menu-link"
+            ><i class="fa-solid fa-gift"></i> &nbsp;Offer</a
+          >
+        </li>
+      </ul>
+
+      <div class="admin-profile">
+        <a
+          href="./adminProfile.html"
+          class="profile-info text-decoration-none text-reset"
+        >
+          <img
+            src="https://placehold.co/100x100/ccc/fff?text=A"
+            alt="Admin"
+            class="admin-avatar"
+          />
+          <div class="admin-details">
+            <h6 id="sidebarName" class="m-0">Admin</h6>
+            <span class="small text-muted">admin@example.com</span>
+          </div>
+        </a>
+        <a href="./adminLogin.html" class="logout-btn">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+        </a>
+      </div>
     </nav>
 
     <div class="main-content content-animate">
+      <div class="page-header">
+        <h1 class="page-title">Admin Profile</h1>
+        <p class="page-description">
+          Manage your account details and security settings.
+        </p>
+      </div>
 
-        <div class="page-header">
-            <h1 class="page-title">Admin Profile</h1>
-            <p class="page-description">Manage your account details and security settings.</p>
-        </div>
+      <div class="form-card">
+        <h5 class="form-title">Profile Information</h5>
 
-        <div class="form-card">
-            <h5 class="form-title">Profile Information</h5>
-
-            <div class="avatar-section">
-                <div class="large-avatar">A</div>
-                <div>
-                    <button class="avatar-btn"><i class="fa-solid fa-camera"></i> Change Photo</button>
-                    <div class="small text-muted mt-1">JPG, GIF or PNG. Max size 800K</div>
-                </div>
+        <div class="avatar-section">
+          <div class="large-avatar">A</div>
+          <div>
+            <button class="avatar-btn">
+              <i class="fa-solid fa-camera"></i> Change Photo
+            </button>
+            <div class="small text-muted mt-1">
+              JPG, GIF or PNG. Max size 800K
             </div>
-
-            <form id="profileForm">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="firstName" value="" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="lastName" value="" required>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label class="form-label">Email Address</label>
-                    <input type="email" class="form-control" id="email" value="" required>
-                </div>
-                <div class="text-end">
-                    <button type="button" class="btn-save" onclick="saveProfile()">Save Profile</button>
-                </div>
-            </form>
+          </div>
         </div>
 
-        <div class="form-card">
-            <h5 class="form-title">Change Password</h5>
+        <form id="profileForm">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">First Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="firstName"
+                value=""
+                required
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Last Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="lastName"
+                value=""
+                required
+              />
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label">Email Address</label>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              value=""
+              required
+            />
+          </div>
+          <div class="text-end">
+            <button type="button" class="btn-save" onclick="saveProfile()">
+              Save Profile
+            </button>
+          </div>
+        </form>
+      </div>
 
-            <form id="passwordForm">
-                <div class="mb-3">
-                    <label class="form-label">Current Password</label>
-                    <div class="password-toggle">
-                        <input type="password" class="form-control" id="currentPass"
-                            placeholder="Enter current password">
-                        <i class="fa-regular fa-eye" onclick="togglePass('currentPass')"></i>
-                    </div>
+      <div class="form-card">
+        <h5 class="form-title">Change Password</h5>
+
+        <form id="passwordForm">
+          <div class="mb-3">
+            <label class="form-label">Current Password</label>
+            <div class="password-toggle">
+              <input
+                type="password"
+                class="form-control"
+                id="currentPass"
+                placeholder="Enter current password"
+              />
+              <i
+                class="fa-regular fa-eye"
+                onclick="togglePass('currentPass')"
+              ></i>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">New Password</label>
+              <div class="password-toggle">
+                <input
+                  type="password"
+                  class="form-control"
+                  id="newPass"
+                  placeholder="Enter new password"
+                  onkeyup="validatePassword()"
+                />
+                <i
+                  class="fa-regular fa-eye"
+                  onclick="togglePass('newPass')"
+                ></i>
+              </div>
+              <div class="password-requirements">
+                <div class="requirement">
+                  <i
+                    class="fa-solid fa-circle-check invalid"
+                    id="lengthCheck"
+                  ></i>
+                  <span>At least 8 characters</span>
                 </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label">New Password</label>
-                        <div class="password-toggle">
-                            <input type="password" class="form-control" id="newPass" placeholder="Enter new password"
-                                onkeyup="validatePassword()">
-                            <i class="fa-regular fa-eye" onclick="togglePass('newPass')"></i>
-                        </div>
-                        <div class="password-requirements">
-                            <div class="requirement">
-                                <i class="fa-solid fa-circle-check invalid" id="lengthCheck"></i>
-                                <span>At least 8 characters</span>
-                            </div>
-                            <div class="requirement">
-                                <i class="fa-solid fa-circle-check invalid" id="uppercaseCheck"></i>
-                                <span>One uppercase letter</span>
-                            </div>
-                            <div class="requirement">
-                                <i class="fa-solid fa-circle-check invalid" id="lowercaseCheck"></i>
-                                <span>One lowercase letter</span>
-                            </div>
-                            <div class="requirement">
-                                <i class="fa-solid fa-circle-check invalid" id="numberCheck"></i>
-                                <span>One number</span>
-                            </div>
-                            <div class="requirement">
-                                <i class="fa-solid fa-circle-check invalid" id="specialCheck"></i>
-                                <span>One special character (!@#$%^&*)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Confirm New Password</label>
-                        <div class="password-toggle">
-                            <input type="password" class="form-control" id="confirmPass"
-                                placeholder="Confirm new password">
-                            <i class="fa-regular fa-eye" onclick="togglePass('confirmPass')"></i>
-                        </div>
-                    </div>
+                <div class="requirement">
+                  <i
+                    class="fa-solid fa-circle-check invalid"
+                    id="uppercaseCheck"
+                  ></i>
+                  <span>One uppercase letter</span>
                 </div>
-
-                <div class="text-end">
-                    <button type="button" class="btn-save" onclick="updatePassword()">Update Password</button>
+                <div class="requirement">
+                  <i
+                    class="fa-solid fa-circle-check invalid"
+                    id="lowercaseCheck"
+                  ></i>
+                  <span>One lowercase letter</span>
                 </div>
-            </form>
-        </div>
+                <div class="requirement">
+                  <i
+                    class="fa-solid fa-circle-check invalid"
+                    id="numberCheck"
+                  ></i>
+                  <span>One number</span>
+                </div>
+                <div class="requirement">
+                  <i
+                    class="fa-solid fa-circle-check invalid"
+                    id="specialCheck"
+                  ></i>
+                  <span>One special character (!@#$%^&*)</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Confirm New Password</label>
+              <div class="password-toggle">
+                <input
+                  type="password"
+                  class="form-control"
+                  id="confirmPass"
+                  placeholder="Confirm new password"
+                />
+                <i
+                  class="fa-regular fa-eye"
+                  onclick="togglePass('confirmPass')"
+                ></i>
+              </div>
+            </div>
+          </div>
 
+          <div class="text-end">
+            <button type="button" class="btn-save" onclick="updatePassword()">
+              Update Password
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/adminCommon.js"></script>
     <script src="/js/adminBadge.js"></script>
     <script>
-        // Load Profile Data
-        async function loadProfile() {
-            try {
-                const res = await window.adminFetch('/api/admin/profile');
-                const data = await res.json();
-                if (data.success && data.admin) {
-                    const admin = data.admin;
-                    document.getElementById('firstName').value = admin.firstName || '';
-                    document.getElementById('lastName').value = admin.lastName || '';
-                    document.getElementById('email').value = admin.email || '';
+      // Load Profile Data
+      async function loadProfile() {
+        try {
+          const res = await window.adminFetch("/api/admin/profile");
+          const data = await res.json();
+          if (data.success && data.admin) {
+            const admin = data.admin;
+            document.getElementById("firstName").value = admin.firstName || "";
+            document.getElementById("lastName").value = admin.lastName || "";
+            document.getElementById("email").value = admin.email || "";
 
-                    // Update Avatars
-                    const initials = (admin.firstName ? admin.firstName.charAt(0) : 'A').toUpperCase();
-                    document.querySelector('.large-avatar').textContent = initials;
+            // Update Avatars
+            const initials = (
+              admin.firstName ? admin.firstName.charAt(0) : "A"
+            ).toUpperCase();
+            document.querySelector(".large-avatar").textContent = initials;
 
-                    // Sidebar name should be updated by adminBadge or already updated
-                }
-            } catch (err) {
-                console.error('Failed to load profile:', err);
-            }
+            // Sidebar name should be updated by adminBadge or already updated
+          }
+        } catch (err) {
+          console.error("Failed to load profile:", err);
         }
+      }
 
-        document.addEventListener('DOMContentLoaded', loadProfile);
+      document.addEventListener("DOMContentLoaded", loadProfile);
 
-        // Toggle Password Visibility
-        function togglePass(id) {
-            const input = document.getElementById(id);
-            const icon = input.nextElementSibling;
-            if (input.type === "password") {
-                input.type = "text";
-                icon.classList.remove("fa-eye");
-                icon.classList.add("fa-eye-slash");
-            } else {
-                input.type = "password";
-                icon.classList.remove("fa-eye-slash");
-                icon.classList.add("fa-eye");
-            }
+      // Toggle Password Visibility
+      function togglePass(id) {
+        const input = document.getElementById(id);
+        const icon = input.nextElementSibling;
+        if (input.type === "password") {
+          input.type = "text";
+          icon.classList.remove("fa-eye");
+          icon.classList.add("fa-eye-slash");
+        } else {
+          input.type = "password";
+          icon.classList.remove("fa-eye-slash");
+          icon.classList.add("fa-eye");
         }
+      }
 
-        // Validate Password Strength
-        function validatePassword() {
-            const password = document.getElementById('newPass').value;
-            const lengthCheck = document.getElementById('lengthCheck');
-            const uppercaseCheck = document.getElementById('uppercaseCheck');
-            const lowercaseCheck = document.getElementById('lowercaseCheck');
-            const numberCheck = document.getElementById('numberCheck');
-            const specialCheck = document.getElementById('specialCheck');
+      // Validate Password Strength
+      function validatePassword() {
+        const password = document.getElementById("newPass").value;
+        const lengthCheck = document.getElementById("lengthCheck");
+        const uppercaseCheck = document.getElementById("uppercaseCheck");
+        const lowercaseCheck = document.getElementById("lowercaseCheck");
+        const numberCheck = document.getElementById("numberCheck");
+        const specialCheck = document.getElementById("specialCheck");
 
-            // Reset all
-            [lengthCheck, uppercaseCheck, lowercaseCheck, numberCheck, specialCheck].forEach(el => {
-                el.classList.remove('valid', 'invalid');
-                el.classList.add('invalid');
+        // Reset all
+        [
+          lengthCheck,
+          uppercaseCheck,
+          lowercaseCheck,
+          numberCheck,
+          specialCheck,
+        ].forEach((el) => {
+          el.classList.remove("valid", "invalid");
+          el.classList.add("invalid");
+        });
+
+        if (password.length >= 8)
+          lengthCheck.classList.replace("invalid", "valid");
+        if (/[A-Z]/.test(password))
+          uppercaseCheck.classList.replace("invalid", "valid");
+        if (/[a-z]/.test(password))
+          lowercaseCheck.classList.replace("invalid", "valid");
+        if (/\d/.test(password))
+          numberCheck.classList.replace("invalid", "valid");
+        if (/[^A-Za-z0-9]/.test(password))
+          specialCheck.classList.replace("invalid", "valid");
+      }
+
+      // Save Profile Logic
+      async function saveProfile() {
+        const firstName = document.getElementById("firstName").value;
+        const lastName = document.getElementById("lastName").value;
+        const email = document.getElementById("email").value;
+
+        try {
+          const res = await window.adminFetch("/api/admin/profile", {
+            method: "PUT",
+            body: JSON.stringify({ firstName, lastName, email }),
+          });
+          const data = await res.json();
+
+          if (data.success) {
+            Swal.fire({
+              title: "Success!",
+              text: "Profile details updated successfully.",
+              icon: "success",
+              confirmButtonColor: "#1a1a1a",
+              timer: 1500,
+              showConfirmButton: false,
             });
+            loadProfile(); // Reload to update UI
+          } else {
+            throw new Error(data.message || "Update failed");
+          }
+        } catch (err) {
+          Swal.fire("Error", err.message, "error");
+        }
+      }
 
-            if (password.length >= 8) lengthCheck.classList.replace('invalid', 'valid');
-            if (/[A-Z]/.test(password)) uppercaseCheck.classList.replace('invalid', 'valid');
-            if (/[a-z]/.test(password)) lowercaseCheck.classList.replace('invalid', 'valid');
-            if (/\d/.test(password)) numberCheck.classList.replace('invalid', 'valid');
-            if (/[^A-Za-z0-9]/.test(password)) specialCheck.classList.replace('invalid', 'valid');
+      // Update Password Logic
+      async function updatePassword() {
+        const current = document.getElementById("currentPass").value;
+        const newP = document.getElementById("newPass").value;
+        const confirmP = document.getElementById("confirmPass").value;
+
+        if (!current || !newP || !confirmP) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "All password fields are required.",
+            confirmButtonColor: "#1a1a1a",
+          });
+          return;
         }
 
-        // Save Profile Logic
-        async function saveProfile() {
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const email = document.getElementById('email').value;
-
-            try {
-                const res = await window.adminFetch('/api/admin/profile', {
-                    method: 'PUT',
-                    body: JSON.stringify({ firstName, lastName, email })
-                });
-                const data = await res.json();
-
-                if (data.success) {
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'Profile details updated successfully.',
-                        icon: 'success',
-                        confirmButtonColor: '#1a1a1a',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                    loadProfile(); // Reload to update UI
-                } else {
-                    throw new Error(data.message || 'Update failed');
-                }
-            } catch (err) {
-                Swal.fire('Error', err.message, 'error');
-            }
+        if (newP !== confirmP) {
+          Swal.fire({
+            icon: "error",
+            title: "Mismatch",
+            text: "New password and confirmation do not match.",
+            confirmButtonColor: "#1a1a1a",
+          });
+          return;
         }
 
-        // Update Password Logic
-        async function updatePassword() {
-            const current = document.getElementById('currentPass').value;
-            const newP = document.getElementById('newPass').value;
-            const confirmP = document.getElementById('confirmPass').value;
+        // ... strength validation remains same ...
+        const hasLength = newP.length >= 8;
+        const hasUppercase = /[A-Z]/.test(newP);
+        const hasLowercase = /[a-z]/.test(newP);
+        const hasNumber = /\d/.test(newP);
+        const hasSpecial = /[^A-Za-z0-9]/.test(newP);
 
-            if (!current || !newP || !confirmP) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'All password fields are required.',
-                    confirmButtonColor: '#1a1a1a'
-                });
-                return;
-            }
-
-            if (newP !== confirmP) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Mismatch',
-                    text: 'New password and confirmation do not match.',
-                    confirmButtonColor: '#1a1a1a'
-                });
-                return;
-            }
-
-            // ... strength validation remains same ...
-            const hasLength = newP.length >= 8;
-            const hasUppercase = /[A-Z]/.test(newP);
-            const hasLowercase = /[a-z]/.test(newP);
-            const hasNumber = /\d/.test(newP);
-            const hasSpecial = /[^A-Za-z0-9]/.test(newP);
-
-            if (!(hasLength && hasUppercase && hasLowercase && hasNumber && hasSpecial)) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Weak Password',
-                    text: 'Password must meet all requirements.',
-                    confirmButtonColor: '#1a1a1a'
-                });
-                return;
-            }
-
-            try {
-                const res = await window.adminFetch('/api/admin/change-password', {
-                    method: 'PUT',
-                    body: JSON.stringify({ currentPassword: current, newPassword: newP })
-                });
-                const data = await res.json();
-
-                if (data.success) {
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'Your password has been updated.',
-                        icon: 'success',
-                        confirmButtonColor: '#1a1a1a'
-                    }).then(() => {
-                        document.getElementById('passwordForm').reset();
-                        // Reset password requirements
-                        document.querySelectorAll('.requirement i').forEach(el => {
-                            el.classList.remove('valid', 'invalid');
-                            el.classList.add('invalid');
-                        });
-                    });
-                } else {
-                    throw new Error(data.message || 'Password update failed');
-                }
-            } catch (err) {
-                Swal.fire('Error', err.message, 'error');
-            }
+        if (
+          !(
+            hasLength &&
+            hasUppercase &&
+            hasLowercase &&
+            hasNumber &&
+            hasSpecial
+          )
+        ) {
+          Swal.fire({
+            icon: "error",
+            title: "Weak Password",
+            text: "Password must meet all requirements.",
+            confirmButtonColor: "#1a1a1a",
+          });
+          return;
         }
+
+        try {
+          const res = await window.adminFetch("/api/admin/change-password", {
+            method: "PUT",
+            body: JSON.stringify({
+              currentPassword: current,
+              newPassword: newP,
+            }),
+          });
+          const data = await res.json();
+
+          if (data.success) {
+            Swal.fire({
+              title: "Success!",
+              text: "Your password has been updated.",
+              icon: "success",
+              confirmButtonColor: "#1a1a1a",
+            }).then(() => {
+              document.getElementById("passwordForm").reset();
+              // Reset password requirements
+              document.querySelectorAll(".requirement i").forEach((el) => {
+                el.classList.remove("valid", "invalid");
+                el.classList.add("invalid");
+              });
+            });
+          } else {
+            throw new Error(data.message || "Password update failed");
+          }
+        } catch (err) {
+          Swal.fire("Error", err.message, "error");
+        }
+      }
     </script>
-</body>
-
+  </body>
 </html>
