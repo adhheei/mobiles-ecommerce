@@ -24,7 +24,6 @@ const orderSchema = new mongoose.Schema({
       mrp: { type: Number }, // Original MRP
       quantity: { type: Number, required: true },
 
-      // --- NEW FIELDS FOR PROPORTIONAL REFUND ---
       discountPerItem: {
         type: Number,
         default: 0,

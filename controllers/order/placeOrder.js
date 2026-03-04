@@ -23,7 +23,7 @@ const placeOrder = async (req, res) => {
     } = req.body;
 
     // 1. RAZORPAY VERIFICATION
-    if (paymentMethod === "Razorpay") {
+    if (paymentMethod && paymentMethod.toUpperCase() === "RAZORPAY") {
       const hmac = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
       hmac.update(razorpayOrderId + "|" + razorpayPaymentId);
       if (hmac.digest("hex") !== razorpaySignature) {
@@ -53,6 +53,7 @@ const placeOrder = async (req, res) => {
         price,
         mrp: product.actualPrice || product.price,
         quantity: buyNowItem.qty,
+        totalItemPrice: price * buyNowItem.qty, // Added required field
         image: formatImageUrl(product.mainImage),
       });
     } else {
@@ -76,6 +77,7 @@ const placeOrder = async (req, res) => {
           price,
           mrp: item.productId.actualPrice || item.productId.price,
           quantity: item.quantity,
+          totalItemPrice: price * item.quantity, // Added required field
           image: formatImageUrl(item.productId.mainImage),
         });
       }
@@ -159,7 +161,9 @@ const placeOrder = async (req, res) => {
       console.error("Email Error:", err),
     );
 
-    res.status(200).json({ success: true, orderId: newOrder.orderId });
+    res
+      .status(200)
+      .json({ success: true, orderId: newOrder.orderId, dbOrderId: newOrder._id });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

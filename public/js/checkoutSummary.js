@@ -42,6 +42,7 @@ async function loadCheckoutSummary() {
             price: price,
             mrp: mrp,
             qty: qty,
+            totalItemPrice: price * qty,
           });
 
           subtotal = price * qty;
@@ -61,6 +62,7 @@ async function loadCheckoutSummary() {
           price: item.price,
           mrp: item.mrp || item.price, // Ensure mrp is passed from cart controller or defaults to price
           qty: item.quantity,
+          totalItemPrice: item.price * item.quantity,
         }));
         subtotal = cartData.subtotal || 0;
         totalMrp = cartData.totalMrp || subtotal;
@@ -137,8 +139,11 @@ async function loadCheckoutSummary() {
     let walletDeducted = 0;
     const walletToggle = document.getElementById("use-wallet-toggle");
     if (walletToggle && walletToggle.checked) {
-      const balanceText = document.getElementById("wallet-balance-display").innerText;
-      const currentBalance = parseFloat(balanceText.replace(/[^\d.]/g, "")) || 0;
+      const balanceText = document.getElementById(
+        "wallet-balance-display",
+      ).innerText;
+      const currentBalance =
+        parseFloat(balanceText.replace(/[^\d.]/g, "")) || 0;
       walletDeducted = Math.min(currentBalance, finalAmount);
       finalAmount -= walletDeducted;
     }
@@ -204,28 +209,30 @@ async function loadCheckoutSummary() {
                     <span>₹${totalMrp.toLocaleString()}</span>
                 </div>
                 
-                ${discount > 0
-        ? `
+                ${
+                  discount > 0
+                    ? `
                 <div class="d-flex justify-content-between mb-2 small text-success">
                     <span>Discount</span>
                     <span>- ₹${discount.toLocaleString()}</span>
                 </div>`
-        : ""
-      }
+                    : ""
+                }
 
                 <div class="d-flex justify-content-between mb-2 small">
                     <span>Subtotal</span>
                     <span>₹${subtotal.toLocaleString()}</span>
                 </div>
 
-                ${couponDiscount > 0
-        ? `
+                ${
+                  couponDiscount > 0
+                    ? `
                 <div class="d-flex justify-content-between mb-2 small text-success fw-bold">
                     <span>Coupon Discount</span>
                     <span>- ₹${couponDiscount.toLocaleString()}</span>
                 </div>`
-        : ""
-      }
+                    : ""
+                }
 
                 <div class="d-flex justify-content-between mb-2 small">
                     <span>Delivery Charges</span>
@@ -234,14 +241,15 @@ async function loadCheckoutSummary() {
                     </span>
                 </div>
 
-                ${walletDeducted > 0
-        ? `
+                ${
+                  walletDeducted > 0
+                    ? `
                 <div class="d-flex justify-content-between mb-3 small text-primary fw-bold">
                     <span>Wallet Applied</span>
                     <span>- ₹${walletDeducted.toLocaleString()}</span>
                 </div>`
-        : ""
-      }
+                    : ""
+                }
 
                 <div class="d-flex justify-content-between py-3 border-top border-bottom mb-3 calc-row total">
                     <span class="fw-bold" style="font-size: 1.1rem;">Total Amount</span>
@@ -291,8 +299,8 @@ async function openCouponModal(cartTotal) {
   const couponsHtml =
     coupons.length > 0
       ? coupons
-        .map(
-          (c) => `
+          .map(
+            (c) => `
         <div class="text-start border rounded p-2 mb-2 ${c.isExpired || c.isUsed ? "bg-light text-muted" : "border-success"}" 
               style="cursor: ${c.isExpired || c.isUsed ? "not-allowed" : "pointer"}"
               onclick="${!c.isExpired && !c.isUsed ? `selectCoupon('${c.code}')` : ""}">
@@ -304,8 +312,8 @@ async function openCouponModal(cartTotal) {
             ${c.isExpired ? '<div class="text-danger small">Expired</div>' : ""}
         </div>
     `,
-        )
-        .join("")
+          )
+          .join("")
       : '<div class="text-muted small">No coupons available</div>';
 
   Swal.fire({

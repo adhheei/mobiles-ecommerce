@@ -4,8 +4,8 @@
  */
 
 document.addEventListener("DOMContentLoaded", function () {
-  // ==================== CONFIG ====================
-  const API_BASE = "/api"; // Update with your actual API endpoint
+  // CONFIG
+  const API_BASE = "/api"; 
   const ITEMS_PER_PAGE = 10;
   let currentPage = 1;
   let allPurchases = [];
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let allProductsList = [];
   let modalInstance = null;
 
-  // ==================== DOM ELEMENTS ====================
+  // DOM ELEMENTS
   const elements = {
     sidebar: document.getElementById("sidebar"),
     overlay: document.getElementById("sidebarOverlay"),
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
     itemsCountCard: document.getElementById("itemsCountCard"),
   };
 
-  // ==================== INITIALIZATION ====================
+  // INITIALIZATION
   function init() {
     initModal();
     initEventListeners();
@@ -98,10 +98,14 @@ document.addEventListener("DOMContentLoaded", function () {
     elements.newPurchaseForm?.addEventListener("submit", handlePurchaseSubmit);
 
     // Quick Add Product Submission
-    document.getElementById("quickAddProductForm")?.addEventListener("submit", handleQuickProductSubmit);
-    document.getElementById('newProductModal')?.addEventListener('show.bs.modal', function () {
-      loadCategoriesForQuickAdd();
-    });
+    document
+      .getElementById("quickAddProductForm")
+      ?.addEventListener("submit", handleQuickProductSubmit);
+    document
+      .getElementById("newProductModal")
+      ?.addEventListener("show.bs.modal", function () {
+        loadCategoriesForQuickAdd();
+      });
 
     // Export
     elements.exportBtn?.addEventListener("click", (e) => {
@@ -121,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // ==================== API & DATA ====================
+  // API & DATA
   async function fetchPurchases() {
     try {
       const response = await fetch(`${API_BASE}/admin/purchase/report`);
@@ -155,13 +159,13 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function updateAllProductDropdowns() {
-    const selects = document.querySelectorAll('.product-select');
-    selects.forEach(select => {
+    const selects = document.querySelectorAll(".product-select");
+    selects.forEach((select) => {
       const currentValue = select.value;
 
       let productOptions = '<option value="">Select a Product</option>';
-      allProductsList.forEach(p => {
-        const selected = (p.name === currentValue) ? 'selected' : '';
+      allProductsList.forEach((p) => {
+        const selected = p.name === currentValue ? "selected" : "";
         productOptions += `<option value="${escapeHtml(p.name)}" ${selected}>${escapeHtml(p.name)}</option>`;
       });
 
@@ -193,7 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
     e.preventDefault();
     const saveBtn = document.getElementById("saveQuickProductBtn");
     saveBtn.disabled = true;
-    saveBtn.innerHTML = 'Saving...';
+    saveBtn.innerHTML = "Saving...";
 
     try {
       const name = document.getElementById("quickProductName").value.trim();
@@ -201,8 +205,11 @@ document.addEventListener("DOMContentLoaded", function () {
       const stock = document.getElementById("quickProductStock").value;
       const category = document.getElementById("quickProductCategory").value;
 
+      const uniqueSKU = "SKU-" + Math.floor(10000 + Math.random() * 90000);
+
       const formData = new FormData();
       formData.append("name", name);
+      formData.append("sku", uniqueSKU);
       formData.append("price", price);
       formData.append("actualPrice", price);
       formData.append("offerPrice", price);
@@ -221,8 +228,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const data = await res.json();
       if (data.success) {
         // Hide modal
-        const modalEl = document.getElementById('newProductModal');
-        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        const modalEl = document.getElementById("newProductModal");
+        const modal =
+          bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
         modal.hide();
 
         document.getElementById("quickAddProductForm").reset();
@@ -238,10 +246,10 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         // Automatically populate the last item empty row if empty
-        const itemRows = document.querySelectorAll('.item-row');
+        const itemRows = document.querySelectorAll(".item-row");
         if (itemRows.length > 0) {
           const lastRow = itemRows[itemRows.length - 1];
-          const productInput = lastRow.querySelector('.product-name');
+          const productInput = lastRow.querySelector(".product-name");
           if (!productInput.value) {
             productInput.value = name;
           }
@@ -254,11 +262,11 @@ document.addEventListener("DOMContentLoaded", function () {
       Swal.fire("Error", err.message, "error");
     } finally {
       saveBtn.disabled = false;
-      saveBtn.innerHTML = 'Save Product';
+      saveBtn.innerHTML = "Save Product";
     }
   }
 
-  // ==================== RENDERING ====================
+  // RENDERING
   function renderTable() {
     if (!elements.purchasesTableBody) return;
 
@@ -339,7 +347,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
     // Unique suppliers
-    const suppliers = new Set(allPurchases.map(p => p.supplierName));
+    const suppliers = new Set(allPurchases.map((p) => p.supplierName));
     const uniqueSuppliers = suppliers.size;
 
     // Total transactions (all records)
@@ -360,7 +368,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (elements.itemsCountCard) elements.itemsCountCard.textContent = items;
   }
 
-  // ==================== FILTERING & SEARCH ====================
+  // FILTERING & SEARCH
   function filterPurchases() {
     const searchTerm = elements.searchInput?.value.toLowerCase() || "";
     const startDate = elements.startDate?.value;
@@ -394,7 +402,7 @@ document.addEventListener("DOMContentLoaded", function () {
     renderTable();
   }
 
-  // ==================== MODAL & FORM ====================
+  // MODAL & FORM
   function resetPurchaseForm() {
     if (elements.newPurchaseForm) elements.newPurchaseForm.reset();
     if (elements.itemsTableBody) elements.itemsTableBody.innerHTML = "";
@@ -417,8 +425,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Generate product options
     let productOptions = '<option value="">Select a Product</option>';
-    allProductsList.forEach(p => {
-      const selected = (p.name === productData.productName) ? 'selected' : '';
+    allProductsList.forEach((p) => {
+      const selected = p.name === productData.productName ? "selected" : "";
       productOptions += `<option value="${escapeHtml(p.name)}" ${selected}>${escapeHtml(p.name)}</option>`;
     });
 
@@ -544,9 +552,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     try {
       const response = await fetch(`${API_BASE}/admin/purchase/add`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(purchaseData)
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(purchaseData),
       });
       const result = await response.json();
 
@@ -562,7 +570,11 @@ document.addEventListener("DOMContentLoaded", function () {
         resetPurchaseForm();
         await fetchPurchases();
       } else {
-        Swal.fire("Error", result.message || "Failed to create purchase order", "error");
+        Swal.fire(
+          "Error",
+          result.message || "Failed to create purchase order",
+          "error",
+        );
       }
     } catch (error) {
       console.error("Error creating purchase:", error);
@@ -570,7 +582,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // ==================== TABLE ACTIONS ====================
+  // TABLE ACTIONS
   function handleTableActions(e) {
     const actionBtn = e.target.closest(".action-btn");
     if (!actionBtn) return;
@@ -601,7 +613,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Pre-fill modal with purchase data and open
   }
 
-  // ==================== EXPORT ====================
+  // EXPORT
   function exportPurchases() {
     if (filteredPurchases.length === 0) {
       Swal.fire("Info", "No data to export", "info");
@@ -609,13 +621,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // CSV Export
-    const headers = [
-      "Purchase ID",
-      "Supplier",
-      "Date",
-      "Quantity",
-      "Amount",
-    ];
+    const headers = ["Purchase ID", "Supplier", "Date", "Quantity", "Amount"];
     const rows = filteredPurchases.map((p) => [
       p.id,
       p.supplierName,
@@ -643,7 +649,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.removeChild(link);
   }
 
-  // ==================== UTILITIES ====================
+  // UTILITIES
   function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -684,6 +690,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // ==================== START ====================
+  // START
   init();
 });

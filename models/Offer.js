@@ -10,7 +10,6 @@ const offerSchema = new mongoose.Schema(
       enum: ["Product", "Category"],
       required: true,
     },
-    // Reference to either a Product or Category
     targetId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,

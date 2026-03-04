@@ -488,18 +488,24 @@
 
         <h4 class="section-title">Payment Method</h4>
 
-        <div class="card mb-4 border-0 shadow-sm"
-          style="background-color: #fff; border: 1px solid #e5e5e5 !important; border-radius: 12px">
+        <div class="card mb-4 border-0 shadow-sm" style="
+              background-color: #fff;
+              border: 1px solid #e5e5e5 !important;
+              border-radius: 12px;
+            ">
           <div class="card-body p-4">
             <div class="form-check d-flex align-items-center mb-0">
               <input class="form-check-input me-3" type="checkbox" id="use-wallet-toggle" onchange="toggleWalletUsage()"
-                style="width: 1.4em; height: 1.4em; cursor: pointer;">
+                style="width: 1.4em; height: 1.4em; cursor: pointer" />
               <label class="form-check-label fw-bold d-flex align-items-center flex-grow-1" for="use-wallet-toggle"
-                style="cursor: pointer;">
+                style="cursor: pointer">
                 <div>
-                  <i class="fa-solid fa-wallet me-2 text-success"></i> Use Wallet Balance
-                  <div class="small text-muted fw-normal" id="wallet-balance-status">Available: Rs. <span
-                      id="wallet-balance-display">0.00</span></div>
+                  <i class="fa-solid fa-wallet me-2 text-success"></i> Use
+                  Wallet Balance
+                  <div class="small text-muted fw-normal" id="wallet-balance-status">
+                    Available: Rs.
+                    <span id="wallet-balance-display">0.00</span>
+                  </div>
                 </div>
               </label>
             </div>
@@ -622,6 +628,8 @@
       }
     }
 
+    // ... existing selectPayment and toggleWalletUsage functions ...
+
     async function placeOrder() {
       const selectedPayment = document.querySelector(
         'input[name="payment_method"]:checked',
@@ -640,11 +648,11 @@
         return;
       }
 
-      // --- STOCK & INTEGRITY CHECK (RE-CHECK TOTAL) ---
-      const totalValStrip = document.getElementById("final-amount-val").innerText.replace(/[^\d.]/g, "");
+      const totalValStrip = document
+        .getElementById("final-amount-val")
+        .innerText.replace(/[^\d.]/g, "");
       const finalPayable = parseFloat(totalValStrip) || 0;
 
-      // --- BUY NOW / CART CHECK ---
       const checkoutType = sessionStorage.getItem("checkoutType");
       let buyNowItem =
         checkoutType === "buyNow"
@@ -660,196 +668,188 @@
         } catch (e) { }
       }
 
-      // If amount is 0 (fully paid by wallet), handle as a wallet transaction regardless of radio
-      if (finalPayable === 0 && useWallet) {
-        return await submitOrder({
-          paymentMethod: "WALLET",
-          useWallet,
-          addressId,
-          buyNowItem,
-          couponCode,
+      // --- PREPARE ITEMS FOR SCHEMA ---
+      // This logic is moved here so both Razorpay and COD flows can use it
+      let orderItems = [];
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+
+      if (checkoutType === "buyNow") {
+        orderItems.push({
+          productId: buyNowItem.productId || buyNowItem._id,
+          name: buyNowItem.name,
+          price: buyNowItem.price,
+          mrp: buyNowItem.mrp || buyNowItem.price,
+          quantity: buyNowItem.qty,
+          totalItemPrice: buyNowItem.price * buyNowItem.qty, // ✅ Schema Fix
+          status: "Processing",
         });
+      } else {
+        const cartRes = await fetch("/api/cart", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const cartData = await cartRes.json();
+        orderItems = (cartData.items || []).map((item) => ({
+          productId: item.productId,
+          name: item.name,
+          image: item.image,
+          price: item.price,
+          mrp: item.mrp || item.price,
+          quantity: item.quantity,
+          totalItemPrice: item.price * item.quantity, // ✅ Schema Fix
+        }));
       }
 
-      // --- BRANCH PAYMENT FLOWS ---
+      const basePayload = {
+        addressId,
+        useWallet,
+        couponCode,
+        items: orderItems,
+        buyNowItem: checkoutType === "buyNow" ? buyNowItem : null,
+      };
+
+      if (finalPayable === 0 && useWallet) {
+        return await submitOrder({ ...basePayload, paymentMethod: "WALLET" });
+      }
+
       if (paymentMethod === "razorpay") {
-        await handleRazorpayFlow(
-          addressId,
-          buyNowItem,
-          couponCode,
-          useWallet,
-        );
+        await handleRazorpayFlow(basePayload, finalPayable);
       } else {
-        await submitOrder({
-          paymentMethod: paymentMethod.toUpperCase(),
-          useWallet,
-          addressId,
-          buyNowItem,
-          couponCode,
-        });
+        await submitOrder({ ...basePayload, paymentMethod: "COD" });
       }
     }
 
-    async function handleRazorpayFlow(
-      addressId,
-      buyNowItem,
-      couponCode,
-      useWallet,
-    ) {
+    async function handleRazorpayFlow(basePayload, amount) {
       try {
         const token =
           localStorage.getItem("token") || sessionStorage.getItem("token");
-
-        // Use the reactive total from the summary
-        const totalElement = document.getElementById("final-amount-val");
-        if (!totalElement) throw new Error("Order summary not loaded");
-
-        const amount = parseFloat(totalElement.innerText.replace(/[^\d.]/g, ""));
-        console.log("Initiating Razorpay for remaining amount:", amount);
-
-        if (isNaN(amount) || amount < 0) {
-          return Swal.fire("Error", "Invalid order amount", "error");
-        }
-
         Swal.fire({
           title: "Initiating Payment...",
           allowOutsideClick: false,
           didOpen: () => Swal.showLoading(),
         });
 
-        // 3. SEND TO SERVER
         const rzpRes = await fetch("/api/cart/razorpay-order", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + token,
           },
-          body: JSON.stringify({
-            addressId,
-            buyNowItem,
-            couponCode,
-            useWallet,
-            amount,
-          }),
+          body: JSON.stringify({ ...basePayload, amount }), // ✅ Now sending items to server for verification
         });
 
         const rzpData = await rzpRes.json();
         Swal.close();
 
-        if (!rzpData.success) {
+        if (!rzpData.success)
           throw new Error(rzpData.message || "Failed to initiate Razorpay");
-        }
 
-        // 4. OPEN RAZORPAY MODAL
         const options = {
           key: rzpData.key_id,
           amount: rzpData.order.amount,
           currency: "INR",
           name: "Jinsa Mobiles",
-          description: "Order Payment",
           order_id: rzpData.order.id,
           handler: async function (response) {
+            // ✅ MAP TO YOUR SCHEMA FIELDS
             await submitOrder({
-              paymentMethod: "Razorpay",
-              useWallet,
-              addressId,
-              buyNowItem,
-              couponCode,
+              ...basePayload,
+              paymentMethod: "RAZORPAY",
               razorpayPaymentId: response.razorpay_payment_id,
               razorpayOrderId: response.razorpay_order_id,
               razorpaySignature: response.razorpay_signature,
             });
           },
-          prefill: {
-            name: "Customer",
-            email: "user@example.com",
-          },
+          prefill: { name: "Customer", email: "user@example.com" },
           theme: { color: "#1a1a1a" },
         };
-
-        const rzpInstance = new Razorpay(options);
-        rzpInstance.open();
+        new Razorpay(options).open();
       } catch (error) {
-        console.error("Razorpay Flow Error:", error);
         Swal.fire("Error", error.message, "error");
       }
     }
 
-    async function submitOrder(payload) {
+    async function submitOrder(finalPayload) {
       try {
         const token =
           localStorage.getItem("token") || sessionStorage.getItem("token");
-
-        // 1. Show Processing State
         Swal.fire({
           title: "Finalizing Order",
-          text: "Please wait while we confirm your purchase...",
           allowOutsideClick: false,
           didOpen: () => Swal.showLoading(),
         });
 
-        // 2. Call the Checkout API
         const res = await fetch("/api/cart/checkout", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + token,
           },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(finalPayload),
         });
 
         const data = await res.json();
-
-        // 3. Handle Success
         if (res.ok && data.success) {
-          // Store complete order data for the Thank You Page summary
-          sessionStorage.setItem(
-            "lastOrderData",
-            JSON.stringify({
-              orderId: data.orderId,
-              items: data.orderItems, // These come from your backend response
-              totals: data.totals,
-              paymentMethod: payload.paymentMethod,
-              address: JSON.parse(
-                sessionStorage.getItem("deliveryAddress") || "{}",
-              ),
-            }),
-          );
+          // --- SAVE DATA FOR THANK YOU PAGE ---
+          const addrJson = sessionStorage.getItem("deliveryAddress");
+          const address = addrJson ? JSON.parse(addrJson) : null;
 
-          // --- CLEANUP SESSION DATA ---
-          sessionStorage.removeItem("buyNowItem");
+          // Gather totals from the UI to be accurate
+          const subtotal =
+            parseFloat(
+              document
+                .querySelector(".summary-calc div:nth-child(1) span:last-child")
+                ?.innerText.replace(/[^\d.]/g, ""),
+            ) || 0;
+          const couponDiscount =
+            parseFloat(
+              document
+                .querySelector(".text-success.fw-bold span:last-child")
+                ?.innerText.replace(/[^\d.]/g, ""),
+            ) || 0;
+          const walletDeducted =
+            parseFloat(
+              document
+                .querySelector(".text-primary.fw-bold span:last-child")
+                ?.innerText.replace(/[^\d.]/g, ""),
+            ) || 0;
+          const finalAmount =
+            parseFloat(
+              document
+                .getElementById("final-amount-val")
+                ?.innerText.replace(/[^\d.]/g, ""),
+            ) || 0;
+
+          const thankYouData = {
+            orderId: data.orderId,
+            dbOrderId: data.dbOrderId,
+            paymentMethod: finalPayload.paymentMethod,
+            items: finalPayload.items,
+            address: address,
+            totals: {
+              subtotal: subtotal,
+              couponDiscount: couponDiscount,
+              walletDeducted: walletDeducted,
+              totalAmount: finalAmount,
+              shipping: 0, // Assuming free for now as per UI
+            },
+          };
+
+          sessionStorage.setItem("lastOrderData", JSON.stringify(thankYouData));
+
+          // Clear checkout specific data but NOT the whole session
           sessionStorage.removeItem("checkoutType");
+          sessionStorage.removeItem("buyNowItem");
           localStorage.removeItem("selectedCoupon");
-          // Clear local cart storage if you use it (optional)
-          localStorage.removeItem("cart");
 
-          // 4. Success Alert & Redirect
-          Swal.fire({
-            icon: "success",
-            title: "Order Placed!",
-            text: `Your Order ID is: ${data.orderId}`,
-            timer: 2500,
-            showConfirmButton: false,
-          }).then(() => {
-            window.location.href = "./thankYouPage.html";
-          });
-        } else {
-          // 5. Handle Known Errors (e.g., "next is not a function" or Stock issues)
-          Swal.fire(
-            "Order Failed",
-            data.message ||
-            "Something went wrong during checkout. Please try again.",
-            "error",
+          Swal.fire("Order Placed!", `ID: ${data.orderId}`, "success").then(
+            () => (window.location.href = "./thankYouPage.html"),
           );
+        } else {
+          Swal.fire("Order Failed", data.message, "error");
         }
       } catch (error) {
-        // 6. Handle Network/Connection Errors
-        console.error("Submit Order Fetch Error:", error);
-        Swal.fire(
-          "Error",
-          "Network error occurred. Please check your connection and try again.",
-          "error",
-        );
+        Swal.fire("Error", "Connection failed", "error");
       }
     }
 
