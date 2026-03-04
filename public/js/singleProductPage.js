@@ -659,7 +659,10 @@ document.addEventListener('DOMContentLoaded', (() => {
       sessionStorage.setItem("checkoutType", "buyNow");
       sessionStorage.setItem("buyNowItem", JSON.stringify({
         productId: productId,
-        qty: quantity
+        qty: quantity,
+        name: currentProduct.name,
+        price: currentProduct.offerPrice || currentProduct.price,
+        image: currentProduct.mainImage
       }));
 
       // Redirect

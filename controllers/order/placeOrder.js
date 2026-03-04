@@ -17,10 +17,11 @@ const placeOrder = async (req, res) => {
       addressId,
       buyNowItem,
       couponCode,
-      razorpayPaymentId,
-      razorpayOrderId,
-      razorpaySignature,
     } = req.body;
+
+    const razorpayPaymentId = req.body.razorpayPaymentId || req.body.razorpay_payment_id;
+    const razorpayOrderId = req.body.razorpayOrderId || req.body.razorpay_order_id;
+    const razorpaySignature = req.body.razorpaySignature || req.body.razorpay_signature;
 
     // 1. RAZORPAY VERIFICATION
     if (paymentMethod && paymentMethod.toUpperCase() === "RAZORPAY") {
@@ -128,6 +129,7 @@ const placeOrder = async (req, res) => {
         totalMrp,
         couponDiscount,
         walletDeducted,
+        shipping: 0,
         totalAmount: Math.max(0, finalAmount - walletDeducted),
       },
       paymentMethod,
@@ -163,7 +165,12 @@ const placeOrder = async (req, res) => {
 
     res
       .status(200)
-      .json({ success: true, orderId: newOrder.orderId, dbOrderId: newOrder._id });
+      .json({
+        success: true,
+        orderId: newOrder.orderId,
+        dbOrderId: newOrder._id,
+        totals: newOrder.totals
+      });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

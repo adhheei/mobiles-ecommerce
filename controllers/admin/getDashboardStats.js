@@ -1,13 +1,16 @@
-// controllers/admin/getDashboardStats.js
 const Order = require("../../models/Order");
 const Product = require("../../models/Product");
 const User = require("../../models/User");
 
 const getDashboardStats = async (req, res) => {
   try {
-    // 1. Revenue (Case-insensitive match for 'Delivered')
+    // 1. Total Revenue - Include Processing, Shipped, and Delivered
     const revenueData = await Order.aggregate([
-      { $match: { orderStatus: { $regex: /^delivered$/i } } },
+      { 
+        $match: { 
+          orderStatus: { $in: ["Processing", "Shipped", "Delivered"] } // ✅ Include March orders
+        } 
+      },
       { $group: { _id: null, total: { $sum: "$totals.totalAmount" } } }
     ]);
 
@@ -25,11 +28,11 @@ const getDashboardStats = async (req, res) => {
       }
     ]);
 
-    // 4. Monthly Graph Data
+    // 4. Monthly Graph Data - Fixed to include active March orders
     const graphData = await Order.aggregate([
       {
         $match: {
-          orderStatus: { $regex: /^delivered$/i },
+          orderStatus: { $in: ["Processing", "Shipped", "Delivered"] }, // ✅ Fixed
           createdAt: { $gte: new Date(new Date().getFullYear(), 0, 1) }
         }
       },
