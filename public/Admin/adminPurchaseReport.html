@@ -207,13 +207,42 @@
     .mobile-nav {
       display: none;
       background: #fff;
-      padding: 15px 20px;
-      border-bottom: 1px solid #eee;
+      padding: 10px 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
       justify-content: space-between;
       align-items: center;
       position: sticky;
       top: 0;
       z-index: 999;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .mobile-nav .brand-section {
+      margin-bottom: 0;
+      gap: 12px;
+    }
+
+    .mobile-nav .brand-logo {
+      width: 38px;
+      height: 38px;
+    }
+
+    .mobile-nav #sidebarToggleBtn {
+      background: #f0f0f0;
+      border: none;
+      border-radius: 12px;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+      font-size: 1.2rem;
+      transition: all 0.2s;
+    }
+
+    .mobile-nav #sidebarToggleBtn:hover {
+      background: #e8e8e8;
     }
 
     .sidebar-overlay {
@@ -236,39 +265,46 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 30px;
+      margin-bottom: 35px;
     }
 
     .page-title {
-      font-size: 1.8rem;
-      font-weight: 800;
+      font-size: 2.5rem;
+      font-weight: 900;
       margin: 0;
       color: #000;
+      letter-spacing: -1.5px;
+      line-height: 1;
     }
 
     .page-subtitle {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-top: 2px;
+      font-size: 1rem;
+      color: #666;
+      margin-top: 4px;
+      font-weight: 500;
     }
 
     .btn-add-new {
       background-color: #000;
       color: #fff;
-      padding: 10px 20px;
-      border-radius: 30px;
-      font-weight: 600;
-      font-size: 0.9rem;
+      padding: 14px 28px;
+      border-radius: 100px;
+      font-weight: 700;
+      font-size: 0.95rem;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      transition: 0.2s;
+      gap: 10px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      border: 2px solid #000;
     }
 
     .btn-add-new:hover {
-      background-color: #333;
-      color: #fff;
+      background-color: transparent;
+      color: #000;
+      transform: scale(1.02);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     }
 
     .summary-cards {
@@ -280,59 +316,77 @@
 
     .summary-card {
       background: #fff;
-      border-radius: 16px;
-      border: 1px solid var(--border-color);
-      padding: 20px;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 24px;
       text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    }
+
+    .summary-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
     }
 
     .summary-card .icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 12px;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 12px;
-      font-size: 1.2rem;
+      margin: 0 auto 15px;
+      font-size: 1.25rem;
       color: #fff;
     }
 
+    .summary-card.items .icon {
+      background: #ffca28;
+      color: #000;
+    }
+
     .summary-card.total .icon {
-      background: #4361ee;
+      background: #000;
     }
 
     .summary-card.pending .icon {
-      background: #f72585;
+      background: #ff5252;
     }
 
     .summary-card.completed .icon {
-      background: #06d6a0;
-    }
-
-    .summary-card.items .icon {
-      background: #ffd166;
-      color: #333;
+      background: #00e676;
     }
 
     .summary-card h3 {
-      margin: 0 0 4px;
-      font-size: 1.5rem;
-      font-weight: 700;
+      margin: 0 0 5px;
+      font-size: 1.75rem;
+      font-weight: 800;
       color: #000;
+      letter-spacing: -0.5px;
+    }
+
+    .summary-card p {
+      margin: 0;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .table-toolbar {
       background: #fff;
       padding: 25px;
-      border-radius: 16px;
-      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 20px;
       flex-wrap: wrap;
-      margin-bottom: 25px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
     }
 
     .search-group {
@@ -342,21 +396,30 @@
     }
 
     .search-group input {
-      border-radius: 12px;
-      padding-left: 45px;
-      height: 46px;
-      border: 1px solid #eee;
-      background-color: #fcfcfc;
+      border-radius: 14px;
+      padding-left: 50px;
+      height: 52px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      background-color: #fdfdfd;
       width: 100%;
-      font-size: 0.88rem;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .search-group input:focus {
+      background-color: #fff;
+      border-color: #000;
+      box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+      outline: none;
     }
 
     .search-group i {
       position: absolute;
-      left: 18px;
+      left: 20px;
       top: 50%;
       transform: translateY(-50%);
-      color: #aaa;
+      color: #999;
+      font-size: 1.1rem;
     }
 
     .filter-group {
@@ -371,10 +434,11 @@
 
     .table-card {
       background: #fff;
-      border-radius: 16px;
-      border: 1px solid var(--border-color);
-      padding: 20px;
+      border-radius: 24px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 0;
       overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
     }
 
     .badge-custom {
@@ -396,23 +460,46 @@
     }
 
     .action-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       background: #f8f9fa;
       color: #555;
-      border: 1px solid #ddd;
-      transition: 0.2s;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      transition: all 0.2s;
       text-decoration: none;
       margin-left: 5px;
     }
 
     .action-btn:hover {
-      background: #e2e6ea;
-      color: #000;
+      background: #000;
+      color: #fff;
+      border-color: #000;
+      transform: translateY(-2px);
+    }
+
+    .table thead th {
+      background: #fafafa;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: #999;
+      padding: 18px 25px;
+      border-bottom: 2px solid #f0f0f0;
+      text-align: left;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+
+    .table tbody td {
+      padding: 20px 25px;
+      font-size: 0.92rem;
+      border-bottom: 1px solid #f9f9f9;
+      vertical-align: middle;
+      color: #333;
+      font-weight: 500;
     }
 
     .export-btn {
@@ -531,7 +618,7 @@
 
       .main-content {
         margin-left: 0;
-        padding: 20px 15px;
+        padding: 25px 20px;
       }
 
       .mobile-nav {
@@ -544,59 +631,72 @@
       }
 
       .page-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 15px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
         margin-bottom: 25px;
       }
 
+      .page-title {
+        font-size: 1.85rem;
+        flex-shrink: 1;
+        letter-spacing: -1.2px;
+      }
+
       .btn-add-new {
-        width: 100%;
-        justify-content: center;
-        padding: 12px;
+        width: auto;
+        padding: 10px 20px;
+        font-size: 0.85rem;
+        white-space: nowrap;
       }
 
       .table-toolbar {
         flex-direction: column;
         align-items: stretch;
-        padding: 18px;
+        padding: 20px;
         gap: 15px;
         border-radius: 20px;
+        width: 100%;
       }
 
       .search-group {
-        max-width: 100%;
+        width: 100%;
+        margin-bottom: 5px;
       }
 
       .filter-group {
+        display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 15px;
+        width: 100%;
       }
 
       .date-range-group {
         width: 100%;
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
+        display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
       }
 
       .date-range-group input {
-        width: 100%;
+        flex: 1;
+        min-width: 0;
       }
 
       .custom-select,
       .export-btn {
-        width: 100%;
+        width: 100% !important;
+        margin-left: 0 !important;
         justify-content: center;
-        height: 46px;
+        height: 48px;
       }
 
       .summary-cards {
         overflow-x: auto;
         display: flex;
-        scroll-snap-type: x mandatory;
-        padding-bottom: 10px;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 20px;
         gap: 15px;
         margin-bottom: 25px;
         -ms-overflow-style: none;
@@ -608,27 +708,10 @@
       }
 
       .summary-card {
-        flex: 0 0 calc(50% - 7.5px);
-        min-width: 160px;
+        flex: 0 0 180px;
         scroll-snap-align: start;
-        padding: 15px;
-        text-align: left;
-      }
-
-      .summary-card .icon {
-        width: 36px;
-        height: 36px;
-        font-size: 0.9rem;
-        margin: 0 0 10px;
-      }
-
-      .summary-card h3 {
-        font-size: 1.1rem;
-        margin-bottom: 2px;
-      }
-
-      .summary-card p {
-        font-size: 0.75rem;
+        padding: 20px;
+        text-align: center;
       }
     }
 
@@ -691,9 +774,9 @@
   <div class="mobile-nav">
     <a href="./adminDashboard.html" class="brand-section">
       <img src="../images/logo.jpg" alt="Logo" class="brand-logo" />
-      <div class="brand-text-mobile">
-        <span class="brand-title-mobile">JINSA MOBILES</span>
-        <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
+      <div class="brand-text-container">
+        <span class="brand-title">JINSA MOBILES</span>
+        <span class="brand-subtitle">AND ACCESSORIES</span>
       </div>
     </a>
     <button class="btn btn-light" id="sidebarToggleBtn" aria-label="Toggle sidebar">
@@ -781,13 +864,8 @@
 
   <!-- Main Content -->
   <div class="main-content content-animate">
-    <div class="page-header">
-      <div>
-        <h2 class="page-title">Purchase Report</h2>
-        <p class="page-subtitle">
-          Track and manage all purchase orders and supplier transactions.
-        </p>
-      </div>
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+      <h2 class="page-title mb-0">Purchase Report</h2>
       <a href="#" class="btn-add-new" id="openNewPurchaseBtn">
         <i class="fa-solid fa-plus"></i> New Purchase Order
       </a>
@@ -795,25 +873,25 @@
 
     <!-- Summary Cards -->
     <div class="summary-cards">
+      <div class="summary-card items">
+        <div class="icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+        <h3 id="itemsCountCard">0</h3>
+        <p>Items Purchased</p>
+      </div>
       <div class="summary-card total">
         <div class="icon"><i class="fa-solid fa-calculator"></i></div>
         <h3 id="totalInvestmentCard">₹0</h3>
-        <p>Total Purchases</p>
+        <p>Total Investment</p>
       </div>
       <div class="summary-card pending">
         <div class="icon"><i class="fa-solid fa-clock"></i></div>
         <h3 id="pendingCountCard">0</h3>
-        <p>Active Supplier</p>
+        <p>Active Suppliers</p>
       </div>
       <div class="summary-card completed">
         <div class="icon"><i class="fa-solid fa-check-circle"></i></div>
         <h3 id="completedCountCard">0</h3>
         <p>Transactions</p>
-      </div>
-      <div class="summary-card items">
-        <div class="icon"><i class="fa-solid fa-boxes-stacked"></i></div>
-        <h3 id="itemsCountCard">0</h3>
-        <p>Items Purchased</p>
       </div>
     </div>
 
@@ -1009,6 +1087,8 @@
   <!-- Scripts -->
   <script src="/libs/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/js/adminCommon.js"></script>
+  <script src="/js/adminBadge.js"></script>
   <script src="/js/purchaseReport.js"></script>
 </body>
 

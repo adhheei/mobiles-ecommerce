@@ -10,8 +10,10 @@ window.toggleSidebar = function () {
     const mainContent = document.querySelector(".main-content");
 
     if (sidebar) {
+        const wasActive = sidebar.classList.contains("active");
         sidebar.classList.toggle("active"); // Mobile
         sidebar.classList.toggle("collapsed"); // Desktop
+        console.log(`[AdminCommon] Sidebar toggled. Active: ${sidebar.classList.contains("active")}, Collapsed: ${sidebar.classList.contains("collapsed")}`);
     }
     if (overlay) {
         overlay.classList.toggle("active");
@@ -52,15 +54,25 @@ window.adminFetch = async function (url, options = {}) {
 
 document.addEventListener("DOMContentLoaded", () => {
     // 1. Sidebar Toggle Listener
-    // Check for various possible IDs/classes for the toggle button
-    const toggleButtons = [
-        document.getElementById("toggleSidebar"),
-        document.getElementById("sidebarToggleBtn"),
-        document.querySelector(".mobile-nav button")
+    const toggleSelectors = [
+        "#toggleSidebar",
+        "#sidebarToggleBtn",
+        ".mobile-nav button",
+        "#sidebarOverlay"
     ];
 
-    toggleButtons.forEach(btn => {
-        if (btn) btn.addEventListener("click", (e) => {
+    const elements = new Set();
+    toggleSelectors.forEach(selector => {
+        const el = document.querySelector(selector);
+        if (el) {
+            console.log(`[AdminCommon] Sidebar toggle listener attached to: ${selector}`);
+            elements.add(el);
+        }
+    });
+
+    elements.forEach(el => {
+        el.addEventListener("click", (e) => {
+            console.log(`[AdminCommon] Sidebar toggle clicked on element:`, el);
             e.preventDefault();
             window.toggleSidebar();
         });

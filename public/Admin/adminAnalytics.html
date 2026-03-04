@@ -620,11 +620,11 @@
         <span class="brand-subtitle-mobile">AND ACCESSORIES</span>
       </div>
     </a>
-    <button class="btn btn-light" onclick="toggleSidebar()">
+    <button class="btn btn-light" id="sidebarToggleBtn">
       <i class="fa-solid fa-bars"></i>
     </button>
   </div>
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <nav class="sidebar" id="sidebar">
     <a href="./adminDashboard.html" class="brand-section">
@@ -649,37 +649,37 @@
       <li class="menu-item"><a href="../Admin/adminMessages.html" class="menu-link"><i
             class="fa-regular fa-envelope"></i> &nbsp;Messages</a></li>
       <!-- Analytics Link -->
-      <li class="menu-item"><a href="../Admin/adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i>
-          &nbsp;Coupon Management</a></li>
-      <li class="menu-item"><a href="../Admin/adminCategories.html" class="menu-link"><i
-            class="fa-solid fa-layer-group"></i> &nbsp;Category Management</a></li>
-      <li class="menu-item"><a href="../Admin/adminOffers.html" class="menu-link"><i class="fa-solid fa-gift"></i>
-          &nbsp;Offer</a></li>
-    </ul>
+<li class="menu-item"><a href="../Admin/adminCoupons.html" class="menu-link"><i class="fa-solid fa-tag"></i>
+    &nbsp;Coupon Management</a></li>
+<li class="menu-item"><a href="../Admin/adminCategories.html" class="menu-link"><i class="fa-solid fa-layer-group"></i>
+    &nbsp;Category Management</a></li>
+<li class="menu-item"><a href="../Admin/adminOffers.html" class="menu-link"><i class="fa-solid fa-gift"></i>
+    &nbsp;Offer</a></li>
+</ul>
 
-    <div class="admin-profile">
-      <a href="./adminProfile.html" class="profile-info text-decoration-none text-reset">
-        <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
-        <div class="admin-details">
-          <h6 id="sidebarName" class="m-0">Admin</h6>
-          <span class="small text-muted">admin@example.com</span>
-        </div>
-      </a>
-      <a href="./adminLogin.html" class="logout-btn">
-        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
-      </a>
+<div class="admin-profile">
+  <a href="./adminProfile.html" class="profile-info text-decoration-none text-reset">
+    <img src="https://placehold.co/100x100/ccc/fff?text=A" alt="Admin" class="admin-avatar" />
+    <div class="admin-details">
+      <h6 id="sidebarName" class="m-0">Admin</h6>
+      <span class="small text-muted">admin@example.com</span>
     </div>
-  </nav>
+  </a>
+  <a href="./adminLogin.html" class="logout-btn">
+    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+  </a>
+</div>
+</nav>
 
-  <div class="main-content content-animate">
-    <div class="page-header">
-      <div>
-        <h2 class="page-title">Analytics</h2>
-        <p class="page-subtitle">Overview of your store performance.</p>
-      </div>
+<div class="main-content content-animate">
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Analytics</h2>
+      <p class="page-subtitle">Overview of your store performance.</p>
+    </div>
 
-      <div class="header-actions">
-        <!-- Date Filter Dropdown -- >
+    <div class="header-actions">
+      <!-- Date Filter Dropdown -- >
         <div class="date-filter" id="dateFilter">
           <i class="fa-regular fa-calendar"></i>
           <span id="dateFilterText">Last 30 Days</span>

@@ -45,29 +45,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ==================== INITIALIZATION ====================
   function init() {
-    initSidebar();
     initModal();
     initEventListeners();
     setDefaultDate();
     loadProductsForSuggestions();
     fetchPurchases();
-  }
-
-  function initSidebar() {
-    if (elements.sidebarToggle && elements.overlay) {
-      elements.sidebarToggle.addEventListener("click", toggleSidebar);
-      elements.overlay.addEventListener("click", closeSidebar);
-    }
-  }
-
-  function toggleSidebar() {
-    elements.sidebar.classList.toggle("active");
-    elements.overlay.classList.toggle("active");
-  }
-
-  function closeSidebar() {
-    elements.sidebar.classList.remove("active");
-    elements.overlay.classList.remove("active");
   }
 
   function initModal() {
@@ -355,10 +337,15 @@ document.addEventListener("DOMContentLoaded", function () {
       (sum, p) => sum + (p.totalAmount || 0),
       0,
     );
-    const pending = allPurchases.filter((p) => p.status !== "completed").length;
-    const completed = allPurchases.filter(
-      (p) => p.status === "completed",
-    ).length;
+
+    // Unique suppliers
+    const suppliers = new Set(allPurchases.map(p => p.supplierName));
+    const uniqueSuppliers = suppliers.size;
+
+    // Total transactions (all records)
+    const transactions = allPurchases.length;
+
+    // Total items (sum of quantities)
     const items = allPurchases.reduce(
       (sum, p) => sum + (p.totalQuantity || 0),
       0,
@@ -367,9 +354,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (elements.totalInvestmentCard)
       elements.totalInvestmentCard.textContent = `₹${formatCurrency(total)}`;
     if (elements.pendingCountCard)
-      elements.pendingCountCard.textContent = pending;
+      elements.pendingCountCard.textContent = uniqueSuppliers;
     if (elements.completedCountCard)
-      elements.completedCountCard.textContent = completed;
+      elements.completedCountCard.textContent = transactions;
     if (elements.itemsCountCard) elements.itemsCountCard.textContent = items;
   }
 
