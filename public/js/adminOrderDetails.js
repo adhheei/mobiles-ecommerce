@@ -26,7 +26,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const order = data.order;
-        renderOrderDetails(order);
+        const totalOrders = data.totalOrders || 0;
+        renderOrderDetails(order, totalOrders);
 
     } catch (error) {
         console.error(error);
@@ -34,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-function renderOrderDetails(order) {
+function renderOrderDetails(order, totalOrders = 0) {
     // 1. Header Info
     document.querySelector('.order-title').textContent = `Order #${order.orderId}`;
     document.querySelector('.order-meta').textContent = `Placed on ${new Date(order.createdAt).toLocaleString()}`;
@@ -79,9 +80,17 @@ function renderOrderDetails(order) {
             `;
         }
 
+        // Determine image source
+        let itemImageSrc = 'https://placehold.co/100x120?text=No+Image';
+        if (item.productId && item.productId.mainImage) {
+            itemImageSrc = '/' + item.productId.mainImage.replace(/\\/g, '/').replace('public/', '');
+        } else if (item.image) {
+            itemImageSrc = '/' + item.image.replace(/\\/g, '/').replace('public/', '');
+        }
+
         itemsHtml += `
             <div class="item-row">
-              <img src="${item.image ? '/' + item.image.replace(/\\/g, '/').replace('public/', '') : 'https://placehold.co/100x120?text=No+Image'}" class="item-img" alt="${item.name}" onerror="this.src='https://placehold.co/100x120?text=No+Image'" />
+              <img src="${itemImageSrc}" class="item-img" alt="${item.name}" onerror="this.src='https://placehold.co/100x120?text=No+Image'" />
               <div class="item-details" style="flex: 1">
                 <h6>${item.name}</h6>
                 <span class="item-meta">Qty: ${item.quantity} | Status: ${item.status}</span>
@@ -103,26 +112,26 @@ function renderOrderDetails(order) {
     const walletRow = (order.totals.walletAmount && order.totals.walletAmount > 0) ? `
         <div class="summary-row text-danger">
             <span>Wallet Used</span>
-            <span>-₹${order.totals.walletAmount.toLocaleString()}</span>
+            <span>-₹${(order.totals.walletAmount || 0).toLocaleString()}</span>
         </div>` : '';
 
     summaryContainer.innerHTML = `
         <div class="summary-row">
             <span>Subtotal</span>
-            <span>₹${order.totals.subtotal.toLocaleString()}</span>
+            <span>₹${(order.totals.subtotal || 0).toLocaleString()}</span>
         </div>
         <div class="summary-row">
             <span>Shipping</span>
-            <span>₹${order.totals.shipping.toLocaleString()}</span>
+            <span>₹${(order.totals.shipping || 0).toLocaleString()}</span>
         </div>
         <div class="summary-row">
             <span>Discount</span>
-            <span>-₹${order.totals.couponDiscount.toLocaleString()}</span>
+            <span>-₹${(order.totals.couponDiscount || 0).toLocaleString()}</span>
         </div>
         ${walletRow}
         <div class="summary-row total">
             <span>Total</span>
-            <span>₹${order.totals.totalAmount.toLocaleString()}</span>
+            <span>₹${(order.totals.totalAmount || 0).toLocaleString()}</span>
         </div>
     `;
 
@@ -147,7 +156,7 @@ function renderOrderDetails(order) {
     if (order.userId) {
         const c_firstName = order.userId.firstName || '';
         const c_lastName = order.userId.lastName || '';
-        const c_name = `${c_firstName} ${c_lastName}`.trim() || 'Guest';
+        const c_name = `${c_firstName} ${c_lastName} `.trim() || 'Guest';
         const c_email = order.userId.email || 'N/A';
         const c_mobile = order.userId.phone || 'N/A';
 
@@ -157,7 +166,7 @@ function renderOrderDetails(order) {
         customerCard.querySelector('.info-group .info-value:nth-child(3)').textContent = c_mobile;
 
         // Attach Click Event for Modal
-        viewProfileLink.onclick = () => showUserProfileModal(order.userId);
+        viewProfileLink.onclick = () => showUserProfileModal(order.userId, totalOrders);
     } else {
         customerCard.querySelector('.admin-avatar').textContent = '?';
         customerCard.querySelector('h6').textContent = 'Guest / Unknown';
@@ -236,13 +245,13 @@ async function updateStatus() {
     });
 }
 
-function showUserProfileModal(user) {
+function showUserProfileModal(user, totalOrders = 0) {
     // 1. Basic Info
     const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Guest';
     document.getElementById('modalUserName').textContent = fullName;
     document.getElementById('modalUserId').textContent = user._id || 'N/A';
     document.getElementById('modalUserEmail').textContent = user.email || 'N/A';
-    document.getElementById('modalUserMobile').textContent = user.mobile || 'N/A';
+    document.getElementById('modalUserMobile').textContent = user.phone || 'N/A';
 
     // 2. Status Badge
     const statusEl = document.getElementById('modalUserStatus');
@@ -264,9 +273,8 @@ function showUserProfileModal(user) {
         document.getElementById('modalUserJoined').textContent = 'N/A';
     }
 
-    // 4. Orders Count (Optional: If we don't have it, keep 0 or N/A)
-    // We didn't populate ordersCount, so leaving as 0 or static for now as per design
-    document.getElementById('modalUserOrders').textContent = '0';
+    // 4. Orders Count
+    document.getElementById('modalUserOrders').textContent = totalOrders || '0';
 
     // 5. Image
     const imgEl = document.getElementById('modalUserImage');

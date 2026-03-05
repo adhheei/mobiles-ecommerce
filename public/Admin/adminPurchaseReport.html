@@ -547,59 +547,55 @@
       align-items: center;
     }
 
+    .remove-item-btn:hover {
+      color: #a71d2a;
+    }
+
+    /* Standardized Pagination */
     .pagination-wrapper {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 20px 25px;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
       margin-top: 25px;
-      padding: 10px 0;
     }
 
     .page-info {
-      font-size: 0.9rem;
-      color: #6c757d;
+      font-size: 0.85rem;
+      color: var(--text-muted);
     }
 
     .page-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid #eee;
+      background: white;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      background: #fff;
-      border: 1px solid #ddd;
-      color: #333;
-      text-decoration: none;
-      margin: 0 5px;
       transition: 0.2s;
+      color: #000;
+      text-decoration: none;
     }
 
-    .page-btn:hover {
-      background: #f8f9fa;
+    .page-btn:hover:not(:disabled) {
+      background: #f1f1f1;
+      color: #000;
+    }
+
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     .page-number {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      background: var(--active-bg);
-      color: #000;
-      font-weight: 600;
-      margin: 0 5px;
-    }
-
-    .remove-item-btn {
-      background: none;
-      border: none;
-      color: #dc3545;
-      font-size: 1.1rem;
-      cursor: pointer;
-      padding: 5px;
-      transition: 0.2s;
+      font-weight: 700;
+      margin: 0 10px;
+      font-size: 0.9rem;
     }
 
     .remove-item-btn:hover {
@@ -938,15 +934,15 @@
 
     <!-- Pagination -->
     <div class="pagination-wrapper">
-      <span class="page-info" id="pageInfoText">Showing 0 records</span>
+      <span class="page-info" id="pageInfoText">Showing 0 to 0 of 0 records</span>
       <div>
-        <a href="#" class="page-btn" id="prevBtn" aria-label="Previous page">
+        <button class="page-btn" id="prevBtn">
           <i class="fa-solid fa-chevron-left"></i>
-        </a>
+        </button>
         <span class="page-number" id="pageNumberDisplay">1</span>
-        <a href="#" class="page-btn" id="nextBtn" aria-label="Next page">
+        <button class="page-btn" id="nextBtn">
           <i class="fa-solid fa-chevron-right"></i>
-        </a>
+        </button>
       </div>
     </div>
   </div>

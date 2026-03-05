@@ -32,6 +32,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (res.ok && data.success) {
         // Save token for API requests
         localStorage.setItem('adminToken', data.token);
+        // Save admin info for sidebar display
+        if (data.admin) {
+          localStorage.setItem('adminInfo', JSON.stringify({
+            name: data.admin.name || data.admin.firstName || data.admin.email?.split('@')[0] || 'Admin',
+            email: data.admin.email || ''
+          }));
+        }
 
         Swal.fire({
           icon: "success",

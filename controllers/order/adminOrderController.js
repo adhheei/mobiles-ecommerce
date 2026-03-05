@@ -4,8 +4,17 @@ const getAdminOrderDetails = async (req, res) => {
     try {
         const orderId = req.params.id;
         if (orderId) {
-            const order = await Order.findById(orderId).populate("userId", "firstName lastName email mobile");
-            return res.json({ success: true, order });
+            const order = await Order.findById(orderId)
+                .populate("userId", "firstName lastName email phone createdAt isBlocked")
+                .populate("items.productId", "mainImage");
+            if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+
+            let totalOrders = 0;
+            if (order.userId) {
+                totalOrders = await Order.countDocuments({ userId: order.userId._id });
+            }
+
+            return res.json({ success: true, order, totalOrders });
         }
         const orders = await Order.find().populate("userId", "firstName lastName email").sort({ createdAt: -1 });
         res.json({ success: true, orders });
@@ -19,7 +28,7 @@ const updateOrderStatus = async (req, res) => {
         const { status } = req.body;
         const id = req.params.id;
         const query = id.match(/^[0-9a-fA-F]{24}$/) ? { _id: id } : { orderId: id };
-        
+
         const order = await Order.findOne(query);
         if (!order) return res.status(404).json({ message: "Order not found" });
 

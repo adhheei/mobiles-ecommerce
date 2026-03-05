@@ -796,21 +796,27 @@
             newPassword: newP,
           }),
         });
-        const data = await res.json();
+
+        // Safely parse JSON (avoid parse errors if server returns HTML)
+        let data;
+        const rawText = await res.text();
+        try { data = JSON.parse(rawText); } catch { data = { message: rawText }; }
+
+        if (!res.ok) {
+          throw new Error(data.message || `Server error (${res.status})`);
+        }
 
         if (data.success) {
           Swal.fire({
-            title: "Success!",
-            text: "Your password has been updated.",
+            title: "Password Updated!",
+            text: "Please log in again with your new password.",
             icon: "success",
             confirmButtonColor: "#1a1a1a",
           }).then(() => {
-            document.getElementById("passwordForm").reset();
-            // Reset password requirements
-            document.querySelectorAll(".requirement i").forEach((el) => {
-              el.classList.remove("valid", "invalid");
-              el.classList.add("invalid");
-            });
+            // Clear admin session and redirect to login
+            localStorage.removeItem("adminToken");
+            localStorage.removeItem("adminInfo");
+            window.location.href = "/Admin/adminLogin.html";
           });
         } else {
           throw new Error(data.message || "Password update failed");

@@ -2,7 +2,7 @@ const Coupon = require("../../models/Coupon");
 
 const getCoupons = async (req, res) => {
   try {
-    const coupons = await Coupon.find({ status: "Active" }).sort({
+    const coupons = await Coupon.find({}).sort({
       createdAt: -1,
     });
 

@@ -2,7 +2,7 @@
 
 // Global variables
 let currentPage = 1;
-const limit = 20;
+const limit = 10;
 let userWishlistIds = new Set();
 let isUserLoggedIn = false;
 const pendingWishlistOperations = new Map(); // Prevent duplicate requests

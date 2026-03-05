@@ -7,13 +7,27 @@ const Offer = require("../../models/Offer");
  */
 const getAllOffers = async (req, res) => {
   try {
-    const offers = await Offer.find({ status: "Active" })
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const query = {}; // Admin sees all offers (Active and Inactive)
+    const total = await Offer.countDocuments(query);
+    const offers = await Offer.find(query)
       .populate("targetId")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     res.status(200).json({
       success: true,
       offers,
+      pagination: {
+        total,
+        page,
+        pages: Math.ceil(total / limit),
+        limit,
+      },
     });
   } catch (error) {
     console.error("Get All Offers Error:", error);

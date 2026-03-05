@@ -7,6 +7,7 @@ const getAllCategories = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search || "";
+    const sort = req.query.sort || "newest";
     const skip = (page - 1) * limit;
 
     let query = {};
@@ -17,9 +18,15 @@ const getAllCategories = async (req, res) => {
       ];
     }
 
+    // Sort mapping
+    let sortQuery = { createdAt: -1 };
+    if (sort === "oldest") sortQuery = { createdAt: 1 };
+    else if (sort === "name-asc") sortQuery = { name: 1 };
+    else if (sort === "name-desc") sortQuery = { name: -1 };
+
     const total = await Category.countDocuments(query);
     const categories = await Category.find(query)
-      .sort({ createdAt: -1 })
+      .sort(sortQuery)
       .skip(skip)
       .limit(limit);
 

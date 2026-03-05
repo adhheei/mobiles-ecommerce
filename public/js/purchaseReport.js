@@ -454,9 +454,9 @@ document.addEventListener("DOMContentLoaded", function () {
       elements.pageInfo.textContent = `Showing ${start} to ${end} of ${total} records`;
     }
 
-    // Toggle disabled class for buttons
-    elements.prevBtn?.classList.toggle("disabled", currentPage === 1);
-    elements.nextBtn?.classList.toggle("disabled", currentPage === totalPages);
+    // Toggle disabled state for buttons
+    if (elements.prevBtn) elements.prevBtn.disabled = (currentPage === 1);
+    if (elements.nextBtn) elements.nextBtn.disabled = (currentPage === totalPages);
   }
 
   function exportPurchases() {

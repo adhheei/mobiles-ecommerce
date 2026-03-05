@@ -754,32 +754,53 @@
     // 1. Fetch Existing Offer Data
     async function loadOfferData() {
       try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const offerId = urlParams.get("id");
+        if (!offerId) throw new Error("No offer ID in URL");
 
         const res = await window.adminFetch(`/api/admin/offers/${offerId}`);
         const result = await res.json();
 
-        // 1. Check if the request was successful and data exists
         if (!result.success || !result.data) {
           throw new Error("Offer data missing from server response");
         }
 
         const offer = result.data;
 
-        // 2. Safety check before accessing properties
-        if (offer && offer._id) {
-          document.getElementById("offerName").value = offer.name;
-          document.getElementById("offerType").value = offer.offerType;
-          // ... fill other fields
+        // Populate all form fields
+        document.getElementById("offerName").value = offer.name || "";
+        document.getElementById("offerType").value = offer.offerType || "Category";
+        document.getElementById("discountValue").value = offer.discountPercentage || "";
+        document.getElementById("minPurchase").value = offer.minPurchaseAmount || 0;
+
+        // Dates - format ISO to YYYY-MM-DD for date input
+        if (offer.startDate)
+          document.getElementById("startDate").value = offer.startDate.slice(0, 10);
+        if (offer.endDate)
+          document.getElementById("endDate").value = offer.endDate.slice(0, 10);
+
+        // Status radio
+        const statusVal = offer.status === "Active" ? "active" : "inactive";
+        document.querySelectorAll('input[name="status"]').forEach(r => {
+          r.checked = (r.value === statusVal);
+        });
+
+        // Load targets then pre-select the saved targetId
+        await loadTargets(offer.offerType);
+        if (offer.targetId) {
+          const targetSel = document.getElementById("targetId");
+          const savedId = (offer.targetId._id || offer.targetId).toString();
+          targetSel.value = savedId;
+          if (!targetSel.value) {
+            const opt = document.createElement("option");
+            opt.value = savedId;
+            opt.textContent = offer.targetId.name || savedId;
+            opt.selected = true;
+            targetSel.appendChild(opt);
+            targetSel.value = savedId;
+          }
         }
       } catch (error) {
         console.error("Load Error:", error);
-        Swal.fire(
-          "Error",
-          "Failed to load offer data: " + error.message,
-          "error",
-        );
+        Swal.fire("Error", "Failed to load offer data: " + error.message, "error");
       }
     }
 
@@ -804,7 +825,8 @@
       };
 
       try {
-        const res = await window.adminFetch(`/api/admin/offers/${offerId}`, {
+        // Correct route: PUT /api/admin/offers/update/:id
+        const res = await window.adminFetch(`/api/admin/offers/update/${offerId}`, {
           method: "PUT",
           body: JSON.stringify(offerData),
         });
@@ -822,8 +844,8 @@
       }
     }
 
-    // 4. Delete Function
-    async function deleteOffer(offerId) {
+    // 4. Delete Function - uses module-level offerId from URL params
+    async function deleteOffer() {
       const result = await Swal.fire({
         title: "Delete Offer?",
         text: "This will remove the discount from the associated products.",
@@ -842,11 +864,8 @@
           const data = await res.json();
 
           if (res.ok) {
-            Swal.fire(
-              "Deleted!",
-              "The offer has been removed.",
-              "success",
-            ).then(() => location.reload()); // Refresh table
+            Swal.fire("Deleted!", "The offer has been removed.", "success")
+              .then(() => (window.location.href = "./adminOffers.html"));
           } else {
             throw new Error(data.message || "Server rejected the deletion");
           }

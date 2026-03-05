@@ -2,29 +2,33 @@
 document.addEventListener('DOMContentLoaded', () => {
   let currentPage = 1;
   let currentSearch = '';
-  const limit = 10;
-
-
+  let currentSort = 'newest';
+  const limit = 5; // Reduced limit to trigger pagination more easily
 
   // Load categories from API
-  async function loadCategories(page = 1, search = '') {
+  async function loadCategories(page = 1, search = '', sort = 'newest') {
     try {
       currentPage = page;
       currentSearch = search;
+      currentSort = sort;
 
       const res = await window.adminFetch(
-        `/api/admin/categories?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`
+        `/api/admin/categories?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}&sort=${sort}`
       );
 
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
       const data = await res.json();
+      console.log("[AdminCategories] Loaded data:", data);
 
       if (data.success) {
         renderTable(data.data);
         renderPagination(data.pagination);
+        updateEntryCount(data.pagination);
+        window.paginationData = data.pagination; // Store globally for button clicks
       } else {
         renderTable([]);
+        renderPagination(null);
       }
     } catch (err) {
       console.error('Failed to load categories:', err);
@@ -94,59 +98,72 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function updateEntryCount(pagination) {
+    const parent = document.querySelector('.page-header');
+    if (!parent) return;
+    let countSpan = document.getElementById('categoryCountDisplay');
+    if (!countSpan) {
+      countSpan = document.createElement('span');
+      countSpan.id = 'categoryCountDisplay';
+      countSpan.className = 'badge bg-dark ms-2';
+      countSpan.style.fontSize = '0.9rem';
+      const title = parent.querySelector('.page-title');
+      if (title) title.appendChild(countSpan);
+    }
+    if (pagination) countSpan.textContent = `Total: ${pagination.total}`;
+  }
+
   // Render Pagination Buttons
   function renderPagination(pagination) {
-    const container = document.getElementById('paginationContainer');
-    if (!pagination || pagination.pages <= 1) {
-      container.innerHTML = '';
+    const infoText = document.getElementById('pageInfoText');
+    const pageNum = document.getElementById('pageNumberDisplay');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    if (!pagination || pagination.total === 0) {
+      if (infoText) infoText.textContent = 'No categories found';
+      if (pageNum) pageNum.textContent = '0';
+      if (prevBtn) prevBtn.disabled = true;
+      if (nextBtn) nextBtn.disabled = true;
       return;
     }
 
-    let html = '';
-    const { page, pages } = pagination;
+    const { page, pages, total, limit } = pagination;
+    const start = (page - 1) * limit + 1;
+    const end = Math.min(page * limit, total);
 
-    // Prev
-    html += `
-      <li class="page-item ${page === 1 ? 'disabled' : ''}">
-        <button class="page-link" onclick="window.changePage(${page - 1})">Previous</button>
-      </li>
-    `;
+    if (infoText) infoText.textContent = `Showing ${start} to ${end} of ${total} categories`;
+    if (pageNum) pageNum.textContent = page;
 
-    // Pages
-    for (let i = 1; i <= pages; i++) {
-      html += `
-          <li class="page-item ${i === page ? 'active' : ''}">
-            <button class="page-link" onclick="window.changePage(${i})">${i}</button>
-          </li>
-        `;
-    }
-
-    // Next
-    html += `
-      <li class="page-item ${page === pages ? 'disabled' : ''}">
-        <button class="page-link" onclick="window.changePage(${page + 1})">Next</button>
-      </li>
-    `;
-
-    container.innerHTML = html;
+    if (prevBtn) prevBtn.disabled = (page <= 1);
+    if (nextBtn) nextBtn.disabled = (page >= pages);
   }
 
   // Global function for pagination buttons
   window.changePage = (page) => {
     if (page >= 1) {
-      loadCategories(page, currentSearch);
+      loadCategories(page, currentSearch, currentSort);
     }
   };
 
   // Search logic (debounced)
   const searchInput = document.getElementById('searchInput');
+  const sortSelect = document.getElementById('sortSelect');
+
   let timeout = null;
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
-        loadCategories(1, e.target.value.trim());
+        loadCategories(1, e.target.value.trim(), currentSort);
       }, 500);
+    });
+  }
+
+  // Sort logic
+  if (sortSelect) {
+    sortSelect.addEventListener('change', (e) => {
+      loadCategories(1, currentSearch, e.target.value);
     });
   }
 
@@ -171,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (data.success) {
           Swal.fire('Deleted!', 'Category has been removed.', 'success');
-          loadCategories(currentPage, currentSearch); // Reload current page
+          loadCategories(currentPage, currentSearch, currentSort); // Reload current page
         } else {
           throw new Error(data.error || 'Delete failed');
         }

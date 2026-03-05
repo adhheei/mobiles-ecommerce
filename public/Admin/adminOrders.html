@@ -332,8 +332,9 @@
       background: #fff;
       border-radius: 16px;
       border: 1px solid var(--border-color);
-      overflow: hidden;
+      overflow-x: auto;
       margin-bottom: 25px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
     .table thead th {
@@ -456,16 +457,17 @@
     @media (max-width: 991px) {
       .sidebar {
         transform: translateX(-100%);
+        box-shadow: none;
       }
 
       .sidebar.active {
         transform: translateX(0);
-        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
       }
 
       .main-content {
         margin-left: 0;
-        padding: 20px;
+        padding: 20px 15px;
       }
 
       .mobile-nav {
@@ -479,20 +481,66 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 998;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(2px);
+        z-index: 999;
       }
 
       .sidebar-overlay.active {
         display: block;
       }
 
-      .table-responsive {
-        overflow-x: auto;
+      .table-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px;
+        gap: 15px;
       }
 
-      .table {
-        min-width: 600px;
+      .search-group {
+        max-width: 100%;
+      }
+
+      .filter-group {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .custom-select {
+        width: 100%;
+      }
+
+      .page-title {
+        font-size: 1.5rem;
+      }
+
+      .pagination-wrapper {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+
+      .table-container {
+        border-radius: 12px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .filter-group {
+        grid-template-columns: 1fr;
+      }
+
+      .table thead th,
+      .table tbody td {
+        padding: 12px 15px;
+        font-size: 0.8rem;
+      }
+
+      .btn-view-details {
+        padding: 6px 12px;
+        font-size: 0.72rem;
       }
     }
   </style>
@@ -816,6 +864,16 @@
       const sortOrders = document.getElementById("sortOrders");
       if (sortOrders) {
         sortOrders.addEventListener("change", applyFiltersAndRender);
+      }
+
+      // Check for search param in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const searchParam = urlParams.get('search');
+      if (searchParam && searchInput) {
+        searchInput.value = searchParam;
+        fetchOrders(searchParam);
+      } else {
+        fetchOrders();
       }
     });
   </script>

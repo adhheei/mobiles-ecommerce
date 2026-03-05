@@ -405,31 +405,49 @@
     }
 
     /* Pagination */
-    .pagination-container {
-      padding: 20px;
+    .pagination-wrapper {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-top: 1px solid #eee;
+      padding: 20px 25px;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+    }
+
+    .page-info {
+      font-size: 0.85rem;
+      color: var(--text-muted);
     }
 
     .page-btn {
-      padding: 6px 12px;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
       border: 1px solid #eee;
-      background: #fff;
-      border-radius: 8px;
-      color: #333;
-      text-decoration: none;
+      background: white;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       transition: 0.2s;
+      color: #000;
+      text-decoration: none;
     }
 
-    .page-btn:hover:not(.disabled) {
+    .page-btn:hover:not(:disabled) {
       background: #f1f1f1;
+      color: #000;
     }
 
-    .page-btn.disabled {
+    .page-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+    }
+
+    .page-number {
+      font-weight: 700;
+      margin: 0 10px;
+      font-size: 0.9rem;
     }
 
     /* Modal */
@@ -500,20 +518,39 @@
       .main-content {
         margin-left: 0;
         padding: 15px;
-        /* Reduced padding on mobile */
       }
 
       .mobile-nav {
         display: flex;
-        /* Show mobile nav */
       }
 
+      /* Page Header: stack title & buttons vertically */
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .page-title {
+        font-size: 1.4rem;
+      }
+
+      .page-header .d-flex {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .page-header .btn {
+        font-size: 0.8rem;
+        padding: 6px 14px;
+      }
+
+      /* Toolbar */
       .toolbar-container {
         flex-direction: column;
         align-items: stretch;
-        gap: 15px;
+        gap: 12px;
         padding: 15px;
-        /* Compact padding */
       }
 
       .filter-section {
@@ -523,11 +560,31 @@
         width: 100%;
       }
 
+      .filter-section .d-flex {
+        flex-direction: column;
+        gap: 10px;
+      }
+
       .search-box {
         max-width: 100%;
         width: 100%;
       }
 
+      .custom-select-tool {
+        width: 100%;
+      }
+
+      /* Custom date range */
+      #customDateContainer {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .date-input {
+        width: 100%;
+      }
+
+      /* Sidebar overlay */
       .sidebar-overlay {
         display: none;
         position: fixed;
@@ -543,37 +600,61 @@
         display: block;
       }
 
+      /* Table scroll */
       .table-responsive {
         overflow-x: auto;
         border: 1px solid #eee;
-        /* Add border for clarity on mobile */
+        -webkit-overflow-scrolling: touch;
       }
 
       .table {
-        min-width: 900px;
-        /* Force scroll */
+        min-width: 750px;
       }
 
-      /* Stack custom date inputs */
-      #customDateContainer {
+      /* Smaller table text on mobile */
+      .table th,
+      .table td {
+        padding: 12px 14px;
+        font-size: 0.82rem;
+      }
+
+      /* Pagination: stack info and buttons */
+      .pagination-wrapper {
         flex-direction: column;
-        width: 100%;
+        align-items: center;
+        gap: 12px;
+        padding: 15px;
+        text-align: center;
       }
 
-      .date-input {
-        width: 100%;
+      .page-info {
+        font-size: 0.8rem;
       }
 
-      /* Adjust modal width */
+      /* Modal */
       .modal-dialog {
         margin: 0.5rem;
         max-width: 100%;
       }
     }
 
-    @media (min-width: 992px) {
+    @media (max-width: 576px) {
+      .page-title {
+        font-size: 1.2rem;
+      }
 
-      /* Ensure search box has reasonable width on desktop */
+      .table {
+        min-width: 620px;
+      }
+
+      .table th,
+      .table td {
+        padding: 10px 10px;
+        font-size: 0.78rem;
+      }
+    }
+
+    @media (min-width: 992px) {
       .search-box {
         min-width: 300px;
       }
@@ -664,9 +745,14 @@
   <div class="main-content content-animate">
     <div class="page-header">
       <h2 class="page-title">Transactions</h2>
-      <button onclick="downloadCSV()" class="btn btn-outline-dark rounded-pill px-4">
-        <i class="fa-solid fa-download me-2"></i> Download CSV
-      </button>
+      <div class="d-flex gap-2">
+        <button onclick="downloadCSV()" class="btn btn-outline-dark rounded-pill px-4">
+          <i class="fa-solid fa-file-csv me-2"></i> CSV
+        </button>
+        <button onclick="downloadPDF()" class="btn btn-dark rounded-pill px-4">
+          <i class="fa-solid fa-file-pdf me-2"></i> PDF
+        </button>
+      </div>
     </div>
 
     <div class="toolbar-container">
@@ -676,26 +762,28 @@
       </div>
 
       <div class="filter-section">
-        <select id="statusFilter" class="custom-select-tool" onchange="fetchTransactions()">
-          <option value="All">All Status</option>
-          <option value="Success">Success</option>
-          <option value="Pending">Pending</option>
-          <option value="Failed">Failed</option>
-        </select>
+        <div class="d-flex gap-2 flex-grow-1">
+          <select id="statusFilter" class="custom-select-tool flex-grow-1" onchange="fetchTransactions()">
+            <option value="All">All Status</option>
+            <option value="Success">Success</option>
+            <option value="Pending">Pending</option>
+            <option value="Failed">Failed</option>
+          </select>
 
-        <select id="dateRange" class="custom-select-tool" onchange="handleDateRangeChange()">
-          <option value="">Date Range</option>
-          <option value="today">Today</option>
-          <option value="7days">Last 7 Days</option>
-          <option value="30days">Last 30 Days</option>
-          <option value="month">This Month</option>
-          <option value="custom">Custom Range</option>
-        </select>
+          <select id="dateRange" class="custom-select-tool flex-grow-1" onchange="handleDateRangeChange()">
+            <option value="">Date Range</option>
+            <option value="today">Today</option>
+            <option value="7days">Last 7 Days</option>
+            <option value="30days">Last 30 Days</option>
+            <option value="month">This Month</option>
+            <option value="custom">Custom Range</option>
+          </select>
+        </div>
 
-        <div id="customDateContainer" class="d-none d-flex gap-2">
-          <input type="text" id="fromDate" class="date-input" placeholder="From Date" />
-          <input type="text" id="toDate" class="date-input" placeholder="To Date" />
-          <button class="btn btn-dark rounded-3" onclick="fetchTransactions()">
+        <div id="customDateContainer" class="d-none d-flex gap-2 w-100 mt-2 mt-lg-0">
+          <input type="text" id="fromDate" class="date-input flex-grow-1" placeholder="From Date" />
+          <input type="text" id="toDate" class="date-input flex-grow-1" placeholder="To Date" />
+          <button class="btn btn-dark rounded-3 px-3" onclick="fetchTransactions()">
             Apply
           </button>
         </div>
@@ -725,12 +813,13 @@
         </table>
       </div>
 
-      <div class="pagination-container">
-        <span class="text-muted small" id="pageInfo">Showing 0 entries</span>
-        <div class="d-flex gap-2">
+      <div class="pagination-wrapper">
+        <span class="page-info" id="pageInfo">Showing 0 to 0 of 0 transactions</span>
+        <div>
           <button class="page-btn" id="prevBtn" onclick="changePage(-1)">
             <i class="fa-solid fa-chevron-left"></i>
           </button>
+          <span class="page-number" id="pageNumberDisplay">1</span>
           <button class="page-btn" id="nextBtn" onclick="changePage(1)">
             <i class="fa-solid fa-chevron-right"></i>
           </button>
@@ -760,6 +849,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <script src="/js/adminCommon.js"></script>
   <script src="/js/adminBadge.js"></script>
   <script>
@@ -863,15 +954,16 @@
     function updatePagination(data) {
       totalPages = data.totalPages;
       currentPage = data.currentPage;
-      document.getElementById("pageInfo").innerText =
-        `Showing page ${currentPage} of ${totalPages} (Total: ${data.total})`;
 
-      document
-        .getElementById("prevBtn")
-        .classList.toggle("disabled", currentPage === 1);
-      document
-        .getElementById("nextBtn")
-        .classList.toggle("disabled", currentPage === totalPages);
+      const start = (currentPage - 1) * limit + 1;
+      const end = Math.min(currentPage * limit, data.total);
+
+      document.getElementById("pageInfo").innerText =
+        `Showing ${start} to ${end} of ${data.total} transactions`;
+      document.getElementById("pageNumberDisplay").innerText = currentPage;
+
+      document.getElementById("prevBtn").disabled = (currentPage === 1);
+      document.getElementById("nextBtn").disabled = (currentPage === totalPages || totalPages === 0);
     }
 
     function changePage(delta) {
@@ -965,6 +1057,74 @@
         url += `&fromDate=${fromDate}&toDate=${toDate}`;
 
       window.location.href = url;
+    }
+
+    async function downloadPDF() {
+      const search = document.getElementById("searchInput").value;
+      const status = document.getElementById("statusFilter").value;
+      const range = document.getElementById("dateRange").value;
+      const fromDate = document.getElementById("fromDate").value;
+      const toDate = document.getElementById("toDate").value;
+
+      let url = `/api/admin/transactions?limit=1000`; // Fetch all for report
+      if (search) url += `&search=${encodeURIComponent(search)}`;
+      if (status && status !== "All") url += `&status=${status}`;
+      if (range && range !== "custom") url += `&range=${range}`;
+      if (range === "custom" && fromDate && toDate)
+        url += `&fromDate=${fromDate}&toDate=${toDate}`;
+
+      try {
+        Swal.showLoading();
+        const res = await window.adminFetch(url);
+        const data = await res.json();
+        Swal.close();
+
+        if (!data.transactions || data.transactions.length === 0) {
+          return Swal.fire("Observation", "No transactions found to export", "info");
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Branding
+        doc.setFontSize(22);
+        doc.text("JINSA MOBILES", 105, 18, { align: "center" });
+        doc.setFontSize(12);
+        doc.setTextColor(100);
+        doc.text("Transaction History Report", 105, 25, { align: "center" });
+        doc.setDrawColor(200);
+        doc.line(15, 30, 195, 30);
+
+        // Meta
+        doc.setFontSize(9);
+        doc.setTextColor(0);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 15, 38);
+        doc.text(`Total Records: ${data.total}`, 195, 38, { align: "right" });
+
+        const tableData = data.transactions.map(t => [
+          t.transactionId,
+          t.orderId,
+          t.user.name,
+          `Rs. ${t.amount.toFixed(2)}`,
+          t.paymentMethod,
+          t.status,
+          new Date(t.date).toLocaleDateString()
+        ]);
+
+        doc.autoTable({
+          startY: 45,
+          head: [["Txn ID", "Order ID", "Customer", "Amount", "Method", "Status", "Date"]],
+          body: tableData,
+          theme: 'grid',
+          headStyles: { fillColor: [26, 26, 26], textColor: [255, 255, 255] },
+          columnStyles: { 3: { halign: 'right' } }
+        });
+
+        doc.save(`Transactions_${new Date().toISOString().split('T')[0]}.pdf`);
+      } catch (error) {
+        Swal.close();
+        Swal.fire("Error", "Failed to generate PDF", "error");
+      }
     }
   </script>
 </body>

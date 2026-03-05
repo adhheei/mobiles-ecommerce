@@ -808,9 +808,12 @@
           ? `<tr><td colspan="4" class="text-center py-4">No recent activity</td></tr>`
           : orders
             .map((order) => {
-              const customerName = order.userId
-                ? `${order.userId.firstName || ""} ${order.userId.lastName || ""}`.trim()
-                : "Guest User";
+              // Safely get user name — userId is populated; guard against raw ObjectId
+              let customerName = "Guest";
+              const u = order.userId;
+              if (u && typeof u === "object" && u.firstName) {
+                customerName = u.firstName;
+              }
 
               const date = new Date(order.createdAt).toLocaleDateString(
                 "en-IN",
@@ -824,14 +827,16 @@
               const status = order.orderStatus || "Processing";
               let badgeClass = "badge-custom ";
               if (status.toLowerCase() === "delivered")
-                badgeClass += "status-shipped"; // using your existing class
+                badgeClass += "status-shipped";
               else if (status.toLowerCase() === "cancelled")
                 badgeClass += "status-cancelled";
               else badgeClass += "status-processing";
 
+              const displayId = order.orderId || order._id?.toString().slice(-6) || "N/A";
+
               return `
                 <tr>
-                    <td class="order-id">#${order.orderId}</td>
+                    <td class="order-id">#${displayId}</td>
                     <td>${customerName}</td>
                     <td>${date}</td>
                     <td><span class="${badgeClass}">${status}</span></td>

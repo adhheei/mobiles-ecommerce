@@ -4,6 +4,7 @@ const Product = require("../../models/Product");
 const Cart = require("../../models/Cart");
 const Coupon = require("../../models/Coupon");
 const Address = require("../../models/Address");
+const Transaction = require("../../models/Transaction");
 const crypto = require("crypto");
 const { formatImageUrl } = require("../../utils/cartHelpers");
 const { sendOrderConfirmationEmail } = require("../../utils/emailService");
@@ -157,8 +158,26 @@ const placeOrder = async (req, res) => {
     }
     if (!buyNowItem) await Cart.findOneAndUpdate({ userId }, { items: [] });
 
-    // 7. ASYNC EMAIL
+    // 7. CREATE TRANSACTION RECORD
     const user = await require("../../models/User").findById(userId);
+    const paymentStatus = finalAmount - walletDeducted <= 0 ? "Success" : (paymentMethod.toUpperCase() === "RAZORPAY" ? "Success" : "Pending");
+    try {
+      await Transaction.create({
+        transactionId: "TXN-" + Date.now(),
+        orderId: newOrder.orderId,
+        user: {
+          name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email,
+          email: user.email
+        },
+        paymentMethod,
+        amount: newOrder.totals.totalAmount,
+        status: paymentStatus,
+      });
+    } catch (txnErr) {
+      console.error("Transaction record creation failed (non-critical):", txnErr.message);
+    }
+
+    // 8. ASYNC EMAIL
     sendOrderConfirmationEmail(user, newOrder).catch((err) =>
       console.error("Email Error:", err),
     );

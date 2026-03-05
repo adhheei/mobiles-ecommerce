@@ -5,10 +5,13 @@ function formatMoney(amount) {
   return "Rs. " + Number(amount).toLocaleString("en-IN") + ".00";
 }
 
-// Parse price helper
+// Parse price helper - handles commas, currency symbols, and decimals
 function parsePrice(str) {
+  if (typeof str === 'number') return str;
   if (!str) return 0;
-  return parseFloat(str.replace(/[^0-9.]/g, "")) || 0;
+  // Remove commas first, then remove everything except digits and the first dot
+  const cleaned = str.replace(/,/g, "").replace(/[^0-9.]/g, "");
+  return parseFloat(cleaned) || 0;
 }
 
 // Function to fetch cart data from API
@@ -145,6 +148,7 @@ function updateTotals() {
     totalMrp += qty * unitMrp;
   });
 
+  currentCartSubtotal = subtotal; // Store globally for coupon logic
   const discount = totalMrp - subtotal;
 
   // --- FIX: Dynamic Strikethrough Logic ---
@@ -314,6 +318,7 @@ async function removeItem(productId) {
 // Initial Load
 // --- Coupon Logic ---
 let currentCoupon = null;
+let currentCartSubtotal = 0;
 
 function initCouponLogic() {
   const btn = document.getElementById("apply-coupon-btn");
@@ -384,11 +389,42 @@ async function fetchCouponsAndShowModal() {
       return;
     }
 
+    // Calculate current cart total - prioritize the numeric global variable
+    let currentTotal = (typeof currentCartSubtotal === 'number' && currentCartSubtotal > 0)
+      ? currentCartSubtotal
+      : parsePrice(document.getElementById("subtotal")?.innerText || "0");
+
+    console.log("[CouponFilter] Final cart subtotal for filtering:", currentTotal);
+
     // Filter valid coupons (checked server side too, but visual filter)
-    const validCoupons = data.data.filter((c) => !c.isExpired && !c.isUsed);
+    // Show only those that haven't been used, aren't expired, and meet minPurchase
+    const validCoupons = (data.data || []).filter((c) => {
+      // Basic availability: Admin active flag AND date range check AND not used up by user
+      const isBasicAvailable = !!c.isAvailable;
+
+      // Min Purchase check: Cart total must be >= min requirement
+      // Ensure we have a valid numeric minPurchase
+      let minReq = 0;
+      if (c.minPurchase !== undefined && c.minPurchase !== null) {
+        minReq = (typeof c.minPurchase === 'number') ? c.minPurchase : parsePrice(String(c.minPurchase));
+      }
+
+      const meetsMinPurchase = Math.floor(currentTotal) >= Math.floor(minReq);
+
+      console.log(`[CouponFilter] Coupon ${c.code}: isAvailable=${isBasicAvailable}, minReq=${minReq}, meets=${meetsMinPurchase}`);
+
+      return isBasicAvailable && meetsMinPurchase;
+    });
 
     if (validCoupons.length === 0) {
-      Swal.fire("No Coupons", "There are no active coupons available.", "info");
+      Swal.fire({
+        icon: "info",
+        title: "No Applicable Coupons",
+        text: currentTotal > 0
+          ? "Your current total (₹" + Math.floor(currentTotal).toLocaleString('en-IN') + ") doesn't meet the minimum requirements for any available coupons."
+          : "Your cart is empty.",
+        confirmButtonColor: "#1a1a1a"
+      });
       return;
     }
 

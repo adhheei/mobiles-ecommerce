@@ -4,12 +4,15 @@ let currentFilters = {
   type: "all",
   searchTerm: "",
 };
+let currentPage = 1;
+const rowsPerPage = 8;
 
 document.addEventListener("DOMContentLoaded", () => {
   fetchCoupons();
 
   document.getElementById("searchInput").addEventListener("input", function () {
     currentFilters.searchTerm = this.value;
+    currentPage = 1;
     applyFilters();
   });
 
@@ -18,9 +21,48 @@ document.addEventListener("DOMContentLoaded", () => {
       document
         .querySelectorAll(".filter-menu")
         .forEach((menu) => menu.classList.remove("show"));
+      document
+        .querySelectorAll(".filter-btn")
+        .forEach((btn) => btn.classList.remove("open"));
     }
   });
 });
+
+window.toggleFilter = function (type) {
+  const menu = document.getElementById(`${type}Menu`);
+  const btn = menu.parentElement;
+
+  // Close other menus
+  document.querySelectorAll(".filter-menu").forEach(m => {
+    if (m !== menu) m.classList.remove("show");
+  });
+  document.querySelectorAll(".filter-btn").forEach(b => {
+    if (b !== btn) b.classList.remove("open");
+  });
+
+  menu.classList.toggle("show");
+  btn.classList.toggle("open");
+};
+
+window.setFilter = function (type, value) {
+  currentFilters[type] = value;
+
+  // Update Labels
+  if (type === 'status') {
+    document.getElementById('statusLabel').textContent = value.charAt(0).toUpperCase() + value.slice(1);
+  } else if (type === 'type') {
+    const typeText = value === 'all' ? 'All' : (value === 'fixed' ? 'Fixed Amount' : 'Percentage');
+    document.getElementById('typeLabel').textContent = typeText;
+  }
+
+  currentPage = 1;
+  applyFilters();
+
+  // Close menu
+  document.querySelectorAll(".filter-menu").forEach(m => m.classList.remove("show"));
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("open"));
+};
+
 async function fetchCoupons() {
   try {
     const response = await window.adminFetch("/api/admin/coupons");
@@ -64,8 +106,43 @@ function applyFilters() {
     return matchSearch && matchStatus && matchType;
   });
 
-  renderTable(filtered);
+  const totalCoupons = filtered.length;
+  const totalPages = Math.ceil(totalCoupons / rowsPerPage) || 1;
+
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const paginatedData = filtered.slice(startIndex, startIndex + rowsPerPage);
+
+  renderTable(paginatedData);
+  updatePaginationUI(startIndex, paginatedData.length, totalCoupons, totalPages);
 }
+
+function updatePaginationUI(startIndex, currentCount, totalEntries, totalPages) {
+  const wrapper = document.getElementById("paginationWrapper");
+  if (!wrapper) return;
+
+  if (totalEntries === 0) {
+    wrapper.innerHTML = `<span class="text-muted small">Showing 0 entries</span>`;
+    return;
+  }
+
+  const endCount = startIndex + currentCount;
+  wrapper.innerHTML = `
+    <span class="text-muted small">Showing ${startIndex + 1} to ${endCount} of ${totalEntries} entries</span>
+    <div class="d-flex align-items-center gap-2">
+      <button class="page-nav-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? "disabled" : ""}><i class="fa-solid fa-chevron-left"></i></button>
+      <span class="fw-bold px-2 small">${currentPage}</span>
+      <button class="page-nav-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? "disabled" : ""}><i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+  `;
+}
+
+window.changePage = function (newPage) {
+  currentPage = newPage;
+  applyFilters();
+};
 
 function renderTable(data) {
   const tbody = document.getElementById("couponTableBody");
@@ -91,17 +168,17 @@ function renderTable(data) {
 
     tbody.innerHTML += `
             <tr>
-                <td>
+                <td data-label="Code">
                     <span class="coupon-code">
                         ${c.code}
                         <i class="fa-regular fa-copy copy-icon"
                            onclick="copyCode('${c.code}')"></i>
                     </span>
                 </td>
-                <td>${discount}</td>
-                <td>${c.used} / ${c.limit}</td>
-                <td>${c.expiry}</td>
-                <td>
+                <td data-label="Discount">${discount}</td>
+                <td data-label="Usage Limit">${c.used} / ${c.limit}</td>
+                <td data-label="Expiry Date">${c.expiry}</td>
+                <td data-label="Status">
                     <span class="badge-custom ${statusClass}">
                         ${c.status}
                     </span>

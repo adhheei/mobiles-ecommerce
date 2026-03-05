@@ -13,7 +13,7 @@ router.use(protect);
 // 1. PROFILE MANAGEMENT
 router.get("/profile", user.getProfile);
 router.put("/profile", user.updateProfile);
-router.put("/avatar", upload.single, user.updateAvatar); 
+router.put("/avatar", upload.single, user.updateAvatar);
 router.delete("/avatar", user.removeAvatar);
 router.post("/change-password", user.changePassword);
 
@@ -27,6 +27,7 @@ router.get("/wallet", wallet.getWallet);
 router.post("/wallet/apply", wallet.applyWallet);
 
 // 4. Coupon MANAGEMENT
-router.get("/coupons", coupon.getCoupons);
+router.get("/coupons", coupon.getAvailableCoupons);
+router.post("/coupons/apply", coupon.applyCoupon);
 
 module.exports = router;

@@ -559,6 +559,73 @@
         width: 100%;
         justify-content: space-between;
       }
+
+      /* Responsive Table to Cards */
+      .table thead {
+        display: none;
+      }
+
+      .table tbody td {
+        display: block;
+        text-align: right;
+        padding: 10px 15px;
+        border-bottom: 1px solid #eee;
+        position: relative;
+      }
+
+      .table tbody td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #888;
+      }
+
+      .table tbody td:last-child {
+        border-bottom: 4px solid #eee;
+        padding-top: 15px;
+      }
+
+      .table tbody td.text-end {
+        text-align: right;
+      }
+    }
+
+    /* Pagination Styles */
+    .pagination-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding: 10px 0;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .page-nav-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    .page-nav-btn:hover:not(:disabled) {
+      background: var(--bg-light);
+      border-color: #ccc;
+    }
+
+    .page-nav-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
   </style>
 </head>
@@ -679,6 +746,10 @@
         <tbody id="couponTableBody">
         </tbody>
       </table>
+    </div>
+
+    <div class="pagination-wrapper" id="paginationWrapper">
+      <!-- Pagination info and buttons -->
     </div>
   </div>
 

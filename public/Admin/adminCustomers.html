@@ -826,7 +826,7 @@
     let allCustomers = [];
     let currentCustomers = [];
     let currentPage = 1;
-    const rowsPerPage = 10;
+    const rowsPerPage = 8;
 
     // --- INITIALIZE ---
     document.addEventListener("DOMContentLoaded", () => {
@@ -946,7 +946,7 @@
         <small class="text-muted">${user.phone || "N/A"}</small>
       </td>
       
-      <td>${user.orderCount || 0} Orders</td> 
+      <td><a href="./adminOrders.html?search=${encodeURIComponent(user.email)}" class="text-decoration-none fw-bold text-primary">${user.orderCount || 0} Orders</a></td> 
       
       <td><span class="badge bg-success-light text-success">${user.status || (user.isBlocked ? "Suspended" : "Active")}</span></td>
       <td>
@@ -1016,7 +1016,7 @@
                 <hr class="my-2 border-light">
                 <div class="detail-row">
                     <span class="detail-label">Total Orders</span>
-                    <span class="detail-value fs-5">${c.orderCount || 0}</span>
+                    <a href="./adminOrders.html?search=${encodeURIComponent(c.email)}" class="detail-value fs-5 text-decoration-none text-primary">${c.orderCount || 0}</a>
                 </div>
           `;
 

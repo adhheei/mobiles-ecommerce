@@ -19,6 +19,8 @@ const wallet = require("../controllers/wallet");
 const order = require("../controllers/order");
 const purchaseController = require("../controllers/admin/purchaseController");
 const updatePurchase = require("../controllers/admin/updatePurchase");
+const { getAdminProfile, updateAdminProfile } = require("../controllers/admin/getAdminProfile");
+const changeAdminPassword = require("../controllers/admin/changeAdminPassword");
 
 // File Uploads
 const {
@@ -31,6 +33,11 @@ const {
 // AUTH
 router.post("/login", loginAdmin);
 router.get("/dashboard-stats", isAdmin, getDashboardStats);
+
+// ADMIN PROFILE
+router.get("/profile", isAdmin, getAdminProfile);
+router.put("/profile", isAdmin, updateAdminProfile);
+router.put("/change-password", isAdmin, changeAdminPassword);
 
 // CATEGORY MANAGEMENT
 router.get("/categories/public", category.getAllCategories);

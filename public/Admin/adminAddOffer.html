@@ -585,12 +585,12 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="offerType" class="form-label">Offer Type</label>
-              <select id="offerType" class="form-select">
+              <select id="offerType" class="form-select" onchange="loadTargetsByType(this.value)">
                 <option value="" disabled selected>
                   Select an offer type
                 </option>
-                <option value="percentage">Percentage Discount</option>
-                <option value="fixed">Fixed Amount Discount</option>
+                <option value="Category">Category Offer</option>
+                <option value="Product">Product Offer</option>
               </select>
             </div>
           </div>
@@ -671,11 +671,7 @@
       // Extract form data
       const offerData = {
         name: document.getElementById("offerName").value,
-        // Ensure this matches your logic: percentage usually implies Category-wide
-        offerType:
-          document.getElementById("offerType").value === "percentage"
-            ? "Category"
-            : "Product",
+        offerType: document.getElementById("offerType").value, // 'Category' or 'Product'
         discountPercentage: parseFloat(
           document.getElementById("discountValue").value,
         ),
@@ -686,20 +682,20 @@
             "active"
             ? "Active"
             : "Inactive",
-        // FIX: Read from the dropdown select element
         targetId: document.getElementById("targetId").value,
       };
 
       // Validation
       if (
         !offerData.name ||
+        !offerData.offerType ||
         isNaN(offerData.discountPercentage) ||
         !offerData.targetId
       ) {
         return Swal.fire({
           icon: "error",
           title: "Wait!",
-          text: "Please fill in all required fields and select a category.",
+          text: "Please fill in all required fields, select a type and a target.",
         });
       }
 
@@ -726,23 +722,44 @@
       }
     }
 
-    // Function to fetch categories from the backend and populate the select menu
-    async function loadCategories() {
-      const res = await window.adminFetch("/api/admin/categories");
-      const result = await res.json();
-      const categoriesArray = result.data || [];
-
+    // Load targets (categories or products) based on offer type
+    async function loadTargetsByType(type) {
       const targetSelect = document.getElementById("targetId");
-      targetSelect.innerHTML =
-        '<option value="" disabled selected>Select a category</option>';
+      const label = document.querySelector('label[for="targetId"]');
+      targetSelect.innerHTML = '<option value="" disabled selected>Loading...</option>';
+      if (label) label.textContent = type === "Category" ? "Applicable Category" : "Applicable Product";
 
-      categoriesArray.forEach((cat) => {
-        const option = document.createElement("option");
-        // 'cat.id' must match your Product model's 'category' field
-        option.value = cat.id;
-        option.textContent = cat.name;
-        targetSelect.appendChild(option);
-      });
+      try {
+        let url = type === "Category"
+          ? "/api/admin/categories"
+          : "/api/admin/products?limit=100";
+
+        const res = await window.adminFetch(url);
+        const result = await res.json();
+
+        let items = [];
+        if (type === "Category") {
+          items = result.data || [];
+        } else {
+          items = result.formatted || result.products || [];
+        }
+
+        targetSelect.innerHTML = '<option value="" disabled selected>Select a target</option>';
+        items.forEach((item) => {
+          const option = document.createElement("option");
+          option.value = item._id || item.id;
+          option.textContent = item.name;
+          targetSelect.appendChild(option);
+        });
+      } catch (err) {
+        console.error("Failed to load targets:", err);
+        targetSelect.innerHTML = '<option value="">Error loading items</option>';
+      }
+    }
+
+    // Legacy alias (called on DOMContentLoaded for initial Category load)
+    async function loadCategories() {
+      return loadTargetsByType("Category");
     }
 
     // Set default dates
