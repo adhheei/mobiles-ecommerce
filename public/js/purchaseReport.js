@@ -405,16 +405,209 @@ document.addEventListener("DOMContentLoaded", function () {
     } catch (e) { }
   }
   function updateSummaryCards() {
+    const totalInvestment = filteredPurchases.reduce((sum, p) => sum + p.totalAmount, 0);
+    const totalItems = filteredPurchases.reduce((sum, p) => sum + p.totalQuantity, 0);
+    const completedCount = filteredPurchases.length;
+    const activeSuppliers = new Set(filteredPurchases.map(p => p.supplierName)).size;
+
+    if (elements.totalInvestmentCard) elements.totalInvestmentCard.textContent = `₹${formatCurrency(totalInvestment)}`;
+    if (elements.itemsCountCard) elements.itemsCountCard.textContent = totalItems;
+    if (elements.completedCountCard) elements.completedCountCard.textContent = completedCount;
+    if (elements.pendingCountCard) elements.pendingCountCard.textContent = activeSuppliers;
   }
+
   function filterPurchases() {
+    const searchTerm = elements.searchInput?.value.toLowerCase() || "";
+    const start = elements.startDate?.value ? new Date(elements.startDate.value) : null;
+    const end = elements.endDate?.value ? new Date(elements.endDate.value) : null;
+    if (end) end.setHours(23, 59, 59, 999);
+
+    filteredPurchases = allPurchases.filter(p => {
+      const matchesSearch = p.supplierName.toLowerCase().includes(searchTerm) ||
+        p.id.toLowerCase().includes(searchTerm) ||
+        p.items.some(it => it.productName.toLowerCase().includes(searchTerm));
+
+      const pDate = new Date(p.purchaseDate);
+      const matchesDate = (!start || pDate >= start) && (!end || pDate <= end);
+
+      return matchesSearch && matchesDate;
+    });
+
+    const sortVal = elements.sortSelect?.value;
+    if (sortVal === "newest") {
+      filteredPurchases.sort((a, b) => new Date(b.purchaseDate) - new Date(a.purchaseDate));
+    } else if (sortVal === "oldest") {
+      filteredPurchases.sort((a, b) => new Date(a.purchaseDate) - new Date(b.purchaseDate));
+    }
+
+    currentPage = 1;
+    updateSummaryCards();
+    renderTable();
   }
-  function updatePagination(t) {
+
+  function updatePagination(total) {
+    const totalPages = Math.ceil(total / ITEMS_PER_PAGE) || 1;
+    if (elements.pageNumber) elements.pageNumber.textContent = currentPage;
+    if (elements.pageInfo) {
+      const start = total === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1;
+      const end = Math.min(currentPage * ITEMS_PER_PAGE, total);
+      elements.pageInfo.textContent = `Showing ${start} to ${end} of ${total} records`;
+    }
+
+    // Toggle disabled class for buttons
+    elements.prevBtn?.classList.toggle("disabled", currentPage === 1);
+    elements.nextBtn?.classList.toggle("disabled", currentPage === totalPages);
   }
+
   function exportPurchases() {
+    if (filteredPurchases.length === 0) return Swal.fire("Observation", "No data to export", "info");
+
+    Swal.fire({
+      title: 'Export Report',
+      text: "Choose your preferred format",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: '<i class="fa-solid fa-file-pdf"></i> Export PDF',
+      cancelButtonText: '<i class="fa-solid fa-file-csv"></i> Export CSV',
+      confirmButtonColor: '#000',
+      cancelButtonColor: '#333'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        generatePDF();
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        generateCSV();
+      }
+    });
+
+    function generatePDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      // Title & Branding
+      doc.setFontSize(22);
+      doc.setTextColor(0, 0, 0);
+      doc.text("JINSA MOBILES", 105, 20, { align: "center" });
+
+      doc.setFontSize(14);
+      doc.setTextColor(100);
+      doc.text("Purchase Inventory Report", 105, 30, { align: "center" });
+
+      doc.setDrawColor(200);
+      doc.line(15, 35, 195, 35);
+
+      // Report Info
+      doc.setFontSize(10);
+      doc.setTextColor(0);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 15, 45);
+      doc.text(`Status: Filtered Results`, 15, 50);
+      doc.text(`Total Records: ${filteredPurchases.length}`, 195, 45, { align: "right" });
+
+      const tableData = filteredPurchases.map(p => [
+        formatDate(p.purchaseDate),
+        p.id,
+        p.supplierName,
+        p.totalQuantity,
+        `Rs. ${formatCurrency(p.totalAmount)}`
+      ]);
+
+      doc.autoTable({
+        startY: 55,
+        head: [["Date", "Purchase ID", "Supplier Name", "Items Qty", "Amount"]],
+        body: tableData,
+        theme: 'grid',
+        headStyles: { fillColor: [26, 26, 26], textColor: [255, 255, 255], fontStyle: 'bold' },
+        columnStyles: {
+          4: { halign: 'right' },
+          3: { halign: 'center' }
+        },
+        margin: { top: 40 }
+      });
+
+      const finalY = doc.lastAutoTable.finalY + 10;
+      const totalInv = filteredPurchases.reduce((s, p) => s + p.totalAmount, 0);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text(`Total Investment: Rs. ${formatCurrency(totalInv)}`, 195, finalY, { align: "right" });
+
+      doc.save(`Purchase_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+    }
+
+    function generateCSV() {
+      const headers = ["Date", "Purchase ID", "Supplier", "Quantity", "Amount"];
+      const rows = filteredPurchases.map(p => [
+        formatDate(p.purchaseDate),
+        p.id,
+        p.supplierName,
+        p.totalQuantity,
+        p.totalAmount
+      ]);
+
+      let csvContent = "data:text/csv;charset=utf-8,"
+        + headers.join(",") + "\n"
+        + rows.map(e => e.join(",")).join("\n");
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Purchase_Report_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   }
+
   async function loadCategoriesForQuickAdd() {
+    const sel = document.getElementById("quickProductCategory");
+    if (!sel) return;
+    try {
+      const r = await fetch(`${API_BASE}/admin/categories`);
+      const d = await r.json();
+      if (d.success) {
+        sel.innerHTML = '<option value="">Select Category</option>' +
+          d.categories.map(c => `<option value="${c._id}">${escapeHtml(c.name)}</option>`).join("");
+      }
+    } catch (e) { }
   }
+
   async function handleQuickProductSubmit(e) {
+    e.preventDefault();
+    const btn = document.getElementById("saveQuickProductBtn");
+    btn.disabled = true;
+
+    const formData = new FormData(e.target);
+    const productData = Object.fromEntries(formData.entries());
+
+    try {
+      const response = await fetch(`${API_BASE}/admin/products`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(productData)
+      });
+      const result = await response.json();
+      if (result.success) {
+        Swal.fire("Success", "Product added successfully", "success");
+        bootstrap.Modal.getInstance(document.getElementById("newProductModal")).hide();
+        loadProductsForSuggestions();
+      } else {
+        Swal.fire("Error", result.message || "Failed to add product", "error");
+      }
+    } catch (error) {
+      Swal.fire("Error", "Server error", "error");
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function updateAllProductDropdowns() {
+    document.querySelectorAll(".product-select").forEach(select => {
+      const currentVal = select.value;
+      let options = '<option value="">Select a Product</option>';
+      allProductsList.forEach(p => {
+        const sel = p.name === currentVal ? "selected" : "";
+        options += `<option value="${escapeHtml(p.name)}" ${sel}>${escapeHtml(p.name)}</option>`;
+      });
+      select.innerHTML = options;
+    });
   }
 
   init();

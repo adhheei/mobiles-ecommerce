@@ -31,6 +31,7 @@ app.use(
           "https://accounts.google.com",
           "https://cdn.jsdelivr.net",
           "https://checkout.razorpay.com",
+          "https://cdnjs.cloudflare.com",
           "'unsafe-inline'",
         ],
         styleSrc: [
