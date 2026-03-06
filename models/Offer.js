@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const offerSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+    slogan: { type: String }, // For the subtitle/slogan
     description: { type: String },
     discountPercentage: { type: Number, required: true, min: 0, max: 100 },
     offerType: {

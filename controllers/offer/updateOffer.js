@@ -6,6 +6,7 @@ const updateOffer = async (req, res) => {
         const { id } = req.params;
         const {
             name,
+            slogan,
             discountPercentage,
             offerType,
             targetId,
@@ -18,6 +19,7 @@ const updateOffer = async (req, res) => {
             id,
             {
                 name,
+                slogan,
                 discountPercentage,
                 offerType,
                 targetId,

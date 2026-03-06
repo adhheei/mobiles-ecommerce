@@ -628,10 +628,19 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="offerName" class="form-label">Offer Name</label>
-              <input type="text" id="offerName" class="form-control" value="Summer BOGO Sale" required />
+              <input type="text" id="offerName" class="form-control" required />
             </div>
           </div>
           <div class="col-md-6">
+            <div class="form-group">
+              <label for="slogan" class="form-label">Offer Banner Slogan</label>
+              <input type="text" id="slogan" class="form-control" placeholder="e.g., FLASH SALE: 50% OFF!" />
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-12">
             <div class="form-group">
               <label for="offerType" class="form-label">Offer Type</label>
               <select id="offerType" class="form-select" onchange="loadTargets(this.value)">
@@ -767,6 +776,7 @@
 
         // Populate all form fields
         document.getElementById("offerName").value = offer.name || "";
+        document.getElementById("slogan").value = offer.slogan || "";
         document.getElementById("offerType").value = offer.offerType || "Category";
         document.getElementById("discountValue").value = offer.discountPercentage || "";
         document.getElementById("minPurchase").value = offer.minPurchaseAmount || 0;
@@ -808,6 +818,7 @@
     async function updateOffer() {
       const offerData = {
         name: document.getElementById("offerName").value,
+        slogan: document.getElementById("slogan").value,
         offerType: document.getElementById("offerType").value,
         discountPercentage: parseFloat(
           document.getElementById("discountValue").value,

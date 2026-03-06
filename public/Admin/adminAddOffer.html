@@ -576,13 +576,22 @@
     <div class="form-card">
       <form id="addOfferForm">
         <div class="row mb-3">
-          <div class="col-md-6">
+          <div class="col-md-12">
             <div class="form-group">
               <label for="offerName" class="form-label">Offer Name</label>
               <input type="text" id="offerName" class="form-control" placeholder="e.g., Summer BOGO Sale" />
             </div>
           </div>
-          <div class="col-md-6">
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="slogan" class="form-label">Offer Banner Slogan</label>
+          <textarea id="slogan" class="form-control" rows="3"
+            placeholder="e.g., FLASH SALE: 50% OFF!&#10;Limited time only!"></textarea>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-12">
             <div class="form-group">
               <label for="offerType" class="form-label">Offer Type</label>
               <select id="offerType" class="form-select" onchange="loadTargetsByType(this.value)">
@@ -671,6 +680,7 @@
       // Extract form data
       const offerData = {
         name: document.getElementById("offerName").value,
+        slogan: document.getElementById("slogan").value,
         offerType: document.getElementById("offerType").value, // 'Category' or 'Product'
         discountPercentage: parseFloat(
           document.getElementById("discountValue").value,

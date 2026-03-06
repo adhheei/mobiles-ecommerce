@@ -4,17 +4,18 @@ const { updateProductPrices } = require("./utils");
 
 const addOffer = async (req, res) => {
     try {
-        const { name, discountPercentage, offerType, targetId, startDate, endDate } = req.body;
-        
+        const { name, slogan, discountPercentage, offerType, targetId, startDate, endDate } = req.body;
+
         const newOffer = new Offer({
             name,
+            slogan,
             discountPercentage,
             offerType,
             targetId,
             startDate: new Date(startDate),
             endDate: new Date(endDate),
         });
-        
+
         await newOffer.save();
         await updateProductPrices(offerType, targetId, discountPercentage);
 

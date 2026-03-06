@@ -670,6 +670,7 @@
           <thead>
             <tr>
               <th>Offer Title</th>
+              <th>Slogan</th>
               <th>Type</th>
               <th>Discount Value</th>
               <th>Valid Until</th>
@@ -711,7 +712,7 @@
 
       try {
         tbody.innerHTML =
-          '<tr><td colspan="6" class="text-center py-4">Loading offers...</td></tr>';
+          '<tr><td colspan="7" class="text-center py-4">Loading offers...</td></tr>';
 
         const res = await window.adminFetch(`/api/admin/offers?page=${page}&limit=${limit}`);
         const result = await res.json();
@@ -726,7 +727,7 @@
         }
       } catch (error) {
         console.error("Fetch error:", error);
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">Error: ${error.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-danger">Error: ${error.message}</td></tr>`;
       }
     }
 
@@ -798,7 +799,7 @@
 
       if (data.length === 0) {
         tbody.innerHTML =
-          '<tr><td colspan="6" class="text-center py-4 text-muted">No offers found.</td></tr>';
+          '<tr><td colspan="7" class="text-center py-4 text-muted">No offers found.</td></tr>';
         return;
       }
 
@@ -815,6 +816,7 @@
         const row = `
         <tr>
           <td class="fw-bold">${offer.name}</td>
+          <td class="text-muted small">${offer.slogan || "-"}</td>
           <td><span class="badge-custom ${badgeClass}">${offer.offerType}</span></td>
           <td>${offer.discountPercentage}%</td>
           <td>${expiryDate}</td>
