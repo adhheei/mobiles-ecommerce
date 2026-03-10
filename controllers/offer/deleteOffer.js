@@ -20,17 +20,8 @@ const deleteOffer = async (req, res) => {
 
     // 2. Reset product prices before deleting the offer
     // This prevents products from being "stuck" with a discounted price after the offer is gone
-    if (offer.offerType === "Product") {
-      await Product.updateMany(
-        { _id: offer.targetId }, // targetId is the specific product
-        { $unset: { offerPrice: "" } }, // Removes the offerPrice field entirely
-      );
-    } else if (offer.offerType === "Category") {
-      await Product.updateMany(
-        { category: offer.targetId }, // targetId is the category ID
-        { $unset: { offerPrice: "" } },
-      );
-    }
+    const { resetProductPrices } = require("./utils");
+    await resetProductPrices(offer.offerType, offer.targetId);
 
     // 3. Delete the offer document
     await Offer.findByIdAndDelete(id);

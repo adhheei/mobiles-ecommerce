@@ -1,5 +1,5 @@
 const Offer = require("../../models/Offer");
-const { updateProductPrices } = require("./utils");
+const { updateProductPrices, resetProductPrices } = require("./utils");
 
 const updateOffer = async (req, res) => {
     try {
@@ -14,6 +14,14 @@ const updateOffer = async (req, res) => {
             endDate,
             status,
         } = req.body;
+
+        const oldOffer = await Offer.findById(id);
+        if (!oldOffer) {
+            return res.status(404).json({ success: false, message: "Offer not found" });
+        }
+
+        // Reset the old target's prices back to actualPrice first
+        await resetProductPrices(oldOffer.offerType, oldOffer.targetId);
 
         const updatedOffer = await Offer.findByIdAndUpdate(
             id,
@@ -30,11 +38,7 @@ const updateOffer = async (req, res) => {
             { new: true }
         );
 
-        if (!updatedOffer) {
-            return res.status(404).json({ success: false, message: "Offer not found" });
-        }
-
-        // Recalculate prices if the offer is Active
+        // Apply new prices if the updated offer is Active
         if (status === "Active") {
             await updateProductPrices(offerType, targetId, discountPercentage);
         }
