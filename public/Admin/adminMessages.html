@@ -835,6 +835,72 @@
       renderMessages(filtered);
     }
 
+    function getInitials(name) {
+      if (!name) return 'U';
+      return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    }
+
+    function renderMessages(messages) {
+      const container = document.getElementById("messageListContainer");
+      if (!messages || messages.length === 0) {
+        container.innerHTML = '<div class="p-5 text-center text-muted"><i class="fa-regular fa-envelope-open fa-3x mb-3 text-light-muted"></i><h5>No messages found</h5></div>';
+        return;
+      }
+
+      container.innerHTML = messages.map(msg => {
+        const isUnread = msg.status === 'unread' || (!msg.status && !msg.isRead);
+        const isReplied = msg.status === 'replied';
+        const itemClass = isUnread ? 'unread' : (isReplied ? 'replied' : '');
+        const time = new Date(msg.createdAt).toLocaleString();
+
+        return `
+          <div class="message-item ${itemClass}" onclick="viewMessage('${msg._id}')">
+            <div class="msg-avatar">${getInitials(msg.name)}</div>
+            <div class="msg-content">
+              <div class="d-flex justify-content-between align-items-baseline mb-1">
+                <span class="msg-sender">${msg.name}</span>
+                <span class="msg-time">${time}</span>
+              </div>
+              <span class="msg-subject">${msg.subject}</span>
+              <span class="msg-preview">${msg.message}</span>
+            </div>
+            <div class="msg-actions" onclick="event.stopPropagation()">
+              <button class="action-icon delete" onclick="deleteMessage('${msg._id}')" title="Delete">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function deleteMessage(id) {
+      const result = await Swal.fire({
+        title: 'Delete Message?',
+        text: "This action cannot be undone.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        confirmButtonText: 'Yes, delete it!'
+      });
+
+      if (result.isConfirmed) {
+        try {
+          const response = await window.adminFetch(`/api/admin/messages/${id}`, { method: 'DELETE' });
+          if (response.ok) {
+            Swal.fire('Deleted!', 'Message has been deleted.', 'success');
+            fetchMessages(currentPage);
+          } else {
+            const data = await response.json();
+            Swal.fire('Error', data.message || 'Failed to delete message', 'error');
+          }
+        } catch (error) {
+          console.error(error);
+          Swal.fire('Error', 'Network error occurred', 'error');
+        }
+      }
+    }
+
     // Initialize Modal instance once
     let messageModal;
     let pendingReplyUrl = null;
