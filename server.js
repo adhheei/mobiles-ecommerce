@@ -43,11 +43,14 @@ app.use(
           "https://fonts.googleapis.com",
           "'unsafe-inline'",
         ],
-        imgSrc: ["'self'", "data:", "blob:", "https://*", "http://localhost:*"],
+        imgSrc: ["'self'", "data:", "blob:", "https://*", "http://localhost:*", "http://3.27.6.57:*", "https://3.27.6.57:*"],
         connectSrc: [
           "'self'",
           "http://localhost:*",
           "ws://localhost:*",
+          "http://3.27.6.57:*",
+          "ws://3.27.6.57:*",
+          "https://3.27.6.57:*",
           "https://accounts.google.com",
           "https://*.razorpay.com",
           "https://cdn.jsdelivr.net",
@@ -64,12 +67,19 @@ app.use(
   }),
 );
 
-app.use(cors());
+// Allow requests from your specific IP or all origins for now
+app.use(cors({
+    origin: '*', // This allows all connections - good for testing
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(morgan("dev")); // Changed to 'dev' for cleaner console logs
 app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-app.use(express.static("public"));
+// 1. Tell Express to look inside 'public' AND 'public/User' for CSS/JS
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public', 'User')));
 
 // 🍪 Session & Passport
 app.use(
@@ -88,9 +98,17 @@ app.use("/api", require("./routes"));
 
 // 🏠 Home route
 app.get("/", (req, res) =>
-  res.sendFile(path.join(__dirname, "public", "index.html")),
+  res.sendFile(path.join(__dirname, "public", "User", "index.html")),
 );
 app.get("/favicon.ico", (req, res) => res.status(204).end());
+
+// 2. Fix the "Blank Page" by pointing to the correct index.html
+app.use((req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(__dirname, 'public', 'User', 'index.html'));
+});
 
 
 mongoose

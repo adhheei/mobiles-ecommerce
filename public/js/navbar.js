@@ -209,7 +209,7 @@ function initializeNavbarFeatures() {
                     const div = document.createElement('div');
                     div.className = 'autocomplete-item';
                     div.innerHTML = `<span class="suggestion-name"><i class="fa-solid fa-layer-group me-2 text-secondary"></i>${cat.label}</span>`;
-                    div.onclick = () => window.location.href = `/User/productPage.html?category=${cat.id}`;
+                    div.onclick = () => window.location.href = `/productPage.html?category=${cat.id}`;
                     autocompleteContainer.appendChild(div);
                 });
             }
@@ -246,7 +246,7 @@ function initializeNavbarFeatures() {
                     e.preventDefault();
                     const query = navbarSearch.value.trim();
                     if (query) {
-                        window.location.href = `/User/productPage.html?search=${encodeURIComponent(query)}`;
+                        window.location.href = `/productPage.html?search=${encodeURIComponent(query)}`;
                     }
                 }
             });
@@ -257,7 +257,7 @@ function initializeNavbarFeatures() {
                 searchIcon.addEventListener('click', () => {
                     const query = navbarSearch.value.trim();
                     if (query) {
-                        window.location.href = `/User/productPage.html?search=${encodeURIComponent(query)}`;
+                        window.location.href = `/productPage.html?search=${encodeURIComponent(query)}`;
                     }
                 });
             }
@@ -277,7 +277,7 @@ function initializeNavbarFeatures() {
 window.updateCartBadge = async function () {
     try {
         // Find badge element (search for .fa-cart-shopping parent/sibling)
-        // Assuming typical navbar structure: <a href="/User/cart.html" ...><i class="fa-solid fa-cart-shopping"></i> <span class="badge">...</span></a>
+        // Assuming typical navbar structure: <a href="/cart.html" ...><i class="fa-solid fa-cart-shopping"></i> <span class="badge">...</span></a>
         // Let's look for a generic selector or specific ID if exists. 
         // If not, we will try to find it relative to the icon.
 
@@ -397,8 +397,8 @@ async function checkUserLogin() {
                 <span class="fw-bold" id="nav-username">${userName}</span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm mt-2">
-                <li><a class="dropdown-item" href="/User/userProfilePage.html"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
-                <li><a class="dropdown-item" href="/User/userWishListPage.html"><i class="fa-solid fa-heart me-2"></i>Wishlist</a></li>
+                <li><a class="dropdown-item" href="/userProfilePage.html"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
+                <li><a class="dropdown-item" href="/userWishListPage.html"><i class="fa-solid fa-heart me-2"></i>Wishlist</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item text-danger" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</a></li>
             </ul>
@@ -430,7 +430,7 @@ async function checkUserLogin() {
             headers["Authorization"] = `Bearer ${token}`;
         }
 
-        const res = await fetch('/api/user/profile', { headers });
+        const res = await fetch('/api/profile', { headers });
         console.log("Navbar: Profile Fetch Status:", res.status);
 
         if (res.ok) {
@@ -515,12 +515,12 @@ window.handleLogout = async function () {
                 showConfirmButton: false
             });
 
-            window.location.href = '/User/index.html';
+            window.location.href = '/index.html';
         }
     } catch (error) {
         console.error('Logout error:', error);
         // Fallback force logout
-        window.location.href = '/User/index.html';
+        window.location.href = '/index.html';
     }
 };
 

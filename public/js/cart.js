@@ -27,7 +27,7 @@ async function fetchCart() {
     });
 
     if (res.status === 401) {
-      window.location.href = "/User/userLogin.html";
+      window.location.href = "/userLogin.html";
       return;
     }
 
@@ -74,7 +74,7 @@ function renderCart(cartData) {
            data-price="${item.price}" data-mrp="${item.mrp}"
            data-stock="${item.stock || 0}">
           <div class="cart-img-wrapper">
-            <a href="/User/singleProductPage.html?id=${item.productId}">
+            <a href="/singleProductPage.html?id=${item.productId}">
                 <img src="${imgSrc}" alt="${item.name}" onerror="this.src='${fallback}'" />
             </a>
           </div>
@@ -370,12 +370,12 @@ async function fetchCouponsAndShowModal() {
         text: "Please login to view coupons",
         showConfirmButton: true,
       }).then(() => {
-        window.location.href = "/User/userLogin.html";
+        window.location.href = "/userLogin.html";
       });
       return;
     }
 
-    const res = await fetch("/api/user/coupons", {
+    const res = await fetch("/api/coupons", {
       headers: { Authorization: "Bearer " + token },
     });
     const data = await res.json();
@@ -482,7 +482,7 @@ async function applyCoupon(code, silent = false) {
   const cleanTotal = parseFloat(subtotalText.replace(/[^\d.]/g, ""));
 
   try {
-    const res = await fetch("/api/user/coupons/apply", {
+    const res = await fetch("/api/coupons/apply", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -631,7 +631,7 @@ async function fetchSuggestions(productIds) {
           p.image || "https://placehold.co/100x100/f0f0f0/333?text=No+Image";
 
         const html = `
-                <a href="/User/singleProductPage.html?id=${p.id}" class="rec-card-link">
+                <a href="/singleProductPage.html?id=${p.id}" class="rec-card-link">
                   <div class="mini-rec-card">
                     <img src="${imgUrl}" alt="${p.name}" onerror="this.src='https://placehold.co/100x100/f0f0f0/333?text=No+Image'" />
                     <div class="rec-info">
@@ -673,7 +673,7 @@ async function addToCart(productId) {
       text: "Please login to add items to your cart",
       icon: "warning",
       confirmButtonText: "Login",
-    }).then(() => (window.location.href = "/User/userLogin.html"));
+    }).then(() => (window.location.href = "/userLogin.html"));
     return;
   }
 
@@ -724,5 +724,5 @@ function proceedToCheckout(e) {
   sessionStorage.removeItem("buyNowItem");
 
   // Redirect
-  window.location.href = "/User/address.html";
+  window.location.href = "/address.html";
 }

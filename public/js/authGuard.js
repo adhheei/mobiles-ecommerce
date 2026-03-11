@@ -21,7 +21,7 @@
     }
 
     try {
-        const response = await fetch('/api/user/profile', {
+        const response = await fetch('/api/profile', {
             method: 'GET',
             credentials: 'include' // 🍪 Send cookies
         });
@@ -30,7 +30,7 @@
             // Unauthorized - redirect to login
             console.warn("Session expired or invalid, redirecting to login...");
             const redirectUrl = encodeURIComponent(currentPath);
-            window.location.replace('/User/userLogin.html?redirect=' + redirectUrl + '&msg=login_required');
+            window.location.replace('/userLogin.html?redirect=' + redirectUrl + '&msg=login_required');
         } else if (!response.ok) {
             // Other errors (500, etc) - optional: let it slide or show error
             // For now, if it's not 401, we assume it's okay-ish or let the page handle it

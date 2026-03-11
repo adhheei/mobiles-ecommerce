@@ -571,7 +571,7 @@
         const fullListEl = document.getElementById("fullTransactionList");
 
         try {
-          const res = await fetch("/api/user/wallet", {
+          const res = await fetch("/api/wallet", {
             headers: { Authorization: "Bearer " + token },
           });
           const data = await res.json();

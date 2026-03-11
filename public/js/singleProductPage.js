@@ -278,7 +278,7 @@ async function addToCart() {
       cancelButtonColor: '#d33'
     }).then((result) => {
       if (result.isConfirmed) {
-        window.location.href = '/User/userLogin.html?redirect=' + encodeURIComponent(window.location.pathname);
+        window.location.href = '/userLogin.html?redirect=' + encodeURIComponent(window.location.pathname);
       }
     });
     return;
@@ -420,7 +420,7 @@ let isUserLoggedIn = false;
 // Fetch user wishlist IDs
 async function loadUserWishlist() {
   try {
-    const res = await fetch('/api/user/wishlist');
+    const res = await fetch('/api/wishlist');
     if (res.status === 401) {
       isUserLoggedIn = false;
       userWishlistIds.clear();
@@ -452,7 +452,7 @@ window.toggleWishlist = async function () {
       cancelButtonColor: '#d33'
     }).then((result) => {
       if (result.isConfirmed) {
-        window.location.href = '/User/userLogin.html?redirect=' + encodeURIComponent(window.location.pathname);
+        window.location.href = '/userLogin.html?redirect=' + encodeURIComponent(window.location.pathname);
       }
     });
     return;
@@ -487,7 +487,7 @@ window.toggleWishlist = async function () {
   }
 
   try {
-    const url = isAdding ? '/api/user/wishlist' : `/api/user/wishlist/${productId}`;
+    const url = isAdding ? '/api/wishlist' : `/api/wishlist/${productId}`;
     const method = isAdding ? 'POST' : 'DELETE';
     const body = isAdding ? JSON.stringify({ productId }) : null;
 
@@ -498,7 +498,7 @@ window.toggleWishlist = async function () {
     });
 
     if (res.status === 401) {
-      window.location.href = '/User/userLogin.html';
+      window.location.href = '/userLogin.html';
       return;
     }
 
@@ -645,7 +645,7 @@ document.addEventListener('DOMContentLoaded', (() => {
           cancelButtonText: 'Cancel'
         }).then((result) => {
           if (result.isConfirmed) {
-            window.location.href = '/User/userLogin.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+            window.location.href = '/userLogin.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
           }
         });
         return;
@@ -668,7 +668,7 @@ document.addEventListener('DOMContentLoaded', (() => {
       }));
 
       // Redirect
-      window.location.href = "/User/address.html";
+      window.location.href = "/address.html";
     });
   }
 }));

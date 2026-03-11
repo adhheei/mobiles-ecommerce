@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function fetchWishlist() {
     try {
-        const response = await fetch('/api/user/wishlist');
+        const response = await fetch('/api/wishlist');
         const data = await response.json();
 
         if (data.success) {
@@ -45,7 +45,7 @@ function renderWishlist(products) {
     products.forEach(product => {
         const productHTML = `
             <div class="col-md-6 col-lg-4 product-item" data-id="${product._id}">
-                <div class="wishlist-card ${product.stock === 0 ? 'sold-out' : ''}" onclick="window.location.href='/User/singleProductPage.html?id=${product._id}'">
+                <div class="wishlist-card ${product.stock === 0 ? 'sold-out' : ''}" onclick="window.location.href='/singleProductPage.html?id=${product._id}'">
                         <div class="wishlist-img-box">
                             ${product.stock === 0 ? '<span class="sold-out-badge">Out of Stock</span>' : ''}
                             <img 
@@ -84,7 +84,7 @@ function removeFromWishlist(productId, button) {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const response = await fetch(`/api/user/wishlist/${productId}`, {
+                const response = await fetch(`/api/wishlist/${productId}`, {
                     method: 'DELETE'
                 });
                 const data = await response.json();
@@ -160,7 +160,7 @@ function addToCart(productId) {
             cancelButtonColor: '#d33'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = '/User/userLogin.html?redirect=' + encodeURIComponent(window.location.pathname);
+                window.location.href = '/userLogin.html?redirect=' + encodeURIComponent(window.location.pathname);
             }
         });
         return;

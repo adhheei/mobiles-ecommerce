@@ -444,7 +444,7 @@
             <div class="mb-3">
               <p class="small mb-2">
                 Already a member?
-                <a href="../User/userLogin.html" class="fw-bold text-dark">Log in</a>
+                <a href="../userLogin.html" class="fw-bold text-dark">Log in</a>
               </p>
               <input type="email" class="form-control" placeholder="Email" />
             </div>
@@ -580,7 +580,7 @@
     async function fetchAddresses() {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       if (!token) {
-        window.location.href = "/User/userLogin.html";
+        window.location.href = "/userLogin.html";
         return;
       }
 
@@ -683,7 +683,7 @@
     function openAddressModal(mode, address = null) {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       if (!token) {
-        window.location.href = "/User/userLogin.html";
+        window.location.href = "/userLogin.html";
         return;
       }
 
@@ -838,7 +838,7 @@
       if (addrObj) {
         sessionStorage.setItem("deliveryAddress", JSON.stringify(addrObj));
         localStorage.setItem("selectedAddressId", selectedId); // Keep for legacy/redundancy
-        window.location.href = "/User/paymentPage.html";
+        window.location.href = "/paymentPage.html";
       } else {
         Swal.fire("Error", "Selected address not found in memory. Please refresh.", "error");
       }

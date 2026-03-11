@@ -446,7 +446,7 @@ async function loadUserWishlist() {
   }
 
   try {
-    const res = await fetch("/api/user/wishlist", {
+    const res = await fetch("/api/wishlist", {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -533,7 +533,7 @@ async function toggleWishlist(btn, productId) {
     const currentPath = encodeURIComponent(
       window.location.pathname + window.location.search,
     );
-    window.location.href = `/User/userLogin.html?redirect=${currentPath}`;
+    window.location.href = `/userLogin.html?redirect=${currentPath}`;
     return;
   }
 
@@ -556,8 +556,8 @@ async function toggleWishlist(btn, productId) {
 
   try {
     const url = isAdding
-      ? "/api/user/wishlist"
-      : `/api/user/wishlist/${normalizedId}`; // Ensure backend has :productId route
+      ? "/api/wishlist"
+      : `/api/wishlist/${normalizedId}`; // Ensure backend has :productId route
 
     const options = {
       method: isAdding ? "POST" : "DELETE",
@@ -578,7 +578,7 @@ async function toggleWishlist(btn, productId) {
     if (res.status === 401 || res.status === 403) {
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
-      window.location.href = `/User/userLogin.html?redirect=${encodeURIComponent(window.location.pathname)}`;
+      window.location.href = `/userLogin.html?redirect=${encodeURIComponent(window.location.pathname)}`;
       return;
     }
 
@@ -685,7 +685,7 @@ async function addToCart(productId) {
         const currentPath = encodeURIComponent(
           window.location.pathname + window.location.search,
         );
-        window.location.href = `/User/userLogin.html?redirect=${currentPath}`;
+        window.location.href = `/userLogin.html?redirect=${currentPath}`;
       }
     });
     return;
