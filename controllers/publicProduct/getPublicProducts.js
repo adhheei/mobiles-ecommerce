@@ -48,17 +48,37 @@ const getPublicProducts = async (req, res) => {
 
         const total = await Product.countDocuments(query);
 
-        const formatted = products.map((p) => ({
-            id: p._id.toString(),
-            name: p.name,
-            actualPrice: p.actualPrice,
-            offerPrice: p.offerPrice,
-            stock: p.stock,
-            brand: p.brand || "Generic",
-            categoryName: p.category?.name || "Uncategorized",
-            category: p.category?._id.toString() || "",
-            mainImage: p.mainImage ? `/uploads/products/${path.basename(p.mainImage)}` : "/images/logo.jpg",
-        }));
+        const Offer = require("../../models/Offer");
+        const activeOffers = await Offer.find({ status: "Active" });
+
+        const formatted = products.map((p) => {
+            let isFlat = false;
+            let flatDiscountValue = 0;
+
+            const matchedOffer = activeOffers.find(offer =>
+                (offer.offerType === "Product" && offer.targetId.toString() === p._id.toString()) ||
+                (offer.offerType === "Category" && p.category && offer.targetId.toString() === p.category._id.toString())
+            );
+
+            if (matchedOffer && matchedOffer.discountType === "fixed") {
+                isFlat = true;
+                flatDiscountValue = matchedOffer.discountValue;
+            }
+
+            return {
+                id: p._id.toString(),
+                name: p.name,
+                actualPrice: p.actualPrice,
+                offerPrice: p.offerPrice,
+                stock: p.stock,
+                brand: p.brand || "Generic",
+                categoryName: p.category?.name || "Uncategorized",
+                category: p.category?._id.toString() || "",
+                mainImage: p.mainImage ? `/uploads/products/${path.basename(p.mainImage)}` : "/images/logo.jpg",
+                isFlat,
+                flatDiscountValue
+            };
+        });
 
         res.json({
             success: true,

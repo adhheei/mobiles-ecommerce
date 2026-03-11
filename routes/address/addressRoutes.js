@@ -7,18 +7,17 @@ const {
     updateAddress,
     deleteAddress,
     setDefaultAddress,
-} = require("../controllers/address");
-const { protect } = require("../middleware/authMiddleware");
+} = require("../../controllers/address");
+const { protect } = require("../../middleware/authMiddleware");
 
 router.use(protect);
 
-// Standard CRUD Routes
 router.post("/", addAddress);
 router.get("/", getAddresses);
 router.get("/:id", getAddress);
 router.put("/:id", updateAddress);
 router.delete("/:id", deleteAddress);
 
-router.patch("/:id/default", setDefaultAddress);
+router.patch("/:id/default", setDefaultAddress); 
 
 module.exports = router;

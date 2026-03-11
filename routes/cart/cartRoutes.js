@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const cart = require("../controllers/cart");
-const order = require("../controllers/order");
-const razorpay = require("../controllers/razorpay");
-const { protect } = require("../middleware/authMiddleware");
+const cart = require("../../controllers/cart");
+const order = require("../../controllers/order");
+const razorpay = require("../../controllers/razorpay");
+const { protect } = require("../../middleware/authMiddleware");
 
 if (!protect) {
     console.error("❌ ERROR: 'protect' middleware is undefined. Check authMiddleware.js!");

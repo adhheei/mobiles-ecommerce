@@ -782,10 +782,11 @@ function renderProductCard(product) {
     <div class="col-6 col-md-4 col-lg-3 col-xl-20-percent mb-4">
       <div class="product-card h-100 ${isOutOfStock ? "sold-out" : ""}">
         <div class="card-img-wrapper" data-id="${pId}">
-          ${hasDiscount ? `<div class="sale-badge">SAVE ${discountPercent}%</div>` : ""}
+          ${hasDiscount ? (product.isFlat ? `<div class="sale-badge">FLAT ₹${product.flatDiscountValue}</div>` : `<div class="sale-badge">SAVE ${discountPercent}%</div>`) : ""}
           <button class="wishlist-btn ${userWishlistIds.has(pId) ? "active" : ""}" data-id="${pId}">
             <i class="fa-${userWishlistIds.has(pId) ? "solid" : "regular"} fa-heart"></i>
           </button>
+          ${isOutOfStock ? `<div class="badge-overlay"><div class="sold-out-badge">Stock Out</div></div>` : ""}
           ${!isOutOfStock ? `<div class="add-to-cart-banner" data-id="${pId}">ADD TO CART</div>` : ""}
           <img src="${product.mainImage || "/images/logo.jpg"}" alt="${product.name}" onerror="this.src='/images/logo.jpg'" />
         </div>

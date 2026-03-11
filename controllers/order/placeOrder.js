@@ -134,7 +134,7 @@ const placeOrder = async (req, res) => {
         totalAmount: Math.max(0, finalAmount - walletDeducted),
       },
       paymentMethod,
-      paymentStatus: finalAmount - walletDeducted <= 0 ? "Paid" : "Pending",
+      paymentStatus: (finalAmount - walletDeducted <= 0 || (paymentMethod && paymentMethod.toUpperCase() === "RAZORPAY")) ? "Paid" : "Pending",
       shippingAddress: { ...addr.toObject() },
       appliedCoupon: appliedCouponCode,
     });

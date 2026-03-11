@@ -785,7 +785,7 @@
         if (sortOption === "oldest")
           return new Date(a.createdAt) - new Date(b.createdAt);
         if (sortOption === "value-high")
-          return b.discountPercentage - a.discountPercentage;
+          return (b.discountValue || b.discountPercentage) - (a.discountValue || a.discountPercentage);
         return 0;
       });
 
@@ -803,7 +803,7 @@
         return;
       }
 
-      data.forEach((offer) => {
+      data.forEach((offer, index) => {
         // Mapping Schema: offerType ('Category'/'Product') and status ('Active'/'Inactive')
         let badgeClass =
           offer.offerType === "Product" ? "offer-product" : "offer-referral";
@@ -813,12 +813,24 @@
         // Formatting date from ISO string
         const expiryDate = new Date(offer.endDate).toLocaleDateString();
 
+        const discountDisplay = offer.discountType === "fixed"
+          ? `₹${offer.discountValue}`
+          : `${offer.discountValue || offer.discountPercentage}%`;
+
         const row = `
-        <tr>
-          <td class="fw-bold">${offer.name}</td>
-          <td class="text-muted small">${offer.slogan || "-"}</td>
+        <tr class="content-animate" style="animation-delay: ${index * 0.05}s;">
+          <td>
+            <div class="d-flex flex-column">
+              <strong>${offer.name}</strong>
+            </div>
+          </td>
+          <td>
+            <span class="text-muted" style="font-size: 0.85rem">${offer.slogan || "-"}</span>
+          </td>
           <td><span class="badge-custom ${badgeClass}">${offer.offerType}</span></td>
-          <td>${offer.discountPercentage}%</td>
+          <td>
+            <strong>${discountDisplay}</strong>
+          </td>
           <td>${expiryDate}</td>
           <td><span class="badge-custom ${statusClass}">${offer.status}</span></td>
           <td class="text-end">

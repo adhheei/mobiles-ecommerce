@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../controllers/auth");
+const auth = require("../../controllers/auth");
 
 // 1. REGISTRATION & LOGIN
 router.post("/signup", auth.signup);
@@ -10,7 +10,7 @@ router.post("/logout", auth.logout);
 // 2. OTP MANAGEMENT (Signup & Forgot Password)
 router.post("/send-otp", auth.sendOtp);
 router.post("/verify-otp", auth.verifyOtp);
-router.post("/resend-otp", auth.sendOtp); // Reuses sendOtp logic
+router.post("/resend-otp", auth.sendOtp); 
 
 // 3. PASSWORD RECOVERY
 router.post("/reset-password", auth.resetPassword);

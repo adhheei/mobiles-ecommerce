@@ -1551,26 +1551,27 @@
       if (!slider) return;
 
       try {
-        const res = await fetch("/api/admin/offers/hot");
+        const res = await fetch("/api/admin/offers/hot?limit=4");
         const data = await res.json();
 
         if (data.success && data.deals && data.deals.length > 0) {
           slider.innerHTML = data.deals
             .map((product) => {
               const pId = product._id;
+              const isOutOfStock = product.stock === 0 || product.status === "outofstock";
               const salePrice = product.offerPrice || 0;
               const regularPrice = product.actualPrice || 0;
               const discount = product.discountPercentage || 0;
 
               return `
 <div class="col-6 col-sm-6 col-md-3 mb-4">
-    <div class="product-card h-100 bg-white rounded-4 shadow-sm border-0 d-flex flex-column overflow-hidden position-relative"
+    <div class="product-card h-100 bg-white rounded-4 shadow-sm border-0 d-flex flex-column overflow-hidden position-relative ${isOutOfStock ? "opacity-75" : ""}"
          onclick="window.location.href='/User/singleProductPage.html?id=${pId}'"
          style="cursor: pointer;">
         
         <span class="badge bg-danger position-absolute top-0 start-0 m-2 px-2 py-1" 
               style="z-index: 3; font-size: 0.65rem; border-radius: 4px;">
-            SAVE ${discount}%
+            ${product.isFlat ? `FLAT ₹${product.flatDiscountValue}` : `SAVE ${discount}%`}
         </span>
 
         <button class="btn btn-light rounded-circle position-absolute top-0 end-0 m-2 shadow-sm d-flex align-items-center justify-content-center"
@@ -1579,7 +1580,8 @@
             <i class="fa-regular fa-heart text-dark" style="font-size: 1rem;"></i>
         </button>
 
-        <div class="p-3 d-flex align-items-center justify-content-center" style="height: 180px;">
+        <div class="p-3 d-flex align-items-center justify-content-center position-relative" style="height: 180px;">
+            ${isOutOfStock ? '<div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-50" style="z-index: 4;"><span class="badge bg-dark px-3 py-2 fs-6">Sold Out</span></div>' : ""}
             <img src="${formatImageUrl(product.mainImage)}" 
                  class="mw-100 mh-100 object-fit-contain" 
                  alt="${product.name}" 
@@ -1587,10 +1589,14 @@
         </div>
 
         <div class="px-3 mt-auto">
+            ${!isOutOfStock ? `
             <button class="btn btn-primary w-100 py-2 rounded-pill fw-bold" style="font-size: 0.8rem;"
                     onclick="event.stopPropagation();addToCart('${pId}')">
                 ADD TO CART
-            </button>
+            </button>` : `
+            <button class="btn btn-secondary w-100 py-2 rounded-pill fw-bold" style="font-size: 0.8rem;" disabled>
+                OUT OF STOCK
+            </button>`}
         </div>
 
         <div class="p-3 d-flex flex-column">

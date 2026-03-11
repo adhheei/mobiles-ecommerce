@@ -439,12 +439,19 @@ async function checkUserLogin() {
                 const userData = { ...data.user, name: data.user.firstName || 'User' };
                 // Update UI (refreshes image/name)
                 renderLoggedInParams(userData);
+            } else {
+                // Not authenticated
+                const loginBtn = document.getElementById('nav-login');
+                if (loginBtn) loginBtn.classList.remove('d-none');
             }
         } else if (res.status === 401) {
             // Cookie and Token invalid
-            // Ensure no dropdown is shown
             const userDropdown = document.querySelector('.dropdown.ms-4');
             if (userDropdown) userDropdown.remove();
+
+            // Show Login Button
+            const loginBtn = document.getElementById('nav-login');
+            if (loginBtn) loginBtn.classList.remove('d-none');
 
             // Clear invalid token
             localStorage.removeItem("token");
@@ -452,9 +459,15 @@ async function checkUserLogin() {
 
             // Force clear server-side cookie
             await fetch('/api/auth/logout', { method: 'POST' });
+        } else {
+            // Other errors
+            const loginBtn = document.getElementById('nav-login');
+            if (loginBtn) loginBtn.classList.remove('d-none');
         }
     } catch (err) {
         console.error("Auth check failed", err);
+        const loginBtn = document.getElementById('nav-login');
+        if (loginBtn) loginBtn.classList.remove('d-none');
     }
 }
 

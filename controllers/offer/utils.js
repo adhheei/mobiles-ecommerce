@@ -1,21 +1,25 @@
 const Product = require("../../models/Product");
 
-const updateProductPrices = async (offerType, targetId, discountPercentage) => {
+const updateProductPrices = async (offerType, targetId, discountValue, discountType = "percentage") => {
+  const calculateOfferPrice = (actualPrice) => {
+    if (discountType === "fixed") {
+      return Math.max(0, actualPrice - discountValue);
+    }
+    // Default to percentage
+    return Math.round(actualPrice * (1 - discountValue / 100));
+  };
+
   if (offerType === "Category") {
     const products = await Product.find({ category: targetId });
     const updatePromises = products.map((product) => {
-      product.offerPrice = Math.round(
-        product.actualPrice * (1 - discountPercentage / 100),
-      );
+      product.offerPrice = calculateOfferPrice(product.actualPrice);
       return product.save();
     });
     await Promise.all(updatePromises);
   } else {
     const product = await Product.findById(targetId);
     if (product) {
-      product.offerPrice = Math.round(
-        product.actualPrice * (1 - discountPercentage / 100),
-      );
+      product.offerPrice = calculateOfferPrice(product.actualPrice);
       await product.save();
     }
   }

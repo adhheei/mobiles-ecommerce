@@ -5,7 +5,12 @@ const offerSchema = new mongoose.Schema(
     name: { type: String, required: true },
     slogan: { type: String }, // For the subtitle/slogan
     description: { type: String },
-    discountPercentage: { type: Number, required: true, min: 0, max: 100 },
+    discountValue: { type: Number, required: true, min: 0 },
+    discountType: {
+      type: String,
+      enum: ["percentage", "fixed"],
+      default: "percentage"
+    },
     offerType: {
       type: String,
       enum: ["Product", "Category"],

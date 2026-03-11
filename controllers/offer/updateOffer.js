@@ -7,7 +7,8 @@ const updateOffer = async (req, res) => {
         const {
             name,
             slogan,
-            discountPercentage,
+            discountValue,
+            discountType,
             offerType,
             targetId,
             startDate,
@@ -28,7 +29,8 @@ const updateOffer = async (req, res) => {
             {
                 name,
                 slogan,
-                discountPercentage,
+                discountValue,
+                discountType,
                 offerType,
                 targetId,
                 startDate,
@@ -40,7 +42,7 @@ const updateOffer = async (req, res) => {
 
         // Apply new prices if the updated offer is Active
         if (status === "Active") {
-            await updateProductPrices(offerType, targetId, discountPercentage);
+            await updateProductPrices(offerType, targetId, discountValue, discountType);
         }
 
         res.status(200).json({ success: true, message: "Offer updated successfully" });

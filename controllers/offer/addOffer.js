@@ -4,12 +4,13 @@ const { updateProductPrices } = require("./utils");
 
 const addOffer = async (req, res) => {
     try {
-        const { name, slogan, discountPercentage, offerType, targetId, startDate, endDate } = req.body;
+        const { name, slogan, discountValue, discountType, offerType, targetId, startDate, endDate } = req.body;
 
         const newOffer = new Offer({
             name,
             slogan,
-            discountPercentage,
+            discountValue,
+            discountType,
             offerType,
             targetId,
             startDate: new Date(startDate),
@@ -17,7 +18,7 @@ const addOffer = async (req, res) => {
         });
 
         await newOffer.save();
-        await updateProductPrices(offerType, targetId, discountPercentage);
+        await updateProductPrices(offerType, targetId, discountValue, discountType);
 
         res.status(201).json({ success: true, message: "Offer created successfully" });
     } catch (error) {

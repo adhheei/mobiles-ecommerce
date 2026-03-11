@@ -84,13 +84,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // 🛣️ Routes
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/admin", require("./routes/adminRoutes"));
-app.use("/api/user", require("./routes/userRoutes"));
-app.use("/api/addresses", require("./routes/addressRoutes"));
-app.use("/api/cart", require("./routes/cartRoutes"));
-app.use("/api/orders", require("./routes/orderRoutes"));
-app.use("/api/contact", require("./routes/contactRoutes"));
+app.use("/api", require("./routes"));
 
 // 🏠 Home route
 app.get("/", (req, res) =>
@@ -98,13 +92,12 @@ app.get("/", (req, res) =>
 );
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 
-// 🔄 Database Connection
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => console.error("❌ MongoDB Error:", err.message));
 
-// 🌍 Global Error Handler
 app.use((err, req, res, next) => {
   console.error("🔥 Server Error:", err.stack);
   res.status(err.status || 500).json({
