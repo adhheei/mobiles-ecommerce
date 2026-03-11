@@ -230,7 +230,7 @@ function handleCredentialResponse(response) {
 }
 
 window.onload = function () {
-  const YOUR_GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID"; // TODO: Replace this with your actual Client ID
+  const YOUR_GOOGLE_CLIENT_ID = "92510819112-1065oo49eqdld5bv4e215u6tataun00r.apps.googleusercontent.com";
 
   if (YOUR_GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID" || !YOUR_GOOGLE_CLIENT_ID) {
     console.warn("⚠️ Google Client ID is not set. Google Sign-In is disabled.");

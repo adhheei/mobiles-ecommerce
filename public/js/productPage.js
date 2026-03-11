@@ -18,7 +18,7 @@ const onSaleOnly = document.getElementById("onSaleOnly"); // Ensure this ID exis
 const priceRange = document.getElementById("priceRange");
 
 // Initialize when DOM is ready
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   // 1. Initial URL Parameter Check (For "Explore Now" button)
   const urlParams = new URLSearchParams(window.location.search);
 
@@ -26,16 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (urlParams.get("onSale") === "true" && onSaleOnly) {
     onSaleOnly.checked = true;
   }
-
-  // Load categories and brands
-  loadCategoriesForFilter();
-  loadBrandsForFilter();
-
-  // Load user wishlist FIRST to ensure UI syncs properly
-  loadUserWishlist().finally(() => {
-    // Load products after wishlist is ready
-    setTimeout(loadProducts, 100);
-  });
 
   // Initialize Search from URL
   const navbarSearch = document.getElementById("navbarSearch");
@@ -45,6 +35,16 @@ document.addEventListener("DOMContentLoaded", () => {
       navbarSearch.value = searchParam;
     }
   }
+
+  // Load categories and brands FIRST so URL filters are checked
+  await Promise.all([
+    loadCategoriesForFilter(),
+    loadBrandsForFilter()
+  ]);
+
+  // Load user wishlist THEN load products
+  await loadUserWishlist();
+  loadProducts();
 
   // Setup event listeners
   setupEventListeners();

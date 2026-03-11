@@ -1385,9 +1385,10 @@
 
             let actionBtnHtml = "";
             if (hasStarted) {
+              const tgtId = offer.targetId && offer.targetId._id ? offer.targetId._id : offer.targetId;
               const link = offer.offerType === "Product"
-                ? `./singleProductPage.html?id=${offer.targetId}`
-                : `./productPage.html?category=${offer.targetId}`;
+                ? `./singleProductPage.html?id=${tgtId}`
+                : `./productPage.html?category=${tgtId}`;
 
               actionBtnHtml = `
                     <a href="${link}" class="btn btn-sm btn-light rounded-pill fw-bold text-danger px-4 btn-animate" 
