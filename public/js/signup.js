@@ -44,7 +44,7 @@ document.getElementById("signupForm").addEventListener("submit", async function 
         confirmButtonText: 'Login Now'
       }).then((r) => {
         if (r.isConfirmed) {
-          window.location.href = "userLogin.html";
+          window.location.href = "/userLogin.html";
         }
       });
       signupBtn.disabled = false;
@@ -218,7 +218,7 @@ function handleCredentialResponse(response) {
     .then((data) => {
       if (data.success) {
         alert("Signup successful");
-        window.location.href = "userLogin.html";
+        window.location.href = "/userLogin.html";
       } else {
         alert(data.message || "Google signup failed");
       }
