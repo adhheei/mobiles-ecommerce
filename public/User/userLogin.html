@@ -288,7 +288,7 @@
               const redirectUrl = urlParams.get("redirect");
               window.location.href = redirectUrl
                 ? decodeURIComponent(redirectUrl)
-                : "./index.html";
+                : "/";
             });
           } else {
             Swal.fire({
@@ -335,7 +335,7 @@
               const redirectUrl = urlParams.get("redirect");
               window.location.href = redirectUrl
                 ? decodeURIComponent(redirectUrl)
-                : "/index.html";
+                : "/";
             });
           } else {
             Swal.fire({
