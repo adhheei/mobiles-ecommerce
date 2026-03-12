@@ -21,7 +21,8 @@ const categorySchema = new mongoose.Schema({
     default: true
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  collection: 'categories'
 });
 
 module.exports = mongoose.model('Category', categorySchema);

@@ -21,7 +21,7 @@ const purchaseSchema = new mongoose.Schema(
     ],
     purchaseDate: { type: Date, default: Date.now },
   },
-  { timestamps: true }
+  { timestamps: true, collection: "purchases" }
 );
 
 module.exports = mongoose.model("Purchase", purchaseSchema);

@@ -213,8 +213,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 function formatImageUrl(path) {
   if (!path) return "https://placehold.co/100x120?text=No+Image";
-  if (path.startsWith("http")) return path;
-  let cleanPath = path.replace(/^public\//, "").replace(/\\/g, "/");
+  if (path.startsWith("http") || path.startsWith("data:")) return path;
+  let cleanPath = path.replace(/^public\//, "").replace(/^User\//, "").replace(/\\/g, "/");
   if (!cleanPath.startsWith("/")) cleanPath = "/" + cleanPath;
   return cleanPath;
 }

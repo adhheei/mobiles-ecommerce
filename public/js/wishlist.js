@@ -25,9 +25,9 @@ async function fetchWishlist() {
 
 function formatImageUrl(path) {
     if (!path) return "/images/product_placeholder.png";
-    if (path.startsWith("http")) return path;
-    let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "");
-    return cleanPath.startsWith("/") ? cleanPath : "/" + cleanPath;
+    if (path.startsWith("http") || path.startsWith("data:")) return path;
+    let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "").replace(/^User\//, "").replace(/^\//, "");
+    return "/" + cleanPath;
 }
 
 function renderWishlist(products) {

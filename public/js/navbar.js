@@ -60,7 +60,7 @@ function setActiveLink() {
 
     navLinks.forEach(link => {
         const href = link.getAttribute('href');
-        if (href && (currentPath.includes(href.replace('./', '')) || (currentPath === '/' && href.includes('index.html')))) {
+        if (href && (currentPath.includes(href.replace('./', '')) || (currentPath === '/' && (href === '/' || href.includes('index.html'))))) {
             link.classList.add('active');
         } else {
             link.classList.remove('active');

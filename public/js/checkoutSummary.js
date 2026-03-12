@@ -274,7 +274,8 @@ function formatImage(path) {
   return (
     "/" +
     path
-      .replace(/^public/, "")
+      .replace(/^public\//, "")
+      .replace(/^User\//, "")
       .replace(/\\/g, "/")
       .replace(/^\//, "")
   );

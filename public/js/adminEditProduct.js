@@ -76,9 +76,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Category
         document.getElementById('categorySelect').value = p.category || '';
 
+        const formatImageUrl = (path) => {
+          if (!path) return "/images/logo.jpg";
+          if (path.startsWith("http") || path.startsWith("data:")) return path;
+          let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "").replace(/^User\//, "").replace(/^\//, "");
+          return "/" + cleanPath;
+        };
+
         // Main image
         if (p.mainImage) {
-          mainImageSrc.src = p.mainImage;
+          mainImageSrc.src = formatImageUrl(p.mainImage);
           mainImagePreview.style.display = 'block';
           mainUploadArea.style.display = 'none';
         }

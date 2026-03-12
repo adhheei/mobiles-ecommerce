@@ -34,6 +34,6 @@ const transactionSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-});
+}, { timestamps: true, collection: "transactions" });
 
 module.exports = mongoose.model('Transaction', transactionSchema);

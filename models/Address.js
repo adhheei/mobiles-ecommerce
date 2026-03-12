@@ -53,7 +53,7 @@ const addressSchema = new mongoose.Schema(
             default: false,
         },
     },
-    { timestamps: true }
+    { timestamps: true, collection: "addresses" }
 );
 
 module.exports = mongoose.model("Address", addressSchema);

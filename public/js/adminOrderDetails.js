@@ -81,11 +81,18 @@ function renderOrderDetails(order, totalOrders = 0) {
         }
 
         // Determine image source
+        const formatImageUrl = (path) => {
+            if (!path) return 'https://placehold.co/100x120?text=No+Image';
+            if (path.startsWith('http') || path.startsWith('data:')) return path;
+            let cleanPath = path.replace(/\\/g, '/').replace(/^public\//, '').replace(/^User\//, '').replace(/^\//, '');
+            return '/' + cleanPath;
+        };
+
         let itemImageSrc = 'https://placehold.co/100x120?text=No+Image';
         if (item.productId && item.productId.mainImage) {
-            itemImageSrc = '/' + item.productId.mainImage.replace(/\\/g, '/').replace('public/', '');
+            itemImageSrc = formatImageUrl(item.productId.mainImage);
         } else if (item.image) {
-            itemImageSrc = '/' + item.image.replace(/\\/g, '/').replace('public/', '');
+            itemImageSrc = formatImageUrl(item.image);
         }
 
         itemsHtml += `

@@ -46,6 +46,6 @@ const messageSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
-});
+}, { timestamps: true, collection: "messages" });
 
 module.exports = mongoose.model("Message", messageSchema);

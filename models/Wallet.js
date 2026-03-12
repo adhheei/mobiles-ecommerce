@@ -43,7 +43,7 @@ const walletSchema = new mongoose.Schema({
         min: 0
     },
     transactions: [walletTransactionSchema]
-}, { timestamps: true });
+}, { timestamps: true, collection: "wallets" });
 
 // Prevent negative balance
 walletSchema.pre('save', function () {

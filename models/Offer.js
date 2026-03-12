@@ -29,7 +29,7 @@ const offerSchema = new mongoose.Schema(
       default: 0,
     },
   },
-  { timestamps: true },
+  { timestamps: true, collection: "offers" },
 );
 
 module.exports = mongoose.model("Offer", offerSchema);

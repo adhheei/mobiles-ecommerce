@@ -2,6 +2,14 @@
 
 let currentProduct = null;
 
+// Helper for image paths
+function formatImageUrl(path) {
+  if (!path) return "/images/logo.jpg";
+  if (path.startsWith("http") || path.startsWith("data:")) return path;
+  let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "").replace(/^User\//, "");
+  return cleanPath.startsWith("/") ? cleanPath : "/" + cleanPath;
+}
+
 // Get product ID from URL
 function getProductId() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -48,7 +56,7 @@ function renderProductDetails(product) {
   currentProduct = product;
 
   // Basic info
-  document.getElementById('mainImage').src = product.mainImage || '/images/logo.jpg';
+  document.getElementById('mainImage').src = formatImageUrl(product.mainImage);
   document.getElementById('mainImage').alt = product.name;
   document.getElementById('vendorText').textContent = product.brand || product.categoryName || 'Generic';
   document.getElementById('productTitle').textContent = product.name;
@@ -150,8 +158,8 @@ function renderProductDetails(product) {
   // Main image as first thumbnail
   const mainThumb = document.createElement('div');
   mainThumb.className = 'thumbnail active';
-  mainThumb.innerHTML = `<img src="${product.mainImage || '/images/logo.jpg'}" alt="Main" />`;
-  mainThumb.onclick = () => changeImage(mainThumb, product.mainImage || '/images/logo.jpg');
+  mainThumb.innerHTML = `<img src="${formatImageUrl(product.mainImage)}" alt="Main" />`;
+  mainThumb.onclick = () => changeImage(mainThumb, formatImageUrl(product.mainImage));
   thumbnailContainer.appendChild(mainThumb);
 
   // Gallery images
@@ -159,8 +167,8 @@ function renderProductDetails(product) {
     product.gallery.forEach((img, index) => {
       const thumb = document.createElement('div');
       thumb.className = 'thumbnail';
-      thumb.innerHTML = `<img src="${img}" alt="Gallery ${index + 1}" />`;
-      thumb.onclick = () => changeImage(thumb, img);
+      thumb.innerHTML = `<img src="${formatImageUrl(img)}" alt="Gallery ${index + 1}" />`;
+      thumb.onclick = () => changeImage(thumb, formatImageUrl(img));
       thumbnailContainer.appendChild(thumb);
     });
   }
@@ -193,7 +201,7 @@ function renderRelatedProducts(products) {
       <a href="./singleProductPage.html?id=${product.id}" class="product-card-link">
         <div class="product-card h-100 position-relative ${isOutOfStock ? "opacity-75" : ""}">
           ${isOutOfStock ? '<div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-50" style="z-index: 4;"><span class="badge bg-dark px-3 py-2 fs-6">Sold Out</span></div>' : ""}
-          <img src="${product.mainImage || '/images/logo.jpg'}" class="card-img-top" alt="${product.name}" />
+          <img src="${formatImageUrl(product.mainImage)}" class="card-img-top" alt="${product.name}" />
           <div class="card-body">
             <div class="related-vendor">${product.categoryName}</div>
             <div class="related-name">${product.name}</div>
@@ -664,7 +672,7 @@ document.addEventListener('DOMContentLoaded', (() => {
         qty: quantity,
         name: currentProduct.name,
         price: currentProduct.offerPrice || currentProduct.price,
-        image: currentProduct.mainImage
+        image: formatImageUrl(currentProduct.mainImage)
       }));
 
       // Redirect

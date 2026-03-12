@@ -96,7 +96,7 @@ const orderSchema = new mongoose.Schema({
   deliveredAt: {
     type: Date,
   },
-});
+}, { timestamps: true, collection: "orders" });
 
 // Middleware to prevent negative total amounts
 orderSchema.pre("save", async function () {

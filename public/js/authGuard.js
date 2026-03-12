@@ -12,7 +12,8 @@
         'userSignup.html',
         'forgotPassword.html',
         'resetPassword.html',
-        'index.html'
+        'index.html',
+        '/'
     ];
 
     // If we are on a public page, do nothing
