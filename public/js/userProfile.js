@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         firstNameEl.innerText = data.user.firstName || "";
         lastNameEl.innerText = data.user.lastName || "";
         emailEl.innerText = data.user.email || "";
-        mobileEl.innerText = data.user.phone || ""; // Mapping phone -> mobile
+        mobileEl.innerText = data.user.phone || "";
 
         // Update profile image if exists
         if (data.user.profileImage) {
@@ -59,6 +59,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (error) {
       console.error("Error fetching profile:", error);
       // Optionally show an error message on UI
+    } finally {
+      // Fade in the details container regardless of success or failure
+      const details = document.getElementById("profileDetails");
+      if (details) details.style.opacity = "1";
     }
   };
 
