@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function fetchWishlist() {
     try {
-        const response = await fetch('/api/wishlist');
+        const response = await fetch('/api/user/wishlist');
         const data = await response.json();
 
         if (data.success) {
@@ -84,7 +84,7 @@ function removeFromWishlist(productId, button) {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const response = await fetch(`/api/wishlist/${productId}`, {
+                const response = await fetch(`/api/user/wishlist/${productId}`, {
                     method: 'DELETE'
                 });
                 const data = await response.json();
