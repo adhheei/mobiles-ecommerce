@@ -84,7 +84,7 @@ function removeFromWishlist(productId, button) {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const response = await fetch(`/api/user/wishlist/${productId}`, {
+                const response = await fetch(`/api/wishlist/${productId}`, {
                     method: 'DELETE'
                 });
                 const data = await response.json();
