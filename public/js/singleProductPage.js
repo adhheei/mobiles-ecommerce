@@ -1,4 +1,5 @@
 // public/js/singleProductPage.js
+alert("VERIFYING JS FILE - V2");
 
 let currentProduct = null;
 
