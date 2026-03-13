@@ -141,6 +141,13 @@
       opacity: 1;
     }
 
+    #profile-loader {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px;
+    }
+
     .skeleton-text {
       display: inline-block;
       width: 150px;
@@ -440,7 +447,14 @@
       </div>
 
       <div class="col-lg-9 main-content content-animate">
-        <h2 class="page-title text-center text-lg-start">Profile</h2>
+        <div id="profile-loader">
+          <div class="spinner-border text-dark" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+
+        <h2 id="userName" class="page-title text-center text-lg-start"><span class="skeleton-text"
+            style="width: 200px;"></span></h2>
 
         <div class="avatar-section">
           <div class="avatar-wrapper">

@@ -34,6 +34,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         emailEl.innerText = data.user.email || "";
         mobileEl.innerText = data.user.phone || "";
 
+        if (data.user.firstName || data.user.lastName) {
+          const userNameEl = document.getElementById("userName");
+          if (userNameEl) userNameEl.innerText = `${data.user.firstName || ""} ${data.user.lastName || ""}`.trim();
+        }
+
         // Update profile image if exists
         if (data.user.profileImage) {
           let imgSrc = data.user.profileImage;
@@ -60,6 +65,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.error("Error fetching profile:", error);
       // Optionally show an error message on UI
     } finally {
+      // Hide the loader
+      const loader = document.getElementById("profile-loader");
+      if (loader) loader.style.display = "none";
+
       // Reveal the container using the class-based approach requested
       const container = document.getElementById("profile-container");
       if (container) container.classList.add("loaded");
