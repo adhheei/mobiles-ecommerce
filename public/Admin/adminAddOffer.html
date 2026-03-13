@@ -611,7 +611,7 @@
               <label for="discountType" class="form-label">Discount Type</label>
               <select id="discountType" class="form-select" onchange="toggleDiscountSymbol()">
                 <option value="percentage" selected>Percentage (%)</option>
-                <option value="fixed">Fixed Amount (?)</option>
+                <option value="fixed">Fixed Amount (₹)</option>
               </select>
             </div>
           </div>
@@ -780,6 +780,12 @@
         console.error("Failed to load targets:", err);
         targetSelect.innerHTML = '<option value="">Error loading items</option>';
       }
+    }
+
+    function toggleDiscountSymbol() {
+      const type = document.getElementById("discountType").value;
+      const symbol = document.getElementById("discountSymbol");
+      symbol.textContent = type === "percentage" ? "%" : "₹";
     }
 
     // Legacy alias (called on DOMContentLoaded for initial Category load)

@@ -657,7 +657,7 @@
               <label for="discountType" class="form-label">Discount Type</label>
               <select id="discountType" class="form-select" onchange="toggleDiscountSymbol()">
                 <option value="percentage">Percentage (%)</option>
-                <option value="fixed">Fixed Amount (?)</option>
+                <option value="fixed">Fixed Amount (₹)</option>
               </select>
             </div>
           </div>
@@ -908,7 +908,7 @@
     function toggleDiscountSymbol() {
       const type = document.getElementById("discountType").value;
       const symbol = document.getElementById("discountSymbol");
-      symbol.textContent = type === "percentage" ? "%" : "?";
+      symbol.textContent = type === "percentage" ? "%" : "₹";
     }
 
     document.addEventListener("DOMContentLoaded", loadOfferData);

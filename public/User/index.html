@@ -1410,11 +1410,16 @@
                   `;
             }
 
+            const isFixed = offer.discountType === 'fixed';
+            const displayValue = isFixed 
+              ? `FLAT ₹${offer.discountValue} OFF` 
+              : (offer.slogan || offer.name);
+
             slide.innerHTML = `
                 <div class="d-flex align-items-center gap-2">
                   <i class="fa-solid fa-bolt flash-icon m-0" style="color: #ffcc00;"></i>
                   <span class="fw-bold text-uppercase" style="color: #ffcc00; letter-spacing: 2px; line-height: 1.1; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-                    ${offer.slogan || offer.name}
+                    ${displayValue}
                   </span>
                 </div>
                 ${actionBtnHtml}
