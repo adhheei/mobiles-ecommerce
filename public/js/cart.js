@@ -471,10 +471,9 @@ window.selectCoupon = function (code) {
 
 function formatImageUrl(path) {
   if (!path) return "https://placehold.co/100x120?text=No+Image";
-  if (path.startsWith("http")) return path;
-  // Normalize slashes FIRST, then remove public/ prefix
-  let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "");
-  return cleanPath.startsWith("/") ? cleanPath : "/" + cleanPath;
+  if (path.startsWith("http") || path.startsWith("data:")) return path;
+  let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "").replace(/^User\//, "").replace(/^\//, "");
+  return "/" + cleanPath;
 }
 
 async function applyCoupon(code, silent = false) {

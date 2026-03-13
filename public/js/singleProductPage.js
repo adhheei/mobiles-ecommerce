@@ -6,8 +6,8 @@ let currentProduct = null;
 function formatImageUrl(path) {
   if (!path) return "/images/logo.jpg";
   if (path.startsWith("http") || path.startsWith("data:")) return path;
-  let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "").replace(/^User\//, "");
-  return cleanPath.startsWith("/") ? cleanPath : "/" + cleanPath;
+  let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "").replace(/^User\//, "").replace(/^\//, "");
+  return "/" + cleanPath;
 }
 
 // Get product ID from URL

@@ -88,12 +88,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Render table
   function renderTable(products) {
-    const formatImageUrl = (path) => {
-      if (!path) return "/images/logo.jpg";
+    function formatImageUrl(path) {
+      if (!path) return "https://placehold.co/100x120?text=No+Image";
       if (path.startsWith("http") || path.startsWith("data:")) return path;
       let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "").replace(/^User\//, "").replace(/^\//, "");
       return "/" + cleanPath;
-    };
+    }
 
     const tbody = document.getElementById("productsTableBody");
     tbody.innerHTML = "";

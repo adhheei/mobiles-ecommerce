@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const div = document.createElement('div');
             div.className = 'thumbnail-item';
             div.innerHTML = `
-              <img src="${imgUrl}" alt="Gallery Image">
+              <img src="${formatImageUrl(imgUrl)}" alt="Gallery Image">
               <button type="button" class="remove-btn">×</button>
             `;
             galleryContainer.appendChild(div);

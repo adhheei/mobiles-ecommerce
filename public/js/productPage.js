@@ -130,9 +130,9 @@ function debounce(func, wait) {
 // Helper for image paths
 function formatImageUrl(path) {
   if (!path) return "/images/logo.jpg";
-  if (path.startsWith("http")) return path;
-  let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "");
-  return cleanPath.startsWith("/") ? cleanPath : "/" + cleanPath;
+  if (path.startsWith("http") || path.startsWith("data:")) return path;
+  let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "").replace(/^User\//, "").replace(/^\//, "");
+  return "/" + cleanPath;
 }
 
 // Common functions
@@ -788,7 +788,7 @@ function renderProductCard(product) {
           </button>
           ${isOutOfStock ? `<div class="badge-overlay"><div class="sold-out-badge">Stock Out</div></div>` : ""}
           ${!isOutOfStock ? `<div class="add-to-cart-banner" data-id="${pId}">ADD TO CART</div>` : ""}
-          <img src="${product.mainImage || "/images/logo.jpg"}" alt="${product.name}" onerror="this.src='/images/logo.jpg'" />
+          <img src="${formatImageUrl(product.mainImage)}" alt="${product.name}" onerror="this.src='/images/logo.jpg'" />
         </div>
         <div class="product-info px-2">
           <div class="product-vendor">${product.brand || "Generic"}</div>

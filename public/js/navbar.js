@@ -70,9 +70,9 @@ function setActiveLink() {
 
 function formatImageUrl(path) {
     if (!path) return "/images/logo.jpg";
-    if (path.startsWith("http")) return path;
-    let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "");
-    return cleanPath.startsWith("/") ? cleanPath : "/" + cleanPath;
+    if (path.startsWith("http") || path.startsWith("data:")) return path;
+    let cleanPath = path.replace(/\\/g, "/").replace(/^public\//, "").replace(/^User\//, "").replace(/^\//, "");
+    return "/" + cleanPath;
 }
 
 // Main initialization function
@@ -359,13 +359,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Check for User Login State
 async function checkUserLogin() {
-    // No more localStorage. Rely on cookie.
     const navIcons = document.querySelector('.nav-icons');
     if (!navIcons) return;
 
+    const loginBtn = document.getElementById('nav-login');
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+
+    // If no token exists, show login button immediately to prevent delay/flicker
+    if (!token) {
+        if (loginBtn) loginBtn.classList.remove('d-none');
+        return;
+    }
+
     const renderLoggedInParams = (userData) => {
-        // Find existing login button
-        const loginBtn = document.getElementById('nav-login');
+        // Remove login button if it exists
         if (loginBtn) loginBtn.remove();
 
         // Check if dropdown already exists
@@ -420,53 +427,37 @@ async function checkUserLogin() {
         }
     };
 
-    // Verify with backend (Cookie/Token Check)
+    // Verify with backend
     try {
-        const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-        console.log("Navbar: Token present?", !!token, token ? token.substring(0, 10) + "..." : "");
-
         const headers = {};
         if (token) {
             headers["Authorization"] = `Bearer ${token}`;
         }
 
         const res = await fetch('/api/profile', { headers });
-        console.log("Navbar: Profile Fetch Status:", res.status);
 
         if (res.ok) {
             const data = await res.json();
             if (data.success && data.user) {
                 const userData = { ...data.user, name: data.user.firstName || 'User' };
-                // Update UI (refreshes image/name)
                 renderLoggedInParams(userData);
             } else {
-                // Not authenticated
-                const loginBtn = document.getElementById('nav-login');
                 if (loginBtn) loginBtn.classList.remove('d-none');
             }
-        } else if (res.status === 401) {
-            // Cookie and Token invalid
-            const userDropdown = document.querySelector('.dropdown.ms-4');
-            if (userDropdown) userDropdown.remove();
-
-            // Show Login Button
-            const loginBtn = document.getElementById('nav-login');
-            if (loginBtn) loginBtn.classList.remove('d-none');
-
-            // Clear invalid token
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-
-            // Force clear server-side cookie
-            await fetch('/api/auth/logout', { method: 'POST' });
         } else {
-            // Other errors
-            const loginBtn = document.getElementById('nav-login');
+            // Not authenticated or error
+            if (res.status === 401) {
+                const userDropdown = document.querySelector('.dropdown.ms-4');
+                if (userDropdown) userDropdown.remove();
+                
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                await fetch('/api/auth/logout', { method: 'POST' });
+            }
             if (loginBtn) loginBtn.classList.remove('d-none');
         }
     } catch (err) {
         console.error("Auth check failed", err);
-        const loginBtn = document.getElementById('nav-login');
         if (loginBtn) loginBtn.classList.remove('d-none');
     }
 }
