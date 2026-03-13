@@ -13,7 +13,7 @@ const getWishlist = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      wishlist: user.wishlist || [],
+      wishlist: (user.wishlist || []).filter((item) => item !== null),
     });
   } catch (error) {
     console.error("Wishlist Error:", error);
