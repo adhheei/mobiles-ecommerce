@@ -782,7 +782,7 @@ function renderProductCard(product) {
     <div class="col-6 col-md-4 col-lg-3 col-xl-20-percent mb-4">
       <div class="product-card h-100 ${isOutOfStock ? "sold-out" : ""}">
         <div class="card-img-wrapper" data-id="${pId}">
-          ${hasDiscount ? ((product.isFlat || product.discountType === 'fixed') ? `<div class="sale-badge">FLAT ₹${product.flatDiscountValue || product.discountValue} OFF</div>` : `<div class="sale-badge">SAVE ${discountPercent}%</div>`) : ""}
+          ${hasDiscount ? ((product.isFlat || product.discountType === 'fixed') ? `<div class="sale-badge">FLAT ₹${product.discountValue || product.flatDiscountValue}</div>` : `<div class="sale-badge">SAVE ${product.discountValue || discountPercent}%</div>`) : ""}
           <button class="wishlist-btn ${userWishlistIds.has(pId) ? "active" : ""}" data-id="${pId}">
             <i class="fa-${userWishlistIds.has(pId) ? "solid" : "regular"} fa-heart"></i>
           </button>

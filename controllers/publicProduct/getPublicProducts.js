@@ -76,7 +76,9 @@ const getPublicProducts = async (req, res) => {
                 category: p.category?._id.toString() || "",
                 mainImage: p.mainImage ? `/uploads/products/${path.basename(p.mainImage)}` : "/images/logo.jpg",
                 isFlat,
-                flatDiscountValue
+                flatDiscountValue,
+                discountType: matchedOffer ? matchedOffer.discountType : (p.actualPrice > p.offerPrice ? "percentage" : null),
+                discountValue: matchedOffer ? matchedOffer.discountValue : Math.round(((p.actualPrice - p.offerPrice) / p.actualPrice) * 100)
             };
         });
 

@@ -1578,7 +1578,7 @@
         
         <span class="badge bg-danger position-absolute top-0 start-0 m-2 px-2 py-1" 
               style="z-index: 3; font-size: 0.65rem; border-radius: 4px;">
-            ${(product.isFlat || product.discountType === 'fixed') ? `FLAT ₹${product.flatDiscountValue || product.discountValue} OFF` : `SAVE ${discount}%`}
+            ${(product.isFlat || product.discountType === 'fixed') ? `FLAT ₹${product.discountValue || product.flatDiscountValue}` : `SAVE ${product.discountValue || discount}%`}
         </span>
 
         <button class="btn btn-light rounded-circle position-absolute top-0 end-0 m-2 shadow-sm d-flex align-items-center justify-content-center"

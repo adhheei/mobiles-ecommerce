@@ -46,7 +46,9 @@ const getHotDeals = async (req, res) => {
         // Always provide an effective percentage for the frontend UI badge for basic checks
         discountPercentage: discountPercentage > 0 ? discountPercentage : 0,
         isFlat,
-        flatDiscountValue
+        flatDiscountValue,
+        discountType: matchedOffer ? matchedOffer.discountType : (discountPercentage > 0 ? "percentage" : null),
+        discountValue: matchedOffer ? matchedOffer.discountValue : discountPercentage
       };
     });
 
