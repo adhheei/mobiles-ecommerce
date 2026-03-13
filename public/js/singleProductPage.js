@@ -427,18 +427,26 @@ let isUserLoggedIn = false;
 
 // Fetch user wishlist IDs
 async function loadUserWishlist() {
-  try {
-    const res = await fetch('/api/wishlist');
-    if (res.status === 401) {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) {
       isUserLoggedIn = false;
       userWishlistIds.clear();
       return;
     }
-    const data = await res.json();
-    if (data.success) {
-      isUserLoggedIn = true;
-      userWishlistIds = new Set(data.wishlist.map(item => item._id || item));
-    }
+    try {
+      const res = await fetch('/api/wishlist', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.status === 401) {
+        isUserLoggedIn = false;
+        userWishlistIds.clear();
+        return;
+      }
+      const data = await res.json();
+      if (data.success) {
+        isUserLoggedIn = true;
+        userWishlistIds = new Set(data.wishlist.map(item => String(item._id || item)));
+      }
   } catch (err) {
     console.error('Error loading wishlist:', err);
   }
@@ -499,9 +507,13 @@ window.toggleWishlist = async function () {
     const method = isAdding ? 'POST' : 'DELETE';
     const body = isAdding ? JSON.stringify({ productId }) : null;
 
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     const res = await fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body
     });
 

@@ -9,8 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function fetchWishlist() {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     try {
-        const response = await fetch('/api/user/wishlist');
+        const response = await fetch('/api/wishlist', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         const data = await response.json();
 
         if (data.success) {
@@ -83,9 +88,13 @@ function removeFromWishlist(productId, button) {
         confirmButtonText: 'Yes, remove it!'
     }).then(async (result) => {
         if (result.isConfirmed) {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
             try {
                 const response = await fetch(`/api/wishlist/${productId}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
                 const data = await response.json();
 
