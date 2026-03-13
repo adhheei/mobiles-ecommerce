@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const data = await response.json();
 
-      if (data.success) {
+      if (data.success && data.user) {
         // Populate fields
         firstNameEl.innerText = data.user.firstName || "";
         lastNameEl.innerText = data.user.lastName || "";

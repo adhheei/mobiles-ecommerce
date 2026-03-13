@@ -129,11 +129,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // 4. Update Admin Info in Sidebar
     const adminInfo = JSON.parse(localStorage.getItem("adminInfo") || "{}");
     const sidebarName = document.getElementById("sidebarName");
-    if (sidebarName && adminInfo.email) {
+    if (sidebarName) {
         sidebarName.textContent = adminInfo.name || "Admin";
         const emailSpan = sidebarName.nextElementSibling;
         if (emailSpan && emailSpan.tagName === "SPAN") {
-            emailSpan.textContent = adminInfo.email;
+            emailSpan.textContent = adminInfo.email || "...";
         }
     }
 });
