@@ -446,7 +446,7 @@ async function loadUserWishlist() {
   }
 
   try {
-    const res = await fetch("/api/wishlist", {
+    const res = await fetch("/api/user/wishlist", {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
