@@ -1554,6 +1554,7 @@
 
     // 6. Load Hot Deals (Fixed ID and Banner Layout)
     async function loadHotDeals() {
+      console.log("Loading Hot Deals (Client-side limit: 4)...");
       const slider = document.getElementById("hotDealsSlider");
       if (!slider) return;
 
@@ -1562,9 +1563,13 @@
         const data = await res.json();
 
         if (data.success && data.deals && data.deals.length > 0) {
-          slider.innerHTML = data.deals.slice(0, 4)
+          // Strictly limit to 4 items even if server returns more
+          const displayDeals = data.deals.slice(0, 4);
+          
+          slider.innerHTML = displayDeals
             .map((product) => {
-              const pId = product._id;
+              // Standardize ID access
+              const pId = product._id || product.id;
               const isOutOfStock = product.stock === 0 || product.status === "outofstock";
               const salePrice = product.offerPrice || 0;
               const regularPrice = product.actualPrice || 0;
@@ -1629,6 +1634,8 @@
 </div>`;
             })
             .join("");
+          
+          console.log(`Rendered ${displayDeals.length} Hot Deals.`);
         } else {
           slider.innerHTML =
             '<div class="col-12 text-center text-muted py-5">No active deals found.</div>';
@@ -1638,7 +1645,7 @@
         slider.innerHTML =
           '<div class="col-12 text-center text-danger">Failed to load deals.</div>';
       } finally {
-        loadUserWishlist(); // Sync icons after loading deals
+        setTimeout(loadUserWishlist, 100); // Slight delay to ensure DOM is ready
       }
     }
 
@@ -1756,8 +1763,12 @@
 
     async function loadUserWishlist() {
       const token = localStorage.getItem("token");
-      if (!token) return;
+      if (!token) {
+          console.log("No token, skipping wishlist sync.");
+          return;
+      }
 
+      console.log("Syncing user wishlist icons...");
       try {
         const res = await fetch("/api/wishlist", {
           headers: { Authorization: `Bearer ${token}` },
@@ -1766,22 +1777,37 @@
 
         if (data.success) {
           const wishlistSet = new Set(
-            data.wishlist.map((item) => (item._id || item).toString()),
+            data.wishlist.map((item) => String(item._id || item)),
           );
+          
+          console.log(`User has ${wishlistSet.size} items in wishlist.`);
+
           document.querySelectorAll(".wishlist-btn").forEach((btn) => {
             const pId = btn.getAttribute("data-product-id");
             if (wishlistSet.has(pId)) {
               btn.classList.add("active");
-              btn
-                .querySelector("i")
-                .classList.replace("fa-regular", "fa-solid");
+              const icon = btn.querySelector("i");
+              if (icon) {
+                icon.classList.remove("fa-regular");
+                icon.classList.add("fa-solid");
+                // Optional: Force color if not handled by CSS
+                icon.style.color = "#d32f2f"; 
+              }
+            } else {
+              btn.classList.remove("active");
+              const icon = btn.querySelector("i");
+              if (icon) {
+                icon.classList.remove("fa-solid");
+                icon.classList.add("fa-regular");
+                icon.style.color = "";
+              }
             }
           });
         }
-      } catch (err) {
-        console.error("Wishlist sync error:", err);
-      }
+    } catch (err) {
+      console.error("Wishlist Sync Error:", err);
     }
+  }
 
     // 8. Load Categories
     async function loadCategories() {
