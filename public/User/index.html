@@ -1581,8 +1581,9 @@
             ${(product.isFlat || product.discountType === 'fixed') ? `FLAT ₹${product.discountValue || product.flatDiscountValue}` : `SAVE ${product.discountValue || discount}%`}
         </span>
 
-        <button class="btn btn-light rounded-circle position-absolute top-0 end-0 m-2 shadow-sm d-flex align-items-center justify-content-center"
+        <button class="btn btn-light rounded-circle position-absolute top-0 end-0 m-2 shadow-sm d-flex align-items-center justify-content-center wishlist-btn"
                 style="width: 35px; height: 35px; z-index: 3; background: white;"
+                data-product-id="${pId}"
                 onclick="event.stopPropagation(); toggleWishlist(event, '${pId}')">
             <i class="fa-regular fa-heart text-dark" style="font-size: 1rem;"></i>
         </button>
@@ -1636,6 +1637,8 @@
         console.error("Hot Deals Error:", err);
         slider.innerHTML =
           '<div class="col-12 text-center text-danger">Failed to load deals.</div>';
+      } finally {
+        loadUserWishlist(); // Sync icons after loading deals
       }
     }
 

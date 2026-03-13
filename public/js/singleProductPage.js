@@ -20,7 +20,7 @@ function getProductId() {
 // Fetch product details from backend
 async function fetchProductDetails(productId) {
   try {
-    const response = await fetch(`/api/admin/products/${productId}`);
+    const response = await fetch(`/api/admin/products/public/${productId}`);
     const data = await response.json();
 
     if (data.success && data.product) {

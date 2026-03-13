@@ -12,6 +12,7 @@ router.get("/products/categories-with-counts", product.getCategoriesWithCounts);
 router.get("/products/public", publicProduct.getPublicProducts);
 router.get("/search/suggestions", publicProduct.getSearchSuggestions);
 router.get("/products/brands-with-counts", publicProduct.getBrandsWithCounts);
+router.get("/products/public/:id", product.getProductById);
 router.post("/products/suggestions", publicProduct.getSuggestions);
 
 // ADMIN PRODUCT ROUTES
