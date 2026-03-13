@@ -434,7 +434,7 @@ async function checkUserLogin() {
             headers["Authorization"] = `Bearer ${token}`;
         }
 
-        const res = await fetch('/api/profile', { headers });
+        const res = await fetch('/api/user/profile', { headers });
 
         if (res.ok) {
             const data = await res.json();
