@@ -1562,7 +1562,7 @@
         const data = await res.json();
 
         if (data.success && data.deals && data.deals.length > 0) {
-          slider.innerHTML = data.deals
+          slider.innerHTML = data.deals.slice(0, 4)
             .map((product) => {
               const pId = product._id;
               const isOutOfStock = product.stock === 0 || product.status === "outofstock";
