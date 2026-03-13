@@ -132,6 +132,15 @@
       background-color: #f8f9fa;
     }
 
+    #profile-container {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #profile-container.loaded {
+      opacity: 1;
+    }
+
     /* --- RESPONSIVE SIDEBAR (MOBILE) --- */
     @media (max-width: 991px) {
       .profile-container {
@@ -368,7 +377,7 @@
 
   <div id="navbar-placeholder"></div>
 
-  <div class="profile-container">
+  <div class="profile-container" id="profile-container">
     <div class="row">
       <div class="col-lg-3 sidebar">
         <ul class="sidebar-menu">
@@ -447,7 +456,7 @@
           </div>
         </div>
 
-        <div class="profile-details" id="profileDetails" style="opacity: 0; transition: opacity 0.5s ease;">
+        <div class="profile-details">
           <div class="info-group">
             <div>
               <span class="info-label">First Name</span>

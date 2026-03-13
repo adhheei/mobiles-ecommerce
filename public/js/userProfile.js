@@ -60,9 +60,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.error("Error fetching profile:", error);
       // Optionally show an error message on UI
     } finally {
-      // Fade in the details container regardless of success or failure
-      const details = document.getElementById("profileDetails");
-      if (details) details.style.opacity = "1";
+      // Reveal the container using the class-based approach requested
+      const container = document.getElementById("profile-container");
+      if (container) container.classList.add("loaded");
     }
   };
 
