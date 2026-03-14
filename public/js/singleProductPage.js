@@ -19,9 +19,17 @@ function getProductId() {
 
 // Fetch product details from backend
 async function fetchProductDetails(productId) {
-  console.log("Fetching product details for:", productId);
+  if (!productId) {
+    console.error("fetchProductDetails: No valid productId provided!");
+    throw new Error('Product not found');
+  }
+  
+  const fetchUrl = `/api/admin/products/public/${productId}`;
+  console.log("Fetching product details from:", fetchUrl);
+  
   try {
-    const response = await fetch(`/api/admin/products/public/${productId}`);
+    const response = await fetch(fetchUrl);
+    console.log("Response status:", response.status);
     const data = await response.json();
 
     if (data.success && data.product) {
@@ -372,14 +380,20 @@ async function initPage() {
     // Render product
     renderProductDetails(product);
 
-    // Update Wishlist Button State
-    if (isUserLoggedIn && userWishlistIds.has(product.id || product._id)) {
-      const btn = document.getElementById('wishlistBtn');
-      if (btn) {
-        btn.classList.add('active'); // Ensure button is active (red)
-        const icon = btn.querySelector('i');
-        icon.classList.remove('fa-regular');
-        icon.classList.add('fa-solid');
+    // Initialize Wishlist Button State
+    const wishlistBtn = document.getElementById('wishlistBtn');
+    if (isUserLoggedIn && wishlistBtn) {
+      const productIdStr = String(product.id || product._id);
+      if (userWishlistIds.has(productIdStr)) {
+        console.log("Product is in wishlist, marking button active");
+        wishlistBtn.classList.add('active');
+        const icon = wishlistBtn.querySelector('i');
+        if (icon) {
+          icon.classList.remove('fa-regular');
+          icon.classList.add('fa-solid');
+        }
+      } else {
+        console.log("Product is not in wishlist");
       }
     }
 
