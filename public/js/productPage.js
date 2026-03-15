@@ -241,7 +241,7 @@ async function loadProducts() {
 
   try {
     const res = await fetch(
-      `/api/admin/products/public?${queryParams.toString()}`,
+      `/user/api/admin/products/public?${queryParams.toString()}`,
     );
     const data = await res.json();
 
@@ -324,7 +324,7 @@ window.changePage = function (newPage) {
 // Load categories with product counts for filtering
 async function loadCategoriesForFilter() {
   try {
-    const res = await fetch("/api/admin/products/categories-with-counts");
+    const res = await fetch("/user/api/admin/products/categories-with-counts");
     const data = await res.json();
     if (data.success && data.categories) {
       const categoryList = document.getElementById("categoryList");
@@ -397,7 +397,7 @@ function setupCategoryFilterListeners() {
 // Load brands from backend and inject into the sidebar
 async function loadBrandsForFilter() {
   try {
-    const res = await fetch("/api/admin/products/brands-with-counts");
+    const res = await fetch("/user/api/admin/products/brands-with-counts");
     const data = await res.json();
 
     if (data.success && data.brands) {
@@ -446,7 +446,7 @@ async function loadUserWishlist() {
   }
 
   try {
-    const res = await fetch("/api/wishlist", {
+    const res = await fetch("/user/api/wishlist", {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -556,8 +556,8 @@ async function toggleWishlist(btn, productId) {
 
   try {
     const url = isAdding
-      ? "/api/wishlist"
-      : `/api/wishlist/${normalizedId}`; // Ensure backend has :productId route
+      ? "/user/api/wishlist"
+      : `/user/api/wishlist/${normalizedId}`; // Ensure backend has :productId route
 
     const options = {
       method: isAdding ? "POST" : "DELETE",
@@ -699,7 +699,7 @@ async function addToCart(productId) {
     if (cartBtn?.dataset.loading === "true") return;
     if (cartBtn) cartBtn.dataset.loading = "true";
 
-    const res = await fetch("/api/cart/add", {
+    const res = await fetch("/user/api/cart/add", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

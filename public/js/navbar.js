@@ -176,7 +176,7 @@ function initializeNavbarFeatures() {
             }
 
             try {
-                const res = await fetch(`/api/admin/search/suggestions?q=${encodeURIComponent(query)}`);
+                const res = await fetch(`/user/api/admin/search/suggestions?q=${encodeURIComponent(query)}`);
                 const data = await res.json();
 
                 if (data.success && data.suggestions && data.suggestions.length > 0) {
@@ -292,7 +292,7 @@ window.updateCartBadge = async function () {
         // Logic: if not logged in (no cookie/token), count is 0? 
         // Or if using cookies, we just request.
 
-        const res = await fetch('/api/cart/count', {
+        const res = await fetch('/user/api/cart/count', {
             method: 'GET',
             headers: {
                 // If you use token-based auth mixed with cookies, include header if available
@@ -434,7 +434,7 @@ async function checkUserLogin() {
             headers["Authorization"] = `Bearer ${token}`;
         }
 
-        const res = await fetch('/api/user/profile', { headers });
+        const res = await fetch('/user/api/user/profile', { headers });
 
         if (res.ok) {
             const data = await res.json();
@@ -452,7 +452,7 @@ async function checkUserLogin() {
                 
                 localStorage.removeItem("token");
                 localStorage.removeItem("user");
-                await fetch('/api/auth/logout', { method: 'POST' });
+                await fetch('/user/api/auth/logout', { method: 'POST' });
             }
             if (loginBtn) loginBtn.classList.remove('d-none');
         }
@@ -493,7 +493,7 @@ window.handleLogout = async function () {
 
         if (result.isConfirmed) {
             try {
-                await fetch('/api/auth/logout', { method: 'POST' });
+                await fetch('/user/api/auth/logout', { method: 'POST' });
             } catch (err) {
                 console.warn('Logout API call failed', err);
             }

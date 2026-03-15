@@ -664,7 +664,7 @@
           image: buyNowItem.image,
         });
       } else {
-        const cartRes = await fetch("/api/cart", {
+        const cartRes = await fetch("/user/api/cart", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const cartData = await cartRes.json();
@@ -717,7 +717,7 @@
       try {
         const token =
           localStorage.getItem("token") || sessionStorage.getItem("token");
-        const rzpRes = await fetch("/api/cart/razorpay-order", {
+        const rzpRes = await fetch("/user/api/cart/razorpay-order", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -762,7 +762,7 @@
           didOpen: () => Swal.showLoading(),
         });
 
-        const res = await fetch("/api/cart/checkout", {
+        const res = await fetch("/user/api/cart/checkout", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -819,7 +819,7 @@
       try {
         const token =
           localStorage.getItem("token") || sessionStorage.getItem("token");
-        const res = await fetch("/api/wallet", {
+        const res = await fetch("/user/api/wallet", {
           headers: { Authorization: "Bearer " + token },
         });
         if (res.ok) {

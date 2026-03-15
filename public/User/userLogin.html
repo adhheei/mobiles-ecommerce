@@ -265,7 +265,7 @@
         const password = document.getElementById("password").value;
 
         try {
-          const res = await fetch("/api/auth/login", {
+          const res = await fetch("/user/api/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
@@ -312,7 +312,7 @@
       async function handleCredentialResponse(response) {
         try {
           // This sends the Google ID token to your backend for verification
-          const res = await fetch("/api/auth/google-signup", {
+          const res = await fetch("/user/api/auth/google-signup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ credential: response.credential }),

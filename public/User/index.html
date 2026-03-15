@@ -1744,7 +1744,7 @@
       }
 
       try {
-        const res = await fetch("/api/cart/add", {
+        const res = await fetch("/user/api/cart/add", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -1789,7 +1789,7 @@
 
       console.log("Syncing user wishlist icons...");
       try {
-        const res = await fetch("/api/wishlist", {
+        const res = await fetch("/user/api/wishlist", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -1833,7 +1833,7 @@
       const container = document.getElementById("categorySlider");
       if (!container) return;
       try {
-        const res = await fetch("/api/admin/products/categories/public");
+        const res = await fetch("/user/api/admin/products/categories/public");
         const data = await res.json();
 
         if (data.success && data.data && data.data.length > 0) {

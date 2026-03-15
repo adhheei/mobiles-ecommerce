@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function fetchUserCoupons() {
     try {
-        const res = await fetch("/api/coupons", {
+        const res = await fetch("/user/api/coupons", {
             headers: {
                 'Cache-Control': 'no-cache'
             }

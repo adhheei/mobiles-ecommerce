@@ -27,7 +27,7 @@ document.getElementById("signupForm").addEventListener("submit", async function 
   };
 
   try {
-    const res = await fetch("/api/auth/signup", {
+    const res = await fetch("/user/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -138,7 +138,7 @@ window.verifyOTP = async function () {
   }
 
   try {
-    const res = await fetch("/api/auth/verify-otp", {
+    const res = await fetch("/user/api/auth/verify-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ emailOrPhone: email, otp }),
@@ -177,7 +177,7 @@ window.resendOTP = async function () {
   const email = document.getElementById("otpEmailDisplay").innerText;
 
   try {
-    const res = await fetch("/api/auth/resend-otp", {
+    const res = await fetch("/user/api/auth/resend-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ emailOrPhone: email }),
@@ -205,7 +205,7 @@ window.resendOTP = async function () {
 
 // GOOGLE SIGNUP FUNCTIONALITY
 function handleCredentialResponse(response) {
-  fetch("/api/auth/google-signup", {
+  fetch("/user/api/auth/google-signup", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

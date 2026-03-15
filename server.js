@@ -98,6 +98,7 @@ app.use(passport.session());
 
 // 🛣️ Routes
 app.use("/api", require("./routes"));
+app.use("/user/api", require("./routes")); // Support for /user/api prefix
 
 // 🏠 Admin Route
 app.get("/admin", (req, res) => {

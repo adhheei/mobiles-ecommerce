@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Check for token (handled by authGuard but double check doesn't hurt)
       // The authGuard.js usually ensures we're logged in before this script runs
 
-      const response = await fetch("/api/user/profile", {
+      const response = await fetch("/user/api/user/profile", {
         method: "GET",
         credentials: "include",
       });
@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const payload = {};
         payload[fieldMap[elementId]] = newValue;
 
-        const response = await fetch("/api/user/profile", {
+        const response = await fetch("/user/api/user/profile", {
           method: "PUT",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -224,7 +224,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           formData.append("image", blob, "avatar.jpg");
 
           try {
-            const response = await fetch("/api/avatar", {
+            const response = await fetch("/user/api/avatar", {
               method: "PUT",
               credentials: "include",
               body: formData,
@@ -292,7 +292,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!result.isConfirmed) return;
 
       try {
-        const response = await fetch("/api/avatar", {
+        const response = await fetch("/user/api/avatar", {
           method: "DELETE",
           credentials: "include",
         });

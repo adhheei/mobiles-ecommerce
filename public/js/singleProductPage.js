@@ -24,7 +24,7 @@ async function fetchProductDetails(productId) {
     throw new Error('Product not found');
   }
   
-  const fetchUrl = `/api/admin/products/public/${productId}`;
+  const fetchUrl = `/user/api/admin/products/public/${productId}`;
   console.log("Fetching product details from:", fetchUrl);
   
   try {
@@ -46,7 +46,7 @@ async function fetchProductDetails(productId) {
 // Fetch related products
 async function fetchRelatedProducts(categoryId, currentProductId) {
   try {
-    const response = await fetch(`/api/admin/products/public?category=${categoryId}&limit=5`);
+    const response = await fetch(`/user/api/admin/products/public?category=${categoryId}&limit=5`);
     const data = await response.json();
 
     if (data.success && data.products) {
@@ -306,7 +306,7 @@ async function addToCart() {
   const quantity = parseInt(document.getElementById('qtyInput').value) || 1;
 
   try {
-    const res = await fetch('/api/cart/add', {
+    const res = await fetch('/user/api/cart/add', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -449,7 +449,7 @@ async function loadUserWishlist() {
       return;
     }
     try {
-      const res = await fetch('/api/wishlist', {
+      const res = await fetch('/user/api/wishlist', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.status === 401) {
@@ -518,7 +518,7 @@ window.toggleWishlist = async function () {
   }
 
   try {
-    const url = isAdding ? '/api/wishlist' : `/api/wishlist/${productId}`;
+    const url = isAdding ? '/user/api/wishlist' : `/user/api/wishlist/${productId}`;
     const method = isAdding ? 'POST' : 'DELETE';
     const body = isAdding ? JSON.stringify({ productId }) : null;
 

@@ -22,7 +22,7 @@
     }
 
     try {
-        const response = await fetch('/api/user/profile', {
+        const response = await fetch('/user/api/user/profile', {
             method: 'GET',
             credentials: 'include' // 🍪 Send cookies
         });
