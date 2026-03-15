@@ -506,12 +506,12 @@ window.handleLogout = async function () {
                 showConfirmButton: false
             });
 
-            window.location.href = '/';
+            window.location.href = '/user';
         }
     } catch (error) {
         console.error('Logout error:', error);
         // Fallback force logout
-        window.location.href = '/';
+        window.location.href = '/user';
     }
 };
 

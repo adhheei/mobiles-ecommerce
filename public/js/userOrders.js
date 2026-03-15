@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <i class="fa-solid fa-box-open fa-3x text-muted mb-3"></i>
                         <h5>No Orders Found</h5>
                         <p class="text-muted">Looks like you haven't placed any orders yet.</p>
-                        <a href="/" class="btn btn-dark mt-3">Start Shopping</a>
+                        <a href="/user" class="btn btn-dark mt-3">Start Shopping</a>
                     </div>
                 `;
                 return;
