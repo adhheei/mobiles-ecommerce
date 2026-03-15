@@ -80,7 +80,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 // 1. Static Assets
 app.use(express.static(path.join(__dirname, 'public'))); // Shared assets (css, js, images)
 app.use("/admin", express.static(path.join(__dirname, 'public', 'Admin')));
-app.use("/", express.static(path.join(__dirname, 'public', 'User')));
+app.use("/user", express.static(path.join(__dirname, 'public', 'User')));
 
 app.set('trust proxy', 1);
 
@@ -104,10 +104,16 @@ app.get("/admin", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "Admin", "adminDashboard.html"));
 });
 
-// 🏠 Home route
-app.get("/", (req, res) =>
-  res.sendFile(path.join(__dirname, "public", "User", "index.html")),
-);
+// 🏠 User Route
+app.get("/user", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "User", "index.html"));
+});
+
+// 🏠 Root Redirect
+app.get("/", (req, res) => {
+  res.redirect("/user");
+});
+
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 
 // 2. Catch-all Routing
@@ -121,9 +127,14 @@ app.use((req, res, next) => {
     if (req.path.startsWith('/admin')) {
       return res.sendFile(path.join(__dirname, 'public', 'Admin', 'adminDashboard.html'));
     }
+
+    // If request starts with /user, but wasn't handled by static or explicit route
+    if (req.path.startsWith('/user')) {
+      return res.sendFile(path.join(__dirname, 'public', 'User', 'index.html'));
+    }
     
-    // Default to User website for all other routes
-    res.sendFile(path.join(__dirname, 'public', 'User', 'index.html'));
+    // Default to redirecting to /user for all other routes
+    res.redirect("/user");
 });
 
 
