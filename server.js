@@ -77,9 +77,10 @@ app.use(morgan("dev")); // Changed to 'dev' for cleaner console logs
 app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-// 1. Tell Express to look inside 'public' AND 'public/User' for CSS/JS
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'public', 'User')));
+// 1. Static Assets
+app.use(express.static(path.join(__dirname, 'public'))); // Shared assets (css, js, images)
+app.use("/admin", express.static(path.join(__dirname, 'public', 'Admin')));
+app.use("/", express.static(path.join(__dirname, 'public', 'User')));
 
 app.set('trust proxy', 1);
 
@@ -98,17 +99,30 @@ app.use(passport.session());
 // 🛣️ Routes
 app.use("/api", require("./routes"));
 
+// 🏠 Admin Route
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "Admin", "adminDashboard.html"));
+});
+
 // 🏠 Home route
 app.get("/", (req, res) =>
   res.sendFile(path.join(__dirname, "public", "User", "index.html")),
 );
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 
-// 2. Fix the "Blank Page" by pointing to the correct index.html
+// 2. Catch-all Routing
 app.use((req, res, next) => {
+    // Skip API requests
     if (req.path.startsWith('/api')) {
       return next();
     }
+    
+    // If request starts with /admin, but wasn't handled by static or explicit route
+    if (req.path.startsWith('/admin')) {
+      return res.sendFile(path.join(__dirname, 'public', 'Admin', 'adminDashboard.html'));
+    }
+    
+    // Default to User website for all other routes
     res.sendFile(path.join(__dirname, 'public', 'User', 'index.html'));
 });
 
