@@ -7,10 +7,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Fetch and Render Addresses
     const fetchAddresses = async () => {
         try {
+            const token = localStorage.getItem("token") || sessionStorage.getItem("token");
             const res = await fetch("/api/user/addresses", {
                 headers: {
-                    "Content-Type": "application/json"
-                    // Credentials are handled by cookie (include logic in authGuard or fetch wrapper if needed, but standard fetch sends cookies to same origin)
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
                 }
             });
 
@@ -88,8 +89,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (result.isConfirmed) {
             try {
+                const token = localStorage.getItem("token") || sessionStorage.getItem("token");
                 const res = await fetch(`/api/user/addresses/${id}`, {
-                    method: "DELETE"
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
                 });
 
                 if (res.ok) {
@@ -107,8 +112,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     window.setDefault = async (id) => {
         try {
+            const token = localStorage.getItem("token") || sessionStorage.getItem("token");
             const res = await fetch(`/api/user/addresses/${id}/default`, {
-                method: "PATCH"
+                method: "PATCH",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
             });
 
             if (res.ok) {

@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
     const ordersContainer = document.getElementById("orders-container");
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
     // Cookie fallback
     // if (!token) { window.location.href = "userLogin.html"; return; }

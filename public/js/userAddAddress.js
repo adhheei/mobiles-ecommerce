@@ -37,10 +37,12 @@ async function saveAddress() {
     };
 
     try {
+        const token = localStorage.getItem("token") || sessionStorage.getItem("token");
         const res = await fetch("/api/user/addresses", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify(payload)
         });

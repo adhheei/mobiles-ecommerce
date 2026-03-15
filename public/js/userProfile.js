@@ -10,9 +10,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Check for token (handled by authGuard but double check doesn't hurt)
       // The authGuard.js usually ensures we're logged in before this script runs
 
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       const response = await fetch("/api/user/profile", {
         method: "GET",
-        credentials: "include",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
       });
 
       if (response.status === 401) {
@@ -126,10 +129,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         const payload = {};
         payload[fieldMap[elementId]] = newValue;
 
+        const token = localStorage.getItem("token") || sessionStorage.getItem("token");
         const response = await fetch("/api/user/profile", {
           method: "PUT",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
           body: JSON.stringify(payload),
         });
 
@@ -224,9 +230,12 @@ document.addEventListener("DOMContentLoaded", async () => {
           formData.append("image", blob, "avatar.jpg");
 
           try {
+            const token = localStorage.getItem("token") || sessionStorage.getItem("token");
             const response = await fetch("/api/avatar", {
               method: "PUT",
-              credentials: "include",
+              headers: {
+                "Authorization": `Bearer ${token}`
+              },
               body: formData,
             });
 
@@ -292,9 +301,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!result.isConfirmed) return;
 
       try {
+        const token = localStorage.getItem("token") || sessionStorage.getItem("token");
         const response = await fetch("/api/avatar", {
           method: "DELETE",
-          credentials: "include",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
         });
 
         if (response.status === 401) {

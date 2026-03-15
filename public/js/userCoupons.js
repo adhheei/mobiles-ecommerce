@@ -4,9 +4,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function fetchUserCoupons() {
     try {
-        const res = await fetch("/api/coupons", {
+        const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+        const res = await fetch("/api/user/coupons", {
             headers: {
-                'Cache-Control': 'no-cache'
+                'Cache-Control': 'no-cache',
+                'Authorization': `Bearer ${token}`
             }
         });
 

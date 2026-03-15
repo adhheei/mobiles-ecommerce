@@ -13,7 +13,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Populate Fields
     try {
-        const res = await fetch(`/api/user/addresses/${addressId}`);
+        const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+        const res = await fetch(`/api/user/addresses/${addressId}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
         const data = await res.json();
 
         if (res.ok) {
@@ -52,9 +57,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         };
 
         try {
+            const token = localStorage.getItem("token") || sessionStorage.getItem("token");
             const res = await fetch(`/api/user/addresses/${addressId}`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
                 body: JSON.stringify(payload)
             });
 
@@ -85,8 +94,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
+                    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
                     const res = await fetch(`/api/user/addresses/${addressId}`, {
-                        method: "DELETE"
+                        method: "DELETE",
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
                     });
 
                     if (res.ok) {

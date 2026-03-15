@@ -22,9 +22,12 @@
     }
 
     try {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         const response = await fetch('/api/user/profile', {
             method: 'GET',
-            credentials: 'include' // 🍪 Send cookies
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         });
 
         if (response.status === 401) {
