@@ -51,7 +51,7 @@ async function loadCheckoutSummary() {
         }
       }
     } else {
-      const res = await fetch("/api/cart", {
+      const res = await fetch("/api/user/cart", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -99,7 +99,7 @@ async function loadCheckoutSummary() {
 
     if (appliedCouponCode) {
       try {
-        const cRes = await fetch("/api/coupons/apply", {
+        const cRes = await fetch("/api/user/coupons/apply", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -286,7 +286,7 @@ async function openCouponModal(cartTotal) {
   try {
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
-    const res = await fetch("/api/coupons", {
+    const res = await fetch("/api/user/coupons", {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (res.ok) {
@@ -350,7 +350,7 @@ async function applyCoupon(code, cartTotal) {
   try {
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
-    const res = await fetch("/api/coupons/apply", {
+    const res = await fetch("/api/user/coupons/apply", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

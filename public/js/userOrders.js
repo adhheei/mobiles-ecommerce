@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const headers = {};
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
-        const res = await fetch("/api/orders", { headers });
+        const res = await fetch("/api/user/orders", { headers });
 
         const data = await res.json();
 

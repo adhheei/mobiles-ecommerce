@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const headers = {};
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const res = await fetch(`/api/orders/${orderId}`, { headers });
+    const res = await fetch(`/api/user/orders/${orderId}`, { headers });
     const data = await res.json();
 
     if (res.ok && data.success) {
@@ -269,7 +269,7 @@ async function returnOrder(itemIndex) {
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `/api/orders/${currentOrder._id}/return/${item._id}`,
+        `/api/user/orders/${currentOrder._id}/return/${item._id}`,
         {
           method: "POST",
           headers: {
@@ -305,7 +305,7 @@ async function handleOrderAction(itemIndex, actionType) {
       const body = { action: actionType };
       if (isItem) body.itemId = currentOrder.items[itemIndex]._id;
 
-      const res = await fetch(`/api/orders/${currentOrder._id}/cancel`, {
+      const res = await fetch(`/api/user/orders/${currentOrder._id}/cancel`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -337,7 +337,7 @@ async function downloadPDFReceipt() {
 
   try {
     const response = await fetch(
-      `/api/orders/download-invoice/${currentOrderId}`,
+      `/api/user/orders/download-invoice/${currentOrderId}`,
       {
         method: "GET",
         headers: {

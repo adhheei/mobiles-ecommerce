@@ -14,4 +14,9 @@ router.use("/wallet", require("./user/walletRoutes"));
 
 router.use("/coupons", require("./user/couponRoutes"));
 
+// Consistently mounted user-specific routes
+router.use("/addresses", require("./address/addressRoutes"));
+router.use("/cart", require("./cart/cartRoutes"));
+router.use("/orders", require("./order/orderRoutes"));
+
 module.exports = router;

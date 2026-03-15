@@ -292,7 +292,7 @@ window.updateCartBadge = async function () {
         // Logic: if not logged in (no cookie/token), count is 0? 
         // Or if using cookies, we just request.
 
-        const res = await fetch('/api/cart/count', {
+        const res = await fetch('/api/user/cart/count', {
             method: 'GET',
             headers: {
                 // If you use token-based auth mixed with cookies, include header if available

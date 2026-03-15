@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function fetchWishlist() {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     try {
-        const response = await fetch('/api/wishlist', {
+        const response = await fetch('/api/user/wishlist', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -90,7 +90,7 @@ function removeFromWishlist(productId, button) {
         if (result.isConfirmed) {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
             try {
-                const response = await fetch(`/api/wishlist/${productId}`, {
+                const response = await fetch(`/api/user/wishlist/${productId}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`

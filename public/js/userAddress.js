@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Fetch and Render Addresses
     const fetchAddresses = async () => {
         try {
-            const res = await fetch("/api/addresses", {
+            const res = await fetch("/api/user/addresses", {
                 headers: {
                     "Content-Type": "application/json"
                     // Credentials are handled by cookie (include logic in authGuard or fetch wrapper if needed, but standard fetch sends cookies to same origin)
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (result.isConfirmed) {
             try {
-                const res = await fetch(`/api/addresses/${id}`, {
+                const res = await fetch(`/api/user/addresses/${id}`, {
                     method: "DELETE"
                 });
 
@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     window.setDefault = async (id) => {
         try {
-            const res = await fetch(`/api/addresses/${id}/default`, {
+            const res = await fetch(`/api/user/addresses/${id}/default`, {
                 method: "PATCH"
             });
 

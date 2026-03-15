@@ -446,7 +446,7 @@ async function loadUserWishlist() {
   }
 
   try {
-    const res = await fetch("/api/wishlist", {
+    const res = await fetch("/api/user/wishlist", {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -556,8 +556,8 @@ async function toggleWishlist(btn, productId) {
 
   try {
     const url = isAdding
-      ? "/api/wishlist"
-      : `/api/wishlist/${normalizedId}`; // Ensure backend has :productId route
+      ? "/api/user/wishlist"
+      : `/api/user/wishlist/${normalizedId}`; // Ensure backend has :productId route
 
     const options = {
       method: isAdding ? "POST" : "DELETE",
@@ -699,7 +699,7 @@ async function addToCart(productId) {
     if (cartBtn?.dataset.loading === "true") return;
     if (cartBtn) cartBtn.dataset.loading = "true";
 
-    const res = await fetch("/api/cart/add", {
+    const res = await fetch("/api/user/cart/add", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

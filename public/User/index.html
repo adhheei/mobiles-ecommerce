@@ -1686,8 +1686,8 @@
       try {
         const res = await fetch(
           isAdding
-            ? `${API_BASE}/wishlist`
-            : `${API_BASE}/wishlist/${productId}`,
+            ? `${API_BASE}/user/wishlist`
+            : `${API_BASE}/user/wishlist/${productId}`,
           {
             method: isAdding ? "POST" : "DELETE",
             headers: {
@@ -1743,7 +1743,7 @@
       }
 
       try {
-        const res = await fetch("/api/cart/add", {
+        const res = await fetch("/api/user/cart/add", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -1788,7 +1788,7 @@
 
       console.log("Syncing user wishlist icons...");
       try {
-        const res = await fetch("/api/wishlist", {
+        const res = await fetch("/api/user/wishlist", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();

@@ -306,7 +306,7 @@ async function addToCart() {
   const quantity = parseInt(document.getElementById('qtyInput').value) || 1;
 
   try {
-    const res = await fetch('/api/cart/add', {
+    const res = await fetch('/api/user/cart/add', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -449,7 +449,7 @@ async function loadUserWishlist() {
       return;
     }
     try {
-      const res = await fetch('/api/wishlist', {
+      const res = await fetch('/api/user/wishlist', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.status === 401) {
@@ -518,7 +518,7 @@ window.toggleWishlist = async function () {
   }
 
   try {
-    const url = isAdding ? '/api/wishlist' : `/api/wishlist/${productId}`;
+    const url = isAdding ? '/api/user/wishlist' : `/api/user/wishlist/${productId}`;
     const method = isAdding ? 'POST' : 'DELETE';
     const body = isAdding ? JSON.stringify({ productId }) : null;
 

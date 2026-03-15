@@ -37,7 +37,7 @@ async function saveAddress() {
     };
 
     try {
-        const res = await fetch("/api/addresses", {
+        const res = await fetch("/api/user/addresses", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

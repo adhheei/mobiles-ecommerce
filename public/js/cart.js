@@ -1,4 +1,4 @@
-const API = "/api/cart";
+const API = "/api/user/cart";
 
 // Helper to format currency
 function formatMoney(amount) {
@@ -375,7 +375,7 @@ async function fetchCouponsAndShowModal() {
       return;
     }
 
-    const res = await fetch("/api/coupons", {
+    const res = await fetch("/api/user/coupons", {
       headers: { Authorization: "Bearer " + token },
     });
     const data = await res.json();
@@ -481,7 +481,7 @@ async function applyCoupon(code, silent = false) {
   const cleanTotal = parseFloat(subtotalText.replace(/[^\d.]/g, ""));
 
   try {
-    const res = await fetch("/api/coupons/apply", {
+    const res = await fetch("/api/user/coupons/apply", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
