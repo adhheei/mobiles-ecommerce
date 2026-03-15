@@ -324,7 +324,7 @@ window.changePage = function (newPage) {
 // Load categories with product counts for filtering
 async function loadCategoriesForFilter() {
   try {
-    const res = await fetch("/api/admin/products/categories");
+    const res = await fetch("/api/admin/products/categories-with-counts");
     const data = await res.json();
     if (data.success && data.categories) {
       const categoryList = document.getElementById("categoryList");
@@ -342,7 +342,7 @@ async function loadCategoriesForFilter() {
       data.categories.forEach((cat) => {
         const isChecked = selectedCategories.includes(cat._id);
         const li = document.createElement("li");
-        li.innerHTML = `<input type="checkbox" class="form-check-input" id="category-${cat._id}" value="${cat._id}" ${isChecked ? "checked" : ""} /><label for="category-${cat._id}" class="form-check-label">${cat.name} (${cat.productCount})</label>`;
+        li.innerHTML = `<input type="checkbox" class="form-check-input" id="category-${cat._id}" value="${cat._id}" ${isChecked ? "checked" : ""} /><label for="category-${cat._id}" class="form-check-label">${cat.name}</label>`;
         categoryList.appendChild(li);
       });
       setupCategoryFilterListeners();
