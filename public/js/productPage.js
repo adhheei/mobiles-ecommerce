@@ -324,7 +324,7 @@ window.changePage = function (newPage) {
 // Load categories with product counts for filtering
 async function loadCategoriesForFilter() {
   try {
-    const res = await fetch("/api/admin/products/categories-with-counts");
+    const res = await fetch("/api/admin/products/categories");
     const data = await res.json();
     if (data.success && data.categories) {
       const categoryList = document.getElementById("categoryList");
