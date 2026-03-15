@@ -176,7 +176,7 @@ function initializeNavbarFeatures() {
             }
 
             try {
-                const res = await fetch(`/user/api/admin/search/suggestions?q=${encodeURIComponent(query)}`);
+                const res = await fetch(`/api/admin/search/suggestions?q=${encodeURIComponent(query)}`);
                 const data = await res.json();
 
                 if (data.success && data.suggestions && data.suggestions.length > 0) {
@@ -209,7 +209,7 @@ function initializeNavbarFeatures() {
                     const div = document.createElement('div');
                     div.className = 'autocomplete-item';
                     div.innerHTML = `<span class="suggestion-name"><i class="fa-solid fa-layer-group me-2 text-secondary"></i>${cat.label}</span>`;
-                    div.onclick = () => window.location.href = `/productPage.html?category=${cat.id}`;
+                    div.onclick = () => window.location.href = `/user/productPage.html?category=${cat.id}`;
                     autocompleteContainer.appendChild(div);
                 });
             }
@@ -246,7 +246,7 @@ function initializeNavbarFeatures() {
                     e.preventDefault();
                     const query = navbarSearch.value.trim();
                     if (query) {
-                        window.location.href = `/productPage.html?search=${encodeURIComponent(query)}`;
+                        window.location.href = `/user/productPage.html?search=${encodeURIComponent(query)}`;
                     }
                 }
             });
@@ -257,7 +257,7 @@ function initializeNavbarFeatures() {
                 searchIcon.addEventListener('click', () => {
                     const query = navbarSearch.value.trim();
                     if (query) {
-                        window.location.href = `/productPage.html?search=${encodeURIComponent(query)}`;
+                        window.location.href = `/user/productPage.html?search=${encodeURIComponent(query)}`;
                     }
                 });
             }
@@ -277,7 +277,7 @@ function initializeNavbarFeatures() {
 window.updateCartBadge = async function () {
     try {
         // Find badge element (search for .fa-cart-shopping parent/sibling)
-        // Assuming typical navbar structure: <a href="/cart.html" ...><i class="fa-solid fa-cart-shopping"></i> <span class="badge">...</span></a>
+        // Assuming typical navbar structure: <a href="/user/cart.html" ...><i class="fa-solid fa-cart-shopping"></i> <span class="badge">...</span></a>
         // Let's look for a generic selector or specific ID if exists. 
         // If not, we will try to find it relative to the icon.
 
@@ -292,7 +292,7 @@ window.updateCartBadge = async function () {
         // Logic: if not logged in (no cookie/token), count is 0? 
         // Or if using cookies, we just request.
 
-        const res = await fetch('/user/api/cart/count', {
+        const res = await fetch('/api/cart/count', {
             method: 'GET',
             headers: {
                 // If you use token-based auth mixed with cookies, include header if available
@@ -404,8 +404,8 @@ async function checkUserLogin() {
                 <span class="fw-bold" id="nav-username">${userName}</span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm mt-2">
-                <li><a class="dropdown-item" href="/userProfilePage.html"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
-                <li><a class="dropdown-item" href="/userWishListPage.html"><i class="fa-solid fa-heart me-2"></i>Wishlist</a></li>
+                <li><a class="dropdown-item" href="/user/userProfilePage.html"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
+                <li><a class="dropdown-item" href="/user/userWishListPage.html"><i class="fa-solid fa-heart me-2"></i>Wishlist</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item text-danger" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</a></li>
             </ul>
@@ -434,7 +434,7 @@ async function checkUserLogin() {
             headers["Authorization"] = `Bearer ${token}`;
         }
 
-        const res = await fetch('/user/api/user/profile', { headers });
+        const res = await fetch('/api/user/profile', { headers });
 
         if (res.ok) {
             const data = await res.json();
@@ -452,7 +452,7 @@ async function checkUserLogin() {
                 
                 localStorage.removeItem("token");
                 localStorage.removeItem("user");
-                await fetch('/user/api/auth/logout', { method: 'POST' });
+                await fetch('/api/auth/logout', { method: 'POST' });
             }
             if (loginBtn) loginBtn.classList.remove('d-none');
         }
@@ -493,7 +493,7 @@ window.handleLogout = async function () {
 
         if (result.isConfirmed) {
             try {
-                await fetch('/user/api/auth/logout', { method: 'POST' });
+                await fetch('/api/auth/logout', { method: 'POST' });
             } catch (err) {
                 console.warn('Logout API call failed', err);
             }

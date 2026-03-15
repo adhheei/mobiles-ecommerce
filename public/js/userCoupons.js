@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function fetchUserCoupons() {
     try {
-        const res = await fetch("/user/api/coupons", {
+        const res = await fetch("/api/coupons", {
             headers: {
                 'Cache-Control': 'no-cache'
             }
@@ -12,7 +12,7 @@ async function fetchUserCoupons() {
 
         if (res.status === 401) {
             // Optional: check if authGuard handles this already
-            window.location.href = "/userLogin.html";
+            window.location.href = "/user/userLogin.html";
             return;
         }
 

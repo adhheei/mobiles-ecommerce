@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Fetch and Render Addresses
     const fetchAddresses = async () => {
         try {
-            const res = await fetch("/user/api/addresses", {
+            const res = await fetch("/api/addresses", {
                 headers: {
                     "Content-Type": "application/json"
                     // Credentials are handled by cookie (include logic in authGuard or fetch wrapper if needed, but standard fetch sends cookies to same origin)
@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </div>
                 <div class="action-column">
                     <div class="top-actions">
-                        <a href="./userEditAddress.html?id=${addr._id}" class="action-item" style="text-decoration: none;">
+                        <a href="/user/userEditAddress.html?id=${addr._id}" class="action-item" style="text-decoration: none;">
                             <i class="fa-regular fa-pen-to-square"></i> Edit
                         </a>
                         <span class="action-item delete" onclick="deleteAddress('${addr._id}')">
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (result.isConfirmed) {
             try {
-                const res = await fetch(`/user/api/addresses/${id}`, {
+                const res = await fetch(`/api/addresses/${id}`, {
                     method: "DELETE"
                 });
 
@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     window.setDefault = async (id) => {
         try {
-            const res = await fetch(`/user/api/addresses/${id}/default`, {
+            const res = await fetch(`/api/addresses/${id}/default`, {
                 method: "PATCH"
             });
 

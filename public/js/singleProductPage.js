@@ -24,7 +24,7 @@ async function fetchProductDetails(productId) {
     throw new Error('Product not found');
   }
   
-  const fetchUrl = `/user/api/admin/products/public/${productId}`;
+  const fetchUrl = `/api/admin/products/public/${productId}`;
   console.log("Fetching product details from:", fetchUrl);
   
   try {
@@ -46,7 +46,7 @@ async function fetchProductDetails(productId) {
 // Fetch related products
 async function fetchRelatedProducts(categoryId, currentProductId) {
   try {
-    const response = await fetch(`/user/api/admin/products/public?category=${categoryId}&limit=5`);
+    const response = await fetch(`/api/admin/products/public?category=${categoryId}&limit=5`);
     const data = await response.json();
 
     if (data.success && data.products) {
@@ -207,7 +207,7 @@ function renderRelatedProducts(products) {
     const col = document.createElement('div');
     col.className = 'col-10 col-md-3';
     col.innerHTML = `
-      <a href="./singleProductPage.html?id=${product.id}" class="product-card-link">
+      <a href="/user/singleProductPage.html?id=${product.id}" class="product-card-link">
         <div class="product-card h-100 position-relative ${isOutOfStock ? "opacity-75" : ""}">
           ${isOutOfStock ? '<div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-50" style="z-index: 4;"><span class="badge bg-dark px-3 py-2 fs-6">Sold Out</span></div>' : ""}
           <img src="${formatImageUrl(product.mainImage)}" class="card-img-top" alt="${product.name}" />
@@ -306,7 +306,7 @@ async function addToCart() {
   const quantity = parseInt(document.getElementById('qtyInput').value) || 1;
 
   try {
-    const res = await fetch('/user/api/cart/add', {
+    const res = await fetch('/api/cart/add', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -449,7 +449,7 @@ async function loadUserWishlist() {
       return;
     }
     try {
-      const res = await fetch('/user/api/wishlist', {
+      const res = await fetch('/api/wishlist', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.status === 401) {
@@ -518,7 +518,7 @@ window.toggleWishlist = async function () {
   }
 
   try {
-    const url = isAdding ? '/user/api/wishlist' : `/user/api/wishlist/${productId}`;
+    const url = isAdding ? '/api/wishlist' : `/api/wishlist/${productId}`;
     const method = isAdding ? 'POST' : 'DELETE';
     const body = isAdding ? JSON.stringify({ productId }) : null;
 
@@ -703,7 +703,7 @@ document.addEventListener('DOMContentLoaded', (() => {
       }));
 
       // Redirect
-      window.location.href = "/address.html";
+      window.location.href = "/user/address.html";
     });
   }
 }));

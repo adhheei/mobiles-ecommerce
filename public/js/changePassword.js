@@ -138,7 +138,7 @@ async function handleChangePassword(e) {
     }
 
     try {
-        const res = await fetch("/user/api/change-password", {
+        const res = await fetch("/api/change-password", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

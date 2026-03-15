@@ -27,7 +27,7 @@ document.getElementById("signupForm").addEventListener("submit", async function 
   };
 
   try {
-    const res = await fetch("/user/api/auth/signup", {
+    const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -44,7 +44,7 @@ document.getElementById("signupForm").addEventListener("submit", async function 
         confirmButtonText: 'Login Now'
       }).then((r) => {
         if (r.isConfirmed) {
-          window.location.href = "/userLogin.html";
+          window.location.href = "/user/userLogin.html";
         }
       });
       signupBtn.disabled = false;
@@ -138,7 +138,7 @@ window.verifyOTP = async function () {
   }
 
   try {
-    const res = await fetch("/user/api/auth/verify-otp", {
+    const res = await fetch("/api/auth/verify-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ emailOrPhone: email, otp }),
@@ -161,7 +161,7 @@ window.verifyOTP = async function () {
         timer: 1500,
         showConfirmButton: false
       }).then(() => {
-        window.location.href = "/";
+        window.location.href = "/user";
       });
     } else {
       console.error("Signup: Verification Failed", result);
@@ -177,7 +177,7 @@ window.resendOTP = async function () {
   const email = document.getElementById("otpEmailDisplay").innerText;
 
   try {
-    const res = await fetch("/user/api/auth/resend-otp", {
+    const res = await fetch("/api/auth/resend-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ emailOrPhone: email }),
@@ -205,7 +205,7 @@ window.resendOTP = async function () {
 
 // GOOGLE SIGNUP FUNCTIONALITY
 function handleCredentialResponse(response) {
-  fetch("/user/api/auth/google-signup", {
+  fetch("/api/auth/google-signup", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -224,7 +224,7 @@ function handleCredentialResponse(response) {
           timer: 1500,
           showConfirmButton: false
         }).then(() => {
-          window.location.href = "/userLogin.html";
+          window.location.href = "/user/userLogin.html";
         });
       } else {
         Swal.fire({

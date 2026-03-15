@@ -216,7 +216,7 @@
 
           <div class="d-flex justify-content-end mb-4">
             <a
-              href="forgotPassword.html"
+              href="/user/forgotPassword.html"
               class="text-decoration-none text-dark small"
               >Forgot Password?</a
             >
@@ -232,7 +232,7 @@
             <p class="small text-muted mb-0">
               Don't have an account?
               <a
-                href="/userSignup.html"
+                href="/user/userSignup.html"
                 class="text-dark fw-bold text-decoration-none"
                 >Sign Up</a
               >
@@ -265,7 +265,7 @@
         const password = document.getElementById("password").value;
 
         try {
-          const res = await fetch("/user/api/auth/login", {
+          const res = await fetch("/api/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
@@ -288,7 +288,7 @@
               const redirectUrl = urlParams.get("redirect");
               window.location.href = redirectUrl
                 ? decodeURIComponent(redirectUrl)
-                : "/";
+                : "/user/";
             });
           } else {
             Swal.fire({
@@ -312,7 +312,7 @@
       async function handleCredentialResponse(response) {
         try {
           // This sends the Google ID token to your backend for verification
-          const res = await fetch("/user/api/auth/google-signup", {
+          const res = await fetch("/api/auth/google-signup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ credential: response.credential }),
@@ -335,7 +335,7 @@
               const redirectUrl = urlParams.get("redirect");
               window.location.href = redirectUrl
                 ? decodeURIComponent(redirectUrl)
-                : "/";
+                : "/user/";
             });
           } else {
             Swal.fire({

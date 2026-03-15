@@ -474,7 +474,7 @@
               <h6 class="fw-bold mb-0">
                 <i class="fa-solid fa-location-dot me-2 text-danger"></i>Delivering to
               </h6>
-              <a href="./address.html" class="text-decoration-none small fw-bold">Change</a>
+              <a href="/user/address.html" class="text-decoration-none small fw-bold">Change</a>
             </div>
             <div id="shipping-address-display" class="small text-muted ps-4">
               <!-- Address will be injected here -->
@@ -664,7 +664,7 @@
           image: buyNowItem.image,
         });
       } else {
-        const cartRes = await fetch("/user/api/cart", {
+        const cartRes = await fetch("/api/cart", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const cartData = await cartRes.json();
@@ -717,7 +717,7 @@
       try {
         const token =
           localStorage.getItem("token") || sessionStorage.getItem("token");
-        const rzpRes = await fetch("/user/api/cart/razorpay-order", {
+        const rzpRes = await fetch("/api/cart/razorpay-order", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -762,7 +762,7 @@
           didOpen: () => Swal.showLoading(),
         });
 
-        const res = await fetch("/user/api/cart/checkout", {
+        const res = await fetch("/api/cart/checkout", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -792,7 +792,7 @@
             title: "Order Placed!",
             timer: 1500,
             showConfirmButton: false,
-          }).then(() => (window.location.href = "./thankYouPage.html"));
+          }).then(() => (window.location.href = "/user/thankYouPage.html"));
         } else {
           Swal.fire("Order Failed", data.message || "Bad Request", "error");
         }
@@ -819,7 +819,7 @@
       try {
         const token =
           localStorage.getItem("token") || sessionStorage.getItem("token");
-        const res = await fetch("/user/api/wallet", {
+        const res = await fetch("/api/wallet", {
           headers: { Authorization: "Bearer " + token },
         });
         if (res.ok) {

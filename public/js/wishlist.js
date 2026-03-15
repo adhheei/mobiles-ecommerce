@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function fetchWishlist() {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     try {
-        const response = await fetch('/user/api/wishlist', {
+        const response = await fetch('/api/wishlist', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -90,7 +90,7 @@ function removeFromWishlist(productId, button) {
         if (result.isConfirmed) {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
             try {
-                const response = await fetch(`/user/api/wishlist/${productId}`, {
+                const response = await fetch(`/api/wishlist/${productId}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -176,7 +176,7 @@ function addToCart(productId) {
     }
 
     // Placeholder for actual cart functionality
-    // In a real app, this should POST to /user/api/cart
+    // In a real app, this should POST to /api/cart
 
     // For now, show success message as requested by original UI behavior
     Swal.fire({

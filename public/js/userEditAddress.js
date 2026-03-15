@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Populate Fields
     try {
-        const res = await fetch(`/user/api/addresses/${addressId}`);
+        const res = await fetch(`/api/addresses/${addressId}`);
         const data = await res.json();
 
         if (res.ok) {
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         };
 
         try {
-            const res = await fetch(`/user/api/addresses/${addressId}`, {
+            const res = await fetch(`/api/addresses/${addressId}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    const res = await fetch(`/user/api/addresses/${addressId}`, {
+                    const res = await fetch(`/api/addresses/${addressId}`, {
                         method: "DELETE"
                     });
 

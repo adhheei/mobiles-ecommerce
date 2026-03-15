@@ -150,7 +150,7 @@
 
       <div class="bottom-links">
         <a href="#" class="resend-link">Resend Code</a>
-        <a href="./forgotPassword.html" class="back-link">Back to Forgot Password</a>
+        <a href="/user/forgotPassword.html" class="back-link">Back to Forgot Password</a>
       </div>
 
     </div>
@@ -188,7 +188,7 @@
       }
 
       try {
-        const res = await fetch('/user/api/auth/verify-otp', {
+        const res = await fetch('/api/auth/verify-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, otp: otpCode })
@@ -198,7 +198,7 @@
 
         if (data.success) {
           // Redirect to Reset Password Page
-          window.location.href = `./resetPassword.html?email=${encodeURIComponent(email)}&otp=${otpCode}`;
+          window.location.href = `/user/resetPassword.html?email=${encodeURIComponent(email)}&otp=${otpCode}`;
         } else {
           alert(data.message || "Invalid OTP");
         }

@@ -1,4 +1,4 @@
-const API = "/user/api/cart";
+const API = "/api/cart";
 
 // Helper to format currency
 function formatMoney(amount) {
@@ -27,7 +27,7 @@ async function fetchCart() {
     });
 
     if (res.status === 401) {
-      window.location.href = "/userLogin.html";
+      window.location.href = "/user/userLogin.html";
       return;
     }
 
@@ -74,7 +74,7 @@ function renderCart(cartData) {
            data-price="${item.price}" data-mrp="${item.mrp}"
            data-stock="${item.stock || 0}">
           <div class="cart-img-wrapper">
-            <a href="/singleProductPage.html?id=${item.productId}">
+            <a href="/user/singleProductPage.html?id=${item.productId}">
                 <img src="${imgSrc}" alt="${item.name}" onerror="this.src='${fallback}'" />
             </a>
           </div>
@@ -370,12 +370,12 @@ async function fetchCouponsAndShowModal() {
         text: "Please login to view coupons",
         showConfirmButton: true,
       }).then(() => {
-        window.location.href = "/userLogin.html";
+        window.location.href = "/user/userLogin.html";
       });
       return;
     }
 
-    const res = await fetch("/user/api/coupons", {
+    const res = await fetch("/api/coupons", {
       headers: { Authorization: "Bearer " + token },
     });
     const data = await res.json();
@@ -481,7 +481,7 @@ async function applyCoupon(code, silent = false) {
   const cleanTotal = parseFloat(subtotalText.replace(/[^\d.]/g, ""));
 
   try {
-    const res = await fetch("/user/api/coupons/apply", {
+    const res = await fetch("/api/coupons/apply", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -613,7 +613,7 @@ async function fetchSuggestions(productIds) {
   // If empty cart, maybe show popular items? The backend handles empty list logic.
 
   try {
-    const res = await fetch("/user/api/admin/products/suggestions", {
+    const res = await fetch("/api/admin/products/suggestions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -630,7 +630,7 @@ async function fetchSuggestions(productIds) {
           p.image || "https://placehold.co/100x100/f0f0f0/333?text=No+Image";
 
         const html = `
-                <a href="/singleProductPage.html?id=${p.id}" class="rec-card-link">
+                <a href="/user/singleProductPage.html?id=${p.id}" class="rec-card-link">
                   <div class="mini-rec-card">
                     <img src="${imgUrl}" alt="${p.name}" onerror="this.src='https://placehold.co/100x100/f0f0f0/333?text=No+Image'" />
                     <div class="rec-info">
@@ -672,12 +672,12 @@ async function addToCart(productId) {
       text: "Please login to add items to your cart",
       icon: "warning",
       confirmButtonText: "Login",
-    }).then(() => (window.location.href = "/userLogin.html"));
+    }).then(() => (window.location.href = "/user/userLogin.html"));
     return;
   }
 
   try {
-    const res = await fetch("/user/api/cart/add", {
+    const res = await fetch("/api/cart/add", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -723,5 +723,5 @@ function proceedToCheckout(e) {
   sessionStorage.removeItem("buyNowItem");
 
   // Redirect
-  window.location.href = "/address.html";
+  window.location.href = "/user/address.html";
 }
