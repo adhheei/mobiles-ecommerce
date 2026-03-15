@@ -2,7 +2,8 @@ const Order = require("../../models/Order");
 
 const getMyOrders = async (req, res) => {
     try {
-        const orders = await Order.find({ userId: req.user._id }).sort({
+        // This is the correct way
+const orders = await Order.find({ userId: req.user._id }).populate('items.productId').sort({
             createdAt: -1,
         });
 
