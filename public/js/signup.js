@@ -259,12 +259,15 @@ window.onload = function () {
     callback: handleCredentialResponse,
   });
 
+  // Use a responsive width for the button
+  const btnWidth = window.innerWidth < 480 ? "300" : "400";
+
   google.accounts.id.renderButton(
     document.getElementById("google-btn-container"),
     {
       theme: "outline",
       size: "large",
-      width: "420",
+      width: btnWidth,
       text: "signup_with",
       shape: "pill",
     },

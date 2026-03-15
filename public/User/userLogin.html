@@ -379,13 +379,16 @@
           callback: handleCredentialResponse,
         });
 
+        // Use a responsive width for the button
+        const btnWidth = window.innerWidth < 480 ? "300" : "330";
+
         // Render the button inside your container
         google.accounts.id.renderButton(
           document.getElementById("google-btn-container"),
           {
             theme: "outline",
             size: "large",
-            width: "330", // Matches card inner width
+            width: btnWidth, 
             text: "continue_with",
             shape: "pill",
           },
