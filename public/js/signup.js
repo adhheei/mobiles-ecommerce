@@ -217,15 +217,31 @@ function handleCredentialResponse(response) {
     .then((res) => res.json())
     .then((data) => {
       if (data.success) {
-        alert("Signup successful");
-        window.location.href = "/userLogin.html";
+        Swal.fire({
+          icon: 'success',
+          title: 'Signup Successful',
+          text: 'Welcome! Redirecting to login...',
+          timer: 1500,
+          showConfirmButton: false
+        }).then(() => {
+          window.location.href = "/userLogin.html";
+        });
       } else {
-        alert(data.message || "Google signup failed");
+        Swal.fire({
+          icon: 'error',
+          title: 'Google Auth Failed',
+          text: data.message || "Google signup failed",
+          footer: data.error ? `<div style="text-align: left"><b>Technical Error:</b> ${data.error}<br>${data.suggestedFix || ''}</div>` : null
+        });
       }
     })
     .catch((err) => {
       console.error("Google signup error:", err);
-      alert("Google signup failed");
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'An error occurred during Google Auth',
+      });
     });
 }
 

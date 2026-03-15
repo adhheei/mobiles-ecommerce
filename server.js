@@ -81,6 +81,8 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public', 'User')));
 
+app.set('trust proxy', 1);
+
 // 🍪 Session & Passport
 app.use(
   session({

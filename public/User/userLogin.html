@@ -341,12 +341,19 @@
             Swal.fire({
               icon: "error",
               title: "Auth Failed",
-              text: data.message,
+              text: data.message || "Google verification failed",
               confirmButtonColor: "#000",
+              footer: data.error ? `<div style="text-align: left"><b>Technical Error:</b> ${data.error}<br>${data.suggestedFix || ''}</div>` : null
             });
           }
         } catch (error) {
           console.error("Google Auth Error:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "An error occurred during Google Auth",
+            confirmButtonColor: "#000",
+          });
         }
       }
 
