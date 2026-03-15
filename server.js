@@ -77,10 +77,18 @@ app.use(morgan("dev")); // Changed to 'dev' for cleaner console logs
 app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-// 1. Static Assets
-app.use(express.static(path.join(__dirname, 'public'))); // Shared assets (css, js, images)
+// 1. Isolated Static Assets
+// We mount specific asset folders instead of the whole public dir for better isolation
+app.use("/css", express.static(path.join(__dirname, 'public', 'css')));
+app.use("/js", express.static(path.join(__dirname, 'public', 'js')));
+app.use("/images", express.static(path.join(__dirname, 'public', 'images')));
+app.use("/uploads", express.static(path.join(__dirname, 'public', 'uploads')));
+app.use("/libs", express.static(path.join(__dirname, 'public', 'libs')));
+app.use("/components", express.static(path.join(__dirname, 'public', 'components')));
+
+// Mount the discrete website folders at their respective paths
+app.use("/user", express.static(path.join(__dirname, 'public', 'User')));
 app.use("/admin", express.static(path.join(__dirname, 'public', 'Admin')));
-app.use("/", express.static(path.join(__dirname, 'public', 'User')));
 
 app.set('trust proxy', 1);
 
@@ -104,10 +112,16 @@ app.get("/admin", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "Admin", "adminDashboard.html"));
 });
 
-// 🏠 Home route
-app.get("/", (req, res) =>
-  res.sendFile(path.join(__dirname, "public", "User", "index.html")),
-);
+// 🏠 User Route
+app.get("/user", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "User", "index.html"));
+});
+
+// 🏠 Root Redirect
+app.get("/", (req, res) => {
+  res.redirect("/user");
+});
+
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 
 // 2. Catch-all Routing
@@ -121,9 +135,14 @@ app.use((req, res, next) => {
     if (req.path.startsWith('/admin')) {
       return res.sendFile(path.join(__dirname, 'public', 'Admin', 'adminDashboard.html'));
     }
-    
-    // Default to User website for all other routes
-    res.sendFile(path.join(__dirname, 'public', 'User', 'index.html'));
+
+    // Default to redirecting to /user for all other missing routes
+    // or serving the user index if they are already in the /user context
+    if (req.path.startsWith('/user')) {
+      return res.sendFile(path.join(__dirname, 'public', 'User', 'index.html'));
+    }
+
+    res.redirect("/user");
 });
 
 
