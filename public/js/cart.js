@@ -696,8 +696,16 @@ async function addToCart(productId) {
         showConfirmButton: false,
         timer: 1500,
       });
-      // Refresh the cart UI
-      fetchCart();
+
+      // Use the returned cart data for immediate UI update
+      if (data.cart) {
+        console.log("Updating UI with returned cart data");
+        renderCart(data.cart);
+      } else {
+        // Fallback to fetchCart if for some reason cart data is not returned
+        fetchCart();
+      }
+
       // Update the cart badge in the navbar if the function exists
       if (typeof window.updateCartBadge === "function")
         window.updateCartBadge();
