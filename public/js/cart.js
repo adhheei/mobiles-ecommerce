@@ -696,6 +696,8 @@ async function addToCart(productId) {
         showConfirmButton: false,
         timer: 1500,
       });
+      // Refresh the cart UI
+      fetchCart();
       // Update the cart badge in the navbar if the function exists
       if (typeof window.updateCartBadge === "function")
         window.updateCartBadge();
