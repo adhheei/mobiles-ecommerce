@@ -1416,6 +1416,7 @@
                 offer.targetId && offer.targetId._id
                   ? offer.targetId._id
                   : offer.targetId;
+              const link =
                 offer.offerType === "Product"
                   ? `/user/singleProductPage.html?id=${tgtId}`
                   : `/user/productPage.html?category=${tgtId}`;
