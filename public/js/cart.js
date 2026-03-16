@@ -623,7 +623,7 @@ async function fetchSuggestions(productIds) {
 
     const data = await res.json();
     if (data.success && data.products.length > 0) {
-      container.innerHTML = ""; // Clear placeholders
+      container.innerHTML = ""; // Clear
 
       data.products.forEach((p) => {
         const imgUrl =
@@ -647,9 +647,10 @@ async function fetchSuggestions(productIds) {
                 `;
         container.innerHTML += html;
       });
-    } else {
-      // If no suggestions, maybe hide the section?
-      // container.closest('.mb-4').style.display = 'none';
+
+      // Show the suggestions section only after real data is loaded
+      const section = document.getElementById("suggestions-section");
+      if (section) section.classList.remove("d-none");
     }
   } catch (e) {
     console.error("Failed to load suggestions:", e);

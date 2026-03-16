@@ -546,14 +546,14 @@
       </p>
       <a href="/user/" class="btn btn-dark rounded-pill px-5 py-2 fw-bold">Start Shopping</a>
     </div>
-    <div class="row g-5" id="main-cart-row">
+    <div class="row g-5 d-none" id="main-cart-row">
       <div class="col-lg-8">
-        <div class="mb-4">
+        <div class="mb-4 d-none" id="suggestions-section">
           <h6 class="fw-bold mb-3">You may also like</h6>
           <div class="scrolling-wrapper d-flex">
             <!-- Recommendations loaded by JS -->
           </div>
-        </div>
+        </div> <!-- end suggestions-section -->
         <div id="cart-items-container">
           <!-- Items will be injected by JS -->
         </div>
@@ -573,11 +573,11 @@
           </div>
           <div class="summary-row text-success">
             <span>Discount on MRP</span>
-            <span id="total-discount">-Rs. 3,000.00</span>
+            <span id="total-discount">-Rs. 0.00</span>
           </div>
           <div class="summary-row">
             <span>Subtotal</span>
-            <span id="subtotal">Rs. 1,497.00</span>
+            <span id="subtotal">Rs. 0.00</span>
           </div>
           <div class="summary-row">
             <span>Shipping</span>
@@ -585,7 +585,7 @@
           </div>
           <div class="summary-total">
             <span>Total Amount</span>
-            <span id="grand-total">Rs. 1,497.00</span>
+            <span id="grand-total">Rs. 0.00</span>
           </div>
           <a href="#" class="checkout-btn" onclick="proceedToCheckout(event)">
             <i class="fa-solid fa-lock me-2"></i> Checkout
