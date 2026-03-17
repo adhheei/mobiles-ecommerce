@@ -34,7 +34,11 @@ app.use(
           "https://checkout.razorpay.com",
           "https://cdnjs.cloudflare.com",
           "'unsafe-inline'",
+          "'unsafe-eval'", // Added for certain library compatibilities
+          "blob:", // FIX: Allows the blob scripts you saw in the error
         ],
+        // ADD THIS NEW SECTION
+        workerSrc: ["'self'", "blob:"],
         styleSrc: [
           "'self'",
           "https://cdn.jsdelivr.net",
@@ -43,19 +47,20 @@ app.use(
           "https://fonts.googleapis.com",
           "'unsafe-inline'",
         ],
-        imgSrc: ["'self'", "data:", "blob:", "https://*", "http://localhost:*", "http://3.27.6.57:*", "https://3.27.6.57:*"],
+        imgSrc: ["'self'", "data:", "blob:", "https:*"],
         connectSrc: [
           "'self'",
-          "http://localhost:*",
-          "ws://localhost:*",
-          "http://3.27.6.57:*",
-          "ws://3.27.6.57:*",
-          "https://3.27.6.57:*",
+          "https://jinsamobiles.online", // Add your domain explicitly
           "https://accounts.google.com",
           "https://*.razorpay.com",
           "https://cdn.jsdelivr.net",
         ],
-        frameSrc: ["https://accounts.google.com", "https://*.razorpay.com"],
+        frameSrc: [
+          "'self'",
+          "https://accounts.google.com",
+          "https://api.razorpay.com",
+          "https://*.razorpay.com",
+        ],
         fontSrc: [
           "'self'",
           "https://cdnjs.cloudflare.com",
@@ -68,21 +73,23 @@ app.use(
 );
 
 // Allow requests from your specific IP or all origins for now
-app.use(cors({
-    origin: '*', // This allows all connections - good for testing
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(
+  cors({
+    origin: "*", // This allows all connections - good for testing
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 app.use(morgan("dev")); // Changed to 'dev' for cleaner console logs
 app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 // 1. Static Assets
-app.use(express.static(path.join(__dirname, 'public'))); // Shared assets (css, js, images)
-app.use("/admin", express.static(path.join(__dirname, 'public', 'Admin')));
-app.use("/user", express.static(path.join(__dirname, 'public', 'User')));
+app.use(express.static(path.join(__dirname, "public"))); // Shared assets (css, js, images)
+app.use("/admin", express.static(path.join(__dirname, "public", "Admin")));
+app.use("/user", express.static(path.join(__dirname, "public", "User")));
 
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
 // 🍪 Session & Passport
 app.use(
@@ -118,25 +125,26 @@ app.get("/favicon.ico", (req, res) => res.status(204).end());
 
 // 2. Catch-all Routing
 app.use((req, res, next) => {
-    // Skip API requests
-    if (req.path.startsWith('/api')) {
-      return next();
-    }
-    
-    // If request starts with /admin, but wasn't handled by static or explicit route
-    if (req.path.startsWith('/admin')) {
-      return res.sendFile(path.join(__dirname, 'public', 'Admin', 'adminDashboard.html'));
-    }
+  // Skip API requests
+  if (req.path.startsWith("/api")) {
+    return next();
+  }
 
-    // If request starts with /user, but wasn't handled by static or explicit route
-    if (req.path.startsWith('/user')) {
-      return res.sendFile(path.join(__dirname, 'public', 'User', 'index.html'));
-    }
-    
-    // Default to redirecting to /user for all other routes
-    res.redirect("/user");
+  // If request starts with /admin, but wasn't handled by static or explicit route
+  if (req.path.startsWith("/admin")) {
+    return res.sendFile(
+      path.join(__dirname, "public", "Admin", "adminDashboard.html"),
+    );
+  }
+
+  // If request starts with /user, but wasn't handled by static or explicit route
+  if (req.path.startsWith("/user")) {
+    return res.sendFile(path.join(__dirname, "public", "User", "index.html"));
+  }
+
+  // Default to redirecting to /user for all other routes
+  res.redirect("/user");
 });
-
 
 mongoose
   .connect(process.env.MONGO_URI)
