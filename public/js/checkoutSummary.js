@@ -24,30 +24,49 @@ async function loadCheckoutSummary() {
       const buyNowItemStr = sessionStorage.getItem("buyNowItem");
       if (buyNowItemStr) {
         const buyNowItem = JSON.parse(buyNowItemStr);
-        const res = await fetch(
-          `/api/admin/products/${buyNowItem.productId || buyNowItem._id}`,
-        );
-        if (res.ok) {
-          const data = await res.json();
-          const p = data.product;
-          const qty = parseInt(buyNowItem.qty) || 1;
-          const price = p.offerPrice || p.price || 0;
-          const mrp = p.actualPrice || p.price || 0;
+        const qty = parseInt(buyNowItem.qty) || 1;
 
+        // Try to load fresh product data, fall back to stored buyNowItem data
+        try {
+          const res = await fetch(
+            `/api/admin/products/public/${buyNowItem.productId || buyNowItem._id}`,
+          );
+          if (res.ok) {
+            const data = await res.json();
+            const p = data.product;
+            const price = p.offerPrice || p.actualPrice || p.price || 0;
+            const mrp = p.actualPrice || p.price || 0;
+
+            items.push({
+              name: p.name || buyNowItem.name,
+              image: formatImage(p.mainImage || (p.productImages && p.productImages[0])) || buyNowItem.image,
+              price: price,
+              mrp: mrp,
+              qty: qty,
+              totalItemPrice: price * qty,
+            });
+
+            subtotal = price * qty;
+            totalMrp = mrp * qty;
+            discount = (mrp - price) * qty;
+          } else {
+            throw new Error("Product fetch failed");
+          }
+        } catch (fetchErr) {
+          // Fallback: use data that was already stored in sessionStorage
+          console.warn("Using stored buyNow data as fallback:", fetchErr.message);
+          const price = buyNowItem.price || 0;
           items.push({
-            name: p.name,
-            image: formatImage(
-              p.mainImage || (p.productImages && p.productImages[0]),
-            ),
+            name: buyNowItem.name || "Product",
+            image: buyNowItem.image || "",
             price: price,
-            mrp: mrp,
+            mrp: price,
             qty: qty,
             totalItemPrice: price * qty,
           });
-
           subtotal = price * qty;
-          totalMrp = mrp * qty; // Total MRP
-          discount = (mrp - price) * qty; // Product level discount
+          totalMrp = subtotal;
+          discount = 0;
         }
       }
     } else {
