@@ -34,6 +34,7 @@ app.use(
           "https://checkout.razorpay.com",
           "https://cdnjs.cloudflare.com",
           "'unsafe-inline'",
+          "blob:",
         ],
         styleSrc: [
           "'self'",
@@ -53,9 +54,17 @@ app.use(
           "https://3.27.6.57:*",
           "https://accounts.google.com",
           "https://*.razorpay.com",
+          "https://lumberjack.razorpay.com",
+          "https://lumberjack-cx.razorpay.com",
+          "https://api.razorpay.com",
           "https://cdn.jsdelivr.net",
         ],
-        frameSrc: ["https://accounts.google.com", "https://*.razorpay.com"],
+        frameSrc: [
+          "https://accounts.google.com",
+          "https://*.razorpay.com",
+          "https://api.razorpay.com",
+          "https://checkout.razorpay.com",
+        ],
         fontSrc: [
           "'self'",
           "https://cdnjs.cloudflare.com",
@@ -69,9 +78,9 @@ app.use(
 
 // Allow requests from your specific IP or all origins for now
 app.use(cors({
-    origin: '*', // This allows all connections - good for testing
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+  origin: '*', // This allows all connections - good for testing
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(morgan("dev")); // Changed to 'dev' for cleaner console logs
 app.use(cookieParser());
@@ -118,23 +127,23 @@ app.get("/favicon.ico", (req, res) => res.status(204).end());
 
 // 2. Catch-all Routing
 app.use((req, res, next) => {
-    // Skip API requests
-    if (req.path.startsWith('/api')) {
-      return next();
-    }
-    
-    // If request starts with /admin, but wasn't handled by static or explicit route
-    if (req.path.startsWith('/admin')) {
-      return res.sendFile(path.join(__dirname, 'public', 'Admin', 'adminDashboard.html'));
-    }
+  // Skip API requests
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
 
-    // If request starts with /user, but wasn't handled by static or explicit route
-    if (req.path.startsWith('/user')) {
-      return res.sendFile(path.join(__dirname, 'public', 'User', 'index.html'));
-    }
-    
-    // Default to redirecting to /user for all other routes
-    res.redirect("/user");
+  // If request starts with /admin, but wasn't handled by static or explicit route
+  if (req.path.startsWith('/admin')) {
+    return res.sendFile(path.join(__dirname, 'public', 'Admin', 'adminDashboard.html'));
+  }
+
+  // If request starts with /user, but wasn't handled by static or explicit route
+  if (req.path.startsWith('/user')) {
+    return res.sendFile(path.join(__dirname, 'public', 'User', 'index.html'));
+  }
+
+  // Default to redirecting to /user for all other routes
+  res.redirect("/user");
 });
 
 
