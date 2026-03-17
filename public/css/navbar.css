@@ -23,22 +23,9 @@
     color: var(--primary-black);
 }
 
-.nav-logo {
-    width: 45px;
-    height: 45px;
-    margin-right: 10px;
-}
-
-.brand-name {
-    line-height: 1.1;
-    font-size: 1.2rem;
-    font-weight: 800;
-    color: var(--primary-black);
-}
-
 .nav-subtitle {
     font-size: 0.6rem !important;
-    letter-spacing: 2px !important;
+    letter-spacing: 4px !important;
     font-weight: 500 !important;
 }
 
@@ -109,52 +96,43 @@
 
 /* Mobile Adjustments */
 @media (max-width: 991px) {
-    :root {
-        --navbar-height: 60px; /* Slimmer mobile navbar */
-    }
-
-    .nav-logo {
-        width: 35px;
-        height: 35px;
-        margin-right: 8px;
-    }
-
-    .brand-name {
-        font-size: 1rem;
-    }
-
-    .nav-subtitle {
-        font-size: 0.5rem !important;
-        letter-spacing: 1px !important;
-    }
-
-    .navbar-toggler {
-        padding-right: 0 !important;
-    }
-
-    .mobile-nav-icons i {
-        font-size: 1.1rem;
-    }
-
-    .cart-badge {
-        font-size: 0.55rem !important;
-        padding: 0.25em 0.4em !important;
-        top: 4px !important;
-        right: 2px !important;
-    }
-
-    #mobileSearchArea {
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-
     .navbar-nav {
-        text-align: left;
+        text-align: center;
+        margin-bottom: 15px;
+        align-items: center;
+        width: 100%;
     }
 
-    .nav-link {
-        padding: 12px 0 !important;
-        border-bottom: 1px solid #f8f9fa;
-        margin: 0 !important;
+    .nav-icons {
+        justify-content: center;
+        margin-top: 15px;
+        width: 100%;
+        border-top: 1px solid #eee;
+        padding-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .search-container {
+        margin-bottom: 10px;
+    }
+
+    /* Reset fixed height for mobile & Smooth Height Transition */
+    .navbar {
+        height: auto;
+        transition: height 0.3s ease-in-out;
+    }
+
+    /* Override Bootstrap Transition for Smooth Slide */
+    .navbar-collapse.collapsing {
+        transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+
+    .navbar-collapse.show {
+        transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 }
 
