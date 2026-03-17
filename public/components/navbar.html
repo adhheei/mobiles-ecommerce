@@ -1,55 +1,75 @@
-<nav class="navbar navbar-expand-lg fixed-top">
-    <div class="container">
+<nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm">
+    <div class="container px-3">
+        <!-- Brand -->
         <a class="navbar-brand d-flex align-items-center" href="/user">
-            <img src="../images/logo.jpg" alt="Logo" width="50" height="50" class="me-2 rounded-circle" />
-            <div class="d-flex flex-column">
-                <span class="text-dark" style="line-height: 1.1; font-size: 1.2rem; font-weight: 800;">JINSA
-                    MOBILES</span>
-                <span class="text-secondary nav-subtitle">AND
-                    ACCESSORIES</span>
+            <img src="../images/logo.jpg" alt="Logo" class="rounded-circle nav-logo" />
+            <div class="d-flex flex-column nav-brand-text">
+                <span class="brand-name">JINSA MOBILES</span>
+                <span class="text-secondary nav-subtitle">AND ACCESSORIES</span>
             </div>
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        <!-- Mobile Header Icons (Visible only on mobile) -->
+        <div class="mobile-nav-icons d-flex d-lg-none align-items-center ms-auto me-2">
+            <button class="btn btn-link text-dark p-2" id="mobileSearchBtn">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            <a href="/user/cart.html" class="position-relative text-dark p-2">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="cart-badge badge rounded-pill bg-danger d-none"></span>
+            </a>
+            <div id="mobile-user-placeholder" class="ms-1">
+                <!-- User icon/avatar injected by JS -->
+            </div>
+        </div>
+
+        <!-- Toggler -->
+        <button class="navbar-toggler border-0 p-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon" style="width: 1.2rem; height: 1.2rem;"></span>
         </button>
 
+        <!-- Main Nav (Desktop & Collapsed) -->
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav align-items-center mx-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/user">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/user/productPage.html">Shop Products</a>
-                </li>
-
-
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/user/aboutUs.html">About Us</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/user/contactUs.html">Contact</a>
+            <ul class="navbar-nav mx-auto py-3 py-lg-0">
+                <li class="nav-item"><a class="nav-link" href="/user">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/user/productPage.html">Shop Products</a></li>
+                <li class="nav-item"><a class="nav-link" href="/user/aboutUs.html">About Us</a></li>
+                <li class="nav-item"><a class="nav-link" href="/user/contactUs.html">Contact</a></li>
+                <!-- Only visible in menu when logged out -->
+                <li class="nav-item d-lg-none" id="mobile-login-item">
+                    <a class="nav-link fw-bold text-primary" href="/user/userLogin.html">LOGIN</a>
                 </li>
             </ul>
 
-            <div class="nav-icons align-items-center d-flex">
-                <div class="position-relative">
-                    <input type="text" id="navbarSearch" class="form-control border-secondary rounded-pill pe-5"
-                        placeholder="Search products..." style="width: 200px; height: 35px; font-size: 0.9rem" />
+            <!-- Desktop Icons -->
+            <div class="nav-icons d-none d-lg-flex align-items-center">
+                <div class="search-container position-relative me-3">
+                    <input type="text" class="navbarSearch form-control rounded-pill ps-3 pe-5"
+                        placeholder="Search..." />
                     <i class="fa-solid fa-magnifying-glass position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"
                         style="cursor: pointer"></i>
                 </div>
 
-                <a href="/user/cart.html" class="position-relative ms-2 text-dark" style="cursor: pointer">
+                <a href="/user/cart.html" class="position-relative text-dark me-4">
                     <i class="fa-solid fa-cart-shopping fs-5"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
-                        style="font-size: 0.6rem"></span>
+                    <span class="cart-badge badge rounded-pill bg-danger d-none"></span>
                 </a>
 
-                <a href="/user/userLogin.html" id="nav-login" class="ms-4 text-dark text-decoration-none fw-bold d-none"
-                    style="font-size: 1rem;">LOGIN</a>
+                <div id="desktop-user-container" class="d-flex align-items-center">
+                    <a href="/user/userLogin.html" id="nav-login" class="text-dark text-decoration-none fw-bold">LOGIN</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Search Area (Dedicated bar below navbar) -->
+    <div id="mobileSearchArea" class="container-fluid bg-light py-2 border-top d-lg-none">
+        <div class="container px-3">
+            <div class="position-relative">
+                <input type="text" class="navbarSearch form-control rounded-pill ps-3 pe-5"
+                    placeholder="What are you looking for?" />
+                <i class="fa-solid fa-magnifying-glass position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"></i>
             </div>
         </div>
     </div>
