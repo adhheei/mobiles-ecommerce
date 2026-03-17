@@ -341,6 +341,13 @@
           d.setDate(d.getDate() + 7);
           delEl.innerHTML = `<span class="fw-bold text-success">${d.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</span>`;
         }
+
+        /* --- 5. UPDATE VIEW DETAILS BUTTON --- */
+        const viewBtn = document.querySelector('a[href="/user/userOrderDetails.html"]');
+        if (viewBtn && order.dbOrderId) {
+          viewBtn.href = `/user/userOrderDetails.html?id=${order.dbOrderId}`;
+          viewBtn.innerText = "View Order Details";
+        }
       });
     </script>
   </body>
