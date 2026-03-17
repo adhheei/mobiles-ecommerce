@@ -963,6 +963,133 @@
         min-width: 80px;
       }
     }
+    /* New Launch Section Compact Styles */
+    .new-launch-section {
+      background-color: #cdc9bf;
+      padding: 15px 0 !important;
+    }
+    .new-launch-section .section-header {
+      margin: 0 !important;
+      font-size: 1.5rem !important;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding-bottom: 5px;
+    }
+    .new-launch-section .section-header::after {
+      width: 40px;
+      height: 3px;
+    }
+    .nl-card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      height: 100%;
+      border: 1px solid rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .nl-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+    .nl-img-wrapper {
+      position: relative;
+      padding-top: 90%; /* Compact aspect ratio */
+      background: #fff;
+      width: 100%;
+    }
+    .nl-img-wrapper img {
+      position: absolute;
+      top: 8%;
+      left: 8%;
+      width: 84%;
+      height: 84%;
+      object-fit: contain;
+      transition: transform 0.4s ease;
+    }
+    .nl-card:hover .nl-img-wrapper img {
+      transform: scale(1.08);
+    }
+    .nl-content {
+      padding: 10px 10px;
+      text-align: center;
+      background: #fff;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .nl-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+      color: #1a1a1a;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.2;
+    }
+    .nl-brand {
+      font-size: 0.7rem;
+      color: #888;
+      margin-bottom: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 500;
+    }
+    .nl-controls .btn {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      border: none;
+      background: #fff;
+      color: #1a1a1a;
+      transition: all 0.2s;
+    }
+    .nl-controls .btn:hover {
+      background: #1a1a1a;
+      color: #fff;
+    }
+
+    /* Responsive adjustments for New Launch Cards */
+    @media (min-width: 992px) {
+      .scrolling-wrapper .nl-item {
+        flex: 0 0 16.666%; /* 6 items on large screens */
+        max-width: 16.666%;
+        padding: 0 8px;
+      }
+    }
+    @media (max-width: 991px) and (min-width: 768px) {
+      .scrolling-wrapper .nl-item {
+        flex: 0 0 25%; /* 4 items on tablets */
+        max-width: 25%;
+        padding: 0 8px;
+      }
+    }
+    @media (max-width: 767px) {
+      .scrolling-wrapper .nl-item {
+        flex: 0 0 48%; /* ~2 items on mobile */
+        max-width: 48%;
+        padding: 0 5px;
+      }
+      .new-launch-section {
+        padding: 10px 0 !important;
+      }
+      .new-launch-section .section-header {
+        font-size: 1.25rem !important;
+      }
+      .nl-content {
+        padding: 8px 5px;
+      }
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link href="/css/navbar.css" rel="stylesheet" />
@@ -1073,12 +1200,12 @@
   </section>
 
   <!-- New Launch Section -->
-  <section class="py-3 reveal-up" style="background-color: #cdc9bf">
+  <section class="new-launch-section reveal-up">
     <div class="container">
-      <div class="d-flex justify-content-between align-items-center mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-2">
         <h2 class="section-header">New Launch</h2>
-        <div>
-          <button class="btn btn-light rounded-circle shadow-sm" onclick="scrollSlider('left')">
+        <div class="nl-controls">
+          <button class="btn btn-light rounded-circle shadow-sm me-2" onclick="scrollSlider('left')">
             <i class="fa-solid fa-chevron-left"></i>
           </button>
           <button class="btn btn-light rounded-circle shadow-sm" onclick="scrollSlider('right')">
@@ -1086,9 +1213,9 @@
           </button>
         </div>
       </div>
-      <div class="row scrolling-wrapper gap-1" id="cardSlider">
-        <div class="text-center w-100 py-5">
-          <div class="spinner-border text-secondary" role="status">
+      <div class="scrolling-wrapper gap-0" id="cardSlider">
+        <div class="text-center w-100 py-3">
+          <div class="spinner-border text-secondary spinner-border-sm" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
         </div>
@@ -1541,7 +1668,7 @@
         if (data.success && data.products && data.products.length > 0) {
           const productCards = data.products
             .map((product) => {
-              const pId = product._id || product.id; // Fix for undefined ID
+              const pId = product._id || product.id; 
               const isOutOfStock =
                 product.stock === 0 || product.status === "outofstock";
               const linkHref = isOutOfStock
@@ -1549,16 +1676,16 @@
                 : `/user/singleProductPage.html?id=${pId}`;
 
               return `
-              <div class="col-10 col-md-3">
+              <div class="nl-item">
                   <a href="${linkHref}" class="text-decoration-none text-dark">
-                      <div class="card product-card mb-3 ${isOutOfStock ? "opacity-75" : ""}">
-                          <div class="card-img-wrapper">
+                      <div class="nl-card ${isOutOfStock ? "opacity-75" : ""}">
+                          <div class="nl-img-wrapper">
                               ${isOutOfStock ? '<div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-50 z-2"><span class="badge bg-dark">Sold Out</span></div>' : ""}
                               <img src="${formatImageUrl(product.mainImage)}" alt="${product.name}" onerror="this.src='/images/logo.jpg'" />
                           </div>
-                          <div class="text-center">
-                              <h5 class="card-title fw-bold text-truncate px-2">${product.name}</h5>
-                              <p class="text-muted small">${product.brand || "Latest Model"}</p>
+                          <div class="nl-content">
+                              <h5 class="nl-title">${product.name}</h5>
+                              <p class="nl-brand">${product.brand || "Latest Model"}</p>
                           </div>
                       </div>
                   </a>
@@ -1567,14 +1694,13 @@
             .join("");
 
           const seeAllCard = `
-          <div class="col-10 col-md-3">
+          <div class="nl-item">
               <a href="/user/productPage.html" class="text-decoration-none text-dark h-100 d-block">
-                  <div class="card product-card mb-3 h-100 d-flex flex-column justify-content-center align-items-center bg-light border-0" style="min-height: 300px;">
-                      <div class="rounded-circle bg-white p-4 shadow-sm mb-3">
-                          <i class="fa-solid fa-arrow-right fa-2x text-dark"></i>
+                  <div class="nl-card bg-light border-0 d-flex flex-column justify-content-center align-items-center py-4">
+                      <div class="rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                          <i class="fa-solid fa-arrow-right text-dark"></i>
                       </div>
-                      <h5 class="fw-bold">View All</h5>
-                      <p class="text-muted small">Go to Shop</p>
+                      <h5 class="nl-title m-0">View All</h5>
                   </div>
               </a>
           </div>`;
