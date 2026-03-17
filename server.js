@@ -22,88 +22,14 @@ uploadDirs.forEach((dir) => {
 
 // 🔧 Security & Logic Middleware
 app.use((req, res, next) => {
-  res.setHeader("X-CSP-Version", "1.1"); // For tracking if server restarted
+  res.setHeader("X-CSP-Version", "1.2"); // Final check: must be 1.2
   next();
 });
 
 app.use(
   helmet({
     crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: [
-          "'self'",
-          "https://accounts.google.com",
-          "https://cdn.jsdelivr.net",
-          "https://checkout.razorpay.com",
-          "https://*.razorpay.com",
-          "https://api.razorpay.com",
-          "https://cdnjs.cloudflare.com",
-          "https://www.googletagmanager.com",
-          "https://www.google-analytics.com",
-          "https://ssl.google-analytics.com",
-          "'unsafe-inline'",
-          "'unsafe-eval'",
-          "blob:",
-        ],
-        styleSrc: [
-          "'self'",
-          "https://cdn.jsdelivr.net",
-          "https://cdnjs.cloudflare.com",
-          "https://accounts.google.com",
-          "https://fonts.googleapis.com",
-          "https://www.googletagmanager.com",
-          "https://tagmanager.google.com",
-          "'unsafe-inline'",
-        ],
-        imgSrc: [
-          "'self'",
-          "data:",
-          "blob:",
-          "https://*",
-          "http://localhost:*",
-          "https://www.google-analytics.com",
-          "https://www.googletagmanager.com",
-          "https://*.razorpay.com",
-        ],
-        connectSrc: [
-          "'self'",
-          "https://*",
-          "http://localhost:*",
-          "ws://localhost:*",
-          "https://accounts.google.com",
-          "https://*.razorpay.com",
-          "https://api.razorpay.com",
-          "https://lumberjack.razorpay.com",
-          "https://lumberjack-cx.razorpay.com",
-          "https://checkout.razorpay.com",
-          "https://custom-analytics.razorpay.com",
-          "https://cdn.jsdelivr.net",
-          "https://www.google-analytics.com",
-          "https://*.google-analytics.com",
-          "https://*.analytics.google.com",
-          "https://stats.g.doubleclick.net",
-        ],
-        frameSrc: [
-          "'self'",
-          "https://accounts.google.com",
-          "https://*.razorpay.com",
-          "https://api.razorpay.com",
-          "https://checkout.razorpay.com",
-          "https://td.doubleclick.net",
-        ],
-        fontSrc: [
-          "'self'",
-          "https://cdnjs.cloudflare.com",
-          "https://fonts.gstatic.com",
-          "https://cdn.jsdelivr.net",
-        ],
-        workerSrc: ["'self'", "blob:"],
-        objectSrc: ["'none'"],
-        upgradeInsecureRequests: [],
-      },
-    },
+    contentSecurityPolicy: false, // Disable for 1 minute to check if this is the ONLY source
   }),
 );
 
