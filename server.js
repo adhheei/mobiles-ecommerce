@@ -21,6 +21,11 @@ uploadDirs.forEach((dir) => {
 });
 
 // 🔧 Security & Logic Middleware
+app.use((req, res, next) => {
+  res.setHeader("X-CSP-Version", "1.1"); // For tracking if server restarted
+  next();
+});
+
 app.use(
   helmet({
     crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
@@ -33,6 +38,7 @@ app.use(
           "https://cdn.jsdelivr.net",
           "https://checkout.razorpay.com",
           "https://*.razorpay.com",
+          "https://api.razorpay.com",
           "https://cdnjs.cloudflare.com",
           "https://www.googletagmanager.com",
           "https://www.google-analytics.com",
@@ -57,18 +63,15 @@ app.use(
           "blob:",
           "https://*",
           "http://localhost:*",
-          "http://3.27.6.57:*",
-          "https://3.27.6.57:*",
           "https://www.google-analytics.com",
           "https://www.googletagmanager.com",
+          "https://*.razorpay.com",
         ],
         connectSrc: [
           "'self'",
+          "https://*",
           "http://localhost:*",
           "ws://localhost:*",
-          "http://3.27.6.57:*",
-          "ws://3.27.6.57:*",
-          "https://3.27.6.57:*",
           "https://accounts.google.com",
           "https://*.razorpay.com",
           "https://api.razorpay.com",
@@ -83,6 +86,7 @@ app.use(
           "https://stats.g.doubleclick.net",
         ],
         frameSrc: [
+          "'self'",
           "https://accounts.google.com",
           "https://*.razorpay.com",
           "https://api.razorpay.com",
@@ -93,8 +97,11 @@ app.use(
           "'self'",
           "https://cdnjs.cloudflare.com",
           "https://fonts.gstatic.com",
+          "https://cdn.jsdelivr.net",
         ],
-        scriptSrcAttr: ["'unsafe-inline'"],
+        workerSrc: ["'self'", "blob:"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [],
       },
     },
   }),
