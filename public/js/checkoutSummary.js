@@ -25,11 +25,12 @@ async function loadCheckoutSummary() {
       if (buyNowItemStr) {
         const buyNowItem = JSON.parse(buyNowItemStr);
         const qty = parseInt(buyNowItem.qty) || 1;
+        const productId = buyNowItem.productId || buyNowItem._id;
 
         // Try to load fresh product data, fall back to stored buyNowItem data
         try {
           const res = await fetch(
-            `/api/admin/products/public/${buyNowItem.productId || buyNowItem._id}`,
+            `/api/admin/products/public/${productId}`,
           );
           if (res.ok) {
             const data = await res.json();
@@ -38,6 +39,7 @@ async function loadCheckoutSummary() {
             const mrp = p.actualPrice || p.price || 0;
 
             items.push({
+              productId: productId,
               name: p.name || buyNowItem.name,
               image: formatImage(p.mainImage || (p.productImages && p.productImages[0])) || buyNowItem.image,
               price: price,
@@ -57,6 +59,7 @@ async function loadCheckoutSummary() {
           console.warn("Using stored buyNow data as fallback:", fetchErr.message);
           const price = buyNowItem.price || 0;
           items.push({
+            productId: productId,
             name: buyNowItem.name || "Product",
             image: buyNowItem.image || "",
             price: price,
@@ -76,6 +79,7 @@ async function loadCheckoutSummary() {
       if (res.ok) {
         const cartData = await res.json();
         items = (cartData.items || []).map((item) => ({
+          productId: item.productId,
           name: item.name,
           image: item.image,
           price: item.price,
@@ -99,6 +103,12 @@ async function loadCheckoutSummary() {
                 </div>`;
       return;
     }
+
+    // Store items for coupon application
+    window.currentCheckoutItems = items.map(item => ({
+      productId: item.productId,
+      quantity: item.qty
+    }));
 
     // --- 2. COUPON & TOTAL CALC ---
     let appliedCouponCode = null;
@@ -127,6 +137,7 @@ async function loadCheckoutSummary() {
           body: JSON.stringify({
             couponCode: appliedCouponCode,
             cartTotal: subtotal,
+            cartItems: window.currentCheckoutItems
           }),
         });
         const cData = await cRes.json();
@@ -375,7 +386,11 @@ async function applyCoupon(code, cartTotal) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ couponCode: code, cartTotal: cartTotal }),
+      body: JSON.stringify({
+        couponCode: code,
+        cartTotal: cartTotal,
+        cartItems: window.currentCheckoutItems, // Send items for validation (Buy Now support)
+      }),
     });
 
     const data = await res.json();

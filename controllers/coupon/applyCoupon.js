@@ -1,23 +1,45 @@
 const Coupon = require("../../models/Coupon");
 const Cart = require("../../models/Cart");
+const Product = require("../../models/Product");
 
 const applyCoupon = async (req, res) => {
   try {
-    const { couponCode } = req.body;
+    const { couponCode, cartItems } = req.body;
     const userId = req.user._id;
 
-    const cart = await Cart.findOne({ userId }).populate("items.productId");
-    if (!cart || cart.items.length === 0) {
-      return res.status(400).json({ success: false, message: "Cart is empty" });
+    if (!couponCode) {
+      return res.status(400).json({ success: false, message: "Coupon code is required" });
     }
 
     let totalAmount = 0;
-    cart.items.forEach(item => {
-      if (item.productId) {
-        const price = item.productId.offerPrice || item.productId.price || 0;
-        totalAmount += price * item.quantity;
+
+    // If cartItems are provided (e.g., Buy Now flow), use them. 
+    // Otherwise, fetch from the database cart.
+    if (cartItems && Array.isArray(cartItems) && cartItems.length > 0) {
+      for (const item of cartItems) {
+        const product = await Product.findById(item.productId);
+        if (product) {
+          const price = product.offerPrice || product.actualPrice || product.price || 0;
+          totalAmount += price * (item.quantity || 1);
+        }
       }
-    });
+    } else {
+      const cart = await Cart.findOne({ userId }).populate("items.productId");
+      if (!cart || cart.items.length === 0) {
+        return res.status(400).json({ success: false, message: "Cart is empty" });
+      }
+
+      cart.items.forEach(item => {
+        if (item.productId) {
+          const price = item.productId.offerPrice || item.productId.actualPrice || item.productId.price || 0;
+          totalAmount += price * item.quantity;
+        }
+      });
+    }
+
+    if (totalAmount === 0) {
+      return res.status(400).json({ success: false, message: "Invalid cart total" });
+    }
 
     const coupon = await Coupon.findOne({ code: couponCode.toUpperCase(), isActive: true });
     if (!coupon) return res.status(400).json({ success: false, message: "Invalid coupon" });
@@ -48,8 +70,9 @@ const applyCoupon = async (req, res) => {
       cartTotal: totalAmount
     });
   } catch (error) {
+    console.error("Apply Coupon Error:", error);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
 
-module.exports = applyCoupon;
+module.exports = applyCoupon;
