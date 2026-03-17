@@ -110,8 +110,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const description = descInput.value.trim();
       const isActive = statusToggle.checked;
 
-      if (!name) {
-        Swal.fire("Error", "Category name is required!", "error");
+      if (!name || name.trim().length < 2) {
+        Swal.fire("Error", "Category name must be at least 2 characters long!", "error");
         return;
       }
 

@@ -114,6 +114,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
+      if (elementId === "mobile") {
+        const phoneRegex = /^\d{10}$/;
+        if (!phoneRegex.test(newValue)) {
+          alert("Phone number must be exactly 10 digits");
+          return;
+        }
+      }
+
+      if (elementId === "firstName" || elementId === "lastName") {
+        const nameRegex = /^[A-Za-z\s]+$/;
+        if (!nameRegex.test(newValue)) {
+          alert("Names should only contain letters");
+          return;
+        }
+      }
+
       // Optimistic UI update (or wait for API) - let's wait for API
       try {
         // Show Loading

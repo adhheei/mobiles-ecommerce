@@ -12,18 +12,68 @@ document.querySelectorAll(".password-toggle").forEach((icon) => {
 document.getElementById("signupForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  const signupBtn = document.getElementById("signupBtn");
-  const originalBtnText = signupBtn.innerText;
-  signupBtn.disabled = true;
-  signupBtn.innerText = "Sending Code...";
+  const firstName = document.getElementById("firstName").value.trim();
+  const lastName = document.getElementById("lastName").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const password = document.getElementById("password").value;
+  const confirmPassword = document.getElementById("confirmPassword").value;
+
+  // Validation Patterns
+  const nameRegex = /^[A-Za-z\s]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^\d{10}$/;
+
+  // Validations
+  if (!firstName || !lastName || !email || !phone || !password || !confirmPassword) {
+    Swal.fire("Error", "All fields are required", "warning");
+    signupBtn.disabled = false;
+    signupBtn.innerText = originalBtnText;
+    return;
+  }
+
+  if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
+    Swal.fire("Error", "Names should only contain letters", "warning");
+    signupBtn.disabled = false;
+    signupBtn.innerText = originalBtnText;
+    return;
+  }
+
+  if (!emailRegex.test(email)) {
+    Swal.fire("Error", "Please enter a valid email address", "warning");
+    signupBtn.disabled = false;
+    signupBtn.innerText = originalBtnText;
+    return;
+  }
+
+  if (!phoneRegex.test(phone)) {
+    Swal.fire("Error", "Phone number must be exactly 10 digits", "warning");
+    signupBtn.disabled = false;
+    signupBtn.innerText = originalBtnText;
+    return;
+  }
+
+  if (password.length < 6) {
+    Swal.fire("Error", "Password must be at least 6 characters long", "warning");
+    signupBtn.disabled = false;
+    signupBtn.innerText = originalBtnText;
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    Swal.fire("Error", "Passwords do not match", "warning");
+    signupBtn.disabled = false;
+    signupBtn.innerText = originalBtnText;
+    return;
+  }
 
   const data = {
-    firstName: document.getElementById("firstName").value,
-    lastName: document.getElementById("lastName").value,
-    email: document.getElementById("email").value,
-    phone: document.getElementById("phone").value,
-    password: document.getElementById("password").value,
-    confirmPassword: document.getElementById("confirmPassword").value,
+    firstName,
+    lastName,
+    email,
+    phone,
+    password,
+    confirmPassword,
   };
 
   try {

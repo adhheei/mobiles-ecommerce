@@ -9,8 +9,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!email || !password) {
       Swal.fire("Error", "Please fill in all fields", "error");
+      return;
+    }
+
+    if (!emailRegex.test(email)) {
+      Swal.fire("Error", "Please enter a valid email address", "error");
       return;
     }
 

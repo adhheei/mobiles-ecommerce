@@ -19,8 +19,21 @@ async function saveAddress() {
     const addressType = document.getElementById("addressType").value;
     const isDefault = document.getElementById("isDefault").checked;
 
+    const phoneRegex = /^\d{10}$/;
+    const pincodeRegex = /^\d{6}$/;
+
     if (!fullName || !phone || !street || !city || !state || !pincode || !country) {
         Swal.fire("Error", "Please fill all required fields", "warning");
+        return;
+    }
+
+    if (!phoneRegex.test(phone)) {
+        Swal.fire("Error", "Phone number must be exactly 10 digits", "warning");
+        return;
+    }
+
+    if (!pincodeRegex.test(pincode)) {
+        Swal.fire("Error", "Pincode must be exactly 6 digits", "warning");
         return;
     }
 

@@ -102,9 +102,24 @@ document.addEventListener("DOMContentLoaded", () => {
       const brand = document.getElementById("productBrand").value.trim();
       const category = categorySelect.value;
 
-      // Validation check for the new price field
-      if (!name || !price || !stock || !category) {
-        Swal.fire("Error", "Please fill all required fields", "error");
+      // Validation check
+      if (!name) {
+        Swal.fire("Error", "Product name is required", "error");
+        return;
+      }
+
+      if (isNaN(price) || price <= 0) {
+        Swal.fire("Error", "Please enter a valid positive price", "error");
+        return;
+      }
+
+      if (isNaN(stock) || stock < 0 || stock === "") {
+        Swal.fire("Error", "Please enter a valid stock quantity (0 or more)", "error");
+        return;
+      }
+
+      if (!category) {
+        Swal.fire("Error", "Please select a category", "error");
         return;
       }
 

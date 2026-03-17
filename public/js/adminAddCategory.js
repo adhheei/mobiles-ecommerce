@@ -58,11 +58,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const isActive = document.getElementById("statusToggle").checked;
       const imageInput = document.getElementById("catImageInput");
 
-      if (!name) {
+      if (!name || name.trim().length < 2) {
         Swal.fire({
           icon: "error",
           title: "Validation Error",
-          text: "Category name is required!",
+          text: "Category name must be at least 2 characters long!",
           confirmButtonColor: "#1a1a1a",
         });
         return;

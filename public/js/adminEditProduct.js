@@ -176,10 +176,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const brand = document.getElementById('productBrand').value.trim();
     const category = categorySelect.value;
 
-    if (!name || !actualPrice || !offerPrice || !stock || !category) {
-      Swal.fire('Error', 'Please fill all required fields', 'error');
-      return;
-    }
+      // Validation check
+      if (!name) {
+        Swal.fire("Error", "Product name is required", "error");
+        return;
+      }
+
+      if (isNaN(actualPrice) || actualPrice <= 0) {
+        Swal.fire("Error", "Please enter a valid positive price", "error");
+        return;
+      }
+
+      if (isNaN(stock) || stock < 0 || stock === "") {
+        Swal.fire("Error", "Please enter a valid stock quantity (0 or more)", "error");
+        return;
+      }
+
+      if (!category) {
+        Swal.fire("Error", "Please select a category", "error");
+        return;
+      }
 
     const formData = new FormData();
     formData.append('name', name);
