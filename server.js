@@ -96,6 +96,7 @@ app.use(
         ],
         workerSrc: ["'self'", "blob:"],
         objectSrc: ["'none'"],
+        scriptSrcAttr: ["'unsafe-inline'"], // Allow onclick handlers
       },
     },
   }),

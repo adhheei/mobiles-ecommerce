@@ -327,25 +327,30 @@ async function openCouponModal(cartTotal) {
     console.error(e);
   }
 
+  const availableCoupons = coupons.filter((c) => !c.isExpired && !c.isUsed);
+
   const couponsHtml =
-    coupons.length > 0
-      ? coupons
+    availableCoupons.length > 0
+      ? availableCoupons
           .map(
             (c) => `
-        <div class="text-start border rounded p-2 mb-2 ${c.isExpired || c.isUsed ? "bg-light text-muted" : "border-success"}" 
-              style="cursor: ${c.isExpired || c.isUsed ? "not-allowed" : "pointer"}"
-              onclick="${!c.isExpired && !c.isUsed ? `selectCoupon('${c.code}')` : ""}">
-            <div class="d-flex justify-content-between">
-                <strong>${c.code}</strong>
-                <small>${c.discountType === "percentage" ? c.value + "% OFF" : "₹" + c.value + " OFF"}</small>
+        <div class="text-start border rounded p-3 mb-2 border-success" 
+              style="cursor: pointer; transition: background 0.2s;"
+              onclick="selectCoupon('${c.code}')"
+              onmouseover="this.style.backgroundColor='#f0fff0'"
+              onmouseout="this.style.backgroundColor='transparent'">
+            <div class="d-flex justify-content-between align-items-center">
+                <strong class="text-dark">${c.code}</strong>
+                <span class="badge bg-success">${c.discountType === "percentage" ? c.value + "% OFF" : "₹" + c.value + " OFF"}</span>
             </div>
-            <div style="font-size: 0.75rem;">Min Order: ₹${c.minPurchase}</div>
-            ${c.isExpired ? '<div class="text-danger small">Expired</div>' : ""}
+            <div class="mt-2 text-muted" style="font-size: 0.8rem;">
+                <i class="fa-solid fa-circle-info me-1"></i>Min Order: ₹${c.minPurchase.toLocaleString()}
+            </div>
         </div>
     `,
           )
           .join("")
-      : '<div class="text-muted small">No coupons available</div>';
+      : '<div class="text-muted small py-3 text-center">No available coupons found for your account.</div>';
 
   Swal.fire({
     title: "Apply Coupon",
