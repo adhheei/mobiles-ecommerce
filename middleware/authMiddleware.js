@@ -104,4 +104,45 @@ const isAdmin = async (req, res, next) => {
   }
 };
 
-module.exports = { protect, isAdmin };
+const optionalProtect = async (req, res, next) => {
+  let token;
+
+  if (req.cookies && req.cookies.token) {
+    token = req.cookies.token;
+  } else if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer ")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
+  console.log('[OptionalProtectDebug] Token found:', token ? 'YES' : 'NO');
+
+  if (!token) {
+    return next();
+  }
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "supersecretkey"
+    );
+    
+    console.log('[OptionalProtectDebug] Decoded ID:', decoded.id);
+
+    const user = await User.findById(decoded.id).select("-password");
+    
+    console.log('[OptionalProtectDebug] User found:', user ? 'YES' : 'NO');
+
+    if (user && !user.isBlocked) {
+      req.user = user;
+    }
+    next();
+  } catch (err) {
+    console.log('[OptionalProtectDebug] Error:', err.message);
+    // Silently continue for invalid/expired tokens in optional routes
+    next();
+  }
+};
+
+module.exports = { protect, isAdmin, optionalProtect };

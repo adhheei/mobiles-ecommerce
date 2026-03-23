@@ -3,14 +3,14 @@ const router = express.Router();
 const cart = require("../../controllers/cart");
 const order = require("../../controllers/order");
 const razorpay = require("../../controllers/razorpay");
-const { protect } = require("../../middleware/authMiddleware");
+const { protect, optionalProtect } = require("../../middleware/authMiddleware");
 
 if (!protect) {
     console.error("❌ ERROR: 'protect' middleware is undefined. Check authMiddleware.js!");
 }
 
-// 1. PUBLIC ROUTES
-router.get("/count", cart.getCartCount);
+// 1. PUBLIC-FRIENDLY ROUTES (Uses optionalProtect to load user if logged in)
+router.get("/count", optionalProtect, cart.getCartCount);
 
 router.use(protect);
 

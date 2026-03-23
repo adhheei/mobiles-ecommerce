@@ -273,54 +273,100 @@ function initializeNavbarFeatures() {
 
 
 
-// --- Global Cart Badge Logic ---
+/**
+ * Robust Cart Badge Updater
+ * Handles multiple icon types, dynamic badge creation, and cache busting.
+ * @param {number|null} explicitCount - If provided, uses this count immediately.
+ */
 window.updateCartBadge = async function (explicitCount = null) {
+    console.log('[CartDebug] updateCartBadge called', { explicitCount });
+    
+    // Select any potential cart icon variants
+    const cartIcons = document.querySelectorAll(
+        '.fa-cart-shopping, .fa-shopping-cart, .fas.fa-shopping-cart, .fa-cart-plus, #cart-icon, #main-cart-icon'
+    );
+    
+    if (cartIcons.length === 0) {
+        console.warn('[CartDebug] No cart icons found in DOM');
+        // If we can't find by class, try finding the cart link directly
+        const cartLink = document.getElementById('main-cart-link') || 
+                         document.querySelector('a[href*="cart.html"]');
+        if (cartLink) {
+            console.log('[CartDebug] Found cart link, but no icon inside. Attempting to fix...');
+            // We'll append a dummy icon if needed or just handle the badge
+        } else {
+            return;
+        }
+    }
+
     try {
-        const cartIcons = document.querySelectorAll('.fa-cart-shopping, .fa-shopping-cart');
-        if (cartIcons.length === 0) return;
-
         let count = 0;
-
         if (explicitCount !== null && !isNaN(explicitCount)) {
             count = parseInt(explicitCount);
+            console.log('[CartDebug] Using explicit count:', count);
         } else {
+            // Fetch fresh count with cache busting
             const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-            const res = await fetch('/api/user/cart/count?cb=' + Date.now(), {
+            const cacheBuster = Date.now();
+            const response = await fetch(`/api/user/cart/count?v=${cacheBuster}`, {
                 method: 'GET',
-                headers: {
+                headers: { 
+                    'Pragma': 'no-cache', 
+                    'Cache-Control': 'no-cache',
                     ...(token ? { "Authorization": "Bearer " + token } : {})
                 },
                 cache: 'no-store'
             });
-
-            if (res.ok) {
-                const data = await res.json();
+            
+            if (response.ok) {
+                const data = await response.json();
                 count = data.count || 0;
+                console.log('[CartDebug] Fetched count from API:', count);
+            } else {
+                console.error('[CartDebug] API fetch failed:', response.status);
             }
         }
 
-        cartIcons.forEach(icon => {
-            let badge = icon.parentElement.querySelector('.badge, .cart-badge');
+        // If we have icons, update them. If not, try the link.
+        const targets = cartIcons.length > 0 ? Array.from(cartIcons) : [document.querySelector('a[href*="cart.html"]')];
 
-            if (!badge && count > 0) {
-                badge = document.createElement('span');
-                badge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge';
-                badge.style.fontSize = '0.65rem';
-                icon.parentElement.style.position = 'relative';
-                icon.parentElement.appendChild(badge);
+        targets.forEach(target => {
+            if (!target) return;
+
+            // Try to find an existing badge in the parent (usually an <a> tag)
+            let parent = target.closest('a') || target.parentElement;
+            if (!parent) return;
+
+            // Ensure parent has relative positioning for the absolute badge
+            if (getComputedStyle(parent).position === 'static') {
+                parent.style.position = 'relative';
             }
 
-            if (badge) {
-                if (count > 0) {
-                    badge.innerText = count > 9 ? '9+' : count;
-                    badge.classList.remove('d-none');
-                } else {
-                    badge.classList.add('d-none');
-                }
+            let badge = parent.querySelector('.badge, .cart-badge');
+
+            // If badge doesn't exist, create it
+            if (!badge) {
+                console.log('[CartDebug] Creating new badge element for target');
+                badge = document.createElement('span');
+                // Use standard Bootstrap 5 classes
+                badge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge d-none';
+                badge.style.fontSize = '0.65rem';
+                badge.style.zIndex = '10'; // Ensure it's above other elements
+                parent.appendChild(badge);
+            }
+
+            // Update badge visibility and content
+            if (count > 0) {
+                badge.innerText = count > 9 ? '9+' : count;
+                badge.classList.remove('d-none');
+                console.log('[CartDebug] Badge updated to:', count);
+            } else {
+                badge.classList.add('d-none');
+                console.log('[CartDebug] Badge hidden (count 0)');
             }
         });
     } catch (error) {
-        console.error("Failed to update cart badge:", error);
+        console.error('[CartDebug] Error in updateCartBadge:', error);
     }
 };
 
