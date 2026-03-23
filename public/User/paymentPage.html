@@ -743,6 +743,8 @@
               razorpayOrderId: response.razorpay_order_id,
               razorpaySignature: response.razorpay_signature,
             });
+            // Redirect using Razorpay Order ID as requested
+            window.location.href = `/user/userOrderDetails.html?id=${response.razorpay_order_id}`;
           },
           theme: { color: "#1a1a1a" },
         };
@@ -792,7 +794,12 @@
             title: "Order Placed!",
             timer: 1500,
             showConfirmButton: false,
-          }).then(() => (window.location.href = `/user/userOrderDetails.html?id=${data.dbOrderId || data.orderId}`));
+          }).then(() => {
+            // Already redirected in Razorpay handler, but need it for COD/Wallet
+            if (finalPayload.paymentMethod !== "RAZORPAY") {
+              window.location.href = `/user/userOrderDetails.html?id=${data.dbOrderId || data.orderId}`;
+            }
+          });
         } else {
           Swal.fire("Order Failed", data.message || "Bad Request", "error");
         }

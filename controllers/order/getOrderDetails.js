@@ -1,11 +1,23 @@
+const mongoose = require("mongoose");
 const Order = require("../../models/Order");
 
 const getOrderDetails = async (req, res) => {
     try {
-        const order = await Order.findOne({
-            _id: req.params.id,
+        // Support lookup by MongoDB _id, Razorpay Order ID, or friendly orderId
+        const orderId = req.params.id;
+        const query = {
+            $or: [
+                { razorpayOrderId: orderId },
+                { orderId: orderId }
+            ],
             userId: req.user._id,
-        }).lean();
+        };
+
+        if (mongoose.isValidObjectId(orderId)) {
+            query.$or.push({ _id: orderId });
+        }
+
+        const order = await Order.findOne(query).lean();
 
         if (!order) {
             return res.status(404).json({ message: "Order not found" });
