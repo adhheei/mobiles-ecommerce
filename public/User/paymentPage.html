@@ -792,7 +792,7 @@
             title: "Order Placed!",
             timer: 1500,
             showConfirmButton: false,
-          }).then(() => (window.location.href = "/user/thankYouPage.html"));
+          }).then(() => (window.location.href = `/user/userOrderDetails.html?id=${data.dbOrderId || data.orderId}`));
         } else {
           Swal.fire("Order Failed", data.message || "Bad Request", "error");
         }
