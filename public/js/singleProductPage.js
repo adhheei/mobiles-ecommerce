@@ -319,17 +319,21 @@ async function addToCart() {
 
     if (res.ok) {
       Swal.fire({
-        title: 'Added to Cart!',
-        text: 'Product added successfully',
+        toast: true,
+        position: 'top-end',
         icon: 'success',
-        confirmButtonColor: '#1a1a1a',
-        timer: 1500,
-        timerProgressBar: true,
-        showConfirmButton: false
-      }).then(() => {
-        // Refresh page as requested
-        window.location.reload();
+        title: 'Added to Cart!',
+        showConfirmButton: false,
+        timer: 1500
       });
+
+      // Update cart badge immediately with new count
+      if (typeof window.updateCartBadge === "function" && data.cart && data.cart.items) {
+        const totalCount = data.cart.items.reduce((acc, item) => acc + item.quantity, 0);
+        window.updateCartBadge(totalCount);
+      } else if (typeof window.updateCartBadge === "function") {
+        window.updateCartBadge();
+      }
     } else {
       throw new Error(data.message || "Failed to add to cart");
     }

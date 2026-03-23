@@ -735,8 +735,11 @@ async function addToCart(productId) {
         showConfirmButton: false,
       });
 
-      // Update cart badge immediately if function exists
-      if (typeof window.updateCartBadge === "function") {
+      // Update cart badge immediately with new count to avoid extra fetch
+      if (typeof window.updateCartBadge === "function" && data.cart && data.cart.items) {
+        const totalCount = data.cart.items.reduce((acc, item) => acc + item.quantity, 0);
+        window.updateCartBadge(totalCount);
+      } else if (typeof window.updateCartBadge === "function") {
         window.updateCartBadge();
       }
     } else {
