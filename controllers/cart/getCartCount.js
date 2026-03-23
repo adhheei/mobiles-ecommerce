@@ -7,7 +7,10 @@ const Cart = require("../../models/Cart");
  */
 const getCartCount = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user ? req.user.id : null;
+        if (!userId) {
+            return res.status(200).json({ success: true, count: 0 });
+        }
         const cart = await Cart.findOne({ userId });
 
         // Sum up all quantities in the items array

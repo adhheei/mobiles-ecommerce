@@ -9,11 +9,13 @@ if (!protect) {
     console.error("❌ ERROR: 'protect' middleware is undefined. Check authMiddleware.js!");
 }
 
+// 1. PUBLIC ROUTES
+router.get("/count", cart.getCartCount);
+
 router.use(protect);
 
-// 1. CART MANAGEMENT
+// 2. CART MANAGEMENT
 router.get("/", cart.getCart);
-router.get("/count", cart.getCartCount);
 router.post("/add", cart.addToCart);
 router.put("/update", cart.updateCart);
 router.delete("/remove/:productId", cart.removeFromCart);

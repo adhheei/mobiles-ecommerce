@@ -441,6 +441,9 @@ async function checkUserLogin() {
             if (data.success && data.user) {
                 const userData = { ...data.user, name: data.user.firstName || 'User' };
                 renderLoggedInParams(userData);
+                
+                // Refresh cart badge after login state is confirmed
+                if (window.updateCartBadge) window.updateCartBadge();
             } else {
                 if (loginBtn) loginBtn.classList.remove('d-none');
             }
