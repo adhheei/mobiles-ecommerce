@@ -137,6 +137,9 @@ const placeOrder = async (req, res) => {
       paymentStatus: (finalAmount - walletDeducted <= 0 || (paymentMethod && paymentMethod.toUpperCase() === "RAZORPAY")) ? "Paid" : "Pending",
       shippingAddress: { ...addr.toObject() },
       appliedCoupon: appliedCouponCode,
+      razorpayOrderId,
+      razorpayPaymentId,
+      razorpaySignature
     });
 
     // 6. DEBIT WALLET & UPDATE STOCK

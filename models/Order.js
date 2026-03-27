@@ -85,7 +85,11 @@ const orderSchema = new mongoose.Schema({
   appliedCoupon: { type: String },
 
   // --- RAZORPAY TRACKING ---
-  razorpayOrderId: { type: String },
+  razorpayOrderId: { 
+    type: String, 
+    required: false,
+    index: true 
+  },
   razorpayPaymentId: { type: String },
   razorpaySignature: { type: String },
 
