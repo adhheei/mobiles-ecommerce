@@ -141,7 +141,7 @@ app.get("/admin", (req, res) => {
 
 // 🏠 User Route
 app.get("/user", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "User", "index.html"));
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // 🏠 Root Redirect
