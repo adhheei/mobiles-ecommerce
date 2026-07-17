@@ -165,7 +165,7 @@ app.use((req, res, next) => {
 
   // If request starts with /user, but wasn't handled by static or explicit route
   if (req.path.startsWith('/user')) {
-    return res.sendFile(path.join(__dirname, 'public', 'User', 'index.html'));
+    return res.sendFile(path.join(__dirname, 'public','index.html'));
   }
 
   // Default to redirecting to /user for all other routes
