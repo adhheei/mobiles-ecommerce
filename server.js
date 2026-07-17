@@ -112,10 +112,11 @@ app.use(morgan("dev")); // Changed to 'dev' for cleaner console logs
 app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
 // 1. Static Assets
 app.use(express.static(path.join(__dirname, 'public'))); // Shared assets (css, js, images)
 app.use("/admin", express.static(path.join(__dirname, 'public', 'Admin')));
-app.use("/user", express.static(path.join(__dirname, 'public', 'User')));
+// ❌ REMOVED THE WRONG USER STATIC PATH FROM HERE TO FIX ENOENT ERROR
 
 app.set('trust proxy', 1);
 
@@ -139,19 +140,19 @@ app.get("/admin", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "Admin", "adminDashboard.html"));
 });
 
-// 🏠 User Route
+// 🏠 User Route (Corrected to redirect to root `/` where main index.html loads)
 app.get("/user", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.redirect("/");
 });
 
-// 🏠 Root Redirect
+// 🏠 Root Redirect (Directly serves the main landing page)
 app.get("/", (req, res) => {
-  res.redirect("/user");
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 
-// 2. Catch-all Routing
+// 2. Catch-all Routing (Corrected for proper SPA behavior)
 app.use((req, res, next) => {
   // Skip API requests
   if (req.path.startsWith('/api')) {
@@ -163,15 +164,9 @@ app.use((req, res, next) => {
     return res.sendFile(path.join(__dirname, 'public', 'Admin', 'adminDashboard.html'));
   }
 
-  // If request starts with /user, but wasn't handled by static or explicit route
-  if (req.path.startsWith('/user')) {
-    return res.sendFile(path.join(__dirname, 'public','index.html'));
-  }
-
-  // Default to redirecting to /user for all other routes
-  res.redirect("/user");
+  // Default to redirecting to root "/" for all other unmatched routes
+  res.redirect("/");
 });
-
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -187,4 +182,3 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => console.log(`🚀 Server: http://localhost:${PORT}`));
-// Triggering restart...
